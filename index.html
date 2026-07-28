@@ -259,6 +259,23 @@ body.dark .badge.fach{color:#67e8f9}
 .kcv{flex:none;min-width:82px;text-align:right;font-weight:600}
 
 /* ---- Einstellungen / Haushalt ---- */
+/* Hauptkategorien-Übersicht: aufklappbare Kategoriezeile mit Anbietern darin */
+.katgrp{border:1px solid var(--border);border-radius:12px;background:var(--panel);margin-bottom:10px;overflow:hidden}
+.katgrp>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:13px 14px}
+.katgrp>summary::-webkit-details-marker{display:none}
+.katgrp>summary:hover{background:var(--panel2)}
+.katic{width:38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:1.15rem;flex:none}
+.katname{display:block;font-weight:650;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.katsub{display:block;font-size:.8rem;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.katright{margin-left:auto;text-align:right;flex:none;display:flex;align-items:center;gap:10px}
+.katcost{font-weight:650;font-size:.9rem;white-space:nowrap}
+.katchev{color:var(--muted2);font-size:.85rem;transition:transform .15s}
+.katgrp[open] .katchev{transform:rotate(90deg)}
+.katbody{padding:2px 10px 10px}
+.anbrow{display:flex;align-items:center;gap:10px;width:100%;padding:10px 8px;border-top:1px solid var(--border);background:none;border-left:none;border-right:none;border-bottom:none;font:inherit;color:var(--fg);cursor:pointer;text-align:left;border-radius:8px}
+.anbrow:hover{background:var(--panel2)}
+.anbname{display:block;font-weight:600;font-size:.89rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.anbmeta{display:block;font-size:.78rem;color:var(--muted);font-weight:400;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .acclabel{font-size:.82rem;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:4px 0 8px}
 .accsep{margin-top:26px;padding-top:18px;border-top:1px solid var(--border)}
 .hhlist{display:flex;flex-direction:column;gap:8px}
@@ -1583,6 +1600,7 @@ async function reviewCreatePerson(name){
 
 /* ---------- Views ---------- */
 var contractsCostSort=false,tipsExpanded=false;
+var contractsMode="kat",katOpen={}; /* Verträge-Tab: Kategorie-Übersicht oder Liste; offene Kategorien merken */
 var uploadTarget=null; /* Vertrag, dem neue Uploads fest zugeordnet werden ("Dokument zu diesem Vertrag") */
 function go(view){activeView=view;if(view!=="contract-detail")detailId=null;if(view!=="contracts")contractsCostSort=false;if(view!=="add")uploadTarget=null;tipsExpanded=false;renderApp();window.scrollTo({top:0,behavior:"smooth"});}
 
@@ -1850,8 +1868,100 @@ function sparCard(CS){
     :('<p class="muted" style="font-size:.9rem;margin:0 0 8px">Deine größten Kostenpunkte – lohnt ein Vergleich? „🌐 Vergleichen" recherchiert den Markt.</p>');
   return '<section class="card"><h2 class="sect">💡 Sparcheck</h2>'+head+rows+'</section>';
 }
+/* ---- Hauptkategorien ----
+   Ordnet ALLES (Verträge + Dokumente, auch Arzt-Dokumente) einer Hauptkategorie zu
+   und listet darin die Anbieter. Ein Dokument am Vertrag erbt dessen Kategorie/Anbieter. */
+function docKat(d){
+  if(isMed(d))return "gesundheit";
+  var c=d.contract_id?contractById(d.contract_id):null;
+  if(c&&c.kategorie&&KAT[c.kategorie])return c.kategorie;
+  var k=d.extracted&&d.extracted.kategorie;
+  return (k&&KAT[k])?k:"sonstiges";
+}
+function docAnbieter(d){
+  if(isMed(d)){
+    /* Der Praxisname aus der KI-Extraktion ist einheitlicher als das lange arzt-Feld
+       ("Dr. X, Zahnzentrum Y, Standort Z") – sonst zersplittert eine Praxis in mehrere Einträge */
+    var a=(d.extracted&&d.extracted.anbieter)||d.arzt||"";
+    return String(a).split(",")[0].trim();
+  }
+  var c=d.contract_id?contractById(d.contract_id):null;
+  if(c&&c.anbieter)return c.anbieter;
+  return (d.extracted&&d.extracted.anbieter)||"";
+}
+function katGroups(){
+  var g={};
+  function slot(k){
+    if(!KAT[k])k="sonstiges";
+    if(!g[k])g[k]={kat:k,cn:0,dn:0,kosten:0,anb:{}};
+    return g[k];
+  }
+  function anb(s,name,cid){
+    var n=String(name||"").trim();
+    var key=n?n.toLowerCase():"__ohne__";
+    if(!s.anb[key])s.anb[key]={name:n,cid:null,cn:0,dn:0,kosten:0};
+    if(cid&&!s.anb[key].cid)s.anb[key].cid=cid;
+    return s.anb[key];
+  }
+  filterPerson(CONTRACTS).forEach(function(c){
+    var s=slot(c.kategorie),mk=monatskosten(c);
+    s.cn++;s.kosten+=mk;
+    var a=anb(s,c.anbieter,c.id);a.cn++;a.kosten+=mk;
+  });
+  filterPerson(DOCS).forEach(function(d){
+    var s=slot(docKat(d));s.dn++;
+    var a=anb(s,docAnbieter(d),d.contract_id||null);a.dn++;
+  });
+  return g;
+}
+function viewKategorien(){
+  var g=katGroups(),keys=Object.keys(g);
+  if(!keys.length)return '<section class="card"><p class="muted">Noch nichts abgelegt. Lade ein Dokument hoch – der Butler sortiert es automatisch ein.</p><div class="btnrow"><button class="primary" data-nav="add">➕ Dokument hochladen</button></div></section>';
+  keys.sort(function(a,b){
+    if(Math.abs(g[b].kosten-g[a].kosten)>0.005)return g[b].kosten-g[a].kosten;
+    if(g[b].cn!==g[a].cn)return g[b].cn-g[a].cn;
+    if(g[b].dn!==g[a].dn)return g[b].dn-g[a].dn;
+    return katInfo(a).label.localeCompare(katInfo(b).label);
+  });
+  var gesamt=0;keys.forEach(function(k){gesamt+=g[k].kosten;});
+  var rows=keys.map(function(k){
+    var s=g[k],ki=katInfo(k);
+    var list=Object.keys(s.anb).map(function(x){return s.anb[x];}).sort(function(a,b){
+      if(Math.abs(b.kosten-a.kosten)>0.005)return b.kosten-a.kosten;
+      if(!a.name)return 1;if(!b.name)return -1;
+      return a.name.localeCompare(b.name);
+    });
+    var nAnb=list.filter(function(a){return !!a.name;}).length;
+    var inner=list.map(function(a){
+      var meta=[];
+      if(a.cn)meta.push(a.cn===1?"1 Vertrag":a.cn+" Verträge");
+      if(a.dn)meta.push(a.dn===1?"1 Dokument":a.dn+" Dokumente");
+      var cost=a.kosten>0?'<span class="katcost">'+fmtEur(a.kosten)+'<span class="muted" style="font-weight:400">/M</span></span>':"";
+      var act=a.cid?('data-action="open-contract" data-id="'+a.cid+'"'):('data-action="kat-docs" data-kat="'+k+'"');
+      return '<button class="anbrow" '+act+'>'+
+        '<span style="flex:1;min-width:0"><span class="anbname">'+escapeHtml(a.name||"Ohne Anbieter")+'</span>'+
+        '<span class="anbmeta">'+meta.join(" · ")+'</span></span>'+
+        cost+'<span class="katchev">›</span></button>';
+    }).join("");
+    var sub=[];
+    if(nAnb)sub.push(nAnb===1?"1 Anbieter":nAnb+" Anbieter");
+    if(s.dn)sub.push(s.dn+" Dok.");
+    if(!sub.length)sub.push(s.cn+" Vertrag");
+    return '<details class="katgrp" data-kat="'+k+'"'+(katOpen[k]?" open":"")+'>'+
+      '<summary class="katsum">'+
+        '<span class="katic">'+ki.icon+'</span>'+
+        '<span style="flex:1;min-width:0"><span class="katname">'+ki.label+'</span>'+
+        '<span class="katsub">'+sub.join(" · ")+'</span></span>'+
+        '<span class="katright">'+(s.kosten>0?'<span class="katcost">'+fmtEur(s.kosten)+'<span class="muted" style="font-weight:400">/M</span></span>':"")+'<span class="katchev">›</span></span>'+
+      '</summary>'+
+      '<div class="katbody">'+inner+'</div>'+
+    '</details>';
+  }).join("");
+  var summe=gesamt>0?('<p class="muted" style="font-size:.82rem;margin:0 0 10px">'+keys.length+' Kategorien · '+fmtEur(gesamt)+' laufende Kosten je Monat</p>'):"";
+  return summe+rows;
+}
 function viewContracts(){
-  if(!CONTRACTS.length)return '<section class="card"><h2 class="sect">📑 Verträge</h2><p class="muted">Noch keine Verträge angelegt. Am schnellsten geht es, wenn du ein Vertrags-PDF oder einen Brief hochlädst – der Butler füllt alles aus.</p><div class="btnrow"><button class="primary" data-nav="add">➕ Dokument hochladen</button><button class="ghost" data-action="new-contract">Von Hand anlegen</button></div></section>';
+  if(!CONTRACTS.length&&!DOCS.length)return '<section class="card"><h2 class="sect">📑 Verträge</h2><p class="muted">Noch keine Verträge angelegt. Am schnellsten geht es, wenn du ein Vertrags-PDF oder einen Brief hochlädst – der Butler füllt alles aus.</p><div class="btnrow"><button class="primary" data-nav="add">➕ Dokument hochladen</button><button class="ghost" data-action="new-contract">Von Hand anlegen</button></div></section>';
   var base=filterPerson(CONTRACTS).slice();
   var sorted;
   if(contractsCostSort){
@@ -1886,7 +1996,12 @@ function viewContracts(){
   var costBanner=contractsCostSort?('<div class="ainote" style="margin:0 0 12px">💶 Nach monatlichen Kosten sortiert (teuerste zuerst). <button class="linkbtn" data-nav="contracts" style="display:inline">Normale Ansicht</button></div>'):"";
   /* Kosten-Aufschlüsselungen leben im Kosten-Drilldown (Dashboard bleibt schlank) */
   var costCards=contractsCostSort?(sparCard(base)+costByPerson()+costBreakdown(base)+jahresvergleichCard()):"";
-  return personBar()+costBanner+costCards+'<div class="btnrow" style="margin:0 0 16px"><button class="primary" data-nav="add">➕ Per Dokument</button><button class="ghost" data-action="new-contract">Von Hand anlegen</button></div>'+body;
+  /* Standard: Hauptkategorien mit den Anbietern darin – die Fristenliste ist einen Tap entfernt */
+  var katMode=(!contractsCostSort&&contractsMode==="kat");
+  var modeBar=contractsCostSort?"":('<div class="btnrow" style="margin:0 0 12px">'+
+    '<button class="'+(katMode?"primary":"ghost")+'" data-action="cmode" data-m="kat">🗂 Kategorien</button>'+
+    '<button class="'+(katMode?"ghost":"primary")+'" data-action="cmode" data-m="liste">📋 Alle Verträge</button></div>');
+  return personBar()+costBanner+modeBar+costCards+'<div class="btnrow" style="margin:0 0 16px"><button class="primary" data-nav="add">➕ Per Dokument</button><button class="ghost" data-action="new-contract">Von Hand anlegen</button></div>'+(katMode?viewKategorien():body);
 }
 function viewContractDetail(){
   var c=contractById(detailId);
@@ -2260,13 +2375,13 @@ function medRow(d){
 }
 function viewDocs(){
   var pool=filterPerson(DOCS).filter(function(d){return !isMed(d);});
-  var kats={};pool.forEach(function(d){if(d.extracted&&d.extracted.kategorie)kats[d.extracted.kategorie]=1;});
+  var kats={};pool.forEach(function(d){kats[docKat(d)]=1;});
   var katOpts='<option value="">Alle Kategorien</option>'+Object.keys(kats).map(function(k){return '<option value="'+k+'"'+(docFilter.kat===k?" selected":"")+'>'+katInfo(k).icon+' '+katInfo(k).label+'</option>';}).join("");
   var typen={};pool.forEach(function(d){typen[d.doc_type||"sonstiges"]=1;});
   var typOpts='<option value="">Alle Arten</option>'+Object.keys(DOCTYPE).filter(function(k){return typen[k];}).map(function(k){return '<option value="'+k+'"'+(docFilter.typ===k?" selected":"")+'>'+DOCTYPE[k].label+'</option>';}).join("");
   var list=pool.filter(function(d){
     if(docFilter.typ&&d.doc_type!==docFilter.typ)return false;
-    if(docFilter.kat&&!(d.extracted&&d.extracted.kategorie===docFilter.kat))return false;
+    if(docFilter.kat&&docKat(d)!==docFilter.kat)return false;
     if(docFilter.jahr&&docYear(d)!==docFilter.jahr)return false;
     if(docFilter.q){var q=docFilter.q.toLowerCase();var hay=((d.titel||"")+" "+(d.filename||"")+" "+(d.zusammenfassung||"")+" "+JSON.stringify(d.extracted||{})).toLowerCase();if(hay.indexOf(q)<0)return false;}
     return true;
@@ -3407,6 +3522,9 @@ function gsOpen(type,id){
 function onAppClick(e){
   var nav=e.target.closest("[data-nav]");
   if(nav){if(nav.dataset.nav==="add"){reviewDoc=null;importResults=[];uploadTarget=null;}go(nav.dataset.nav);return;}
+  /* Kategorie auf-/zugeklappt: Zustand merken, damit ein Re-Render ihn nicht verwirft */
+  var sm=e.target.closest(".katsum");
+  if(sm&&sm.parentNode&&sm.parentNode.dataset){var kk=sm.parentNode.dataset.kat;if(kk)katOpen[kk]=!sm.parentNode.open;}
   var b=e.target.closest("[data-action]");if(!b)return;
   var act=b.dataset.action,id=b.dataset.id;
   if(act==="open-contract"){closeModal();detailId=id;activeView="contract-detail";renderApp();window.scrollTo({top:0,behavior:"smooth"});}
@@ -3452,6 +3570,13 @@ function onAppClick(e){
   else if(act==="med-tovertrag")fromMedical(id);
   else if(act==="review-med-done"){reviewDoc=null;go("gesundheit");toast("Im Gesundheitsbereich abgelegt ✅");}
   else if(act==="cancel-import")cancelImport();
+  else if(act==="cmode"){contractsMode=(b.dataset.m==="liste")?"liste":"kat";renderApp();}
+  else if(act==="kat-docs"){
+    /* Anbieter ohne Vertrag: die zugehörigen Dokumente dieser Kategorie zeigen */
+    var kd=b.dataset.kat;
+    if(kd==="gesundheit"){go("gesundheit");return;}
+    docFilter={kat:kd,typ:"",q:"",jahr:"",sort:"date_desc"};go("docs");
+  }
   else if(act==="drill-costs"){contractsCostSort=true;activeView="contracts";renderApp();window.scrollTo({top:0,behavior:"smooth"});}
   else if(act==="df-reset"){docFilter={kat:"",typ:"",q:"",jahr:"",sort:"date_desc"};renderApp();}
   else if(act==="mf-reset"){medFilter={fach:"",typ:"",arzt:"",jahr:"",sort:"date_desc"};renderApp();}
