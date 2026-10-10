@@ -1,14 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 <defs><radialGradient id="bg" cx="30%" cy="20%" r="90%"><stop offset="0" stop-color="#fffdf8"/><stop offset="1" stop-color="#f7f4ef"/></radialGradient></defs>
 <rect width="512" height="512" fill="url(#bg)"/>
-<g transform="translate(256 322) rotate(-9)">
-  <rect x="-96" y="-66" width="150" height="104" rx="16" fill="#ec6431"/>
-</g>
-<g transform="translate(256 326) rotate(0)">
-  <rect x="-80" y="-60" width="150" height="104" rx="16" fill="#1a9fd8"/>
-</g>
-<g transform="translate(256 330) rotate(9)">
-  <rect x="-62" y="-54" width="150" height="104" rx="16" fill="#e8930c"/>
-</g>
+<rect x="182" y="232" width="66" height="66" rx="18" fill="#ec6431"/>
+<rect x="264" y="232" width="66" height="66" rx="18" fill="#1a9fd8"/>
+<rect x="182" y="314" width="66" height="66" rx="18" fill="#e8930c"/>
+<rect x="264" y="314" width="66" height="66" rx="18" fill="#1f9d62"/>
 <path d="M256 104 L408 226 L408 392 Q408 412 388 412 L124 412 Q104 412 104 392 L104 226 Z" fill="none" stroke="#231f1a" stroke-width="30" stroke-linejoin="round"/>
 </svg>
