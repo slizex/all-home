@@ -951,6 +951,11 @@ var T={ru:{
   "Nichts gefunden für „{0}“.":"Ничего не найдено по запросу «{0}».",
   "Hake mindestens eine Art an.":"Отметьте хотя бы один вид.",
   "Daten konnten nicht geladen werden":"Не удалось загрузить данные",
+  "Daten nicht erreichbar":"Нет доступа к данным",
+  "All-Home kommt gerade nicht an deine Daten.":"All-Home сейчас не может получить ваши данные.",
+  "Erneut versuchen":"Попробовать снова",
+  "Das hat nicht geklappt":"Не получилось",
+  "Wird gespeichert …":"Сохранение …",
 
 
 /* ---- Rahmen & Navigation ---- */
@@ -1469,6 +1474,8 @@ function render(){
   if(booting){r.innerHTML=ladeHtml();return;}
   if(!me){r.innerHTML=authHtml();return;}
   var rt=route();
+  /* Daten kamen nicht an? Das muss man sehen, nicht erraten. */
+  if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
   if(SETUP&&!SETUP.eingerichtet&&rt.name!=="einrichten"&&rt.name!=="mehr"){
     r.innerHTML=shell(viewEinrichten(true),"start");
@@ -1488,6 +1495,20 @@ function render(){
   else if(rt.name==="vorschlaege"){inhalt=viewVorschlaege();cur="start";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
+}
+/* Fehler, der stehen bleibt – anders als eine Kurzmeldung, die man verpasst */
+function fehlerKarte(txt){
+  return '<div class="sug bad" style="margin-bottom:14px"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+    '<div class="st">'+t("Das hat nicht geklappt")+'</div>'+
+    '<div class="sx">'+esc(txt)+'</div></div></div>';
+}
+function ladefehlerHtml(){
+  return seitenTitel(t("Daten nicht erreichbar"))+
+    '<section class="card"><div class="sug bad"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+      '<div class="st">'+t("All-Home kommt gerade nicht an deine Daten.")+'</div>'+
+      '<div class="sx">'+esc(LADEFEHLER)+'</div>'+
+      '<div class="sa"><button class="btn" data-a="neu-laden">'+ic("refresh")+' '+t("Erneut versuchen")+'</button></div>'+
+    '</div></div></section>';
 }
 function ladeHtml(){
   return '<div class="auth"><div class="authc" style="text-align:center">'+
@@ -1525,7 +1546,10 @@ async function ladeSetup(){
   SETUP={household_id:HH?HH.id:null,arten:[],eingerichtet:false};
   if(!HH)return;
   var r=await sb.from("household_setup").select("*").eq("household_id",HH.id).maybeSingle();
-  if(r&&!r.error&&r.data)SETUP=r.data;
+  /* Fehler NICHT verschlucken: sonst sieht man nur eine leere Einrichtung und
+     merkt nicht, dass die Verbindung klemmt. */
+  if(r&&r.error)throw r.error;
+  if(r&&r.data)SETUP=r.data;
 }
 async function speichereSetup(arten,fertig){
   if(!HH)return;
@@ -1619,8 +1643,13 @@ async function setzeSprache(v){
   }catch(e){toast(t("Sprache konnte nicht dauerhaft gespeichert werden.")+" "+errMsg(e),true);}
 }
 
-/* ---- Alles laden ---- */
+/* ---- Alles laden ----
+   Schlägt etwas fehl, merkt sich LADEFEHLER den Grund; die Oberfläche zeigt ihn
+   dann offen an, statt eine leere App zu malen. Die Energie-Spiegelung ist
+   optional – ihr Ausfall bleibt folgenlos. */
+var LADEFEHLER=null;
 async function ladeAlles(){
+  LADEFEHLER=null;
   await ladePrefs();
   await ladeHaushalte();
   await ladeSetup();
@@ -1726,7 +1755,8 @@ function artFrist(k){
 }
 
 /* ================= Einrichtung: Arten anhaken ================= */
-var setupWahl=null;   /* Zwischenstand während der Auswahl */
+var setupWahl=null;      /* Zwischenstand während der Auswahl */
+var SETUP_FEHLER=null;   /* letzter Speicherfehler, bleibt sichtbar stehen */
 function viewEinrichten(erstmalig){
   if(!setupWahl)setupWahl=aktiveArten().length?aktiveArten().slice():standardArten();
   var gruppen=GRUPPEN.map(function(g){
@@ -1751,6 +1781,7 @@ function viewEinrichten(erstmalig){
         '<div class="st">'+t("Vorausgewählt: das Übliche")+'</div>'+
         '<div class="sx">'+tf("{0} Arten sind vorgeschlagen, weil fast jeder Haushalt sie hat. Korrigiere einfach, was bei dir anders ist.",standardArten().length)+'</div>'+
       '</div></div>':"")+
+    (SETUP_FEHLER?fehlerKarte(SETUP_FEHLER):"")+
     gruppen+
     '<div class="factions" style="margin-top:22px">'+
       '<button class="btn lg full" data-a="setup-save">'+ic("check")+' '+tf("{0} Arten übernehmen",setupWahl.length)+'</button>'+
@@ -3403,6 +3434,7 @@ document.addEventListener("click",function(ev){
   if(a==="logout"){doLogout();return;}
   if(a==="suche"){sucheOeffnen();return;}
   if(a==="noop"){return;}
+  if(a==="neu-laden"){LADEFEHLER=null;SETUP_FEHLER=null;starteSitzung();return;}
 
   /* --- Anmeldung --- */
   if(a==="signup"){doSignup();return;}
@@ -3588,14 +3620,26 @@ function sucheLaufen(){
   box.innerHTML=html||('<p class="hint">'+tf("Nichts gefunden für „{0}“.",esc(q))+'</p>');
 }
 
+var setupBusy=false;
 async function setupSpeichern(){
+  if(setupBusy)return;
   if(!setupWahl||!setupWahl.length){toast(t("Hake mindestens eine Art an."),true);return;}
+  /* Sichtbar arbeiten: der Aufruf dauert einen Moment, und ein Knopf, bei dem
+     nichts passiert, sieht aus wie ein Fehler. */
+  setupBusy=true;
+  var knopf=document.querySelector('[data-a="setup-save"]');
+  if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gespeichert …");}
   try{
     await speichereSetup(setupWahl.slice(),true);
     setupWahl=null;
     toast(t("Gespeichert")+" ✅");
     go("#/vertraege");
-  }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+  }catch(e){
+    /* Der Grund bleibt stehen, bis er gelesen wurde – nicht nur als Kurzmeldung. */
+    SETUP_FEHLER=errMsg(e);
+    toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);
+    render();
+  }finally{setupBusy=false;}
 }
 function haushaltWaehlen(){
   openModal('<h2 class="mhead">'+t("Haushalt wechseln")+'</h2>'+
@@ -3638,7 +3682,7 @@ async function boot(){
 async function starteSitzung(){
   booting=true;render();
   try{await ladeAlles();}
-  catch(e){toast(t("Daten konnten nicht geladen werden")+": "+errMsg(e),true);}
+  catch(e){LADEFEHLER=errMsg(e);}
   booting=false;
   if(!location.hash)location.hash="#/start";
   render();
