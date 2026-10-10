@@ -51,11 +51,15 @@ wählbar direkt beim Einlesen und unter Mehr.
 **Zweisprachig** Deutsch/Russisch, umschaltbar pro Benutzer. Deutsche Fachbegriffe
 stehen in Klammern hinter der Übersetzung, damit man sie auf dem Papier wiedererkennt.
 
-## Verhältnis zu AllTrack
+## Verhältnis zu AllTrack (optional)
 
-Strom, Gas und Wasser werden in [AllTrack](https://github.com/slizex/verbrauchs-tracker)
-geführt — mit Tarifen, Ablesungen und Jahresabrechnung. All-Home **spiegelt** sie nur:
-es zeigt den aktuellen Stand und verlinkt dorthin. Keine Doppelpflege.
+All-Home funktioniert ohne [AllTrack](https://github.com/slizex/verbrauchs-tracker). Strom, Gas und
+Wasser sind dann ganz normale Vertragsarten — eintragen, Dokumente hochladen, Fristen verfolgen.
+
+Wer AllTrack nutzt, kann je Haus die **AllTrack-Verbindung** einschalten (Mehr › Haushalt):
+Automatisch (Standard, an sobald AllTrack für das Haus Tarife hat), An oder Aus. Ist sie an,
+**spiegelt** All-Home den aktuellen Tarif, zeigt ihn an und verlinkt dorthin — keine Doppelpflege.
+Eigene Einträge derselben Art bleiben sichtbar, zählen dann aber nicht doppelt zu den Kosten.
 
 Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Domäne).
 

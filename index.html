@@ -715,7 +715,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.2.0";
+var APP_VERSION="1.3.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -769,6 +769,21 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.3: AllTrack optional ---- */
+  "Aus – alles wird in All-Home geführt":"Выкл. — всё ведётся в All-Home",
+  "nichts gespiegelt":"ничего не передаётся",
+  "An":"Вкл.",
+  "Automatisch":"Автоматически",
+  "keine Daten in AllTrack":"в AllTrack нет данных",
+  "An, sobald AllTrack für dieses Haus Tarife hat.":"Включается, как только в AllTrack есть тарифы для этого дома.",
+  "Strom, Gas und Wasser kommen aus AllTrack und werden dort gepflegt.":"Электричество, газ и вода берутся из AllTrack и ведутся там.",
+  "Aus":"Выкл.",
+  "Alles in All-Home führen. AllTrack bleibt unberührt.":"Вести всё в All-Home. AllTrack остаётся без изменений.",
+  "AllTrack-Verbindung":"Связь с AllTrack",
+  "Auch in All-Home erfasst":"Также внесено в All-Home",
+  "Zählt nicht zu den Kosten, solange AllTrack verbunden ist.":"Не учитывается в расходах, пока подключён AllTrack.",
+
 
 /* ---- 1.2: Fahrzeuge, KI-Stufen, Logo-Verwaltung ---- */
   "Weitere":"Прочие",
@@ -1524,7 +1539,8 @@ function toast(msg,err){
    nur Angehaktes erscheint irgendwo in der Oberfläche.
      g             = Gruppe
      std           = Teil des Standardsatzes beim Einrichten
-     spiegel       = Daten kommen aus AllTrack, hier nur Anzeige + Sprungknopf
+     spiegel       = kann aus AllTrack gespiegelt werden (optional, siehe spiegelArt());
+                     ohne Verbindung eine ganz normale Art
      einzig        = sollte es nur einmal geben → Doppelt-Warnung
      felder        = artspezifische Zusatzfelder (Schlüssel aus FELDER)
      termin        = wiederkehrender Pflichttermin {k:Feldschlüssel, l:Beschriftung}
@@ -2000,6 +2016,53 @@ function energieInfo(art){
     ab:r.gueltig_ab||null
   };
 }
+/* ---- Ist die AllTrack-Verbindung für dieses Haus an? ----
+   household_setup.alltrack: true an, false aus, null automatisch (an, sobald
+   AllTrack für dieses Haus Tarife führt). All-Home funktioniert auch ganz ohne. */
+function alltrackModus(){var v=SETUP?SETUP.alltrack:null;return v===true?"an":(v===false?"aus":"auto");}
+function alltrackHatDaten(){return Object.keys(ENERGIE||{}).length>0;}
+function alltrackAn(){var m=alltrackModus();return m==="an"||(m==="auto"&&alltrackHatDaten());}
+/* Wird diese Art gespiegelt? Wenn die Verbindung an ist und AllTrack dafür einen
+   Tarif hat. Dann gilt AllTrack: eigene Einträge dieser Art bleiben sichtbar
+   (Art-Ansicht), zählen aber nicht zu den Kosten – sonst stünde alles doppelt da. */
+function spiegelArt(k){
+  var a=ARTEN[k];
+  if(!a||!a.spiegel||!alltrackAn()||!ENERGIE[a.spiegel])return null;
+  return a.spiegel;
+}
+async function setzeAlltrack(modus){
+  var wert=modus==="an"?true:(modus==="aus"?false:null);
+  if(!HH)return;
+  try{
+    var reihe={household_id:HH.id,alltrack:wert,arten:aktiveArten(),eingerichtet:!!(SETUP&&SETUP.eingerichtet),updated_at:new Date().toISOString()};
+    var r=await sb.from("household_setup").upsert(reihe).select("*").single();
+    if(r&&r.error)throw r.error;
+    SETUP=(r&&r.data)||Object.assign({},SETUP,reihe);
+    closeModal(true);render();
+    toast(t("Gespeichert")+" ✅");
+  }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+}
+function alltrackStatus(){
+  var m=alltrackModus(),an=alltrackAn();
+  var arten=["strom","gas","wasser"].filter(function(k){return !!spiegelArt(k);}).map(function(k){return artInfo(k).label;});
+  if(m==="aus")return t("Aus – alles wird in All-Home geführt");
+  var was=arten.length?arten.join(", ")+" "+t("aus AllTrack"):t("nichts gespiegelt");
+  if(m==="an")return t("An")+" · "+was;
+  return t("Automatisch")+" · "+(an?was:t("keine Daten in AllTrack"));
+}
+function alltrackBlatt(){
+  var m=alltrackModus();
+  var opt=[["auto",t("Automatisch"),t("An, sobald AllTrack für dieses Haus Tarife hat.")],
+           ["an",t("An"),t("Strom, Gas und Wasser kommen aus AllTrack und werden dort gepflegt.")],
+           ["aus",t("Aus"),t("Alles in All-Home führen. AllTrack bleibt unberührt.")]];
+  openModal('<h2 class="mhead">'+t("AllTrack-Verbindung")+'</h2>'+
+    '<div class="mlist">'+opt.map(function(o){
+      return '<button class="setupcat'+(o[0]===m?" on":"")+'" data-a="alltrack-set" data-v="'+o[0]+'">'+ic("link")+
+        '<span style="min-width:0;flex:1"><span class="hhw">'+esc(o[1])+'</span><span class="hhwa" style="white-space:normal">'+esc(o[2])+'</span></span>'+
+        '<span class="ck">'+ic("check",18)+'</span></button>';
+    }).join("")+'</div>'+
+    '<div class="factions"><button class="btn ghost full" data-a="modal-close">'+t("Schließen")+'</button></div>');
+}
 /* Monatskosten der gespiegelten Energie (für die Haushaltskosten) */
 function energieMonat(art){var e=energieInfo(art);return (e&&e.abschlag)?e.abschlag:0;}
 
@@ -2129,9 +2192,22 @@ function vertraegeDerArt(k){
   return CONTRACTS.filter(function(c){return (c.art||"sonstiges")===k;});
 }
 function artMonatskosten(k){
-  var a=artInfo(k);
-  if(a.spiegel)return energieMonat(a.spiegel);
+  var sp=spiegelArt(k);
+  if(sp)return energieMonat(sp);
   return vertraegeDerArt(k).reduce(function(s,c){return s+monatskosten(c);},0);
+}
+/* Monatskosten je Posten: angehakte Arten (gespiegelte aus AllTrack) und
+   „Weitere“ für Verträge ohne angehakte Art. Start und Kostenseite nutzen beide das. */
+function kostenPosten(){
+  var posten=[];
+  aktiveArten().forEach(function(k){
+    var m=artMonatskosten(k);
+    if(m>0)posten.push({k:k,label:artInfo(k).label,icon:artInfo(k).icon,m:m});
+  });
+  var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return k==="sonstiges"||!ARTEN[k]||!artAktiv(k);})
+    .reduce(function(s,c){return s+monatskosten(c);},0);
+  if(weitere>0)posten.push({k:"weitere",label:t("Weitere"),icon:"📄",m:weitere});
+  return posten.sort(function(a,b){return b.m-a.m;});
 }
 /* Die dringendste Frist einer Art */
 function artFrist(k){
@@ -2182,9 +2258,8 @@ function viewEinrichten(erstmalig){
 /* ================= Start ================= */
 function viewStart(){
   var aktive=CONTRACTS.filter(function(c){return c.status==="aktiv";});
-  /* Monatskosten: eigene Verträge + gespiegelte Energie */
-  var mk=aktive.reduce(function(s,c){return s+monatskosten(c);},0);
-  ["strom","gas","wasser"].forEach(function(a){if(artAktiv(a))mk+=energieMonat(a);});
+  /* Monatskosten: dieselbe Rechnung wie auf der Kostenseite */
+  var mk=kostenPosten().reduce(function(s,p){return s+p.m;},0);
   var fristen=naheTermine(60);
   return topBar()+
     '<div class="kpis k3">'+
@@ -2210,7 +2285,7 @@ function gruppenUebersicht(kurz){
     var arten=artenDerGruppe(g.k).filter(artAktiv);
     if(!arten.length)return "";
     var kosten=arten.reduce(function(s,k){return s+artMonatskosten(k);},0);
-    var offen=arten.filter(function(k){return !vertraegeDerArt(k).length&&!artInfo(k).spiegel;}).length;
+    var offen=arten.filter(function(k){return !vertraegeDerArt(k).length&&!spiegelArt(k);}).length;
     return '<a class="slot" href="#/vertraege">'+
       '<span class="ai">'+g.icon+'</span>'+
       '<span class="sb3"><span class="sn">'+t(g.label)+'</span>'+
@@ -2259,22 +2334,16 @@ function viewVertraege(){
 /* Ein Platz: gefüllt, gespiegelt oder sichtbar leer */
 function artSlot(k){
   var a=artInfo(k),liste=vertraegeDerArt(k);
-  /* Aus AllTrack gespiegelt */
-  if(a.spiegel){
-    var e=energieInfo(a.spiegel);
-    if(!e){
-      return '<a class="slot leer mirror" href="'+ALLTRACK_URL+'">'+
-        '<span class="ai">'+a.icon+'</span>'+
-        '<span class="sb3"><span class="sn">'+esc(a.label)+'</span>'+
-        '<span class="ss">'+t("in AllTrack noch nicht erfasst")+'</span></span>'+
-        '<span class="srt"><span class="go">'+ic("link",18)+'</span></span></a>';
-    }
-    return '<a class="slot mirror" href="'+ALLTRACK_URL+'">'+
+  /* Aus AllTrack gespiegelt – nur wenn die Verbindung an ist und Daten da sind */
+  var sp=spiegelArt(k);
+  if(sp){
+    var e=energieInfo(sp);
+    return '<a class="slot mirror" href="#/art?k='+k+'">'+
       anbieterKachel(e.anbieter,a.icon)+
       '<span class="sb3"><span class="sn">'+esc(e.anbieter||a.label)+'</span>'+
       '<span class="ss">'+esc(a.label)+' · <span class="mlink">'+t("aus AllTrack")+'</span></span></span>'+
       '<span class="srt">'+(e.abschlag?'<span class="scost">'+eur0(e.abschlag)+'</span>':"")+
-      '<span class="go">'+ic("link",18)+'</span></span></a>';
+      '<span class="go">'+ic("right",18)+'</span></span></a>';
   }
   /* Leerer Platz */
   if(!liste.length){
@@ -2347,12 +2416,7 @@ function viewTermine(){
 
 /* ================= Kosten ================= */
 function viewKosten(){
-  var posten=[];
-  aktiveArten().forEach(function(k){
-    var m=artMonatskosten(k);
-    if(m>0)posten.push({k:k,label:artInfo(k).label,icon:artInfo(k).icon,m:m});
-  });
-  posten.sort(function(a,b){return b.m-a.m;});
+  var posten=kostenPosten();
   var ges=posten.reduce(function(s,p){return s+p.m;},0);
   var max=posten.length?posten[0].m:1;
   return zurueck("#/start",t("Start"))+seitenTitel(t("Haushaltskosten"))+
@@ -2377,6 +2441,10 @@ function viewMehr(){
         '<span class="db"><span class="dn">'+t("Vertragsarten anpassen")+'</span>'+
         '<span class="dm">'+tf("{0} von {1} angehakt",aktiveArten().length,Object.keys(ARTEN).length-1)+'</span></span>'+
         '<span class="go">'+ic("right",18)+'</span></a>'+
+      '<button class="drow3" data-a="alltrack-blatt"><span class="di">'+ic("link")+'</span>'+
+        '<span class="db"><span class="dn">'+t("AllTrack-Verbindung")+'</span>'+
+        '<span class="dm"><span>'+esc(alltrackStatus())+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></button>'+
       '<a class="drow3" href="#/haushalte"><span class="di">'+ic("users")+'</span>'+
         '<span class="db"><span class="dn">'+t("Häuser & Mitglieder")+'</span>'+
         '<span class="dm">'+tn(HOUSEHOLDS.length,"{0} Haus","{0} Häuser")+(HH?' · '+tn(mitgliederZahl(HH.id),"{0} Mitglied","{0} Mitglieder")+' '+t("hier"):"")+'</span></span>'+
@@ -2445,8 +2513,9 @@ function zahlFehlt(ids){
 /* ================= Eine Art mit mehreren Verträgen ================= */
 function viewArt(k){
   var a=artInfo(k||"sonstiges"),liste=vertraegeDerArt(a.key);
-  if(a.spiegel){
-    var e=energieInfo(a.spiegel);
+  var sp=spiegelArt(a.key);
+  if(sp){
+    var e=energieInfo(sp);
     return zurueck("#/vertraege",t("Verträge"))+seitenTitel(a.icon+" "+a.label)+
       '<section class="card">'+
         '<div class="sug info"><span class="si">'+ic("link")+'</span><div class="sb2">'+
@@ -2462,7 +2531,17 @@ function viewArt(k){
           (e.kundennummer?kv(t("Kundennummer"),esc(e.kundennummer)):"")+
           (e.ab?kv(t("Gültig ab"),fmtDate(e.ab)):"")+
         '</div>':'<p class="hint">'+t("In AllTrack ist für diese Art noch kein Tarif erfasst.")+'</p>')+
-      '</section>';
+      '</section>'+
+      (liste.length?'<div class="sect">'+t("Auch in All-Home erfasst")+'</div>'+
+        '<p class="hint" style="margin:-4px 4px 10px">'+t("Zählt nicht zu den Kosten, solange AllTrack verbunden ist.")+'</p>'+
+        '<div class="slots">'+liste.map(function(c){
+          return '<a class="slot" href="#/vertrag?id='+c.id+'">'+anbieterKachel(c.anbieter,a.icon)+
+            '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span><span class="ss">'+esc(fristInfo(c).label)+'</span></span>'+
+            '<span class="srt"><span class="go">'+ic("right",18)+'</span></span></a>';
+        }).join("")+'</div>':"")+
+      '<div class="factions" style="margin-top:18px">'+
+        '<button class="btn ghost" data-a="alltrack-blatt">'+ic("link")+' '+t("AllTrack-Verbindung")+'</button>'+
+      '</div>';
   }
   return zurueck("#/vertraege",t("Verträge"))+seitenTitel(a.icon+" "+a.label)+
     (liste.length
@@ -3712,7 +3791,7 @@ function vorschlaege(){
   if(smartAn("luecken")){
     var leer=aktiveArten().filter(function(k){
       var a=artInfo(k);
-      return !a.spiegel&&!vertraegeDerArt(k).length;
+      return !spiegelArt(k)&&!vertraegeDerArt(k).length;
     });
     if(leer.length){
       v.push({key:"leer:"+leer.length,art:"info",icon:"folder",
@@ -3764,7 +3843,7 @@ function vorschlaege(){
     var teuerste=null;
     aktiveArten().forEach(function(k){
       var a=artInfo(k);
-      if(a.spiegel)return;                     /* Energie läuft über AllTrack */
+      if(spiegelArt(k))return;                 /* Energie läuft über AllTrack */
       vertraegeDerArt(k).forEach(function(c){
         if(c.status!=="aktiv")return;
         var m=monatskosten(c);
@@ -4603,6 +4682,8 @@ document.addEventListener("click",function(ev){
   if(a==="hh-pick"){haushaltSetzen(b.dataset.id);return;}
   if(a==="ki-set"){setzeKiStufe(b.dataset.v);return;}
   if(a==="ki-blatt"){kiStufeBlatt();return;}
+  if(a==="alltrack-blatt"){alltrackBlatt();return;}
+  if(a==="alltrack-set"){setzeAlltrack(b.dataset.v);return;}
   if(a==="logo-neu"){logoFormular(null,b.dataset.name||"");return;}
   if(a==="logo-edit"){logoFormular(id);return;}
   if(a==="logo-holen"){logoHolen();return;}
