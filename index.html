@@ -488,7 +488,7 @@ a.vsep.abr span{color:var(--text)}
 /* Gruppenkopf in der Arten-Liste und in der Einrichtung */
 .grp{display:flex;align-items:center;gap:9px;margin:var(--sect) 4px 10px;font-weight:900;font-size:1.02rem}
 .grp .gi{width:30px;height:30px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;font-size:.95rem;flex:none}
-.grp .gn{color:var(--muted);font-weight:800;font-size:.84rem;margin-left:auto}
+.grp .gn{color:var(--muted);font-weight:800;font-size:.84rem;margin-left:auto;white-space:nowrap;flex:none}
 
 /* Platz einer Vertragsart: gefüllt oder sichtbar leer */
 .slots{display:grid;gap:12px;grid-template-columns:1fr}
@@ -498,7 +498,7 @@ a.vsep.abr span{color:var(--text)}
 .slot .sb3{flex:1;min-width:0}
 .slot .sn{font-weight:900;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slot .ss{color:var(--muted);font-size:.84rem;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot .sr{flex:none;display:flex;align-items:center;gap:8px}
+.slot .srt{flex:none;display:flex;align-items:center;gap:8px}
 .slot .scost{font-weight:900;font-size:.95rem;white-space:nowrap}
 .slot .go{color:var(--muted-2);flex:none}
 /* Leerer Platz: gestrichelt, zurückgenommen – lädt zum Füllen ein */
@@ -560,12 +560,99 @@ a.vsep.abr span{color:var(--text)}
 @media (max-width:560px){.krow .kl{width:108px}}
 .kbarw{flex:1;height:9px;background:var(--surface-2);border-radius:999px;overflow:hidden}
 .kbar{display:block;height:100%;border-radius:999px;background:var(--ink)}
-.krow .kv{flex:none;font-weight:900;white-space:nowrap}
+.krow .kv{flex:none;font-weight:900;white-space:nowrap;display:block;margin:0}
 
 /* ================= All-Home: Sprache ================= */
 .langrow{display:flex;gap:8px}
 .langrow .lb{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);font-weight:800}
 .langrow .lb.on{border-color:var(--ink);background:var(--surface-2)}
+
+/* ================= All-Home: Breite im Griff ================= */
+/* Eine Zeile darf die Seite nie verbreitern. Sonst rechnet das Handy mit einer
+   breiteren Fläche, und die untere Leiste rutscht aus dem Bild (10.10.2026).
+   1) Rasterzellen dürfen schrumpfen – sonst wächst 1fr auf die Textbreite. */
+:where(.slots,.setupgrid,.tiles,.kpis,.kv,.two,.abrres,.mcols,.vgrid2)>*{min-width:0}
+/* 2) Text-Zeilen sind <span>: erst als Block greift das Abkürzen mit „…". */
+.slot .sn,.slot .ss,.trow .tn,.trow .tx,.drow3 .dn{display:block}
+/* 3) Sicherung: was trotzdem übersteht, wird abgeschnitten statt die Seite aufzublähen. */
+.main{overflow-x:clip}
+/* Filterzeile (Gesundheit): Auswahlfelder brechen um statt überzustehen */
+.filt{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.filt .sel{flex:1 1 140px;min-width:0;max-width:100%}
+
+/* ================= All-Home: Knopf-Varianten & Kennzahlen ================= */
+/* Zweitknopf: zurückgenommen neben dem Hauptknopf */
+.btn.ghost{background:var(--surface-2);color:var(--text);box-shadow:none}
+.btn.ghost:hover{filter:none;background:var(--surface-3)}
+/* Zerstörende Aktion: rot, aber nicht laut */
+.btn.danger{background:var(--neg-bg);color:var(--neg);box-shadow:none}
+/* Kennzahl-Kachel: Beschriftung · Wert · Zusatz */
+.kpi .kl{color:var(--muted);font-weight:800;font-size:.84rem}
+.kpi .kv{display:block;margin:0;font-size:1.5rem;font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .ks{color:var(--muted);font-weight:700;font-size:.84rem}
+a.kpi:hover{border-color:var(--line-2)}
+/* drei Kacheln: auf dem Handy die dritte über die volle Breite */
+.kpis.k3>.kpi:last-child{grid-column:1/-1}
+@media (min-width:620px){.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis.k3>.kpi:last-child{grid-column:auto}}
+/* Angaben als Liste: Bezeichnung links, Wert rechts.
+   Eigene Klassen – .dl und .kv sind in AllTrack schon anders belegt. */
+.kvl{display:flex;flex-direction:column}
+.kvr{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 2px;border-bottom:1px solid var(--line)}
+.kvr:last-child{border-bottom:none}
+.kvr .kk{color:var(--muted);font-weight:700;font-size:.88rem;flex:none;max-width:48%}
+.kvr .kw{font-weight:800;text-align:right;min-width:0;overflow-wrap:anywhere}
+/* Kacheln nicht an die folgende Karte stoßen lassen */
+.kpis{margin-bottom:14px}
+/* Zurück zeigt nach links */
+.back .ico{transform:rotate(180deg)}
+/* Filter: Fachrichtung über die volle Breite, Person und Jahr darunter nebeneinander */
+.filt .sel:first-child{flex-basis:100%}
+/* .lg ist in AllTrack ein Legenden-Kästchen (14×10 px, 3 px Rundung) und
+   überschreibt sonst Form und Darstellung der großen Knöpfe */
+.btn.lg{display:inline-flex;width:auto;height:auto;border-radius:999px}
+.btn.lg.full{width:100%}
+/* Einrichtung: der Übernehmen-Knopf bleibt über der Leiste sichtbar */
+.setupbar{position:sticky;z-index:5;margin-top:22px;bottom:calc(var(--nav-h) + 22px + env(safe-area-inset-bottom))}
+.setupbar .btn{box-shadow:var(--sh-3)}
+@media (min-width:900px){.setupbar{bottom:20px}}
+/* Zahlfeld mit unlesbarem Inhalt */
+.inp.bad{border-color:var(--neg);box-shadow:0 0 0 3px var(--neg-bg)}
+
+/* ================= All-Home: Häuser & Mitglieder ================= */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:900;border-radius:999px;padding:2px 8px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.pill.on{background:var(--pos-bg);color:var(--pos)}
+.pill.admin{background:var(--info-bg);color:var(--info)}
+.drow3 .di.av{border-radius:50%;font-weight:900;color:var(--text);background:var(--surface-3)}
+.drow3 .dm{align-items:center}
+/* Kopf eines Hauses */
+.hhkopf{display:flex;align-items:center;gap:14px;margin:6px 2px 18px}
+.hhi{width:54px;height:54px;border-radius:17px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.hhn{font-size:1.55rem;font-weight:900;letter-spacing:-.01em;line-height:1.15;overflow-wrap:anywhere}
+.hha{display:flex;align-items:center;gap:5px;color:var(--muted);font-weight:700;font-size:.9rem;margin-top:3px;overflow-wrap:anywhere}
+.hha .ico{flex:none}
+/* Umschalter: Name mit Adresse darunter */
+.hhw{display:block;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hhwa{display:block;font-size:.82rem;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mlist .setupcat{border-radius:0;border:0;border-bottom:1px solid var(--line)}
+.mlist .setupcat:last-child{border-bottom:0}
+.mlist .setupcat.on{background:var(--surface-2)}
+/* Einladungscode groß und gut abschreibbar */
+.code{font-size:2rem;font-weight:900;letter-spacing:.2em;text-align:center;padding:18px 10px;border-radius:var(--r);background:var(--surface-2);font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all}
+.inp.code-in{text-transform:uppercase;letter-spacing:.2em;font-weight:900;text-align:center;font-size:1.2rem}
+/* Hausname oben: lang darf er sein, aber nicht die Kopfzeile sprengen */
+.top .hh{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ================= All-Home: Anbieter-Logos ================= */
+.logo svg{display:block}
+html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+/* Vertragskopf: Kachel neben Name und Art */
+.vkopf .vk{display:flex;align-items:center;gap:14px;min-width:0}
+.vkopf .hhi{font-size:1.6rem}
+/* Große Bildschirme: Plätze zweispaltig statt 1.100 px breiter Zeilen */
+@media (min-width:900px){.slots{grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}}
+/* Kopfzeilen: Titel einer Detailseite bricht um, der Hausname-Knopf kürzt mit „…" */
+.top>div{min-width:0}
+.top div.hh{white-space:normal;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -583,7 +670,7 @@ a.vsep.abr span{color:var(--text)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.0.0";
+var APP_VERSION="1.1.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -636,6 +723,91 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.1: Häuser & Mitglieder, Einzahl, Zahlen ---- */
+  "Haus wählen":"Выбрать дом",
+  "Haushalte nicht erreichbar":"Хозяйства недоступны",
+  "Häuser & Mitglieder":"Дома и участники",
+  "hier":"здесь",
+  "Bitte eine Zahl eingeben, z. B. 9,90.":"Введите число, например 9,90.",
+  "Gekündigt zum":"Расторгнут с",
+  "Es muss immer mindestens einen Admin geben. Ernenne zuerst jemand anderen zum Admin.":"Всегда должен быть хотя бы один администратор. Сначала назначьте администратором кого-то другого.",
+  "Das ist dein einziger Haushalt. Lege zuerst einen weiteren an.":"Это ваше единственное хозяйство. Сначала создайте ещё одно.",
+  "Dafür brauchst du Admin-Rechte in diesem Haus.":"Для этого нужны права администратора в этом доме.",
+  "Dich selbst nimmst du über „Haushalt verlassen“ heraus.":"Себя вы удаляете через «Покинуть хозяйство».",
+  "Der Code ist ungültig oder abgelaufen.":"Код недействителен или истёк.",
+  "Du bist kein Mitglied dieses Hauses.":"Вы не участник этого дома.",
+  "Keine Adresse":"Адрес не указан",
+  "Admin":"Админ",
+  "Neues Haus anlegen":"Добавить дом",
+  "Mit Einladungscode beitreten":"Присоединиться по коду",
+  "Nicht gefunden":"Не найдено",
+  "Du":"Вы",
+  "Mitglied":"Участник",
+  "Zu diesem Haus wechseln":"Перейти в этот дом",
+  "Name & Adresse bearbeiten":"Изменить название и адрес",
+  "Mitglieder":"Участники",
+  "Person einladen":"Пригласить человека",
+  "Mitglieder verwalten können nur Admins.":"Управлять участниками могут только администраторы.",
+  "Haushalt verlassen":"Покинуть хозяйство",
+  "Haus löschen":"Удалить дом",
+  "Häuser & Mitglieder verwalten":"Управлять домами и участниками",
+  "Jetzt in „{0}“":"Теперь в «{0}»",
+  "Haus bearbeiten":"Изменить дом",
+  "Neues Haus":"Новый дом",
+  "z. B. Wohnung Frankfurt":"например, квартира во Франкфурте",
+  "Adresse":"Адрес",
+  "Straße Nr., PLZ Ort":"Улица, дом, индекс, город",
+  "Haus anlegen":"Создать дом",
+  "Bitte einen Namen eingeben.":"Введите название.",
+  "„{0}“ angelegt":"«{0}» создан",
+  "Mit Code beitreten":"Присоединиться по коду",
+  "Einladungscode":"Код приглашения",
+  "Beitreten":"Присоединиться",
+  "Bitte den Code aus der Einladung eingeben.":"Введите код из приглашения.",
+  "Komm in unseren Haushalt „{0}“ bei All-Home. Code: {1} (14 Tage gültig) – {2}":"Присоединяйся к нашему хозяйству «{0}» в All-Home. Код: {1} (действует 14 дней) – {2}",
+  "Die Person meldet sich mit eigenem Konto an und gibt unter Mehr › Häuser & Mitglieder diesen Code ein. Er gilt 14 Tage und nur einmal.":"Человек входит в свою учётную запись и вводит этот код в разделе «Ещё › Дома и участники». Код действует 14 дней и только один раз.",
+  "Einladung teilen":"Поделиться приглашением",
+  "Code kopieren":"Скопировать код",
+  "Kopiert":"Скопировано",
+  "Kopieren ging nicht – bitte den Code abschreiben.":"Не удалось скопировать — перепишите код вручную.",
+  "Einziger Admin – bleibt es, bis jemand anderes Admin ist.":"Единственный администратор — останется им, пока администратором не станет кто-то другой.",
+  "Meine Admin-Rechte abgeben":"Отказаться от прав администратора",
+  "Admin-Rechte entziehen":"Отозвать права администратора",
+  "Zum Admin machen":"Сделать администратором",
+  "Aus dem Haus entfernen":"Удалить из дома",
+  "Ist jetzt Admin":"Теперь администратор",
+  "Admin-Rechte entzogen":"Права администратора отозваны",
+  "{0} aus dem Haus entfernen? Die Person sieht danach nichts mehr davon.":"Удалить {0} из дома? После этого человек ничего из него не увидит.",
+  "Entfernt":"Удалено",
+  "„{0}“ verlassen? Du siehst danach nichts mehr aus diesem Haus.":"Покинуть «{0}»? После этого вы ничего из этого дома не увидите.",
+  "Haus verlassen":"Дом покинут",
+  "Endgültig – nicht rückgängig zu machen":"Окончательно — отменить нельзя",
+  "Löscht für alle {0} Mitglieder: Verträge, Dokumente, Gesundheit und die AllTrack-Zählerstände dieses Hauses.":"Удаляет для всех участников ({0}): договоры, документы, раздел здоровья и показания счётчиков AllTrack этого дома.",
+  "Löscht Verträge, Dokumente, Gesundheit und die AllTrack-Zählerstände dieses Hauses.":"Удаляет договоры, документы, раздел здоровья и показания счётчиков AllTrack этого дома.",
+  "Zum Bestätigen „{0}“ eintippen":"Для подтверждения введите «{0}»",
+  "Endgültig löschen":"Удалить окончательно",
+  "Der Name stimmt nicht überein.":"Название не совпадает.",
+  "Wird gelöscht …":"Удаляется …",
+  "„{0}“ gelöscht":"«{0}» удалён",
+  "{0} Art":"Видов: {0}",
+  "{0} Tag":"{0} дн.",
+  "{0} Monat":"{0} мес.",
+  "{0} Art übernehmen":"Применить ({0})",
+  "{0} laufender Vertrag":"Действующих договоров: {0}",
+  "{0} Vertrag":"Договоров: {0}",
+  "{0} Haus":"Домов: {0}",
+  "{0} Häuser":"Домов: {0}",
+  "{0} Mitglied":"Участников: {0}",
+  "{0} Mitglieder":"Участников: {0}",
+  "{0} Dokument":"Документов: {0}",
+  "{0} Dokument verliert die Zuordnung.":"Документов потеряют привязку: {0}.",
+  "{0} ist nur noch {1} Tag kündbar":"{0} можно расторгнуть ещё только {1} дн.",
+  "{0} angehakte Art ist noch leer":"Отмеченных, но пустых видов: {0}",
+  "{0} Vertrag ohne Unterlagen":"Договоров без документов: {0}",
+  "{0} Dokument ohne Vertrag":"Документов без договора: {0}",
+  "{0} Dokument wartet auf die KI":"Документов ждут анализа ИИ: {0}",
+
 
 /* ---- Etappen 3–6: Verträge, Dokumente, Gesundheit, Vorschläge ---- */
   "{0} von {1}":"{0} из {1}",
@@ -1069,6 +1241,14 @@ function tf(s){
   var a=arguments;
   return t(s).replace(/\{(\d+)\}/g,function(m,i){var v=a[Number(i)+1];return v==null?"":String(v);});
 }
+/* Einzahl/Mehrzahl: tn(n,"{0} Art","{0} Arten"[,weitere Werte]).
+   Ohne weitere Werte wird n selbst eingesetzt. Russisch braucht das nicht –
+   dort stehen Zählungen als „Видов: {0}". */
+function tn(n,einz,mehr){
+  var rest=Array.prototype.slice.call(arguments,3);
+  var args=[Number(n)===1?einz:mehr].concat(rest.length?rest:[n]);
+  return tf.apply(null,args);
+}
 /* Zahlenformat folgt der Sprache; Datum ist in DE und RU gleich (TT.MM.JJJJ) */
 function locale(){return curLang==="ru"?"ru-RU":"de-DE";}
 function applyLangAttr(){try{document.documentElement.lang=curLang;}catch(e){}}
@@ -1114,6 +1294,10 @@ var ICONS={
   link:'<path d="M10 13.5a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1"/><path d="M14 10.5a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1"/>',
   trash:'<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/>',
   pencil:'<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  share:'<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
+  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/>'
 };
 
@@ -1123,7 +1307,17 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){retur
 function ic(n,s){return '<svg class="ico" width="'+(s||20)+'" height="'+(s||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||"")+'</svg>';}
 function errMsg(e){if(!e)return t("Unbekannter Fehler");if(typeof e==="string")return e;return e.message||e.error_description||e.msg||JSON.stringify(e);}
 function numOr(v,d){var n=Number(String(v==null?"":v).replace(",","."));return isNaN(n)?d:n;}
-function numOrNull(v){if(v==null||v==="")return null;var n=Number(String(v).replace(",","."));return isNaN(n)?null:n;}
+/* Zahl aus Eingabe oder Datenbank. Versteht „9,90", „9.90", „1.234,56", „12,50 €"
+   und „65.000" (deutscher Tausenderpunkt). „0.086" bleibt 0,086. */
+function numOrNull(v){
+  if(v==null||v==="")return null;
+  if(typeof v==="number")return isNaN(v)?null:v;
+  var s=String(v).replace(/[€\s\u00a0]/g,"");
+  if(!s)return null;
+  if(s.indexOf(",")>=0)s=s.replace(/\./g,"").replace(",",".");
+  else if(/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(s))s=s.replace(/\./g,"");
+  var n=Number(s);return isNaN(n)?null:n;
+}
 
 /* ---- Geld & Zahlen ---- */
 function eur(n){if(n==null||isNaN(n))return "–";return Number(n).toLocaleString(locale(),{style:"currency",currency:"EUR",maximumFractionDigits:2});}
@@ -1207,8 +1401,8 @@ function fristTxt(m){
   if(m==null)return t("unbekannt");
   if(m===0.5)return t("2 Wochen");
   if(m===1)return t("1 Monat");
-  if(m<1)return tf("{0} Tage",Math.round(m*30));
-  return tf("{0} Monate",m);
+  if(m<1)return tn(Math.round(m*30),"{0} Tag","{0} Tage");
+  return tn(m,"{0} Monat","{0} Monate");
 }
 function ivLabel(k){return INTERVALL_LABEL[k]?t(INTERVALL_LABEL[k]):"?";}
 /* Monatskosten eines Vertrags (einmalige Zahlungen zählen nicht als laufend) */
@@ -1389,6 +1583,82 @@ function artFelder(k){
 function aktiveArten(){return (SETUP&&Array.isArray(SETUP.arten))?SETUP.arten:[];}
 function artAktiv(k){return aktiveArten().indexOf(k)>=0;}
 
+/* ================= Anbieter-Logos =================
+   Markenzeichen aus Simple Icons (simpleicons.org, CC0), direkt eingebettet:
+   kein Abruf fremder Server, nichts verrät, bei wem der Haushalt Kunde ist.
+   [Kennung, Erkennungsmuster für den Anbieternamen, Markenfarbe, Name, SVG-Pfad 24×24]
+   Reihenfolge zählt: Speziellere Muster (Apple TV) stehen vor allgemeineren (Apple). */
+var LOGOS=[
+  ["deutschetelekom",/telekom|magenta/i,"E20074","Telekom","M6.72 15.84h-4.8v-4.8h4.79v4.8zM1.92 0v8.16H3.36v-.24c0-3.84 2.16-6.24 6.24-6.24h.24v17.28c0 2.40-.96 3.36-3.36 3.36h-.72V24h12.48v-1.68h-.72c-2.40 0-3.36-.96-3.36-3.36V1.68h.24c4.08 0 6.24 2.40 6.24 6.24v.24h1.44V0Zm15.36 15.84h4.8v-4.8h-4.79v4.8z"],
+  ["vodafone",/vodafone|kabel ?deutschland|unitymedia/i,"E60000","Vodafone","M12 0A12 12 0 0 0 0 12A12 12 0 0 0 12 24A12 12 0 0 0 24 12A12 12 0 0 0 12 0M16.25 1.12C16.57 1.12 16.9 1.15 17.11 1.22C14.94 1.67 13.21 3.69 13.22 6C13.22 6.05 13.22 6.11 13.23 6.17C16.87 7.06 18.5 9.25 18.5 12.28C18.54 15.31 16.14 18.64 12.09 18.65C8.82 18.66 5.41 15.86 5.39 11.37C5.38 8.4 7 5.54 9.04 3.85C11.04 2.19 13.77 1.13 16.25 1.12Z"],
+  ["o2",/\bo2\b|o₂|telef[oó]nica/i,"0050FF","O2","M9.47.19C3.83.19 0 4.27 0 9.92c0 5.32 3.86 9.73 9.47 9.73 5.61 0 9.43-4.41 9.43-9.73C18.91 4.27 15.12.19 9.47.19zm-.00 2.77c3.68 0 5.79 3.42 5.79 6.96 0 3.31-1.78 6.96-5.79 6.96-4.01 0-5.83-3.64-5.83-6.96 0-3.53 2.15-6.96 5.83-6.96zm11.69 12.48a5.47 5.47 0 0 0-2.44.59l.13 1.37c.54-.35 1.20-.66 1.9-.66.69 0 1.34.35 1.34 1.11 0 1.51-2.79 3.84-3.56 4.58v1.38H24v-1.30h-3.36c1.34-1.32 3.1-2.92 3.1-4.67 0-1.61-1.01-2.40-2.58-2.40z"],
+  ["1and1",/\b1 ?(&|und|and) ?1\b/i,"003D8F","1&1","M0 0v24h24V0zm11.72 5.79c1.56 0 2.67 1.04 2.67 2.47 0 1.04-.43 1.82-1.75 2.92l1.95 2.65c.16-.15.30-1.05.27-1.78-.00-.09-.02-.34-.04-.62h1.81c0 .24.02.59.02.68 0 1.43-.22 2.33-.91 3.20L17.2 17.22h-2.23l-.50-.68c-.82.66-1.55.91-2.71.90-2.28-.01-3.86-1.17-4.00-3.24-.09-1.24.74-2.51 2.32-3.42C9.05 9.48 8.84 9.03 8.84 8.21c0-1.39 1.19-2.42 2.88-2.42zm-9.42.13h4.06v11.30H4.1V7.74H2.29zm14.45 0h4.07v11.30H18.55V7.74h-1.81zm-5.04 1.49c-.55 0-.93.36-.93.84 0 .47.14.73.79 1.56.77-.56 1.06-1.07 1.06-1.58 0-.50-.35-.83-.92-.83zm-.52 4.81c-1.00.66-1.40 1.31-1.39 1.92.03.93.81 1.52 1.95 1.52.70 0 1.17-.26 1.58-.59z"],
+  ["freenet",/freenet/i,"84BC34","freenet","M9.33 6.18c-.77-.17-1.58-.48-4.27-1.88C1.48 2.47.69 2.33.23 3.08c-.62.99-.05 3.51 2.42 8.10 1.59 3.02 4.11 6.90 4.57 7.42.10.10.22.14.33.07.10-.07.15-.15.07-.31-.38-.70-1.68-3.41-2.28-4.81-1.41-3.39-1.73-4.54-1.25-4.80.14-.07.31-.02.70.21 1.35.72 4.33 3.02 4.87 4.63.22.70.34 1.51.39 4.39.07 3.79.34 4.49 1.27 4.49 1.23 0 3.29-1.71 6.36-6.00 2.02-2.81 4.38-6.77 4.63-7.4.07-.14 0-.24-.09-.31-.10-.07-.22-.05-.31.09-.46.65-2.33 3.07-3.36 4.25-2.45 2.81-3.34 3.63-3.84 3.38-.14-.07-.17-.24-.17-.65 0-1.47.63-5.02 1.87-6.22.53-.53 1.25-1.03 3.91-2.5 3.51-1.95 4.01-2.52 3.55-3.29-.62-.99-3.22-1.80-8.77-2.12-3.62-.22-8.50-.14-9.2-.02-.15.02-.22.10-.24.22 0 .10.07.21.24.21.84.05 4.03.34 5.64.56 3.85.55 5.09.87 5.09 1.41 0 .14-.14.26-.53.46-1.39.79-5.02 2.04-6.75 1.66"],
+  ["sparkasse",/sparkasse/i,"FF0000","Sparkasse","M7.06 12.31v1.85h14.18v6.78c.03 1.66-1.41 3.11-3.07 3.07H5.84c-1.66.03-3.10-1.41-3.07-3.07v-1.23H16.91v-1.85H2.76v-6.78c-.03-1.66 1.41-3.10 3.07-3.07h12.33c1.66-.04 3.1 1.41 3.07 3.07v1.23H7.06zm4.92-6.15c1.70 0 3.08-1.38 3.08-3.08S13.68 0 11.98 0 8.91 1.38 8.91 3.08s1.38 3.08 3.08 3.08z"],
+  ["n26",/\bn26\b/i,"48AC98","N26","M0 3.80v1.20h7.44V3.80H0zM12.69 7.29c-2.03 0-3.04 1.25-3.04 2.68 0 .23.03.47.09.73l1.39.14a3.70 3.70 0 0 1-.09-.79c0-1.07.71-1.59 1.60-1.59.87 0 1.51.48 1.51 1.65 0 1.19-.58 2.00-1.46 2.88-.93.92-2.4 2.03-3.11 2.53v1.09h6.13v-1.20h-4.17c.69-.48 1.69-1.28 2.13-1.72.50-.50 1.93-1.79 1.93-3.64 0-1.90-1.24-2.77-2.92-2.77zm8.34 0c-1.98 0-3.45 1.52-3.45 4.92 0 3.02 1.23 4.51 3.36 4.51 1.75 0 3.07-1.20 3.07-3.17 0-1.54-.82-3.07-2.79-3.07-1.1 0-1.88.51-2.28 1.26 0-1.78.62-3.33 2.09-3.33.94 0 1.31.54 1.51 1.42l1.37-.27c-.32-1.53-1.29-2.27-2.86-2.27zM.07 7.39v9.23h1.33v-6.31c0-.56-.01-.90-.04-1.22h.03c.14.37.30.70.54 1.12l3.73 6.41h1.69V7.39H6.04v6.31c0 .56.01.90.04 1.22h-.03a7.25 7.25 0 0 0-.54-1.12L1.78 7.39H.08zm20.82 4.18c1.11 0 1.74.82 1.74 1.99 0 1.26-.72 2.03-1.70 2.03-1.09 0-1.84-1.00-1.97-2.33.33-1.13 1.06-1.70 1.93-1.70zM0 19.01v1.19h7.44v-1.19H0z"],
+  ["commerzbank",/commerzbank/i,"FFCC33","Commerzbank","M6.28 1.54a.02.02 0 0 0-.01.01l-4.74 8.21-1.40 2.42c.45.77.79 1.35 1.22 2.09.67 1.16 1.55 1.60 3.13 1.89a12.9 12.9 0 0 1 .70-1.39l2.78-4.82 2.79-4.83c.40-.70 1.30-2.14 2.57-2.96-.04.03-.07.06-.11.09.07-.05.14-.09.21-.14.46-.28.98-.47 1.41-.52.34-.04 1.47-.04 2.74-.04zm11.59.51c-1.05-.01-1.46.01-2.54.01-1.39 0-2.38.89-3.08 1.77.37.49.68.97.86 1.29a13357.60 13357.60 0 0 0 5.57 9.65c.40.7 1.21 2.20 1.28 3.71.03.57-.08 1.17-.27 1.59-.13.3-.65 1.21-1.26 2.25L24 12.68v-.01a.01.01 0 0 0-.00-.01zM.00 8.16l.10 4.95L0 8.16zm.09 4.95 1.13 1.96 4.26 7.38a.01.01 0 0 0 .01.01h12.27c.45-.78.66-1.15 1.31-2.28.71-1.24.28-2.68-.04-3.47-.62.08-1.18.09-1.55.09H6.35c-.81 0-2.50-.05-3.85-.74-.51-.26-.97-.65-1.25-1.03-.18-.24-.63-1.00-1.16-1.92z"],
+  ["deutschebank",/deutsche ?bank/i,"0018A8","Deutsche Bank","M3.38 3.38v17.25h17.25V3.38H3.38zM0 0h24v24H0V0zm5.25 18.23 9.15-12.45h4.35L9.6 18.23H5.25z"],
+  ["paypal",/paypal/i,"002991","PayPal","M15.61 4.65H8.94L6.64 19.25H1.82L4.86 0h8.00c3.75 0 6.38 2.29 6.47 5.51-.65-.48-2.10-.86-3.72-.86m6.57 5.55c0 3.41-3.01 6.85-6.96 6.85h-2.49L11.60 24H6.74l1.84-11.54h3.59c4.21 0 7.35-3.63 7.15-6.95a5.24 5.24 0 0 1 2.85 4.69M9.65 5.55h6.41c.91 0 1.94.22 2.36.54-.20 2.74-2.65 5.48-6.44 5.48H8.71Z"],
+  ["revolut",/revolut/i,"191C1F","Revolut","M20.91 6.96C20.91 3.12 17.79 0 13.95 0H2.42v3.86h10.98c1.74 0 3.18 1.37 3.21 3.04.02.84-.30 1.63-.89 2.23-.59.60-1.38.93-2.21.93H9.23a.28.28 0 0 0-.28.28v3.43c0 .06.02.11.05.16L16.26 24h5.31l-7.27-10.09c3.66-.18 6.61-3.26 6.61-6.95zM6.89 5.92H2.42V24h4.47z"],
+  ["klarna",/klarna/i,"FFB3C7","Klarna","M4.59 2v20H0V2h4.59zm11.46 0c0 4.19-1.58 8.11-4.42 11.07l-.28.28L17.70 22h-5.67l-6.89-9.4 1.78-1.33c2.86-2.14 4.54-5.38 4.64-8.92L11.56 2h4.49zM21.5 17a2.5 2.5 0 110 5 2.5 2.5 0 010-5z"],
+  ["bunq",/\bbunq\b/i,"3394D7","bunq","M16.41 14.62h1.10v-2.90a2.48 2.48 0 0 0-2.48-2.48 2.48 2.48 0 0 0-2.48 2.48v2.90h1.10v-2.90c0-.84.62-1.52 1.38-1.52.76 0 1.38.68 1.38 1.52zm-6.07-5.24h1.10v2.90a2.48 2.48 0 0 1-2.48 2.48 2.48 2.48 0 0 1-2.48-2.48V9.38h1.10v2.90c0 .84.62 1.52 1.38 1.52.76 0 1.38-.68 1.38-1.52zM0 7.03V12c0 .05.00.09.00.14H0v2.48h.96l.06-.48A2.76 2.76 0 0 0 5.52 12a2.76 2.76 0 0 0-4.41-2.21V7.04zm2.69 3.17c.95 0 1.72.80 1.72 1.79 0 .99-.77 1.79-1.73 1.79-.95 0-1.72-.80-1.72-1.79 0-.99.77-1.79 1.72-1.79zm18.55-.96A2.76 2.76 0 0 0 18.48 12a2.76 2.76 0 0 0 4.41 2.21v2.76H24V12a2.15 2.15 0 0 0-.00-.14H24V9.38h-.96l-.06.48a2.74 2.74 0 0 0-1.74-.62zm.07.96c.95 0 1.72.80 1.72 1.79 0 .99-.77 1.79-1.72 1.79-.95 0-1.73-.80-1.73-1.79 0-.99.77-1.79 1.73-1.79Z"],
+  ["visa",/\bvisa\b/i,"1A1F71","Visa","M9.11 8.26L5.97 15.76H3.92L2.37 9.78c-.09-.37-.17-.50-.46-.66C1.45 8.86.68 8.63 0 8.48l.05-.22h3.3a.90.90 0 1.89.76l.82 4.34 2.02-5.10zm8.03 5.05c.01-1.98-2.74-2.09-2.72-2.97.01-.27.26-.56.82-.63a3.66 3.66 0 11.91.34l.34-1.59a5.21 5.21 0 00-1.81-.33c-1.92 0-3.27 1.02-3.28 2.48-.01 1.08.96 1.68 1.70 2.04.76.37 1.01.60 1.01.93-.01.50-.60.72-1.16.73-.97.01-1.54-.26-1.99-.47l-.35 1.64c.45.21 1.29.39 2.16.40 2.04 0 3.37-1.01 3.38-2.56m5.06 2.45H24l-1.56-7.50h-1.66a.88.88 0 00-.83.55l-2.91 6.95h2.04l.41-1.12h2.49zm-2.16-2.66l1.02-2.81.59 2.81zm-8.16-4.84l-1.60 7.50H8.34l1.60-7.50z"],
+  ["mastercard",/mastercard/i,"EB001B","Mastercard","M11.34 18.03c.06.05.12.10.18.15-1.18.78-2.59 1.24-4.11 1.24C3.32 19.42 0 16.10 0 12c0-4.09 3.32-7.42 7.42-7.42 1.52 0 2.93.46 4.11 1.24-.06.05-.12.10-.17.15C9.6 7.49 8.60 9.69 8.60 12c0 2.31 1.00 4.51 2.75 6.03zm5.24-13.45c-1.52 0-2.93.46-4.11 1.24.06.05.12.10.17.15C14.4 7.49 15.40 9.69 15.40 12c0 2.31-1.00 4.51-2.75 6.03-.06.05-.12.10-.18.15 1.18.78 2.59 1.24 4.11 1.24C20.68 19.42 24 16.10 24 12c0-4.09-3.32-7.42-7.42-7.42zM12 6.17c-.10.07-.19.15-.28.23C10.16 7.76 9.17 9.77 9.17 12c0 2.24.99 4.24 2.55 5.59.09.08.18.16.28.23.10-.07.19-.15.28-.23 1.56-1.36 2.55-3.36 2.55-5.59 0-2.23-.99-4.24-2.55-5.59-.09-.08-.18-.16-.28-.23z"],
+  ["netflix",/netflix/i,"E50914","Netflix","m5.40 0 8.35 23.60c2.35.06 4.86.40 4.86.40L10.11 0H5.40zm8.49 0v9.17l4.71 13.33V0h-4.71zM5.40 1.5V24c1.87-.23 2.81-.31 4.71-.40V14.83L5.40 1.5z"],
+  ["spotify",/spotify/i,"1ED760","Spotify","M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.10-10.56-1.14-.42.12-.78-.18-.90-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.30 1.02zm1.44-3.3c-.30.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14C9.6 9.9 15 10.56 18.72 12.84c.36.18.54.78.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.30c-.6.18-1.2-.18-1.38-.72-.18-.60.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.62.54.3.72 1.02.42 1.56-.30.42-1.02.60-1.56.3z"],
+  ["appletv",/apple ?tv/i,"000000","Apple TV","M20.57 17.73h-1.81l-3.34-9.20h1.63l2.02 5.99c.07.23.27.9.59 2.01l.30-.997.33-1.01 2.09-6.00H24zm-5.34-.07a5.76 5.76 0 0 1-1.55.21c-1.23 0-1.84-.69-1.84-2.09V9.65h-1.06V8.53h1.12V7.08l1.48-.60v2.06h1.71v1.11H13.38v5.80c0 .45.07.75.21.93.14.18.40.26.75.26.21 0 .49-.04.88-.12zm-7.29-5.34c.02 1.76 1.55 2.36 1.57 2.37-.02.04-.25.84-.81 1.66-.49.71-.99 1.42-1.79 1.44-.78.02-1.03-.46-1.93-.46-.89 0-1.17.45-1.91.48-.76.03-1.34-.78-1.84-1.48-.998-1.45-1.76-4.10-.73-5.88.51-.89 1.43-1.45 2.42-1.46.75-.02 1.47.51 1.93.51.46 0 1.33-.63 2.23-.54.38.02 1.45.16 2.14 1.15-.06.03-1.28.74-1.27 2.22M6.47 7.99c.40-.49.69-1.18.61-1.86-.58.03-1.29.39-1.72.88-.38.44-.71 1.14-.62 1.81.65.05 1.33-.34 1.73-.82Z"],
+  ["applemusic",/apple ?music/i,"FA243C","Apple Music","M23.99 6.12a9.23 9.23 0 00-.24-2.19c-.32-1.31-1.06-2.31-2.18-3.04a5.02 5.02 0 00-1.88-.73 10.50 10.50 0 00-1.56-.15c-.04-.00-.08-.01-.12-.01H5.99c-.15.01-.30.02-.46.03-.75.04-1.49.12-2.19.4-1.34.53-2.3 1.45-2.87 2.78-.19.45-.29.93-.36 1.41-.06.39-.09.79-.1 1.18 0 .03-.01.06-.01.09v12.22c.01.14.02.28.03.42.05.81.15 1.62.50 2.37.65 1.42 1.74 2.35 3.23 2.80.42.13.86.19 1.29.23.56.05 1.11.06 1.67.06h11.03a12.5 12.5 0 001.57-.1c.82-.11 1.60-.35 2.29-.81a5.05 5.05 0 001.88-2.21c.19-.42.29-.87.37-1.32.11-.68.14-1.36.14-2.04-.00-3.8 0-7.59-.00-11.39zm-6.42 3.99v5.71c0 .42-.06.83-.24 1.21-.29.59-.76.96-1.39 1.14-.35.1-.71.16-1.07.17-.95.04-1.77-.6-1.94-1.54a1.88 1.88 0 11.04-2.02c.32-.16.67-.25 1.02-.32.38-.08.76-.15 1.13-.24.27-.06.46-.23.51-.52a.90.90 0 00.02-.19c0-1.81 0-3.63-.00-5.44a.72.72 0 00-.03-.18c-.04-.15-.15-.24-.30-.23-.16.01-.32.04-.47.07-.76.15-1.52.30-2.28.46l-2.33.47-1.37.28c-.02.00-.03.01-.05.01-.28.08-.38.20-.39.49-.00.04 0 .09 0 .13-.00 2.60 0 5.20-.00 7.80 0 .42-.05.84-.21 1.23-.28.64-.77 1.04-1.43 1.23-.35.1-.71.16-1.07.17-.96.04-1.75-.6-1.92-1.54-.14-.81.23-1.69 1.15-2.08.36-.15.73-.23 1.11-.31.29-.06.57-.12.86-.18.38-.08.58-.32.6-.71v-.15c0-2.96 0-5.92.00-8.88 0-.12.01-.25.04-.37.07-.28.27-.45.55-.52.26-.07.52-.11.77-.17.73-.15 1.47-.30 2.2-.44l2.27-.46c.67-.13 1.34-.27 2.01-.40.22-.04.44-.09.66-.11.31-.03.52.17.55.48.01.07.01.15.01.22.00 1.91.00 3.82 0 5.73z"],
+  ["icloud",/icloud/i,"3693F3","iCloud","M13.76 4.29a6.51 6.51 0 0 0-5.67 3.33 3.57 3.57 0 0 0-1.56-.36 3.57 3.57 0 0 0-3.52 3A4.92 4.92 0 0 0 0 14.80a4.92 4.92 0 0 0 4.92 4.91 4.93 4.93 0 0 0 .62-.04h14.42c2.31-.27 4.04-2.26 4.04-4.59v-.01a4.59 4.59 0 0 0-3.73-4.51 6.51 6.51 0 0 0-6.51-6.27z"],
+  ["apple",/\bapple\b/i,"000000","Apple","M12.15 6.90c-.95 0-2.42-1.08-3.96-1.04-2.04.03-3.91 1.18-4.96 3.01-2.12 3.67-.55 9.10 1.52 12.09 1.01 1.45 2.21 3.09 3.79 3.04 1.52-.07 2.09-.99 3.94-.99 1.83 0 2.35.99 3.96.95 1.64-.03 2.68-1.48 3.68-2.95 1.16-1.69 1.64-3.33 1.66-3.42-.04-.01-3.18-1.22-3.22-4.86-.03-3.04 2.48-4.49 2.60-4.56-1.43-2.09-3.62-2.32-4.39-2.38-2-.16-3.67 1.09-4.61 1.09zM15.53 3.83c.84-1.01 1.4-2.43 1.25-3.83-1.21.05-2.66.81-3.53 1.82-.78.90-1.45 2.34-1.27 3.71 1.34.10 2.71-.69 3.56-1.70"],
+  ["youtube",/youtube/i,"FF0000","YouTube","M23.50 6.19a3.02 3.02 0 0 0-2.12-2.14C19.50 3.54 12 3.54 12 3.54s-7.50 0-9.38.51A3.02 3.02 0 0 0 .50 6.19C0 8.07 0 12 0 12s0 3.93.50 5.81a3.02 3.02 0 0 0 2.12 2.14c1.87.51 9.38.51 9.38.51s7.50 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.50-5.81zM9.54 15.57V8.43L15.82 12l-6.27 3.57z"],
+  ["dazn",/\bdazn\b/i,"F8F8F5","DAZN","M14.77 8.29l.77-2.60.79 2.60zm3.85 2.27l-2.02-6.13c-.04-.14-.10-.22-.15-.27-.06-.04-.15-.06-.28-.06h-1.12a.48.48 0 0 0-.28.07c-.06.04-.11.13-.15.26l-2.04 6.13c-.03.03-.04.10-.04.19 0 .15.09.22.27.22h.84c.08 0 .14-.00.19-.01a.21.21 0 0 0 .12-.05.33.33 0 0 0 .08-.12c.02-.05.05-.12.07-.20l.32-1.07h2.31l.33 1.05c.03.09.05.16.08.21a.40.40 0 0 0 .09.12c.03.03.07.05.11.05h.00c.04.01.10.01.17.01h.90c.18 0 .27-.07.27-.22a.59.59 0 0 0-.01-.09.88.88 0 0 0-.04-.11l.00.01zm-.99 2.47h-.65c-.17 0-.28.02-.33.07-.06.05-.08.15-.08.29v3.64l-1.91-3.65c-.08-.15-.15-.25-.23-.29-.07-.04-.20-.06-.39-.06h-.60c-.17 0-.28.03-.33.07-.06.05-.08.15-.08.29v6.14c0 .15.03.25.08.29.05.05.16.07.33.07h.66c.17 0 .28-.02.33-.07.06-.05.08-.15.08-.29v-3.65l1.91 3.66c.08.15.15.25.23.29.07.04.20.06.39.06h.60c.17 0 .28-.02.33-.07.05-.05.08-.15.08-.29v-6.14c0-.15-.03-.25-.08-.29-.06-.05-.17-.07-.33-.07zm3.20-.58l1.67 1.67v8.38H1.50V14.11l1.66-1.66a.63.63 0 0 0 0-.89L1.50 9.89V1.50h20.99v8.38l-1.67 1.67a.63.63 0 0 0 0 .89zM24 0H0v10.61L1.39 12 0 13.39V24h24V13.39L22.61 12 24 10.61zM10.67 18.47H7.96l2.85-4.01a.67.67 0 0 0 .09-.15.42.42 0 0 0 .02-.14v-.77c0-.15-.03-.25-.08-.29-.06-.05-.17-.07-.33-.07H6.38c-.15 0-.24.03-.29.08-.04.06-.07.17-.07.34v.58c0 .17.02.29.07.34.04.06.14.08.29.08h2.54L6.11 18.47a.44.44 0 0 0-.11.27v.79c0 .15.03.24.08.29.06.05.17.07.33.07h4.25c.15 0 .24-.03.29-.08.04-.06.07-.17.07-.34v-.58c0-.17-.02-.29-.07-.34-.04-.06-.14-.08-.29-.08zM9.41 8.23c0 .26-.02.48-.05.66-.04.18-.09.32-.17.43a.65.65 0 0 1-.32.23 1.52 1.52 0 0 1-.49.07h-.79v-4.17h.79c.37 0 .63.11.79.32.16.21.24.57.24 1.07v1.39zm1.38-2.79c-.23-.46-.53-.80-.92-1.01-.39-.22-.88-.33-1.47-.33H6.42c-.17 0-.28.02-.33.07-.05.05-.08.15-.08.29v6.14c0 .15.03.25.08.29.06.05.17.07.33.07h2.22c1.05 0 1.76-.45 2.15-1.34.09-.20.15-.41.19-.62a4.91 4.91 0 0 0 .05-.80V6.91c0-.37-.02-.66-.05-.87a2.2 2.2 0 0 0-.19-.61l.01.01z"],
+  ["sky",/\bsky\b/i,"0072C9","Sky","M7.39 13.66c0 1.42-.93 2.45-2.82 2.67-1.35.15-3.34-.03-4.29-.15-.03-.15-.07-.34-.07-.49 0-1.25.66-1.52 1.3-1.52.66 0 1.69.12 2.46.12.83 0 1.10-.29 1.10-.56 0-.37-.34-.52-1.01-.64l-1.77-.34C.79 12.45 0 11.42 0 10.34c0-1.32.93-2.45 2.80-2.65 1.40-.15 3.12.02 4.05.12.02.17.05.32.05.49 0 1.25-.66 1.52-1.28 1.52-.49 0-1.23-.10-2.09-.10-.88 0-1.23.25-1.23.54 0 .32.34.44.88.54l1.72.32c1.74.29 2.48 1.3 2.48 2.53m3.09 1.52c0 .76-.29 1.20-1.79 1.20-.20 0-.37-.03-.54-.05V6.22c0-.76.27-1.57 1.77-1.57.20 0 .39.02.56.05zm6.08 3.93c.20.10.59.22 1.10.24.86.03 1.32-.32 1.69-1.08L24 7.91a2.5 2.5 0 0 0-.96-.22c-.59 0-1.40.12-1.91 1.32l-1.50 3.53-2.94-4.81c-.20-.05-.66-.15-1.01-.15-1.03 0-1.62.39-2.23 1.03l-2.87 3.14 2.31 3.63c.42.66.98 1.01 1.89 1.01.59 0 1.10-.15 1.32-.24l-2.77-4.20 1.96-2.09 3.24 5.08Z"],
+  ["rtl",/\brtl/i,"FA002E","RTL+","M0 9.89v4.22h7.50V9.89H0zm8.25 0v4.22h7.5V9.89h-7.5zm8.25 0v4.22H24V9.89h-7.50zm-14.37.97H4.12c.61 0 .94.28.94.73 0 .40-.25.66-.69.72l.98.82h-.75l-.93-.80H2.66v.80h-.52v-2.28zm8.28 0h3.16v.45H12.26v1.83h-.52v-1.83h-1.32v-.45zm8.41 0h.52v1.83h2.32v.45h-2.84v-2.28zm-16.18.43v.63H4.06c.33 0 .48-.10.48-.32 0-.21-.15-.32-.48-.32H2.66z"],
+  ["audible",/audible/i,"F8991C","Audible","M12.01 17.36L24 9.88v2.03l-11.99 7.51L0 11.91V9.89l12.01 7.48zm0-9.38c-2.71 0-5.08 1.36-6.45 3.47.11-.11.17-.17.29-.25 3.37-2.80 8.24-2.17 10.88 1.36l1.76-1.12c-1.39-2.04-3.79-3.45-6.48-3.45m0 3.47a4.39 4.39 0 0 0-3.55 1.82 3.60 3.60 0 0 1 2.14-.70c1.30 0 2.46.67 3.23 1.79l1.68-1.04c-.73-1.16-2.03-1.87-3.50-1.87M3.90 8.41c4.94-3.90 11.93-2.84 15.65 2.34l.03.03 1.82-1.13a11.21 11.21 0 0 0-9.39-5.08c-3.90 0-7.37 2.00-9.39 5.08.36-.41.82-.90 1.28-1.25"],
+  ["deezer",/deezer/i,"A238FF","Deezer","M.69 10.02c.38 0 .69-1.26.69-2.81 0-1.55-.31-2.81-.69-2.81C.31 4.41 0 5.67 0 7.22s.31 2.81.69 2.81ZM21.04 1.56c-.36 0-.68.81-.91 2.10C19.77 1.45 19.18 0 18.53 0c-.78 0-1.46 2.04-1.78 5-.31-2.16-.79-3.54-1.32-3.54-.74 0-1.39 2.70-1.62 6.47-.44-1.93-1.08-3.15-1.79-3.15s-1.35 1.21-1.79 3.15c-.24-3.76-.87-6.46-1.63-6.46-.54 0-1.01 1.38-1.32 3.54C6.94 2.04 6.26 0 5.47 0c-.66 0-1.25 1.45-1.60 3.67-.22-1.29-.55-2.10-.91-2.10-.68 0-1.22 2.81-1.22 6.27 0 3.47.55 6.27 1.22 6.27.28 0 .54-.48.74-1.27.32 2.93.996 4.94 1.78 4.94.61 0 1.14-1.20 1.51-3.11.25 3.62.88 6.20 1.60 6.20.46 0 .88-1.02 1.19-2.68C10.14 21.6 11 24 12.00 24c1.00 0 1.86-2.4 2.23-5.82.31 1.65.73 2.68 1.19 2.68.73 0 1.35-2.57 1.60-6.20.36 1.91.9 3.11 1.51 3.11.78 0 1.46-2.01 1.77-4.94.21.80.46 1.27.74 1.27.68 0 1.22-2.81 1.22-6.27-.01-3.46-.55-6.27-1.23-6.27ZM23.31 10.02c.38 0 .69-1.26.69-2.81 0-1.55-.31-2.81-.69-2.81-.38 0-.69 1.26-.69 2.81s.31 2.81.69 2.81Z"],
+  ["playstation",/playstation|\bps ?plus\b/i,"0070D1","PlayStation","M8.98 2.60v17.55l3.92 1.26V6.69c0-.69.30-1.15.79-.99.64.18.76.81.76 1.50v5.88c2.44 1.19 4.36-.00 4.36-3.15 0-3.24-1.13-4.67-4.44-5.83-1.31-.45-3.73-1.19-5.39-1.50zm4.66 16.24l6.30-2.27c.71-.26.83-.63.25-.82-.59-.19-1.64-.14-2.36.12l-4.21 1.5V14.98l.24-.09s1.20-.42 2.91-.61c1.70-.18 3.79.03 5.44.66 1.85.60 2.04 1.47 1.58 2.07-.47.6-1.62 1.04-1.62 1.04l-8.54 3.11V18.86zM1.81 18.6c-1.9-.55-2.21-1.67-1.35-2.32.80-.59 2.16-1.05 2.16-1.05l5.62-2.01v2.31L4.21 17c-.70.27-.82.63-.24.83.59.20 1.64.15 2.34-.12L8.25 17v2.07c-.12.03-.26.04-.39.07-1.94.33-4.00.20-6.04-.48z"],
+  ["google",/\bgoogle\b/i,"4285F4","Google","M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.19-1.79 4.13-1.15 1.15-2.93 2.4-6.05 2.4-4.83 0-8.6-3.89-8.6-8.72s3.77-8.72 8.6-8.72c2.6 0 4.51 1.03 5.91 2.35l2.31-2.31C18.75 1.44 16.13 0 12.48 0 5.87 0 .31 5.39.31 12s5.56 12 12.17 12c3.57 0 6.27-1.17 8.37-3.36 2.16-2.16 2.84-5.21 2.84-7.67 0-.76-.05-1.47-.17-2.05H12.48z"],
+  ["dropbox",/dropbox/i,"0061FF","Dropbox","M6 1.81L0 5.63l6 3.82 6.00-3.82L6 1.81zM18 1.81l-6 3.82 6 3.82 6-3.82-6-3.82zM0 13.27l6 3.82 6.00-3.82L6 9.45l-6 3.82zM18 9.45l-6 3.82 6 3.82 6-3.82-6-3.82zM6 18.37l6.00 3.82 6-3.82-6-3.82L6 18.37z"],
+  ["deutschebahn",/deutsche ?bahn|bahncard|\bdb\b/i,"F01414","Deutsche Bahn","M21.6 3.6H2.4C1.08 3.6 0 4.68 0 6v12c0 1.32 1.08 2.4 2.4 2.4h19.2c1.32 0 2.4-1.08 2.4-2.42V6c0-1.32-1.08-2.4-2.4-2.4zm.65 14.38c.02.36-.26.67-.65.70H2.4c-.36 0-.65-.31-.65-.67V6a.67.67 0 0 1 .62-.70H21.6c.36 0 .65.31.65.67v12zM7.34 6.50H3.31v10.99h4.03c3.34-.02 4.42-2.38 4.42-5.54 0-3.67-1.56-5.45-4.42-5.45zm-.46 9.22h-.94V8.23h.53c2.38 0 2.62 1.73 2.62 3.94 0 2.42-.82 3.55-2.21 3.55zm11.83-3.98c1.13-.34 1.90-1.37 1.92-2.57 0-.24-.05-2.69-3.14-2.69h-4.58v10.99H16.8c1.03 0 4.25 0 4.25-3.10 0-.74-.34-2.21-2.33-2.64zm-2.35-3.53c1.18 0 1.66.41 1.66 1.32 0 .72-.53 1.32-1.44 1.32h-1.03v-2.64h.82zm.24 7.51h-1.08v-2.83h1.15c1.37 0 1.70.79 1.70 1.42 0 1.42-1.34 1.42-1.78 1.42z"],
+  ["hellofresh",/hello ?fresh/i,"99CC33","HelloFresh","M9.79 22.23c-.97-.10-2.00-.33-3.04-.76-.59-.25-1.17-.58-1.21-.61-.36-.21-.66-.46-1.21-.73-.70-.34-1.38-.53-2.11-.61-.98-.07-1.04.01-1.32-.07-.17-.05-.32-.12-.49-.28-.05-.05-.13-.13-.16-.18-.13-.18-.17-.33-.19-.40-.03-.10-.04-.16-.04-.33 0-.16.02-.24.04-.31.08-.28.17-.34.43-.85.33-.65.52-1.28.62-1.96a5.73 5.73 0 0 0 .06-1.02c-.01-.51-.04-.61-.04-1.04-.00-1.25.24-2.35.55-3.29.21-.61.39-1.01.60-1.43.58-1.16 1.50-2.48 2.94-3.69.77-.65 1.97-1.50 3.55-2.12 1.34-.53 2.52-.70 3.06-.76.66-.09 1.81-.12 2.98.05.9966.15 2.24.49 3.51 1.2.43.24.68.44 1.01.63.81.47 1.65.71 2.45.80.42.05 1.06.00 1.30.07.15.04.26.09.39.18.11.08.36.28.49.65.06.18.12.61-.10.99-.04.06-.11.18-.16.27-.05.08-.14.26-.21.40-.66 1.37-.65 2.55-.60 3.26.05.84.05 2.23-.54 3.96-.10.30-.34.93-.70 1.61-.83 1.55-1.88 2.63-2.54 3.23-1.47 1.32-2.96 2.04-3.93 2.40-.90.34-1.58.51-2.30.63-.69.12-1.82.24-3.08.12z"],
+  ["bmw",/\bbmw\b/i,"0066B1","BMW","M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm0 .78C18.20.78 23.22 5.80 23.22 12c0 6.20-5.02 11.22-11.22 11.22C5.80 23.22.78 18.20.78 12S5.80.78 12 .78zm-.68.63c-.33.01-.66.04-.99.08l-.11 2.94a9.95 9.95 0 0 1 .71-.09l.07-1.99-.01-.14.04.13.66 1.49h.61l.66-1.49.04-.13-.01.14.07 1.99c.23.02.47.05.71.09l-.11-2.94a14.75 14.75 0 0 0-.99-.08l-.65 1.63-.02.12-.02-.12-.66-1.63zm6.70 1.82l-1.54 2.43c.20.15.45.37.62.52l1.45-.75.09-.07-.07.09-.75 1.45c.16.17.40.46.53.63l2.43-1.54a16.14 16.14 0 0 0-.46-.57L18.78 6.44l-.10.09.08-.12.68-1.36-.48-.48-1.36.68-.12.08.09-.11 1.02-1.54c-.18-.15-.35-.29-.57-.46zM5.5 3.79c-.36.04-.64.28-1.39 1.13a18.97 18.97 0 0 0-.76.91l2.07 1.97c.69-.76.97-1.04 1.51-1.61.38-.41.6-.87.22-1.32-.21-.24-.56-.29-.85-.17l-.03.01.01-.03a.7.7 0 0 0-.24-.73.72.72 0 0 0-.54-.15zm.01.61c.14-.04.28.06.31.2.03.14-.06.27-.15.38-.22.25-1.03 1.10-1.03 1.10l-.40-.38c.42-.51.86-.97 1.06-1.16a.55.55 0 0 1 .22-.14zM12 4.88a7.11 7.11 0 0 0-7.08 6.39v.00a7.12 7.12 0 0 0 8.52 7.70 7.11 7.11 0 0 0 5.68-6.97A7.12 7.12 0 0 0 12 4.88v-.00zm-5.54.24c.05 0 .10.01.14.04.09.06.13.16.11.26-.03.12-.13.23-.20.32l-1.04 1.12-.42-.4s.79-.83 1.04-1.10c.10-.11.17-.17.24-.20a.33.33 0 0 1 .14-.04zM12 5.82A6.17 6.17 0 0 1 18.18 12H12v6.18A6.17 6.17 0 0 1 5.82 12H12V5.82Z"],
+  ["volkswagen",/volkswagen|\bvw\b/i,"151F5D","Volkswagen","M12 0C5.36 0 0 5.36 0 12S5.36 24 12 24 24 18.64 24 12 18.64 0 12 0M12 1.41C13.2 1.41 14.36 1.63 15.43 2L12.13 9.13C12.09 9.17 12.09 9.26 12 9.26S11.91 9.17 11.87 9.13L8.57 2C9.64 1.63 10.8 1.42 12 1.42M6.9 2.74L10.72 10.97C10.8 11.14 10.89 11.19 11 11.19H13C13.12 11.19 13.2 11.14 13.29 10.97L17.06 2.74C18.64 3.64 20 4.93 20.96 6.47L15.6 16.84C15.56 16.93 15.5 16.97 15.47 16.97C15.39 16.97 15.39 16.89 15.34 16.84L13.29 12.3C13.2 12.13 13.12 12.09 13 12.09H11C10.89 12.09 10.8 12.13 10.71 12.3L8.66 16.84C8.61 16.89 8.62 16.97 8.53 16.97C8.44 16.97 8.44 16.89 8.4 16.84L3 6.47C3.94 4.93 5.32 3.64 6.9 2.74M2.06 8.53L8.23 20.53C8.31 20.7 8.4 20.83 8.62 20.83C8.83 20.83 8.91 20.7 9 20.53L11.87 14.14C11.91 14.06 11.96 14 12 14C12.09 14 12.09 14.1 12.13 14.14L15.04 20.53C15.13 20.7 15.21 20.83 15.43 20.83C15.64 20.83 15.73 20.7 15.81 20.53L22 8.53C22.37 9.6 22.59 10.76 22.59 12C22.54 17.79 17.79 22.59 12 22.59C6.21 22.59 1.46 17.79 1.46 12C1.46 10.8 1.67 9.65 2.06 8.53Z"],
+  ["audi",/\baudi\b/i,"BB0A30","Audi","M19.85,7.85c-0.99,0-1.90,0.35-2.62,0.93c-0.71-0.58-1.62-0.93-2.62-0.93 c-0.99,0-1.90,0.35-2.62,0.93c-0.71-0.58-1.62-0.93-2.62-0.93c-0.99,0-1.90,0.35-2.62,0.93 c-0.71-0.58-1.62-0.93-2.62-0.93C1.86,7.85,0,9.71,0,12s1.86,4.15,4.15,4.15c0.99,0,1.90-0.35,2.62-0.93 c0.71,0.58,1.62,0.93,2.62,0.93c0.99,0,1.90-0.35,2.62-0.93c0.71,0.58,1.62,0.93,2.62,0.93 c0.99,0,1.90-0.35,2.62-0.93c0.71,0.58,1.62,0.93,2.62,0.93C22.14,16.15,24,14.29,24,12S22.14,7.85,19.85,7.85z M17.23,13.87c-0.38-0.53-0.60-1.17-0.60-1.87c0-0.70,0.22-1.34,0.60-1.87c0.38,0.53,0.60,1.17,0.60,1.87 C17.83,12.70,17.61,13.34,17.23,13.87z M12,13.87c-0.38-0.53-0.60-1.17-0.60-1.87c0-0.70,0.22-1.34,0.60-1.87 c0.38,0.53,0.60,1.17,0.60,1.87C12.60,12.70,12.38,13.34,12,13.87z M6.77,13.87C6.39,13.34,6.17,12.70,6.17,12 c0-0.70,0.22-1.34,0.60-1.87C7.14,10.66,7.37,11.30,7.37,12C7.37,12.70,7.14,13.34,6.77,13.87z M0.94,12 c0-1.77,1.44-3.21,3.21-3.21c0.74,0,1.41,0.25,1.96,0.67C5.56,10.15,5.23,11.04,5.23,12 c0,0.96,0.33,1.85,0.88,2.55c-0.54,0.42-1.22,0.67-1.96,0.67C2.38,15.21,0.94,13.78,0.94,12z M7.43,14.55 C7.98,13.85,8.30,12.96,8.30,12c0-0.96-0.33-1.85-0.88-2.55c0.54-0.42,1.22-0.67,1.96-0.67 c0.74,0,1.41,0.25,1.96,0.67c-0.55,0.70-0.88,1.59-0.88,2.55c0,0.96,0.33,1.85,0.88,2.55 c-0.54,0.42-1.22,0.67-1.96,0.67C8.65,15.21,7.97,14.97,7.43,14.55z M12.66,14.55c0.55-0.70,0.88-1.59,0.88-2.55 c0-0.96-0.33-1.85-0.88-2.55c0.54-0.42,1.22-0.67,1.96-0.67s1.41,0.25,1.96,0.67 c-0.55,0.70-0.88,1.59-0.88,2.55c0,0.96,0.33,1.85,0.88,2.55c-0.54,0.42-1.22,0.67-1.96,0.67 C13.88,15.21,13.20,14.97,12.66,14.55z M19.85,15.21c-0.74,0-1.41-0.25-1.96-0.67c0.55-0.70,0.88-1.59,0.88-2.55 c0-0.96-0.33-1.85-0.88-2.55c0.54-0.42,1.22-0.67,1.96-0.67c1.77,0,3.21,1.44,3.21,3.21 S21.62,15.21,19.85,15.21z"],
+  ["tesla",/tesla/i,"CC0000","Tesla","M12 5.36l2.48-3.03s4.25.09 8.47 2.05c-1.08 1.64-3.23 2.44-3.23 2.44-.15-1.44-1.15-1.79-4.35-1.79L12 24 8.62 5.03c-3.18 0-4.19.35-4.33 1.79 0 0-2.15-.80-3.23-2.43C5.28 2.43 9.53 2.34 9.53 2.34L12 5.36l-.00.00H12v-.00zm0-3.90c3.42-.03 7.33.53 11.33 2.28.54-.97.67-1.40.67-1.40C19.63.61 15.53.01 12 0 8.47.01 4.38.61 0 2.35c0 0 .20.53.67 1.40C4.67 1.99 8.59 1.44 12 1.46v.00z"],
+  ["toyota",/toyota/i,"EB0A1E","Toyota","M12 3.85C5.22 3.85 0 7.30 0 12c0 4.70 5.22 8.15 12 8.15S24 16.70 24 12c0-4.70-5.22-8.15-12-8.15zm7.33 3.84c0 1.08-1.73 1.91-4.49 2.25-.26-2.58-1.00-4.28-1.96-4.91 2.95.18 6.45 1.23 6.45 2.67zM12 16.40c-.96 0-1.75-1.5-1.81-4.39.58.05 1.18.07 1.81.07.63 0 1.23-.03 1.81-.07-.06 2.89-.85 4.39-1.81 4.39zm0-6.31c-.59 0-1.16-.02-1.69-.05.26-1.73.92-3.15 1.69-3.15.77 0 1.43 1.42 1.69 3.15-.54.03-1.10.05-1.69.05zm-.88-5.08c-.96.63-1.71 2.33-1.96 4.92C6.39 9.6 4.67 8.77 4.67 7.69c0-1.44 3.50-2.49 6.45-2.67zM2.04 11.68a5.26 5.26 0 11.05-3.16c.27 1.55 2.52 2.88 5.97 3.37V12c0 3.77.88 6.20 2.09 6.97-5.11-.32-9.11-3.48-9.11-7.29zm10.82 7.29c1.21-.77 2.09-3.20 2.09-6.97v-.12c3.45-.49 5.70-1.83 5.97-3.37a5.26 5.26 0 11.05 3.17c-.00 3.81-4.01 6.97-9.11 7.29z"],
+  ["skoda",/[sš]koda/i,"0E3A2F","Škoda","M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0Zm0 22.96C5.95 22.96 1.04 18.05 1.04 12 1.04 5.95 5.95 1.04 12 1.04S22.96 5.95 22.96 12 18.05 22.96 12 22.96Zm5.19-7.23-.27.73h-.98c.26-.71 3.58-8.62-2.94-13.98a9.53 9.53 0 0 0-4.05.45c.22.17 2.47 2.03 3.54 4.32l-.31.08c-.59-.64-2.72-2.98-4.74-3.74a9.62 9.62 0 0 0-2.84 2.36c.95.49 3.44 1.97 4.39 3.13-.05.02-.27.14-.27.14-1.74-1.32-4.82-2.00-4.98-2.04a9.51 9.51 0 0 0-1.23 3.61c4.78.96 6.06 3.17 6.28 5.67H7.88l-1.55-.68a.86.86 0 0 0-.25-.05H3.18a9.59 9.59 0 0 0 1.93 2.92h1.23c.11 0 .20-.01.29-.07l1.25-.64h9.04l.27.73a4.84 4.84 0 0 0 2.95-1.47 4.84 4.84 0 0 0-2.95-1.47zm-4.14-.58a1.19 1.19 0 0 1-.50-1.22 1.19 1.19 0 0 1 .93-.93 1.19 1.19 0 0 1 1.22.50c.31.46.26 1.09-.15 1.50-.40.40-1.03.46-1.50.15z"],
+  ["seat",/\bseat\b/i,"33302E","SEAT","M0 10.32l23.98 4.46c-.02.66-.06 2.71-.10 3.90-.04 1.42-.35 2.28-.93 2.81-.80.72-1.75.88-4.01 1.01-5.22.29-10.54.25-17.22-.23-.70-.04-.97-.18-1.09-.27-.29-.20-.33-.43-.41-1.60-.06-.80-.16-3.12-.20-3.90 3.10.21 7.85.37 11.71.37.97 0 3.49.02 4.17.02.53 0 1.23-.14 1.58-.70L0 13.22zm.02-1.25c.02-.76.06-2.65.10-3.76.04-1.42.35-2.28.93-2.81.80-.72 1.75-.88 4.01-1.01 5.22-.29 10.54-.25 17.22.23.70.04.97.18 1.09.27.29.20.33.43.41 1.60.04.68.14 2.49.18 3.47-2.30-.12-6.21-.31-9.60-.35-3.39-.04-6.45.02-6.82.06-.74.10-1.09.45-1.19.59L24 10.63v2.57Z"],
+  ["opel",/\bopel\b/i,"F7FF14","Opel","M12.29 4.57a7.46 7.46 0 0 0-7.34 5.01h.57a6.93 6.93 0 0 1 6.48-4.49 6.92 6.92 0 0 1 6.92 6.92c0 .12 0 .23-.01.35l.53.06c0-.13.01-.27.01-.4a7.46 7.46 0 0 0-7.17-7.45zM.87 10.11 0 10.57l13.25 1.44 3.63-1.89H.87zm3.68 1.48v.41a7.46 7.46 0 0 0 14.50 2.44h-.57a6.92 6.92 0 0 1-6.47 4.49 6.93 6.93 0 0 1-6.92-6.93v-.35l-.53-.06zm6.19.41-3.63 1.90h16.01l.87-.45v-.01l-13.25-1.44zm13.25 1.44H24l-.00-.01v.01z"],
+  ["hyundai",/hyundai/i,"002C5E","Hyundai","M12 18.16c-6.63 0-12-2.76-12-6.16 0-3.40 5.37-6.16 12-6.16 6.63 0 12 2.76 12 6.16 0 3.40-5.37 6.16-12 6.16zM7.60 7.17C3.70 7.98.97 9.83.97 11.98c0 1.19.84 2.29 2.25 3.18.12.07.19.09.25.08.10-.01.16-.07.20-.15.03-.05.06-.12.10-.20.46-1.08 2.08-4.83 4.20-7.38a1.18 1.18 0 0 0 .10-.15c.05-.08.04-.15.00-.19-.06-.06-.22-.07-.48-.02zM9.74 8.90c-1.17 2.85 1.05 2.50 1.65 2.36 1.02-.23 1.99-.61 2.77-.93 2.22-.89 3.40-1.78 3.79-2.12a1.98 1.98 0 0 0 .11-.10c.06-.06.10-.12.10-.20 0-.09-.08-.17-.24-.22-.01-.00-.05-.02-.06-.03-1.70-.54-3.72-.86-5.90-.86-.02 0-.06-.00-.12 0-.26.01-.55.07-.79.19-.78.40-1.12 1.42-1.31 1.90zm10.59.00c-.03.05-.06.12-.10.20-.46 1.08-2.08 4.83-4.20 7.37-.05.06-.08.10-.10.15-.05.08-.04.15 0 .19.06.06.22.07.47.02 3.90-.81 6.63-2.66 6.63-4.81 0-1.19-.84-2.29-2.25-3.17-.12-.07-.19-.09-.25-.08-.10.01-.16.07-.20.15zM14.26 15.10c1.17-2.85-1.05-2.49-1.65-2.36-1.02.23-2.00.61-2.78.92-2.22.89-3.40 1.78-3.79 2.12-.05.04-.08.07-.11.10-.06.06-.10.12-.10.20 0 .09.08.17.24.22.01.00.05.02.07.03 1.70.54 3.72.86 5.9.86.02 0 .06.00.12 0 .26-.01.55-.07.79-.19.78-.41 1.12-1.42 1.31-1.90z"],
+  ["kia",/\bkia\b/i,"05141F","Kia","M13.92 14.18c0 .05.01.07.04.07a.12.12 0 0 0 .06-.02l7.48-4.85a.72.72 0 0 1 .43-.13h1.64c.25 0 .42.17.42.42v3.14c0 .38-.08.6-.42.80l-1.99 1.2a.14.14 0 0 1-.07.02c-.02 0-.05-.02-.05-.09v-3.66c0-.04-.01-.07-.04-.07a.11.11 0 0 0-.06.02l-5.47 3.55a.73.73 0 0 1-.42.13h-3.62c-.25 0-.42-.17-.42-.42V9.76c0-.03-.01-.06-.04-.06a.12.12 0 0 0-.06.02L7.73 11.88c-.04.02-.05.04-.05.06 0 .01.01.03.03.06l2.58 2.58c.03.03.06.06.06.09 0 .02-.04.04-.08.04H7.94c-.18 0-.32-.03-.42-.13l-1.56-1.56a.07.07 0 0 0-.05-.02.10.10 0 0 0-.05.01l-2.61 1.57a.72.72 0 0 1-.42.12H.42C.17 14.7 0 14.53 0 14.28v-3.08c0-.38.08-.6.42-.8L2.43 9.19a.10.10 0 0 1 .05-.02c.03 0 .05.03.05.1V13.4c0 .04.01.06.04.06a.14.14 0 0 0 .06-.02L9.41 9.36a.73.73 0 0 1 .45-.12h3.65c.25 0 .42.17.42.42l-.00 4.52z"],
+  ["renault",/renault/i,"FFCC33","Renault","M17.46 11.99l-4.10-7.69-.92 1.71 3.21 5.99-5.48 10.28L4.69 11.99 11.10 0H9.27L2.88 11.99 9.27 24h1.81zm3.65 0L14.71 0h-1.81L6.52 11.99l4.12 7.71.90-1.71-3.19-6.00 5.46-10.26L19.29 11.99 12.90 24h1.81Z"],
+  ["fiat",/\bfiat\b/i,"941711","Fiat","M21.18 6.25c.49 1.15.73 2.44.73 3.96 0 .82-.07 1.69-.21 2.67-.29 2.01-1.05 4.11-1.75 5.49-.11.22-.20.37-.39.53-.32.28-.60.35-.71.29-.08-.05-.13-.30-.11-.67.01-.32.09-.55.20-.92a36.26 36.26 0 0 0 1.2-5.42c.39-2.66.37-5.06-.20-6.52a2.22 2.22 0 0 0-.22-.43c-.06-.09-.11-.14-.11-.14-1.18-1.18-4.37-1.78-7.56-1.78-3.19 0-6.38.59-7.56 1.78 0 0-.04.04-.11.14a2.12 2.12 0 0 0-.22.43c-.57 1.46-.59 3.86-.20 6.52.26 1.81.67 3.72 1.23 5.50.10.31.16.52.17.84.02.37-.03.62-.11.67-.10.06-.39-.01-.71-.29-.23-.20-.34-.41-.49-.70-.68-1.39-1.39-3.40-1.67-5.32a18.88 18.88 0 0 1-.21-2.67c0-1.51.24-2.81.73-3.95.37-.86.98-1.58 1.78-2.08a13.89 13.89 0 0 1 6.53-2.12 13.9 13.9 0 0 1 .81-.03h.02c.27 0 .55.01.82.03 2.28.14 4.54.87 6.53 2.12a4.58 4.58 0 0 1 1.78 2.08zm-4.76 14.53c-.09.02-.36.08-.63.16-.24.07-.48.12-.60.14a16.51 16.51 0 0 1-3.12.28h-.03c-1.12 0-2.18-.10-3.11-.28a9.23 9.23 0 0 1-.56-.13 14.99 14.99 0 0 0-.60-.15c-.42-.10-.80-.16-.82-.08-.03.09.16.29.40.47.06.04.20.14.36.22.15.07.32.13.39.15 1.10.35 2.35.50 3.94.50h.02c1.56 0 2.79-.14 3.88-.48.37-.12.59-.21.85-.42.22-.17.39-.35.36-.44-.02-.07-.35-.02-.73.06zm-2.51-10.31c-.14-.81-.32-1.43-.52-1.85l-.00-.00h-.02l-.68-.01h-.01l-.03 3.00h1.43l-.00-.01c0-.01-.06-.52-.17-1.13zm5.76 1.69c-.32 2.23-.88 4.62-1.66 6.70-.13.35-.25.48-.53.7a6.23 6.23 0 0 1-2.43 1.03c-.90.17-1.91.27-2.97.27h-.03a15.66 15.66 0 0 1-2.97-.27 6.23 6.23 0 0 1-2.43-1.03c-.28-.22-.40-.35-.53-.7-.78-2.08-1.34-4.47-1.66-6.70-.37-2.58-.35-4.85.18-6.20.07-.17.14-.29.19-.37.05-.07.08-.1.08-.1 1.07-1.07 4.06-1.65 7.16-1.65 3.10 0 6.09.58 7.16 1.65 0 0 .03.03.08.1.05.08.12.20.19.37.53 1.35.55 3.63.18 6.20zM8.90 7.57L6.22 7.55l.27 9.34 1.12.01-.02-4.25h1.01v-1.10H7.59V8.66h1.31V7.56zm1.88-.02l-1.36.00.18 9.35h1.16l.03-9.35zm3.45.01h-2.73l.11 9.33h1.09l.01-4.22h1.42l.00.01c.13.80.14 4.17.14 4.21v.01h1.06l.01-.48c.05-2.42.13-6.47-1.11-8.86zm4.32-.01l-3.34.01v1.08h.998v.01l-.04 8.25h1.13l.28-8.26h.98v-1.09zM23.98 12c0 6.62-5.37 12-11.98 12C5.40 24 .03 18.62.03 12S5.40 0 12 0c6.60 0 11.98 5.38 11.98 12zm-.33-.01C23.64 5.56 18.42.33 12.00.33 5.64.33.46 5.46.36 11.81a1.71 1.71 0 0 1 .68-.78c.66-.39.83-1.39.89-1.98l.01-.06c-.04.40-.07.79-.07 1.22 0 .83.07 1.72.21 2.71.41 2.9 1.81 6.01 2.64 6.96l.05.05.19.20.01.01c2.01 1.65 3.86 2.23 7.06 2.23h.02c3.20 0 5.05-.58 7.06-2.23l.01-.01.18-.20.05-.06c.83-.95 2.23-4.06 2.64-6.96.14-.99.21-1.88.21-2.71 0-.45-.02-.89-.06-1.31l.01.01c.06.60.38 2.14.995 2.59.21.15.38.32.50.50z"],
+  ["mini",/\bmini\b/i,"000000","MINI","M0 9.17h7.56c.48-.75 1.11-1.34 1.89-1.78.78-.44 1.63-.66 2.55-.66.92 0 1.77.22 2.55.66.79.44 1.42 1.03 1.89 1.78H24l-.75.75h-6.40a4.28 4.28 0 0 1 .30.89h5.23l-.75.75h-4.37c.01.19.02.34.02.44 0 .10-.01.25-.02.44h3.49l-.75.75h-2.86a4.07 4.07 0 0 1-.30.88h2.26l-.76.75H16.44c-.47.75-1.10 1.34-1.89 1.79-.79.44-1.64.67-2.55.67-.92 0-1.77-.22-2.55-.66-.78-.44-1.41-1.04-1.89-1.79H5.64l-.74-.75h2.26a4.09 4.09 0 0 1-.30-.88H4.01l-.76-.75h3.49c-.01-.19-.02-.34-.02-.44 0-.10.01-.25.02-.44h-4.36l-.76-.75h5.24a4.31 4.31 0 0 1 .30-.89H.75zm7.84 1.07c-.24.56-.36 1.14-.36 1.75 0 .61.12 1.20.36 1.75.24.56.56 1.04.96 1.44.40.41.88.73 1.44.97.56.24 1.14.36 1.75.36.61 0 1.20-.12 1.75-.36.56-.24 1.04-.56 1.44-.97.40-.41.72-.89.97-1.44.24-.56.36-1.14.36-1.75 0-.61-.12-1.20-.36-1.75-.24-.56-.56-1.04-.97-1.44-.40-.40-.88-.72-1.44-.96-.56-.24-1.14-.36-1.75-.36-.61 0-1.20.12-1.75.36-.56.24-1.04.56-1.44.96-.40.40-.72.88-.96 1.44zm.55 2.94h.47l-.01-1.77.57 1.77.52-.00.56-1.76v1.76h.50v-2.38l-.70-.00-.60 1.90-.61-1.89-.67-.00zm3.13 0h.50v-2.38h-.50zm1.03 0h.48v-1.71l.95 1.71h.58v-2.38h-.47v1.72l-.95-1.72h-.58zm2.55 0h.49v-2.38h-.49z"],
+  ["volvo",/volvo/i,"003057","Volvo","M10.87 12.58h.49l-.00-1.45h-.49v-.32h1.94v.32h-.48v1.45h.45c.41 0 .69-.27.69-.65h.32v.97h-2.91v-.33zm4.31.33h1.13l.96-1.78h.48v-.32h-1.45v.32h.42l-.70 1.29-.71-1.29h.51l-.00-.32h-2.10v.32h.48l.98 1.78zM5.07 10.81H2.97v.32h.48l.98 1.78h1.13l.96-1.78h.48v-.32h-1.45v.32h.42l-.7 1.29-.71-1.29h.51v-.32zm3.71-.04c.97 0 1.50.49 1.50 1.10 0 .62-.49 1.11-1.49 1.11-.999 0-1.50-.49-1.50-1.11 0-.61.52-1.10 1.49-1.10zm.02.33c-.33-.01-.53.35-.53.75-.01.39.15.78.51.79.37.01.52-.39.53-.77.01-.41-.17-.76-.50-.77zm10.74-.33c.97 0 1.50.49 1.50 1.10 0 .62-.49 1.11-1.49 1.11-1 0-1.50-.49-1.50-1.11 0-.61.52-1.10 1.49-1.10zm-.52 1.08c-.01.39.15.78.51.79.37.01.52-.39.53-.77.01-.41-.17-.76-.50-.77-.33-.01-.53.35-.53.75zm2.86-6.67L20.66 6.4A10.26 10.26 0 0 1 22.31 12c0 5.69-4.62 10.31-10.31 10.31S1.69 17.69 1.69 12 6.31 1.69 12 1.69c2.07 0 4.00.61 5.61 1.66l1.22-1.22A11.94 11.94 0 0 0 12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12c0-2.53-.79-4.88-2.13-6.82zM18.04.47v.34c.73.39 1.41.86 2.05 1.38l-1.71 1.71a10.29 10.29 0 0 1 1.74 1.73l1.71-1.71c.52.64.99 1.32 1.38 2.04h.33V.47h-5.49z"],
+  ["nissan",/nissan/i,"C3002F","Nissan","M20.58 14.96l-.01.03c-1.25 3.64-4.68 6.09-8.56 6.09-3.88 0-7.32-2.45-8.56-6.09l-.01-.03H.71v.33l1.13.13c.7.08.85.39 1.04.78l.05.10c1.64 3.50 5.20 5.75 9.08 5.75 3.88 0 7.44-2.26 9.08-5.75l.05-.10c.19-.39.34-.7 1.04-.78l1.13-.13v-.33zM3.44 9.01c1.25-3.64 4.69-6.09 8.56-6.09 3.88 0 7.32 2.45 8.56 6.09l.01.03h2.73v-.33l-1.13-.13c-.7-.08-.85-.39-1.04-.78l-.05-.10C19.45 4.22 15.88 1.96 12.01 1.96c-3.88 0-7.44 2.26-9.08 5.75l-.05.10c-.19.39-.34.7-1.04.78l-1.13.13v.33h2.72zm13.86 1.59l-1.74 2.79h.75l.31-.5h2.03l.31.5h.75l-1.74-2.79zm1.03 1.77h-1.40l.7-1.12zm2.81-1.07l2.07 2.10H24v-2.79h-.61v2.08l-2.06-2.08h-.80v2.79h.62zM0 13.39h.62v-2.10l2.08 2.10h.78v-2.79h-.62v2.08L.80 10.60H0zm4.84-2.79h.62v2.79h-.62zm4.49 2.20c-.02.01-.10.01-.12.01H6.74v.57h2.5c.02 0 .17 0 .20-.01.51-.05.74-.47.74-.84 0-.38-.24-.79-.70-.83-.09-.01-.17-.01-.2-.01H7.64a.83.83 0 0 1-.18-.01c-.13-.03-.18-.15-.18-.24 0-.09.05-.2.18-.24a.68.68 0 0 1 .17-.01h2.36v-.56H7.6c-.1 0-.18.00-.24.01a.79.79 0 0 0-.69.81c0 .34.21.74.69.81.09.01.20.01.26.01H9.2c.03 0 .1 0 .11.01.18.02.24.16.24.28a.26.26 0 0 1-.23.27zm4.66 0c-.02.01-.10.01-.13.01H11.4v.57h2.5c.02 0 .17 0 .20-.01.51-.05.74-.47.74-.84 0-.38-.24-.79-.70-.83-.09-.01-.17-.01-.2-.01H12.3a.83.83 0 0 1-.18-.01c-.13-.03-.18-.15-.18-.24 0-.09.05-.2.18-.24a.68.68 0 0 1 .17-.01h2.36v-.56h-2.40c-.1 0-.18.00-.24.01a.79.79 0 0 0-.69.81c0 .34.21.74.69.81.09.01.20.01.26.01h1.59c.03 0 .1 0 .11.01.18.02.24.16.24.28a.27.27 0 0 1-.23.27Z"],
+  ["mazda",/mazda/i,"101010","Mazda","M12.00 12.88c-.04 0-.10-.05-.22-.26a7.53 7.53 0 00-1.98-2.35A8.26 8.26 0 007.7 9.06a17.95 17.95 0 00-.34-.14c-1.01-.4-2.06-.81-3.04-1.38A8.98 8.98 0 014 7.36c.19-.34.42-.67.67-.96a6.05 6.05 0 11.25-1.13 7.13 7.13 0 11.62-.81c1.22-.43 2.68-.65 4.46-.65 1.78.00 3.24.21 4.46.65a7.10 7.10 0 11.62.81c.47.32.89.70 1.25 1.13.25.30.47.62.67.96-.10.06-.21.13-.32.19-.98.56-2.02.98-3.04 1.38l-.34.14a8.26 8.26 0 00-2.1 1.20 7.52 7.52 0 00-1.98 2.35c-.12.21-.19.26-.22.26m0 7.07c-1.54-.00-2.80-.13-3.83-.39-1.01-.25-1.85-.64-2.58-1.19a5.79 5.79 0 01-1.39-1.54 7.61 7.61 0 01-.81-1.77 10.30 10.30 0 01-.47-2.98c0-.67.05-1.31.14-1.90 1.11.60 2.15.90 3.08 1.16l.21.06c1.29.37 2.31.86 3.13 1.49.47.37.89.79 1.23 1.26.37.51.66 1.09.88 1.73.10.29.2.47.40.47.21 0 .31-.18.41-.47a6.12 6.12 0 12.11-2.99c.82-.63 1.84-1.12 3.13-1.49l.22-.06c.93-.27 1.97-.56 3.08-1.16.09.59.14 1.23.14 1.9 0 .46-.05 1.66-.47 2.98a7.63 7.63 0 01-.81 1.77 5.79 5.79 0 01-1.40 1.54c-.72.55-1.56.94-2.57 1.19-1.03.26-2.29.39-3.83.39m9.69-14.56c-1.91-2.05-4.99-2.99-9.69-3.00-4.7.01-7.78.94-9.69 2.99C.89 6.91 0 9.02 0 11.87c0 1.58.39 5.6 3.56 7.68 1.9 1.24 4.35 2.05 8.44 2.05 4.08-.01 6.54-.81 8.44-2.05C23.61 17.47 24 13.45 24 11.87c0-2.85-.90-4.97-2.31-6.48Z"],
+  ["honda",/honda/i,"E40521","Honda","M23.90 6.87c-.33-3.22-2.47-3.90-4.35-4.20-.95-.16-2.63-.3-3.72-.34-.95-.06-3.17-.09-3.83-.09-.66 0-2.89.03-3.83.09-1.08.04-2.77.18-3.72.34C2.56 2.98.42 3.66.09 6.87c-.08.88-.1 2.02-.09 3.25.03 2.03.2 3.41.3 4.36.07.66.34 2.62.69 3.64.48 1.40.92 1.80 1.42 2.22.94.76 2.47.996 2.79 1.06 1.73.31 5.24.37 6.78.37 1.54 0 5.05-.05 6.78-.37.33-.06 1.86-.29 2.79-1.06.51-.42.95-.83 1.42-2.22.35-1.02.63-2.98.70-3.64.1-.96.28-2.33.30-4.36.04-1.23.01-2.37-.08-3.25m-1.18 5.4c-.19 2.57-.42 4.10-.75 5.22-.29.98-.64 1.62-1.17 2.09-.87.79-2.06.96-2.76 1.06-1.51.23-4.05.3-6.06.3-2.00 0-4.54-.08-6.06-.3-.70-.1-1.89-.27-2.76-1.06-.52-.47-.88-1.13-1.16-2.09-.33-1.10-.56-2.65-.75-5.22-.11-1.54-.09-4.05.08-5.4.26-2.01 1.25-3.02 3.39-3.40.996-.18 2.34-.31 3.61-.37 1.02-.07 2.7-.1 3.64-.09.94-.01 2.62.03 3.64.09 1.27.06 2.61.19 3.61.37 2.14.38 3.14 1.40 3.39 3.40.20 1.34.23 3.86.11 5.4m-5.20-8.39c-.55 2.46-.77 3.59-1.22 5.37-.43 1.72-.77 3.30-1.33 4.07-.59.78-1.36.95-1.89 1.01-.28.03-.48.04-1.07.05-.60 0-.80-.02-1.07-.05-.53-.06-1.31-.23-1.89-1.01-.58-.77-.91-2.35-1.33-4.06-.47-1.77-.68-2.91-1.24-5.37 0 0-.55.02-.80.04-.33.02-.59.05-.87.09.34 5.37.69 11.08 1.13 16.13a21.98 21.98 0 002.39.17c.33-1.27.75-3.02 1.21-3.77.38-.61.97-.68 1.29-.72.52-.07.96-.08 1.17-.08.2-.01.64 0 1.17.08.33.05.92.11 1.29.72.47.75.88 2.5 1.21 3.77 0 0 .36-.01 1.17-.05.41-.02.82-.06 1.23-.12.46-5.39.79-10.73 1.13-16.13-.28-.04-.54-.07-.87-.09-.23-.02-.79-.04-.79-.04z"]
+];
+function logoVon(name){
+  if(!name)return null;
+  var s=String(name).toLowerCase();
+  for(var i=0;i<LOGOS.length;i++)if(LOGOS[i][1].test(s))return LOGOS[i];
+  return null;
+}
+/* helle Markenfarbe → dunkles Zeichen, sonst weißes */
+function logoHell(hex){
+  var r=parseInt(hex.slice(0,2),16)/255,g=parseInt(hex.slice(2,4),16)/255,b=parseInt(hex.slice(4,6),16)/255;
+  return 0.2126*r+0.7152*g+0.0722*b>0.6;
+}
+/* Kachel für einen Anbieter: Markenzeichen auf Markenfarbe, sonst das Symbol der Art */
+function anbieterKachel(name,ersatz,cls,groesse){
+  var L=logoVon(name),k=cls||"ai";
+  if(!L)return '<span class="'+k+'">'+ersatz+'</span>';
+  var px=groesse||22;
+  return '<span class="'+k+' logo" style="background:#'+L[2]+';color:'+(logoHell(L[2])?"#231f1a":"#fff")+'" title="'+esc(L[3])+'">'+
+    '<svg viewBox="0 0 24 24" width="'+px+'" height="'+px+'" fill="currentColor" aria-hidden="true"><path d="'+L[4]+'"/></svg></span>';
+}
+
 /* ================= Hell / Dunkel ================= */
 function isDark(){return document.documentElement.classList.contains("dark");}
 function applyTheme(dark){
@@ -1399,7 +1669,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -1441,10 +1711,9 @@ function topBar(){
   var std=new Date().getHours();
   var gruss=std<5?"Gute Nacht":(std<11?"Guten Morgen":(std<18?"Hallo":"Guten Abend"));
   var name=HH?(HH.name||t("Haushalt")):t("Haushalt");
-  var kann=HOUSEHOLDS.length>1;
-  return '<div class="top"><div>'+
+  return '<div class="top"><div style="min-width:0">'+
       '<div class="greet">'+t(gruss)+'</div>'+
-      '<button class="hh'+(kann?" can":"")+'"'+(kann?' data-a="hh-switch"':' disabled')+'>'+esc(name)+(kann?' '+ic("down",18):"")+'</button>'+
+      '<button class="hh can" data-a="hh-switch" aria-label="'+esc(t("Haus wählen"))+'">'+esc(name)+' '+ic("down",18)+'</button>'+
     '</div>'+
     '<div style="display:flex;gap:6px;flex:none">'+
       '<button class="ibtn" data-a="suche" title="'+t("Suchen")+'" aria-label="'+t("Suchen")+'">'+ic("search")+'</button>'+
@@ -1456,13 +1725,24 @@ function seitenTitel(s){return '<div class="pt">'+esc(s)+'</div>';}
 function zurueck(hash,label){return '<a class="back" href="'+hash+'">'+ic("arrow")+' '+esc(label)+'</a>';}
 
 /* ================= Modal / Blatt ================= */
+/* Im AllTrack-Stil erscheinen Blatt und Abdeckung erst mit der Klasse .on –
+   ohne sie bleibt das Blatt unter dem Rand und die unsichtbare Abdeckung
+   schluckt den nächsten Tipp (Fehler bis 10.10.2026). */
 function openModal(html){
   var w=$("#modal");if(!w)return;
-  $("#modalBox").innerHTML=html;w.hidden=false;
+  var box=$("#modalBox"),scrim=w.querySelector(".scrim");
+  box.innerHTML='<div class="grab"></div>'+html;
+  box.setAttribute("role","dialog");box.setAttribute("aria-modal","true");
+  box.classList.remove("on");if(scrim)scrim.classList.remove("on");
+  w.hidden=false;
   document.body.classList.add("modal-open");
+  void box.offsetWidth;   /* Ausgangslage festschreiben, damit der Übergang läuft – ohne requestAnimationFrame */
+  box.classList.add("on");if(scrim)scrim.classList.add("on");
 }
 function closeModal(still){
   var w=$("#modal");if(!w||w.hidden)return;
+  var scrim=w.querySelector(".scrim");if(scrim)scrim.classList.remove("on");
+  $("#modalBox").classList.remove("on");
   w.hidden=true;$("#modalBox").innerHTML="";
   document.body.classList.remove("modal-open");
   if(!still)render();
@@ -1477,7 +1757,7 @@ function render(){
   /* Daten kamen nicht an? Das muss man sehen, nicht erraten. */
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&rt.name!=="einrichten"&&rt.name!=="mehr"){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -1493,6 +1773,8 @@ function render(){
   else if(rt.name==="termine")   {inhalt=viewTermine();cur="start";}
   else if(rt.name==="kosten")    {inhalt=viewKosten();cur="start";}
   else if(rt.name==="vorschlaege"){inhalt=viewVorschlaege();cur="start";}
+  else if(rt.name==="haushalte") {inhalt=viewHaushalte();cur="mehr";}
+  else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
 }
@@ -1522,8 +1804,10 @@ function ladeHtml(){
 function hhKey(){return "ah_hh_"+(me?me.id:"anon");}
 
 async function ladeHaushalte(){
-  var r=await sbPub.from("households").select("id,name,created_at").order("created_at",{ascending:true});
-  HOUSEHOLDS=(r&&!r.error&&r.data)?r.data:[];
+  var r=await sbPub.from("households").select("id,name,adresse,created_at").order("created_at",{ascending:true});
+  /* Bei einem Fehler abbrechen – sonst sähe es aus wie „kein Haushalt" und es würde ein neuer angelegt. */
+  if(!r||r.error)throw (r&&r.error)||new Error(t("Haushalte nicht erreichbar"));
+  HOUSEHOLDS=r.data||[];
   var gemerkt=null;try{gemerkt=localStorage.getItem(hhKey());}catch(e){}
   var id=(gemerkt&&HOUSEHOLDS.some(function(h){return h.id===gemerkt;}))?gemerkt:(HOUSEHOLDS.length?HOUSEHOLDS[0].id:null);
   if(!id){
@@ -1532,7 +1816,7 @@ async function ladeHaushalte(){
       var c=await sbPub.rpc("create_household",{p_name:t("Mein Haushalt")});
       if(c&&!c.error&&c.data){
         id=c.data;
-        var r2=await sbPub.from("households").select("id,name,created_at").order("created_at",{ascending:true});
+        var r2=await sbPub.from("households").select("id,name,adresse,created_at").order("created_at",{ascending:true});
         HOUSEHOLDS=(r2&&r2.data)||[];
       }
     }catch(e){}
@@ -1652,6 +1936,7 @@ async function ladeAlles(){
   LADEFEHLER=null;
   await ladePrefs();
   await ladeHaushalte();
+  await ladeRollen();
   await ladeSetup();
   await ladeDaten();
   await ladeEnergie();
@@ -1783,8 +2068,8 @@ function viewEinrichten(erstmalig){
       '</div></div>':"")+
     (SETUP_FEHLER?fehlerKarte(SETUP_FEHLER):"")+
     gruppen+
-    '<div class="factions" style="margin-top:22px">'+
-      '<button class="btn lg full" data-a="setup-save">'+ic("check")+' '+tf("{0} Arten übernehmen",setupWahl.length)+'</button>'+
+    '<div class="setupbar">'+
+      '<button class="btn lg full" data-a="setup-save">'+ic("check")+' '+tn(setupWahl.length,"{0} Art übernehmen","{0} Arten übernehmen")+'</button>'+
     '</div>';
 }
 
@@ -1796,8 +2081,8 @@ function viewStart(){
   ["strom","gas","wasser"].forEach(function(a){if(artAktiv(a))mk+=energieMonat(a);});
   var fristen=naheTermine(60);
   return topBar()+
-    '<div class="kpis">'+
-      '<a class="kpi" href="#/kosten"><div class="kl">'+t("Pro Monat")+'</div><div class="kv">'+eur0(mk)+'</div><div class="ks">'+tf("{0} laufende Verträge",aktive.length)+'</div></a>'+
+    '<div class="kpis k3">'+
+      '<a class="kpi" href="#/kosten"><div class="kl">'+t("Pro Monat")+'</div><div class="kv">'+eur0(mk)+'</div><div class="ks">'+tn(aktive.length,"{0} laufender Vertrag","{0} laufende Verträge")+'</div></a>'+
       '<a class="kpi" href="#/kosten"><div class="kl">'+t("Pro Jahr")+'</div><div class="kv">'+eur0(mk*12)+'</div><div class="ks">'+t("hochgerechnet")+'</div></a>'+
       '<a class="kpi" href="#/termine"><div class="kl">'+t("Termine")+'</div><div class="kv">'+fristen.length+'</div><div class="ks">'+t("in 60 Tagen")+'</div></a>'+
     '</div>'+
@@ -1823,8 +2108,8 @@ function gruppenUebersicht(kurz){
     return '<a class="slot" href="#/vertraege">'+
       '<span class="ai">'+g.icon+'</span>'+
       '<span class="sb3"><span class="sn">'+t(g.label)+'</span>'+
-      '<span class="ss">'+tf("{0} Arten",arten.length)+(offen?' · '+tf("{0} noch leer",offen):"")+'</span></span>'+
-      '<span class="sr">'+(kosten>0?'<span class="scost">'+eur0(kosten)+'</span>':"")+'<span class="go">'+ic("arrow-r",18)+'</span></span>'+
+      '<span class="ss">'+tn(arten.length,"{0} Art","{0} Arten")+(offen?' · '+tf("{0} noch leer",offen):"")+'</span></span>'+
+      '<span class="srt">'+(kosten>0?'<span class="scost">'+eur0(kosten)+'</span>':"")+'<span class="go">'+ic("right",18)+'</span></span>'+
     '</a>';
   }).filter(Boolean).join("");
   if(!zeilen)return '<section class="card"><div class="empty"><div class="ei">'+ic("house",28)+'</div>'+
@@ -1866,13 +2151,13 @@ function artSlot(k){
         '<span class="ai">'+a.icon+'</span>'+
         '<span class="sb3"><span class="sn">'+esc(a.label)+'</span>'+
         '<span class="ss">'+t("in AllTrack noch nicht erfasst")+'</span></span>'+
-        '<span class="sr"><span class="go">'+ic("link",18)+'</span></span></a>';
+        '<span class="srt"><span class="go">'+ic("link",18)+'</span></span></a>';
     }
     return '<a class="slot mirror" href="'+ALLTRACK_URL+'">'+
-      '<span class="ai">'+a.icon+'</span>'+
+      anbieterKachel(e.anbieter,a.icon)+
       '<span class="sb3"><span class="sn">'+esc(e.anbieter||a.label)+'</span>'+
       '<span class="ss">'+esc(a.label)+' · <span class="mlink">'+t("aus AllTrack")+'</span></span></span>'+
-      '<span class="sr">'+(e.abschlag?'<span class="scost">'+eur0(e.abschlag)+'</span>':"")+
+      '<span class="srt">'+(e.abschlag?'<span class="scost">'+eur0(e.abschlag)+'</span>':"")+
       '<span class="go">'+ic("link",18)+'</span></span></a>';
   }
   /* Leerer Platz */
@@ -1881,21 +2166,21 @@ function artSlot(k){
       '<span class="ai">'+ic("plus",18)+'</span>'+
       '<span class="sb3"><span class="sn">'+esc(a.label)+'</span>'+
       '<span class="ss">'+t("noch nichts hinterlegt")+'</span></span>'+
-      '<span class="sr"><span class="go">'+ic("arrow-r",18)+'</span></span></a>';
+      '<span class="srt"><span class="go">'+ic("right",18)+'</span></span></a>';
   }
   /* Gefüllt: ein Vertrag direkt, mehrere über die Art-Ansicht */
   var kosten=artMonatskosten(k),fr=artFrist(k);
   var ziel=liste.length===1?("#/vertrag?id="+liste[0].id):("#/art?k="+k);
   var untertitel=liste.length===1
     ?(fr?esc(fr.f.label):esc(a.label))
-    :tf("{0} Verträge",liste.length);
+    :tn(liste.length,"{0} Vertrag","{0} Verträge");
   return '<a class="slot" href="'+ziel+'">'+
-    '<span class="ai">'+a.icon+'</span>'+
+    (liste.length===1?anbieterKachel(liste[0].anbieter,a.icon):'<span class="ai">'+a.icon+'</span>')+
     '<span class="sb3"><span class="sn">'+esc(liste.length===1?(liste[0].anbieter||a.label):a.label)+'</span>'+
     '<span class="ss">'+(fr?'<span class="dot '+fr.level+'"></span> ':"")+untertitel+'</span></span>'+
-    '<span class="sr">'+(kosten>0?'<span class="scost">'+eur0(kosten)+'</span>':"")+
+    '<span class="srt">'+(kosten>0?'<span class="scost">'+eur0(kosten)+'</span>':"")+
     (liste.length>1?'<span class="cnt">'+liste.length+'</span>':"")+
-    '<span class="go">'+ic("arrow-r",18)+'</span></span></a>';
+    '<span class="go">'+ic("right",18)+'</span></span></a>';
 }
 
 /* ================= Termine ================= */
@@ -1971,11 +2256,11 @@ function viewMehr(){
       '<a class="drow3" href="#/einrichten"><span class="di">'+ic("tool")+'</span>'+
         '<span class="db"><span class="dn">'+t("Vertragsarten anpassen")+'</span>'+
         '<span class="dm">'+tf("{0} von {1} angehakt",aktiveArten().length,Object.keys(ARTEN).length-1)+'</span></span>'+
-        '<span class="go">'+ic("arrow-r",18)+'</span></a>'+
-      (HOUSEHOLDS.length>1?'<button class="drow3" data-a="hh-switch"><span class="di">'+ic("house")+'</span>'+
-        '<span class="db"><span class="dn">'+t("Haushalt wechseln")+'</span>'+
-        '<span class="dm">'+esc(HH?HH.name:"")+'</span></span>'+
-        '<span class="go">'+ic("swap",18)+'</span></button>':"")+
+        '<span class="go">'+ic("right",18)+'</span></a>'+
+      '<a class="drow3" href="#/haushalte"><span class="di">'+ic("users")+'</span>'+
+        '<span class="db"><span class="dn">'+t("Häuser & Mitglieder")+'</span>'+
+        '<span class="dm">'+tn(HOUSEHOLDS.length,"{0} Haus","{0} Häuser")+(HH?' · '+tn(mitgliederZahl(HH.id),"{0} Mitglied","{0} Mitglieder")+' '+t("hier"):"")+'</span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a>'+
     '</section>'+
     '<div class="mgrp">'+t("Sprache")+'</div>'+
     '<section class="card">'+
@@ -2001,7 +2286,13 @@ function viewMehr(){
 
 /* ================= Formular-Bausteine ================= */
 function fld(label,inner){return '<label class="fld"><span>'+esc(label)+'</span>'+inner+'</label>';}
+/* Zahlen als Textfeld mit Dezimal-Tastatur (wie AllTrack): type="number"
+   verwirft „9,90" mit Komma stillschweigend – valNum() versteht beides. */
 function inp(id,val,typ,extra){
+  if(typ==="number"){
+    var anzeige=(val==null||val==="")?"":String(val).replace(".",",");
+    return '<input class="inp" id="'+id+'" type="text" inputmode="decimal" autocomplete="off" value="'+esc(anzeige)+'">';
+  }
   return '<input class="inp" id="'+id+'" type="'+(typ||"text")+'" value="'+esc(val==null?"":val)+'"'+(extra||"")+'>';
 }
 function sel(id,opts,cur){
@@ -2011,6 +2302,15 @@ function sel(id,opts,cur){
 }
 function val(id){var e=$("#"+id);return e?(e.value||"").trim():"";}
 function valNum(id){return numOrNull(val(id));}
+/* Steht in einem Zahlfeld Text, der keine Zahl ist? Dann nicht leer speichern,
+   sondern das Feld zeigen. */
+function zahlFehlt(ids){
+  for(var i=0;i<ids.length;i++){
+    var r=val(ids[i]);
+    if(r&&numOrNull(r)==null){var e=$("#"+ids[i]);if(e){e.focus();e.classList.add("bad");}return true;}
+  }
+  return false;
+}
 
 /* ================= Eine Art mit mehreren Verträgen ================= */
 function viewArt(k){
@@ -2024,7 +2324,7 @@ function viewArt(k){
           '<div class="sx">'+t("Tarife, Ablesungen und Jahresabrechnung liegen dort. All-Home zeigt den aktuellen Stand nur an.")+'</div>'+
           '<div class="sa"><a class="btn" href="'+ALLTRACK_URL+'">'+ic("link")+' '+t("In AllTrack öffnen")+'</a></div>'+
         '</div></div>'+
-        (e?'<div class="dl">'+
+        (e?'<div class="kvl">'+
           kv(t("Anbieter"),esc(e.anbieter||"–"))+
           (e.abschlag!=null?kv(t("Abschlag"),eur(e.abschlag)+" / "+t("Monat")):"")+
           (e.arbeitspreisCt!=null?kv(t("Arbeitspreis"),num(e.arbeitspreisCt,3)+" ct"):"")+
@@ -2039,11 +2339,11 @@ function viewArt(k){
       ?'<div class="slots">'+liste.map(function(c){
          var f=fristInfo(c),nd=DOCS.filter(function(d){return d.contract_id===c.id;}).length;
          return '<a class="slot" href="#/vertrag?id='+c.id+'">'+
-           '<span class="ai">'+a.icon+'</span>'+
+           anbieterKachel(c.anbieter,a.icon)+
            '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span>'+
            '<span class="ss"><span class="dot '+f.level+'"></span> '+esc(f.label)+(nd?' · '+tf("{0} Dok.",nd):"")+'</span></span>'+
-           '<span class="sr">'+(c.kosten!=null?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
-           '<span class="go">'+ic("arrow-r",18)+'</span></span></a>';
+           '<span class="srt">'+(c.kosten!=null?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
+           '<span class="go">'+ic("right",18)+'</span></span></a>';
        }).join("")+'</div>'
       :'<section class="card"><div class="empty"><div class="ei">'+a.icon+'</div>'+
        '<h3>'+t("Noch nichts hinterlegt")+'</h3><p>'+t("Lade ein Dokument hoch oder trage den Vertrag von Hand ein.")+'</p></div></section>')+
@@ -2052,7 +2352,7 @@ function viewArt(k){
       '<button class="btn ghost" data-a="v-neu" data-k="'+a.key+'">'+ic("pencil")+' '+t("Von Hand eintragen")+'</button>'+
     '</div>';
 }
-function kv(k,v){return '<div class="kv"><span>'+esc(k)+'</span><b>'+v+'</b></div>';}
+function kv(k,v){return '<div class="kvr"><span class="kk">'+esc(k)+'</span><span class="kw">'+v+'</span></div>';}
 
 /* ================= Vertragsdetail ================= */
 function vertragById(id){return CONTRACTS.filter(function(c){return c.id===id;})[0]||null;}
@@ -2070,11 +2370,11 @@ function viewVertrag(id){
   }).join("");
   var doks=DOCS.filter(function(d){return d.contract_id===c.id;});
   return zurueck("#/vertraege",t("Verträge"))+
-    '<div class="top" style="margin-bottom:12px"><div>'+
-      '<div class="greet">'+a.icon+' '+esc(a.label)+'</div>'+
+    '<div class="top vkopf" style="margin-bottom:12px"><div class="vk">'+anbieterKachel(c.anbieter,a.icon,"hhi",28)+'<div style="min-width:0">'+
+      '<div class="greet">'+esc(a.label)+'</div>'+
       '<div class="hh">'+esc(c.anbieter||a.label)+'</div>'+
       (c.produkt?'<div class="greet">'+esc(c.produkt)+'</div>':"")+
-    '</div></div>'+
+    '</div></div></div>'+
     /* Frist */
     '<section class="card">'+
       '<div style="display:flex;align-items:center;gap:10px"><span class="dot '+f.level+'"></span>'+
@@ -2087,12 +2387,12 @@ function viewVertrag(id){
     '</section>'+
     /* Angaben */
     '<div class="sect">'+t("Angaben")+'</div>'+
-    '<section class="card"><div class="dl">'+
+    '<section class="card"><div class="kvl">'+
       (c.kosten!=null?kv(t("Kosten"),eur(c.kosten)+" / "+ivLabel(c.kosten_intervall)+(mk&&c.kosten_intervall!=="monatlich"?" ("+eur(mk)+" / "+t("Monat")+")":"")):"")+
       (c.kundennummer?kv(t("Kundennummer"),esc(c.kundennummer)):"")+
       (c.vertragsnummer?kv(t("Vertragsnummer"),esc(c.vertragsnummer)):"")+
       (c.vertragsstart?kv(t("Vertragsbeginn"),fmtDate(c.vertragsstart)):"")+
-      (c.mindestlaufzeit_monate!=null?kv(t("Mindestlaufzeit"),c.mindestlaufzeit_monate===0?t("keine"):tf("{0} Monate",c.mindestlaufzeit_monate)):"")+
+      (c.mindestlaufzeit_monate!=null?kv(t("Mindestlaufzeit"),c.mindestlaufzeit_monate===0?t("keine"):tn(c.mindestlaufzeit_monate,"{0} Monat","{0} Monate")):"")+
       (c.kuendigungsfrist_monate!=null?kv(t("Kündigungsfrist"),fristTxt(c.kuendigungsfrist_monate)):"")+
       (c.verlaengerung_monate!=null?kv(t("Verlängerung"),c.verlaengerung_monate<=1?t("monatlich"):tf("um {0} Monate",c.verlaengerung_monate)):"")+
       zusatz+
@@ -2196,6 +2496,9 @@ async function speichereVertrag(){
   var a=artInfo(FORM.art);
   var anbieter=a.kein_anbieter?"":val("f_anbieter");
   if(!a.kein_anbieter&&!anbieter){toast(t("Bitte mindestens den Anbieter angeben."),true);return;}
+  var zahlFelder=["f_kosten","f_ml","f_kf","f_vl"].concat(artFelder(a.key)
+    .filter(function(fd){return fd.t==="eur"||fd.t==="num";}).map(function(fd){return "f_d_"+fd.k;}));
+  if(zahlFehlt(zahlFelder)){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
   var det={};
   artFelder(a.key).forEach(function(fd){
     var raw=val("f_d_"+fd.k);
@@ -2257,14 +2560,20 @@ async function speichereVertrag(){
     go("#/vertrag?id="+zielId);
   }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
 }
-async function setzeStatus(id,status){
-  var zum=null;
-  if(status==="gekuendigt"){
-    var c=vertragById(id),f=c?fristInfo(c):null;
-    zum=prompt(t("Gekündigt zum (JJJJ-MM-TT)"),(f&&f.end)||todayISO());
-    if(zum===null)return;
-    zum=(zum||"").trim()||null;
-  }
+/* Kündigen: Datum per Datumsauswahl statt Texteingabe „JJJJ-MM-TT" */
+function kuendigenBlatt(id){
+  var c=vertragById(id);if(!c)return;
+  var f=fristInfo(c);
+  openModal('<h2 class="mhead">✂️ '+t("Als gekündigt markieren")+'</h2>'+
+    '<p class="hint" style="margin:0 0 12px">'+esc(c.anbieter||artInfo(c.art).label)+'</p>'+
+    fld(t("Gekündigt zum"),'<input class="inp" id="k_zum" type="date" value="'+esc((f&&f.end)||todayISO())+'">')+
+    '<div class="factions" style="margin-top:16px;flex-direction:column">'+
+      '<button class="btn full" data-a="v-kuend-ok" data-id="'+esc(c.id)+'">'+ic("check")+' '+t("Speichern")+'</button>'+
+      '<button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button>'+
+    '</div>');
+}
+async function setzeStatus(id,status,zum){
+  zum=(status==="gekuendigt")?(zum||null):null;
   try{
     var r=await sb.from("contracts").update({status:status,gekuendigt_zum:zum}).eq("id",id);
     if(r.error)throw r.error;
@@ -2346,7 +2655,7 @@ function dokListe(c){
       '<span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
       '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span>'+
       (d.extracted&&d.extracted.betrag!=null?'<span>'+eur(d.extracted.betrag)+'</span>':"")+'</span></span>'+
-      '<span class="go">'+ic("arrow-r",16)+'</span></button>';
+      '<span class="go">'+ic("right",16)+'</span></button>';
   }).join("");
   /* Dokumenten-Lücken: welche Unterlage fehlt? */
   var vorhanden={};doks.forEach(function(d){vorhanden[d.doc_type]=1;});
@@ -2683,7 +2992,7 @@ async function dokumentOeffnen(id){
     (aiVal(d,"zusammenfassung")?'<p>'+esc(aiVal(d,"zusammenfassung"))+'</p>':"")+
     (Array.isArray(wichtig)&&wichtig.length?'<ul class="hint" style="padding-left:20px">'+wichtig.map(function(w){return '<li>'+esc(w)+'</li>';}).join("")+'</ul>':"")+
     (hinweise?'<div class="sug info"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"")+
-    '<div class="dl">'+
+    '<div class="kvl">'+
       kv(t("Art"),ty.icon+" "+ty.label)+
       kv(t("Dokumentdatum"),fmtDate(d.doc_date))+
       kv(t("Vertrag"),c?esc(c.anbieter||artInfo(c.art).label):'<span class="mut">'+t("nicht zugeordnet")+'</span>')+
@@ -2861,10 +3170,10 @@ function viewGesundheit(){
   return topBar()+seitenTitel(t("Gesundheit"))+
     '<div class="kpis">'+
       '<div class="kpi"><div class="kl">'+tf("Arztkosten {0}",jahr)+'</div><div class="kv">'+eur0(kostenJahr)+'</div></div>'+
-      '<div class="kpi"><div class="kl">'+t("Gesamt erfasst")+'</div><div class="kv">'+eur0(kostenGes)+'</div><div class="ks">'+tf("{0} Dokumente",meds.length)+'</div></div>'+
+      '<div class="kpi"><div class="kl">'+t("Gesamt erfasst")+'</div><div class="kv">'+eur0(kostenGes)+'</div><div class="ks">'+tn(meds.length,"{0} Dokument","{0} Dokumente")+'</div></div>'+
     '</div>'+
-    (kostenGes>0?'<div class="factions" style="margin:-4px 0 14px"><button class="btn ghost" data-a="med-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button></div>':"")+
-    '<div class="seg" style="margin-bottom:14px">'+
+    (kostenGes>0?'<div class="factions" style="margin:0 0 14px"><button class="btn ghost" data-a="med-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button></div>':"")+
+    '<div class="filt">'+
       '<select class="sel" id="mfFach">'+
         '<option value="">'+t("Alle Fachrichtungen")+'</option>'+
         Object.keys(faecher).map(function(f){
@@ -2897,7 +3206,7 @@ function medZeile(d){
       '<span>'+fmtDate(d.behandlungsdatum||d.doc_date)+'</span>'+
       (d.betrag!=null?'<span><b>'+eur(d.betrag)+'</b></span>':"")+
     '</span>'+(beh?'<span class="dm"><span>'+esc(beh)+'</span></span>':"")+'</span>'+
-    '<span class="go">'+ic("arrow-r",16)+'</span></button>';
+    '<span class="go">'+ic("right",16)+'</span></button>';
 }
 /* ---- Detail eines Arztdokuments ---- */
 function medDetail(d){
@@ -2909,7 +3218,7 @@ function medDetail(d){
       '<div class="greet">'+fa.icon+' '+esc(fa.label)+' · '+mt.label+'</div>'+
       '<div class="hh">'+esc(aiVal(d,"titel")||d.arzt||mt.label)+'</div>'+
     '</div></div>'+
-    '<section class="card"><div class="dl">'+
+    '<section class="card"><div class="kvl">'+
       (d.arzt?kv(t("Arzt / Praxis"),esc(d.arzt)):"")+
       (d.person_id?kv(t("Patient"),esc(personName(d.person_id)||"–")):"")+
       kv(t("Behandlungsdatum"),fmtDate(d.behandlungsdatum||d.doc_date))+
@@ -3053,6 +3362,7 @@ function medFormular(id){
 async function medSpeichern(id){
   var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d)return;
   var ext=Object.assign({},d.extracted||{});
+  if(zahlFehlt(["m_betrag"])){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
   ext.behandlung=val("m_beh")||null;
   try{
     var r=await sb.from("documents").update({
@@ -3104,7 +3414,7 @@ async function personAnlegen(name,docId){
 async function personLoeschen(id){
   var p=personById(id);if(!p)return;
   var n=DOCS.filter(function(d){return d.person_id===id;}).length;
-  if(!confirm(tf("Person „{0}“ löschen?",p.name)+(n?" "+tf("{0} Dokumente verlieren die Zuordnung.",n):"")))return;
+  if(!confirm(tf("Person „{0}“ löschen?",p.name)+(n?" "+tn(n,"{0} Dokument verliert die Zuordnung.","{0} Dokumente verlieren die Zuordnung."):"")))return;
   try{
     var r=await sb.from("persons").delete().eq("id",id);
     if(r.error)throw r.error;
@@ -3188,7 +3498,7 @@ function vorschlaege(){
       if(f.days==null||f.days>45)return;
       var a=artInfo(c.art||"sonstiges");
       v.push({key:"frist:"+c.id+":"+f.lastDay,art:f.days<=14?"bad":"warn",icon:"clock",
-        titel:tf("{0} ist nur noch {1} Tage kündbar",c.anbieter||a.label,f.days),
+        titel:tn(f.days,"{0} ist nur noch {1} Tag kündbar","{0} ist nur noch {1} Tage kündbar",c.anbieter||a.label,f.days),
         text:tf("Letzter Kündigungstag: {0}",fmtDate(f.lastDay)),
         knopf:t("Ansehen"),href:"#/vertrag?id="+c.id});
     });
@@ -3212,7 +3522,7 @@ function vorschlaege(){
     });
     if(leer.length){
       v.push({key:"leer:"+leer.length,art:"info",icon:"folder",
-        titel:tf("{0} angehakte Arten sind noch leer",leer.length),
+        titel:tn(leer.length,"{0} angehakte Art ist noch leer","{0} angehakte Arten sind noch leer"),
         text:leer.slice(0,4).map(function(k){return artInfo(k).label;}).join(", ")+(leer.length>4?" …":""),
         knopf:t("Verträge"),href:"#/vertraege"});
     }
@@ -3298,7 +3608,7 @@ function vorschlaege(){
     });
     if(ohne.length){
       v.push({key:"dok:"+ohne.length,art:"info",icon:"doc",
-        titel:tf("{0} Verträge ohne Unterlagen",ohne.length),
+        titel:tn(ohne.length,"{0} Vertrag ohne Unterlagen","{0} Verträge ohne Unterlagen"),
         text:ohne.slice(0,3).map(function(c){return c.anbieter||artInfo(c.art).label;}).join(", ")+(ohne.length>3?" …":""),
         knopf:t("Verträge"),href:"#/vertraege"});
     }
@@ -3306,7 +3616,7 @@ function vorschlaege(){
     var frei=DOCS.filter(function(d){return !istMed(d)&&!d.contract_id&&!d.ki_pending;});
     if(frei.length){
       v.push({key:"frei:"+frei.length,art:"info",icon:"link",
-        titel:tf("{0} Dokumente ohne Vertrag",frei.length),
+        titel:tn(frei.length,"{0} Dokument ohne Vertrag","{0} Dokumente ohne Vertrag"),
         text:t("Zuordnen hilft dem Archiv und den Fristen."),
         knopf:t("Ansehen"),aktion:"d-open",id:frei[0].id});
     }
@@ -3314,7 +3624,7 @@ function vorschlaege(){
     var offen=DOCS.filter(function(d){return d.ki_pending;});
     if(offen.length){
       v.push({key:"kipend:"+offen.length,art:"warn",icon:"refresh",
-        titel:tf("{0} Dokumente warten auf die KI",offen.length),
+        titel:tn(offen.length,"{0} Dokument wartet auf die KI","{0} Dokumente warten auf die KI"),
         text:t("Das Guthaben war leer – jetzt nachholen?"),
         knopf:t("Nachholen"),aktion:"d-reanalyze",id:offen[0].id});
     }
@@ -3419,6 +3729,344 @@ function rechercheKarte(c){
   '</section>';
 }
 
+/* ================= Häuser & Mitglieder =================
+   Mehrere Häuser (Adressen) je Konto, Mitglieder mit Rollen.
+   Grundsatz: Solange ein Haus Mitglieder hat, hat es einen Admin – das
+   erzwingt die Datenbank (Trigger admin_pflicht); hier wird es nur freundlich
+   erklärt, bevor jemand dagegenläuft. Haushalte teilt All-Home mit AllTrack. */
+var ROLLEN=[];     /* public.household_members meiner Häuser: household_id, user_id, is_admin */
+var MITGL={};      /* hid → Liste aus household_members_info (mit E-Mail) */
+var hhBusy=false;
+
+async function ladeRollen(){
+  try{
+    var r=await sbPub.from("household_members").select("household_id,user_id,is_admin");
+    ROLLEN=(r&&!r.error&&r.data)?r.data:[];
+  }catch(e){ROLLEN=[];}
+}
+function ichAdmin(hid){
+  return !!me&&ROLLEN.some(function(r){return r.household_id===hid&&r.user_id===me.id&&r.is_admin;});
+}
+function mitgliederZahl(hid){return ROLLEN.filter(function(r){return r.household_id===hid;}).length;}
+function adminZahl(hid){return ROLLEN.filter(function(r){return r.household_id===hid&&r.is_admin;}).length;}
+/* Hausliste neu laden. Ändert sich dabei das aktive Haus (z. B. weil es
+   gelöscht wurde), werden dessen Daten nachgeladen – sonst stünden die alten da. */
+async function haeuserNeuLaden(){
+  var vorher=HH?HH.id:null;
+  await ladeHaushalte();await ladeRollen();
+  if((HH?HH.id:null)!==vorher){
+    LADEFEHLER=null;setupWahl=null;
+    try{await ladeSetup();await ladeDaten();await ladeEnergie();}
+    catch(e){LADEFEHLER=errMsg(e);}
+  }
+}
+function hausById(id){return HOUSEHOLDS.filter(function(h){return h.id===id;})[0]||null;}
+
+async function ladeMitglieder(hid){
+  var r=await sbPub.rpc("household_members_info",{p_household_id:hid});
+  if(r&&r.error)throw r.error;
+  MITGL[hid]=(r&&r.data)||[];
+  return MITGL[hid];
+}
+/* Fehlercodes der Datenbank in verständliche Sätze übersetzen */
+function hausFehler(e){
+  var m=errMsg(e);
+  if(/last_admin/.test(m))return t("Es muss immer mindestens einen Admin geben. Ernenne zuerst jemand anderen zum Admin.");
+  if(/last_household/.test(m))return t("Das ist dein einziger Haushalt. Lege zuerst einen weiteren an.");
+  if(/not_admin/.test(m))return t("Dafür brauchst du Admin-Rechte in diesem Haus.");
+  if(/cannot_remove_self/.test(m))return t("Dich selbst nimmst du über „Haushalt verlassen“ heraus.");
+  if(/invalid_or_expired/.test(m))return t("Der Code ist ungültig oder abgelaufen.");
+  if(/not.a.member/.test(m))return t("Du bist kein Mitglied dieses Hauses.");
+  return m;
+}
+
+/* ---- Liste aller Häuser ---- */
+function viewHaushalte(){
+  var zeilen=HOUSEHOLDS.map(function(h){
+    var n=mitgliederZahl(h.id),aktiv=HH&&h.id===HH.id;
+    return '<a class="slot" href="#/haushalt?id='+encodeURIComponent(h.id)+'">'+
+      '<span class="ai">'+ic("house")+'</span>'+
+      '<span class="sb3"><span class="sn">'+esc(h.name||t("Haushalt"))+'</span>'+
+      '<span class="ss">'+(h.adresse?esc(h.adresse):t("Keine Adresse"))+'</span>'+
+      '<span class="ss">'+tn(n,"{0} Mitglied","{0} Mitglieder")+(ichAdmin(h.id)?' · '+t("Admin"):"")+'</span></span>'+
+      '<span class="srt">'+(aktiv?'<span class="pill on">'+t("aktiv")+'</span>':"")+'<span class="go">'+ic("right",18)+'</span></span>'+
+    '</a>';
+  }).join("");
+  return zurueck("#/mehr",t("Mehr"))+seitenTitel(t("Häuser & Mitglieder"))+
+    '<div class="slots">'+zeilen+'</div>'+
+    '<div class="factions">'+
+      '<button class="btn" data-a="hh-neu">'+ic("plus")+' '+t("Neues Haus anlegen")+'</button>'+
+      '<button class="btn ghost" data-a="hh-join">'+ic("link")+' '+t("Mit Einladungscode beitreten")+'</button>'+
+    '</div>';
+}
+
+/* ---- Ein Haus: Adresse, Mitglieder, Einladen, Verlassen/Löschen ---- */
+function viewHaushalt(id){
+  var h=hausById(id);
+  if(!h)return zurueck("#/haushalte",t("Häuser & Mitglieder"))+seitenTitel(t("Nicht gefunden"));
+  var admin=ichAdmin(h.id),aktiv=HH&&h.id===HH.id,liste=MITGL[h.id];
+  if(!liste)ladeMitglieder(h.id).then(render).catch(function(e){MITGL[h.id]=[];toast(hausFehler(e),true);render();});
+  var allein=mitgliederZahl(h.id)<=1,einzigesHaus=HOUSEHOLDS.length<=1;
+  var mitglieder=!liste?'<div class="spin" style="margin:18px auto"></div>':
+    liste.map(function(m){
+      var ich=me&&m.user_id===me.id;
+      var inhalt='<span class="di av">'+esc(((m.email||"?")[0]||"?").toUpperCase())+'</span>'+
+        '<span class="db"><span class="dn">'+esc(m.email||"–")+'</span>'+
+        '<span class="dm">'+(ich?'<span class="pill">'+t("Du")+'</span>':"")+
+          (m.is_admin?'<span class="pill admin">'+ic("shield",12)+' '+t("Admin")+'</span>':'<span>'+t("Mitglied")+'</span>')+'</span></span>';
+      /* Admins verwalten andere; jeder darf seine eigene Admin-Rolle abgeben */
+      return (admin?'<button class="drow3" data-a="mg-menu" data-id="'+esc(h.id)+'" data-uid="'+esc(m.user_id)+'">'+inhalt+'<span class="go">'+ic("more",18)+'</span></button>'
+                   :'<div class="drow3">'+inhalt+'</div>');
+    }).join("");
+  return zurueck("#/haushalte",t("Häuser & Mitglieder"))+
+    '<div class="hhkopf"><span class="hhi">'+ic("house",26)+'</span><div style="min-width:0">'+
+      '<div class="hhn">'+esc(h.name||t("Haushalt"))+'</div>'+
+      '<div class="hha">'+ic("pin",15)+' '+(h.adresse?esc(h.adresse):t("Keine Adresse"))+'</div></div></div>'+
+    '<div class="factions" style="margin-top:0">'+
+      (aktiv?'':'<button class="btn" data-a="hh-pick" data-id="'+esc(h.id)+'">'+ic("swap")+' '+t("Zu diesem Haus wechseln")+'</button>')+
+      (admin?'<button class="btn ghost" data-a="hh-edit" data-id="'+esc(h.id)+'">'+ic("pencil")+' '+t("Name & Adresse bearbeiten")+'</button>':"")+
+    '</div>'+
+    '<div class="sect">'+t("Mitglieder")+(liste?'<span class="more">'+liste.length+'</span>':"")+'</div>'+
+    '<section class="card"><div class="dlist">'+mitglieder+'</div>'+
+      (admin?'<div class="factions" style="margin-top:14px"><button class="btn ghost" data-a="hh-invite" data-id="'+esc(h.id)+'">'+ic("users")+' '+t("Person einladen")+'</button></div>'
+            :'<p class="hint" style="margin:12px 4px 0">'+t("Mitglieder verwalten können nur Admins.")+'</p>')+
+    '</section>'+
+    (einzigesHaus?'':'<div class="factions">'+
+      (allein?'':'<button class="btn ghost" data-a="hh-leave" data-id="'+esc(h.id)+'">'+ic("logout")+' '+t("Haushalt verlassen")+'</button>')+
+      (admin?'<button class="btn danger" data-a="hh-del" data-id="'+esc(h.id)+'">'+ic("trash")+' '+t("Haus löschen")+'</button>':"")+
+    '</div>');
+}
+
+/* ---- Umschalter (Tipp auf den Hausnamen oben) ---- */
+function haushaltWaehlen(){
+  openModal('<h2 class="mhead">'+t("Haus wählen")+'</h2>'+
+    '<div class="mlist">'+HOUSEHOLDS.map(function(h){
+      return '<button class="setupcat'+(HH&&h.id===HH.id?" on":"")+'" data-a="hh-pick" data-id="'+esc(h.id)+'">'+
+        ic("house")+'<span style="min-width:0;flex:1"><span class="hhw">'+esc(h.name||t("Haushalt"))+'</span>'+
+        (h.adresse?'<span class="hhwa">'+esc(h.adresse)+'</span>':"")+'</span>'+
+        '<span class="ck">'+ic("check",18)+'</span></button>';
+    }).join("")+'</div>'+
+    '<div class="factions">'+
+      '<a class="btn ghost" href="#/haushalte">'+ic("users")+' '+t("Häuser & Mitglieder verwalten")+'</a>'+
+    '</div>');
+}
+async function haushaltSetzen(id){
+  if(!id||(HH&&id===HH.id)){closeModal();return;}
+  var neu=hausById(id);if(!neu)return;
+  HH=neu;
+  try{localStorage.setItem(hhKey(),id);}catch(e){}
+  closeModal(true);
+  $("#root").innerHTML=ladeHtml();
+  LADEFEHLER=null;
+  try{await ladeSetup();await ladeDaten();await ladeEnergie();}
+  catch(e){LADEFEHLER=errMsg(e);}
+  setupWahl=null;
+  toast(tf("Jetzt in „{0}“",HH.name||t("Haushalt"))+" 🏠");
+  render();
+}
+
+/* ---- Anlegen / Bearbeiten ---- */
+function hausFormular(id){
+  var h=id?hausById(id):null;
+  openModal('<h2 class="mhead">'+(h?t("Haus bearbeiten"):t("Neues Haus"))+'</h2>'+
+    '<form data-form="haus"'+(h?' data-id="'+esc(h.id)+'"':"")+'>'+
+      fld(t("Name"),'<input class="inp" id="h_name" maxlength="60" required value="'+esc(h?h.name||"":"")+'" placeholder="'+esc(t("z. B. Wohnung Frankfurt"))+'">')+
+      fld(t("Adresse"),'<input class="inp" id="h_adresse" maxlength="200" autocomplete="street-address" value="'+esc(h?h.adresse||"":"")+'" placeholder="'+esc(t("Straße Nr., PLZ Ort"))+'">')+
+      '<div class="factions">'+
+        '<button class="btn" type="submit">'+ic("check")+' '+(h?t("Speichern"):t("Haus anlegen"))+'</button>'+
+        '<button class="btn ghost" type="button" data-a="modal-close">'+t("Abbrechen")+'</button>'+
+      '</div>'+
+    '</form>');
+  var f=$("#h_name");if(f)f.focus();
+}
+async function hausSpeichern(id){
+  if(hhBusy)return;
+  var name=val("h_name"),adresse=val("h_adresse");
+  if(!name){toast(t("Bitte einen Namen eingeben."),true);return;}
+  hhBusy=true;
+  try{
+    if(id){
+      var r=await sbPub.from("households").update({name:name,adresse:adresse||null}).eq("id",id).select("id");
+      if(r.error)throw r.error;
+      if(!r.data||!r.data.length)throw new Error("not_admin");
+      closeModal(true);await haeuserNeuLaden();render();
+      toast(t("Gespeichert")+" ✅");
+    }else{
+      var c=await sbPub.rpc("create_household",{p_name:name,p_adresse:adresse||null});
+      if(c.error)throw c.error;
+      await haeuserNeuLaden();
+      closeModal(true);
+      toast(tf("„{0}“ angelegt",name)+" 🏠");
+      await haushaltSetzen(c.data);
+      go("#/einrichten");
+    }
+  }catch(e){toast(hausFehler(e),true);}
+  finally{hhBusy=false;}
+}
+
+/* ---- Beitreten per Code ---- */
+function beitretenFormular(){
+  openModal('<h2 class="mhead">'+t("Mit Code beitreten")+'</h2>'+
+    '<form data-form="beitreten">'+
+      fld(t("Einladungscode"),'<input class="inp code-in" id="h_code" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABCD1234">')+
+      '<div class="factions">'+
+        '<button class="btn" type="submit">'+ic("check")+' '+t("Beitreten")+'</button>'+
+        '<button class="btn ghost" type="button" data-a="modal-close">'+t("Abbrechen")+'</button>'+
+      '</div>'+
+    '</form>');
+  var f=$("#h_code");if(f)f.focus();
+}
+async function beitreten(){
+  if(hhBusy)return;
+  var code=val("h_code").replace(/\s+/g,"").toUpperCase();
+  if(code.length<6){toast(t("Bitte den Code aus der Einladung eingeben."),true);return;}
+  hhBusy=true;
+  try{
+    var r=await sbPub.rpc("redeem_invite",{p_code:code});
+    if(r.error)throw r.error;
+    await haeuserNeuLaden();
+    closeModal(true);
+    await haushaltSetzen(r.data);
+  }catch(e){toast(hausFehler(e),true);}
+  finally{hhBusy=false;}
+}
+
+/* ---- Einladen ---- */
+async function einladen(hid){
+  var h=hausById(hid);if(!h)return;
+  try{
+    var r=await sbPub.rpc("create_invite",{p_household_id:hid});
+    if(r.error)throw r.error;
+    var code=String(r.data||"");
+    var text=tf("Komm in unseren Haushalt „{0}“ bei All-Home. Code: {1} (14 Tage gültig) – {2}",h.name||"",code,location.origin+location.pathname);
+    openModal('<h2 class="mhead">'+t("Person einladen")+'</h2>'+
+      '<p class="hint" style="margin:0 0 12px">'+t("Die Person meldet sich mit eigenem Konto an und gibt unter Mehr › Häuser & Mitglieder diesen Code ein. Er gilt 14 Tage und nur einmal.")+'</p>'+
+      '<div class="code" id="h_einl">'+esc(code)+'</div>'+
+      '<div class="factions">'+
+        (navigator.share?'<button class="btn" data-a="hh-share" data-text="'+esc(text)+'">'+ic("share")+' '+t("Einladung teilen")+'</button>':"")+
+        '<button class="btn ghost" data-a="hh-copy" data-text="'+esc(code)+'">'+ic("copy")+' '+t("Code kopieren")+'</button>'+
+        '<button class="btn ghost" data-a="modal-close">'+t("Fertig")+'</button>'+
+      '</div>');
+  }catch(e){toast(hausFehler(e),true);}
+}
+async function kopieren(text){
+  try{await navigator.clipboard.writeText(text);toast(t("Kopiert")+" ✅");}
+  catch(e){toast(t("Kopieren ging nicht – bitte den Code abschreiben."),true);}
+}
+async function teilen(text){
+  try{await navigator.share({title:"All-Home",text:text});}
+  catch(e){if(e&&e.name!=="AbortError")kopieren(text);}
+}
+
+/* ---- Mitglied: Rolle ändern, entfernen ---- */
+function mitgliedMenue(hid,uid){
+  var m=(MITGL[hid]||[]).filter(function(x){return x.user_id===uid;})[0];if(!m)return;
+  var ich=me&&uid===me.id,letzterAdmin=m.is_admin&&adminZahl(hid)<=1;
+  openModal('<h2 class="mhead">'+esc(m.email||"–")+'</h2>'+
+    '<p class="hint" style="margin:0 0 12px">'+(m.is_admin?t("Admin"):t("Mitglied"))+(ich?' · '+t("Du"):"")+'</p>'+
+    (letzterAdmin?'<div class="sug info" style="margin-bottom:12px"><span class="si">'+ic("shield")+'</span><div class="sb2"><div class="sx">'+
+      t("Einziger Admin – bleibt es, bis jemand anderes Admin ist.")+'</div></div></div>':"")+
+    '<div class="factions" style="margin-top:0">'+
+      (m.is_admin?(letzterAdmin?"":'<button class="btn ghost" data-a="mg-admin" data-id="'+esc(hid)+'" data-uid="'+esc(uid)+'" data-v="0">'+ic("shield")+' '+(ich?t("Meine Admin-Rechte abgeben"):t("Admin-Rechte entziehen"))+'</button>')
+                 :'<button class="btn" data-a="mg-admin" data-id="'+esc(hid)+'" data-uid="'+esc(uid)+'" data-v="1">'+ic("shield")+' '+t("Zum Admin machen")+'</button>')+
+      (ich||letzterAdmin?"":'<button class="btn danger" data-a="mg-remove" data-id="'+esc(hid)+'" data-uid="'+esc(uid)+'">'+ic("trash")+' '+t("Aus dem Haus entfernen")+'</button>')+
+      '<button class="btn ghost" data-a="modal-close">'+t("Schließen")+'</button>'+
+    '</div>');
+}
+async function mitgliedAdmin(hid,uid,wert){
+  if(hhBusy)return;hhBusy=true;
+  try{
+    var r=await sbPub.rpc("set_member_admin",{p_household_id:hid,p_user_id:uid,p_is_admin:!!wert});
+    if(r.error)throw r.error;
+    closeModal(true);await ladeRollen();await ladeMitglieder(hid);render();
+    toast(wert?t("Ist jetzt Admin")+" 🛡️":t("Admin-Rechte entzogen"));
+  }catch(e){toast(hausFehler(e),true);}
+  finally{hhBusy=false;}
+}
+async function mitgliedEntfernen(hid,uid){
+  var m=(MITGL[hid]||[]).filter(function(x){return x.user_id===uid;})[0];
+  if(!confirm(tf("{0} aus dem Haus entfernen? Die Person sieht danach nichts mehr davon.",m?m.email:"")))return;
+  if(hhBusy)return;hhBusy=true;
+  try{
+    var r=await sbPub.rpc("remove_household_member",{p_household_id:hid,p_user_id:uid});
+    if(r.error)throw r.error;
+    closeModal(true);await ladeRollen();await ladeMitglieder(hid);render();
+    toast(t("Entfernt"));
+  }catch(e){toast(hausFehler(e),true);}
+  finally{hhBusy=false;}
+}
+
+/* ---- Verlassen ---- */
+async function hausVerlassen(hid){
+  var h=hausById(hid);if(!h)return;
+  /* vorab erklären statt in die Sperre laufen */
+  if(ichAdmin(hid)&&adminZahl(hid)<=1&&mitgliederZahl(hid)>1){toast(hausFehler("last_admin"),true);return;}
+  if(!confirm(tf("„{0}“ verlassen? Du siehst danach nichts mehr aus diesem Haus.",h.name||"")))return;
+  if(hhBusy)return;hhBusy=true;
+  try{
+    var r=await sbPub.rpc("leave_household",{p_household_id:hid});
+    if(r.error)throw r.error;
+    delete MITGL[hid];
+    await haeuserNeuLaden();
+    toast(t("Haus verlassen"));
+    go("#/haushalte");
+  }catch(e){toast(hausFehler(e),true);}
+  finally{hhBusy=false;}
+}
+
+/* ---- Löschen: erst Dateien (All-Home und AllTrack), dann die Daten ---- */
+function loeschenFormular(hid){
+  var h=hausById(hid);if(!h)return;
+  var n=mitgliederZahl(hid);
+  openModal('<h2 class="mhead">'+t("Haus löschen")+'</h2>'+
+    '<div class="sug bad" style="margin-bottom:14px"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+      '<div class="st">'+t("Endgültig – nicht rückgängig zu machen")+'</div>'+
+      '<div class="sx">'+(n>1?tf("Löscht für alle {0} Mitglieder: Verträge, Dokumente, Gesundheit und die AllTrack-Zählerstände dieses Hauses.",n)
+                           :t("Löscht Verträge, Dokumente, Gesundheit und die AllTrack-Zählerstände dieses Hauses."))+'</div>'+
+    '</div></div>'+
+    '<form data-form="haus-loeschen" data-id="'+esc(hid)+'">'+
+      fld(tf("Zum Bestätigen „{0}“ eintippen",h.name||""),'<input class="inp" id="h_bestaetigen" autocomplete="off" spellcheck="false">')+
+      '<div class="factions">'+
+        '<button class="btn danger" type="submit">'+ic("trash")+' '+t("Endgültig löschen")+'</button>'+
+        '<button class="btn ghost" type="button" data-a="modal-close">'+t("Abbrechen")+'</button>'+
+      '</div>'+
+    '</form>');
+}
+async function dateienEntfernen(client,bucket,tabelle,hid){
+  var r=await client.from(tabelle).select("storage_path").eq("household_id",hid);
+  if(r.error)throw r.error;
+  var pfade=(r.data||[]).map(function(d){return d.storage_path;}).filter(Boolean);
+  for(var i=0;i<pfade.length;i+=100){
+    var x=await client.storage.from(bucket).remove(pfade.slice(i,i+100));
+    if(x&&x.error)throw x.error;
+  }
+  return pfade.length;
+}
+async function hausLoeschen(hid){
+  var h=hausById(hid);if(!h)return;
+  if(val("h_bestaetigen").trim()!==(h.name||"").trim()){
+    toast(t("Der Name stimmt nicht überein."),true);var f=$("#h_bestaetigen");if(f){f.focus();f.classList.add("bad");}return;
+  }
+  if(hhBusy)return;hhBusy=true;
+  var knopf=document.querySelector('[data-form="haus-loeschen"] button[type=submit]');
+  if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gelöscht …");}
+  try{
+    await dateienEntfernen(sb,BUCKET,"documents",hid);          /* All-Home */
+    await dateienEntfernen(sbPub,"documents","documents",hid);  /* AllTrack */
+    var r=await sbPub.rpc("delete_household",{p_household_id:hid});
+    if(r.error)throw r.error;
+    delete MITGL[hid];
+    closeModal(true);
+    await haeuserNeuLaden();
+    toast(tf("„{0}“ gelöscht",h.name||""));
+    go("#/haushalte");
+  }catch(e){
+    toast(t("Löschen fehlgeschlagen")+": "+hausFehler(e),true);
+    if(knopf){knopf.disabled=false;knopf.innerHTML=ic("trash")+' '+t("Endgültig löschen");}
+  }
+  finally{hhBusy=false;}
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 document.addEventListener("click",function(ev){
@@ -3443,6 +4091,17 @@ document.addEventListener("click",function(ev){
   /* --- Haushalt --- */
   if(a==="hh-switch"){haushaltWaehlen();return;}
   if(a==="hh-pick"){haushaltSetzen(b.dataset.id);return;}
+  if(a==="hh-neu"){hausFormular(null);return;}
+  if(a==="hh-edit"){hausFormular(id);return;}
+  if(a==="hh-join"){beitretenFormular();return;}
+  if(a==="hh-invite"){einladen(id);return;}
+  if(a==="hh-copy"){kopieren(b.dataset.text);return;}
+  if(a==="hh-share"){teilen(b.dataset.text);return;}
+  if(a==="hh-leave"){hausVerlassen(id);return;}
+  if(a==="hh-del"){loeschenFormular(id);return;}
+  if(a==="mg-menu"){mitgliedMenue(id,b.dataset.uid);return;}
+  if(a==="mg-admin"){mitgliedAdmin(id,b.dataset.uid,b.dataset.v==="1");return;}
+  if(a==="mg-remove"){mitgliedEntfernen(id,b.dataset.uid);return;}
 
   /* --- Einrichtung --- */
   if(a==="art-toggle"){
@@ -3458,7 +4117,8 @@ document.addEventListener("click",function(ev){
   if(a==="v-neu"){oeffneForm(b.dataset.k,null,null);return;}
   if(a==="v-edit"){var c=vertragById(id);if(c)oeffneForm(c.art||"sonstiges",id,null);return;}
   if(a==="v-del"){loescheVertrag(id);return;}
-  if(a==="v-kuendigen"){setzeStatus(id,"gekuendigt");return;}
+  if(a==="v-kuendigen"){kuendigenBlatt(id);return;}
+  if(a==="v-kuend-ok"){var zum=val("k_zum");closeModal(true);setzeStatus(id,"gekuendigt",zum);return;}
   if(a==="v-aktiv"){setzeStatus(id,"aktiv");return;}
   if(a==="ics"){icsExport(id);return;}
 
@@ -3508,6 +4168,9 @@ document.addEventListener("submit",function(ev){
     return;
   }
   if(f.id==="vForm"){ev.preventDefault();speichereVertrag();return;}
+  if(f.dataset.form==="haus"){ev.preventDefault();hausSpeichern(f.dataset.id||null);return;}
+  if(f.dataset.form==="beitreten"){ev.preventDefault();beitreten();return;}
+  if(f.dataset.form==="haus-loeschen"){ev.preventDefault();hausLoeschen(f.dataset.id);return;}
   if(f.id==="medForm"){ev.preventDefault();medSpeichern(f.dataset.id);return;}
   if(f.id==="persForm"){
     ev.preventDefault();
@@ -3608,7 +4271,7 @@ function sucheLaufen(){
   if(vt.length)html+='<div class="mgrp">'+t("Verträge")+'</div><div class="dlist">'+vt.map(function(c){
     var a=artInfo(c.art||"sonstiges");
     return '<a class="drow3" href="#/vertrag?id='+c.id+'" data-a="modal-close">'+
-      '<span class="di">'+a.icon+'</span><span class="db"><span class="dn">'+esc(c.anbieter||a.label)+'</span>'+
+      anbieterKachel(c.anbieter,a.icon,"di",18)+'<span class="db"><span class="dn">'+esc(c.anbieter||a.label)+'</span>'+
       '<span class="dm"><span>'+esc(a.label)+'</span></span></span></a>';
   }).join("")+'</div>';
   if(dk.length)html+='<div class="mgrp">'+t("Dokumente")+'</div><div class="dlist">'+dk.map(function(d){
@@ -3641,25 +4304,6 @@ async function setupSpeichern(){
     render();
   }finally{setupBusy=false;}
 }
-function haushaltWaehlen(){
-  openModal('<h2 class="mhead">'+t("Haushalt wechseln")+'</h2>'+
-    '<div class="mlist">'+HOUSEHOLDS.map(function(h){
-      return '<button class="setupcat'+(HH&&h.id===HH.id?" on":"")+'" data-a="hh-pick" data-id="'+h.id+'">'+
-        ic("house")+'<span>'+esc(h.name||t("Haushalt"))+'</span>'+
-        '<span class="ck">'+ic("check",18)+'</span></button>';
-    }).join("")+'</div>'+
-    '<div class="factions"><button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button></div>');
-}
-async function haushaltSetzen(id){
-  if(!id||(HH&&id===HH.id)){closeModal();return;}
-  HH=HOUSEHOLDS.filter(function(h){return h.id===id;})[0]||HH;
-  try{localStorage.setItem(hhKey(),id);}catch(e){}
-  closeModal(true);
-  $("#root").innerHTML=ladeHtml();
-  try{await ladeSetup();await ladeDaten();await ladeEnergie();}catch(e){toast(errMsg(e),true);}
-  setupWahl=null;render();
-}
-
 /* ================= Start der App ================= */
 async function boot(){
   if(/type=recovery/i.test(location.hash)||/[?&]type=recovery/i.test(location.search))AUTH_MODE="reset";

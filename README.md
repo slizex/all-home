@@ -29,6 +29,15 @@ Jeder Helfer ist einzeln abschaltbar.
 Abrechnungsziffern (GOÄ/GOZ) in Alltagssprache samt verwendeter Materialien, und eine
 Steuerübersicht als CSV — nach Person getrennt.
 
+**Mehrere Häuser, mehrere Menschen.** Ein Konto kann mehrere Häuser mit Adresse führen
+(Wohnung, Ferienhaus, Elternhaus) und oben per Tipp auf den Namen wechseln. Mitglieder
+kommen per Einladungscode dazu; Admins verwalten Haus, Rollen und Einladungen. Es gibt
+immer mindestens einen Admin — das erzwingt die Datenbank selbst.
+
+**Anbieter-Logos** bekannter Marken (Telekom, Vodafone, O2, Banken, Streaming, Autohersteller)
+aus [Simple Icons](https://simpleicons.org) (CC0), direkt eingebettet — es wird kein fremder
+Server gefragt, bei wem der Haushalt Kunde ist.
+
 **Zweisprachig** Deutsch/Russisch, umschaltbar pro Benutzer. Deutsche Fachbegriffe
 stehen in Klammern hinter der Übersetzung, damit man sie auf dem Papier wiedererkennt.
 
