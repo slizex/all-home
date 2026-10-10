@@ -653,6 +653,51 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 /* Kopfzeilen: Titel einer Detailseite bricht um, der Hausname-Knopf kürzt mit „…" */
 .top>div{min-width:0}
 .top div.hh{white-space:normal;overflow-wrap:anywhere}
+
+/* ================= All-Home: Fahrzeuge ================= */
+/* Kennzeichen als Schild: weiß, schwarzer Rand, blauer EU-Streifen */
+.kz{display:inline-flex;align-items:stretch;flex:none;border:1.5px solid #231f1a;border-radius:5px;background:#fff;color:#111;
+  font-weight:900;font-size:.74rem;line-height:1;letter-spacing:.04em;overflow:hidden;white-space:nowrap;vertical-align:middle}
+.kz::before{content:"D";display:flex;align-items:flex-end;justify-content:center;width:11px;padding-bottom:2px;
+  background:#1f4fbf;color:#fff;font-size:.5rem;letter-spacing:0}
+.kz>span{padding:3px 6px 3px 5px}
+.kz.gross{font-size:.95rem;border-width:2px;border-radius:6px}
+.kz.gross::before{width:14px;font-size:.6rem}
+.kz.gross>span{padding:5px 9px 5px 7px}
+.fzg{display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:100%}
+.fzn{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.slot .ss.fzss{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;overflow:visible}
+.slot .ss .fzn{color:var(--text)}
+.vfzg{margin:6px 0 2px}
+.vfzg .fzn{font-size:1rem}
+/* Großbuchstaben-Felder (Kennzeichen, FIN, HSN/TSN) */
+.inp.gross{text-transform:uppercase;letter-spacing:.03em}
+
+/* ================= All-Home: KI-Stufen ================= */
+.kiw{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 8px}
+.kib{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);text-align:center;min-width:0}
+.kib b{font-weight:900;font-size:.9rem}
+.kib small{color:var(--muted);font-weight:700;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.kib i{font-style:normal;color:var(--muted-2);font-weight:900;font-size:.72rem;letter-spacing:.06em}
+.kib.on{border-color:var(--ink);background:var(--surface-2)}
+.kib.on i{color:var(--text)}
+.hint.kih{display:flex;align-items:center;gap:6px;margin:0 2px 14px}
+
+/* ================= All-Home: Logo-Verwaltung ================= */
+.logo.bild{background:#fff;padding:0;overflow:hidden}
+.logo.bild img{display:block;width:100%;height:100%;object-fit:cover}
+.drow3.aus{opacity:.55}
+.lvor{display:flex;align-items:center;gap:14px;margin:0 0 14px}
+.lvor .ai{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--surface-2);flex:none}
+.inrow{display:flex;gap:8px;align-items:stretch}
+.inrow .btn{flex:none}
+.chk{display:flex;align-items:center;gap:10px;font-weight:800;margin:4px 4px 0}
+.chk input{width:20px;height:20px;accent-color:var(--ink)}
+/* AllTrack-Hinweis in einer Karte: Abstand zur folgenden Angaben-Liste */
+.card>.sug+.kvl,.card>.sug+.hint{margin-top:14px}
+.kil{font-weight:800;font-size:.88rem;margin:0 0 6px 4px}
+/* Zweispaltige Formularzeilen: Felder bündig, auch wenn eine Beschriftung umbricht */
+.two{align-items:end}
 </style>
 </head>
 <body>
@@ -670,7 +715,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.1.1";
+var APP_VERSION="1.2.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -702,6 +747,7 @@ var DOCTYPE={
   kuendigung:{label:"Kündigung",icon:"✂️"},
   preisaenderung:{label:"Preisänderung",icon:"📈"},
   schreiben:{label:"Schreiben",icon:"✉️"},
+  fahrzeugschein:{label:"Fahrzeugschein",icon:"🪪"},
   sonstiges:{label:"Dokument",icon:"📄"}
 };
 /* Welche Unterlagen gehören zu einem vollständigen Vertrag? (Dokumenten-Lücken) */
@@ -723,6 +769,59 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.2: Fahrzeuge, KI-Stufen, Logo-Verwaltung ---- */
+  "Weitere":"Прочие",
+  "KI":"ИИ",
+  "KI-Stufe":"Уровень ИИ",
+  "Verwaltung":"Администрирование",
+  "Anbieter-Logos":"Логотипы поставщиков",
+  "Bitte wählen …":"Выберите …",
+  "Vertragsart":"Вид договора",
+  "Bitte die Vertragsart wählen.":"Выберите вид договора.",
+  "Die FIN hat normalerweise 17 Zeichen (ohne I, O, Q).":"VIN (FIN) обычно состоит из 17 знаков (без I, O, Q).",
+  "Die HSN (zu 2.1) besteht aus 4 Ziffern.":"Код производителя (HSN, поле 2.1) состоит из 4 цифр.",
+  "Die TSN (zu 2.2) besteht aus Buchstaben und Ziffern – für die Versicherung zählen die ersten 3.":"Код типа (TSN, поле 2.2) состоит из букв и цифр — для страховки важны первые 3.",
+  "KI-Stufe konnte nicht dauerhaft gespeichert werden.":"Не удалось сохранить уровень ИИ.",
+  "Gilt fürs Einlesen, für Arzt-Erklärungen und die Markt-Recherche.":"Действует для распознавания документов, пояснений к счетам врачей и анализа рынка.",
+  "Nur für App-Admins.":"Только для администраторов приложения.",
+  "Ohne Logo":"Без логотипа",
+  "Logo hinzufügen":"Добавить логотип",
+  "Verzeichnis":"Каталог",
+  "Anbieter suchen":"Найти поставщика",
+  "aus":"выкл.",
+  "Neues Logo":"Новый логотип",
+  "Trifft hier auf:":"Совпадает с:",
+  "Trifft im aktuellen Haus auf keinen Vertrag.":"В текущем доме не совпадает ни с одним договором.",
+  "Logo bearbeiten":"Изменить логотип",
+  "Bild hochladen":"Загрузить изображение",
+  "Suchwörter (mit Komma)":"Ключевые слова (через запятую)",
+  "Website":"Сайт",
+  "Holen":"Загрузить",
+  "Aktiv":"Активен",
+  "Bitte zuerst die Website eintragen, z. B. axa.de.":"Сначала укажите сайт, например axa.de.",
+  "Logo gefunden":"Логотип найден",
+  "Bildformat wird nicht unterstützt. Bitte PNG, JPG oder WebP.":"Формат не поддерживается. Используйте PNG, JPG или WebP.",
+  "Das Bild ist zu groß (max. 5 MB).":"Изображение слишком большое (макс. 5 МБ).",
+  "Bild übernommen":"Изображение принято",
+  "Hochladen fehlgeschlagen":"Не удалось загрузить",
+  "Name und mindestens ein Suchwort angeben.":"Укажите название и хотя бы одно ключевое слово.",
+  "Bitte ein Bild hochladen oder von der Website holen.":"Загрузите изображение или получите его с сайта.",
+  "Logo „{0}“ löschen?":"Удалить логотип «{0}»?",
+  "Gelöscht":"Удалено",
+  "{0} Logo":"Логотипов: {0}",
+  "{0} Logos":"Логотипов: {0}",
+  "{0} Anbieter ohne Logo":"Поставщиков без логотипа: {0}",
+  "Schnell":"Быстро",
+  "Gründlich":"Тщательно",
+  "Maximal":"Максимум",
+  "Klare Fotos und einfache Belege":"Чёткие фото и простые документы",
+  "Mehrseitige Verträge, schwierige Fotos":"Многостраничные договоры, сложные фото",
+  "Stärkstes Modell für knifflige Dokumente":"Самая мощная модель для сложных документов",
+  "HSN (zu 2.1)":"Код производителя (HSN, поле 2.1)",
+  "TSN (zu 2.2)":"Код типа (TSN, поле 2.2)",
+  "Fahrzeugschein":"Свидетельство о регистрации ТС (Fahrzeugschein)",
+
 
 /* ---- 1.1: Häuser & Mitglieder, Einzahl, Zahlen ---- */
   "Haus wählen":"Выбрать дом",
@@ -1455,6 +1554,8 @@ var FELDER={
   modell:         {l:"Modell",                      t:"text"},
   kennzeichen:    {l:"Kennzeichen",                 t:"text"},
   fin:            {l:"Fahrgestellnummer (FIN)",     t:"text"},
+  hsn:            {l:"HSN (zu 2.1)",                t:"text"},
+  tsn:            {l:"TSN (zu 2.2)",                t:"text"},
   erstzulassung:  {l:"Erstzulassung",               t:"date"},
   hu_bis:         {l:"HU gültig bis",               t:"date"},
   deckungsart:    {l:"Deckungsumfang",              t:"text"},
@@ -1505,9 +1606,9 @@ var ARTEN={
   garage:         {g:"wohnen",label:"Garage / Stellplatz",         icon:"🛖",felder:["objekt"]},
 
   /* ---------- Mobilität ---------- */
-  fahrzeug:       {g:"mobil",label:"Fahrzeug",                    icon:"🚗",std:1,felder:["marke","modell","kennzeichen","fin","erstzulassung","hu_bis"],termin:{k:"hu_bis",l:"HU / TÜV fällig"}},
-  kfz_steuer:     {g:"mobil",label:"KFZ-Steuer",                  icon:"🧾",felder:["kennzeichen","steuernummer"]},
-  leasing:        {g:"mobil",label:"Leasing / Autofinanzierung",    icon:"📄",felder:["marke","modell","kennzeichen","rate","laufzeit_bis","restschuld"]},
+  fahrzeug:       {g:"mobil",label:"Fahrzeug",                    icon:"🚗",std:1,felder:["kennzeichen","marke","modell","fin","hsn","tsn","erstzulassung","hu_bis"],termin:{k:"hu_bis",l:"HU / TÜV fällig"}},
+  kfz_steuer:     {g:"mobil",label:"KFZ-Steuer",                  icon:"🧾",felder:["kennzeichen","marke","modell","steuernummer"]},
+  leasing:        {g:"mobil",label:"Leasing / Autofinanzierung",    icon:"📄",felder:["kennzeichen","marke","modell","fin","rate","laufzeit_bis","restschuld"]},
   oepnv:          {g:"mobil",label:"Deutschlandticket / ÖPNV",     icon:"🚆",felder:["tarif_stufe"]},
   fahrrad:        {g:"mobil",label:"Fahrrad / E-Bike",            icon:"🚲",felder:["marke","modell"]},
 
@@ -1515,7 +1616,7 @@ var ARTEN={
   haftpflicht:    {g:"vers",label:"Privathaftpflicht",            icon:"🛡️",std:1,einzig:1,felder:["versnummer","deckungssumme","selbstbeteiligung","versichert"]},
   hausrat:        {g:"vers",label:"Hausrat",                      icon:"🛋️",std:1,einzig:1,felder:["versnummer","objekt","deckungssumme","selbstbeteiligung"]},
   wohngebaeude:   {g:"vers",label:"Wohngebäude",                   icon:"🏠",einzig:1,felder:["versnummer","objekt","deckungssumme","selbstbeteiligung"]},
-  kfz_vers:       {g:"vers",label:"KFZ-Versicherung",             icon:"🚘",std:1,felder:["versnummer","kennzeichen","deckungsart","sf_klasse","sf_prozent","selbstbeteiligung"]},
+  kfz_vers:       {g:"vers",label:"KFZ-Versicherung",             icon:"🚘",std:1,felder:["kennzeichen","marke","modell","fin","hsn","tsn","versnummer","deckungsart","sf_klasse","sf_prozent","selbstbeteiligung"]},
   rechtsschutz:   {g:"vers",label:"Rechtsschutz",                  icon:"⚖️",einzig:1,felder:["versnummer","deckungsart","selbstbeteiligung"]},
   kranken:        {g:"vers",label:"Krankenversicherung",          icon:"🏥",std:1,felder:["versnummer","tarif_stufe","inhaber"]},
   zahnzusatz:     {g:"vers",label:"Zahnzusatz",                   icon:"🦷",felder:["versnummer","tarif_stufe","inhaber"]},
@@ -1652,6 +1753,8 @@ function logoHell(hex){
 }
 /* Kachel für einen Anbieter: Markenzeichen auf Markenfarbe, sonst das Symbol der Art */
 function anbieterKachel(name,ersatz,cls,groesse){
+  var R=logoEintragVon(name);
+  if(R)return logoBildKachel(R,ersatz,cls);
   var L=logoVon(name),k=cls||"ai";
   if(!L)return '<span class="'+k+'">'+ersatz+'</span>';
   var px=groesse||22;
@@ -1669,7 +1772,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -1757,7 +1860,7 @@ function render(){
   /* Daten kamen nicht an? Das muss man sehen, nicht erraten. */
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -1775,6 +1878,7 @@ function render(){
   else if(rt.name==="vorschlaege"){inhalt=viewVorschlaege();cur="start";}
   else if(rt.name==="haushalte") {inhalt=viewHaushalte();cur="mehr";}
   else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
+  else if(rt.name==="logos")     {inhalt=viewLogos();cur="mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
 }
@@ -1909,6 +2013,7 @@ async function ladePrefs(){
     var r=await sb.from("user_settings").select("*").eq("user_id",me.id).maybeSingle();
     if(r&&!r.error&&r.data){
       PREFS=r.data;
+      if(r.data.ai_level)try{localStorage.setItem("ah_ki",r.data.ai_level);}catch(e){}
       if(r.data.lang){curLang=(r.data.lang==="ru")?"ru":"de";applyLangAttr();
         try{localStorage.setItem("ah_lang",curLang);}catch(e){}}
     }
@@ -1937,6 +2042,7 @@ async function ladeAlles(){
   await ladePrefs();
   await ladeHaushalte();
   await ladeRollen();
+  await Promise.all([ladeLogos(),ladeAppAdmin()]);
   await ladeSetup();
   await ladeDaten();
   await ladeEnergie();
@@ -2135,6 +2241,16 @@ function viewVertraege(){
              (kosten>0?'<span class="gn">'+eur0(kosten)+' / '+t("Monat")+'</span>':"")+'</div>'+
            '<div class="slots">'+arten.map(artSlot).join("")+'</div>';
   }).filter(Boolean).join("");
+  var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return k==="sonstiges"||!ARTEN[k]||!artAktiv(k);});
+  if(weitere.length)body+='<div class="grp"><span class="gi">📄</span>'+t("Weitere")+'</div>'+
+    '<div class="slots">'+weitere.map(function(c){
+      var a=artInfo(c.art||"sonstiges"),f=fristInfo(c);
+      return '<a class="slot" href="#/vertrag?id='+c.id+'">'+anbieterKachel(c.anbieter,a.icon)+
+        '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span>'+
+        '<span class="ss"><span class="dot '+f.level+'"></span> '+esc(a.label)+'</span></span>'+
+        '<span class="srt">'+(c.kosten!=null?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
+        '<span class="go">'+ic("right",18)+'</span></span></a>';
+    }).join("")+'</div>';
   return topBar()+seitenTitel(t("Verträge"))+body+
     '<div class="factions" style="margin-top:20px">'+
       '<a class="btn ghost" href="#/einrichten">'+ic("tool")+' '+t("Arten anpassen")+'</a>'+
@@ -2174,16 +2290,20 @@ function artSlot(k){
   var untertitel=liste.length===1
     ?(fr?esc(fr.f.label):esc(a.label))
     :tn(liste.length,"{0} Vertrag","{0} Verträge");
+  var fz=liste.length===1?fahrzeugZeile(liste[0])
+        :liste.map(function(c){var f=fahrzeugVon(c);return f&&f.kz?kzHtml(f.kz):"";}).join("");
+  if(fz)fz='<span class="ss fzss">'+fz+'</span>';
   return '<a class="slot" href="'+ziel+'">'+
     (liste.length===1?anbieterKachel(liste[0].anbieter,a.icon):'<span class="ai">'+a.icon+'</span>')+
     '<span class="sb3"><span class="sn">'+esc(liste.length===1?(liste[0].anbieter||a.label):a.label)+'</span>'+
-    '<span class="ss">'+(fr?'<span class="dot '+fr.level+'"></span> ':"")+untertitel+'</span></span>'+
+    fz+'<span class="ss">'+(fr?'<span class="dot '+fr.level+'"></span> ':"")+untertitel+'</span></span>'+
     '<span class="srt">'+(kosten>0?'<span class="scost">'+eur0(kosten)+'</span>':"")+
     (liste.length>1?'<span class="cnt">'+liste.length+'</span>':"")+
     '<span class="go">'+ic("right",18)+'</span></span></a>';
 }
 
 /* ================= Termine ================= */
+function terminTitel(c,a){var f=fahrzeugVon(c);return (c.anbieter||a.label)+(f&&f.kz?" · "+f.kz:"");}
 /* Sammelt Kündigungsfristen und Pflichttermine der nächsten n Tage */
 function naheTermine(tage){
   var raus=[];
@@ -2194,7 +2314,7 @@ function naheTermine(tage){
       var f=fristInfo(c);
       if(f.days!=null&&f.days<=tage)
         raus.push({days:f.days,level:f.level,icon:a.icon,
-                   titel:(c.anbieter||a.label),text:t("Letzter Kündigungstag")+" · "+fmtDate(f.lastDay),
+                   titel:terminTitel(c,a),text:t("Letzter Kündigungstag")+" · "+fmtDate(f.lastDay),
                    href:"#/vertrag?id="+c.id});
     }
     /* Pflichttermin aus den Zusatzfeldern */
@@ -2202,7 +2322,7 @@ function naheTermine(tage){
       var d=daysUntil(c.details[a.termin.k]);
       if(d!=null&&d<=tage)
         raus.push({days:d,level:ampel(d),icon:a.icon,
-                   titel:(c.anbieter||a.label),text:t(a.termin.l)+" · "+fmtDate(c.details[a.termin.k]),
+                   titel:terminTitel(c,a),text:t(a.termin.l)+" · "+fmtDate(c.details[a.termin.k]),
                    href:"#/vertrag?id="+c.id});
     }
   });
@@ -2262,6 +2382,16 @@ function viewMehr(){
         '<span class="dm">'+tn(HOUSEHOLDS.length,"{0} Haus","{0} Häuser")+(HH?' · '+tn(mitgliederZahl(HH.id),"{0} Mitglied","{0} Mitglieder")+' '+t("hier"):"")+'</span></span>'+
         '<span class="go">'+ic("right",18)+'</span></a>'+
     '</section>'+
+    '<div class="mgrp">'+t("KI")+'</div>'+
+    '<section class="card"><button class="drow3" data-a="ki-blatt"><span class="di">'+ic("sparkles")+'</span>'+
+      '<span class="db"><span class="dn">'+t("KI-Stufe")+'</span>'+
+      '<span class="dm"><span>'+t(KI_STUFEN[kiStufe()].name)+' · '+esc(KI_STUFEN[kiStufe()].model)+'</span></span></span>'+
+      '<span class="go">'+ic("right",18)+'</span></button></section>'+
+    (IST_APP_ADMIN?'<div class="mgrp">'+t("Verwaltung")+'</div>'+
+      '<section class="card"><a class="drow3" href="#/logos"><span class="di">'+ic("folder")+'</span>'+
+        '<span class="db"><span class="dn">'+t("Anbieter-Logos")+'</span>'+
+        '<span class="dm"><span>'+tn(LOGO_REG.length,"{0} Logo","{0} Logos")+(anbieterOhneLogo().length?' · '+tn(anbieterOhneLogo().length,"{0} Anbieter ohne Logo","{0} Anbieter ohne Logo"):"")+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a></section>':"")+
     '<div class="mgrp">'+t("Sprache")+'</div>'+
     '<section class="card">'+
       '<p class="hint" style="margin:0 0 10px">'+t("Gilt nur für dich – andere im Haushalt behalten ihre Sprache.")+'</p>'+
@@ -2341,6 +2471,7 @@ function viewArt(k){
          return '<a class="slot" href="#/vertrag?id='+c.id+'">'+
            anbieterKachel(c.anbieter,a.icon)+
            '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span>'+
+           (fahrzeugVon(c)?'<span class="ss">'+fahrzeugZeile(c)+'</span>':"")+
            '<span class="ss"><span class="dot '+f.level+'"></span> '+esc(f.label)+(nd?' · '+tf("{0} Dok.",nd):"")+'</span></span>'+
            '<span class="srt">'+(c.kosten!=null?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
            '<span class="go">'+ic("right",18)+'</span></span></a>';
@@ -2373,6 +2504,7 @@ function viewVertrag(id){
     '<div class="top vkopf" style="margin-bottom:12px"><div class="vk">'+anbieterKachel(c.anbieter,a.icon,"hhi",28)+'<div style="min-width:0">'+
       '<div class="greet">'+esc(a.label)+'</div>'+
       '<div class="hh">'+esc(c.anbieter||a.label)+'</div>'+
+      (fahrzeugVon(c)?'<div class="vfzg">'+fahrzeugZeile(c,true)+'</div>':"")+
       (c.produkt?'<div class="greet">'+esc(c.produkt)+'</div>':"")+
     '</div></div></div>'+
     /* Frist */
@@ -2417,24 +2549,74 @@ function viewVertrag(id){
 
 /* ================= Vertragsformular ================= */
 var FORM=null;   /* {art, id, prefill} – offenes Formular */
+/* Felder, die nebeneinander stehen (erstes Feld → Partner) */
+var FELD_PAARE={marke:"modell",hsn:"tsn",sf_klasse:"sf_prozent",zaehlernummer:"jahresverbrauch",rufnummer:"datenvolumen"};
+/* Eingaben, die als Großbuchstaben gespeichert werden */
+var FELD_GROSS={kennzeichen:1,fin:1,hsn:1,tsn:1};
+var FELD_PLATZ={kennzeichen:"FB-AB 1234",marke:"Volkswagen",modell:"Golf",fin:"WVWZZZ1KZ6W000000",hsn:"0603",tsn:"BJH"};
+/* Art-Auswahl, nach Gruppen geordnet; leer = „bitte wählen“ */
+function artAuswahl(akt){
+  return '<select class="inp" id="f_art" required>'+
+    '<option value=""'+(akt?"":" selected")+'>'+t("Bitte wählen …")+'</option>'+
+    GRUPPEN.map(function(g){
+      return '<optgroup label="'+esc(t(g.label))+'">'+artenDerGruppe(g.k).map(function(k){
+        var a=artInfo(k);
+        return '<option value="'+k+'"'+(k===akt?" selected":"")+'>'+a.icon+' '+esc(a.label)+'</option>';
+      }).join("")+'</optgroup>';
+    }).join("")+
+    '<option value="sonstiges"'+(akt==="sonstiges"?" selected":"")+'>📄 '+t("Sonstiges")+'</option>'+
+  '</select>';
+}
+/* Was steht gerade im Formular? (damit ein Wechsel der Art nichts verliert) */
+function formularEntwurf(){
+  var e={details:{}};
+  ["anbieter","produkt","kundennummer","vertragsnummer","notizen"].forEach(function(k){var el=$("#f_"+k);if(el)e[k]=el.value;});
+  [["kosten","f_kosten"],["vertragsstart","f_start"],["mindestlaufzeit_monate","f_ml"],["kuendigungsfrist_monate","f_kf"],
+   ["verlaengerung_monate","f_vl"],["kosten_intervall","f_iv"]].forEach(function(p){var el=$("#"+p[1]);if(el)e[p[0]]=el.value;});
+  document.querySelectorAll('[id^="f_d_"]').forEach(function(el){if(el.value!=="")e.details[el.id.slice(4)]=el.value;});
+  return e;
+}
+function artWechseln(neu){
+  if(!FORM)return;
+  FORM.entwurf=formularEntwurf();
+  /* bisherige Details behalten, die neue Art zeigt davon, was sie kennt */
+  var alt=(FORM.id&&vertragById(FORM.id)&&vertragById(FORM.id).details)||(FORM.prefill&&FORM.prefill.details)||{};
+  FORM.entwurf.details=Object.assign({},alt,FORM.entwurf.details);
+  FORM.art=neu;
+  $("#modalBox").innerHTML='<div class="grab"></div>'+vertragFormular();
+  setTimeout(formVorschau,0);
+}
 function vertragFormular(){
   if(!FORM)return "";
-  var a=artInfo(FORM.art),c=FORM.id?vertragById(FORM.id):null;
-  var p=FORM.prefill||{};
+  var a=artInfo(FORM.art||"sonstiges"),c=FORM.id?vertragById(FORM.id):null;
+  var p=FORM.prefill||{},en=FORM.entwurf||null;
   function v(spalte,extK){
+    if(en&&en[spalte]!=null)return en[spalte];
     if(c&&c[spalte]!=null)return c[spalte];
     var pk=extK||spalte;
     return p[pk]!=null?p[pk]:"";
   }
-  var det=(c&&c.details)||p.details||{};
+  var det=(en&&en.details)||(c&&c.details)||p.details||{};
   var ivOpts=Object.keys(INTERVALL_LABEL).map(function(k){return [k,ivLabel(k)];});
-  var zusatz=artFelder(a.key).map(function(fd){
+  var felder=FORM.art?artFelder(a.key):[],genutzt={};
+  function feldHtml(fd){
     var typ=fd.t==="date"?"date":((fd.t==="eur"||fd.t==="num")?"number":"text");
-    var extra=(fd.t==="eur"||fd.t==="num")?' step="any" min="0"':"";
-    return fld(fd.l,inp("f_d_"+fd.k,det[fd.k]==null?"":det[fd.k],typ,extra));
+    var extra=(FELD_GROSS[fd.k]?' class="inp gross" autocapitalize="characters" spellcheck="false"':"")+
+              (FELD_PLATZ[fd.k]?' placeholder="'+esc(FELD_PLATZ[fd.k])+'"':"")+(fd.k==="fin"?' maxlength="17"':"");
+    var html=inp("f_d_"+fd.k,det[fd.k]==null?"":det[fd.k],typ,extra);
+    if(FELD_GROSS[fd.k])html=html.replace('<input class="inp" ','<input ');
+    return fld(fd.l,html);
+  }
+  var zusatz=felder.map(function(fd,i){
+    if(genutzt[fd.k])return "";
+    var partner=FELD_PAARE[fd.k],pf=partner&&felder.filter(function(x){return x.k===partner;})[0];
+    if(pf){genutzt[pf.k]=1;return '<div class="two">'+feldHtml(fd)+feldHtml(pf)+'</div>';}
+    return feldHtml(fd);
   }).join("");
-  return '<h2 class="mhead">'+a.icon+' '+esc(c?t("Vertrag bearbeiten"):a.label)+'</h2>'+
+  var titel=c?t("Vertrag bearbeiten"):(FORM.art?a.label:t("Vertrag eintragen"));
+  return '<h2 class="mhead">'+(FORM.art?a.icon+' ':"")+esc(titel)+'</h2>'+
     '<form id="vForm" novalidate>'+
+    fld(t("Vertragsart"),artAuswahl(FORM.art||""))+
     (a.kein_anbieter?"":fld(t("Anbieter"),inp("f_anbieter",v("anbieter"),"text",' list="anbListe"')))+
     '<datalist id="anbListe">'+anbieterListe()+'</datalist>'+
     fld(t("Tarif / Produkt"),inp("f_produkt",v("produkt")))+
@@ -2444,7 +2626,7 @@ function vertragFormular(){
     '</div>'+
     '<div class="two">'+
       fld(t("Kosten (€)"),inp("f_kosten",v("kosten"),"number",' step="0.01" min="0"'))+
-      fld(t("Zahlungsintervall"),sel("f_iv",ivOpts,(c&&c.kosten_intervall)||p.kostenIntervall||"monatlich"))+
+      fld(t("Zahlungsintervall"),sel("f_iv",ivOpts,(en&&en.kosten_intervall)||(c&&c.kosten_intervall)||p.kostenIntervall||"monatlich"))+
     '</div>'+
     fld(t("Vertragsbeginn"),inp("f_start",v("vertragsstart","vertragsstart"),"date"))+
     '<div class="two">'+
@@ -2467,7 +2649,7 @@ function anbieterListe(){
     .map(function(x){return '<option value="'+esc(x)+'">';}).join("");
 }
 function oeffneForm(art,id,prefill){
-  FORM={art:art||"sonstiges",id:id||null,prefill:prefill||null};
+  FORM={art:art||"",id:id||null,prefill:prefill||null,entwurf:null};
   openModal(vertragFormular());
   setTimeout(formVorschau,0);
 }
@@ -2493,16 +2675,25 @@ function formVorschau(){
 }
 async function speichereVertrag(){
   if(!FORM)return;
+  var gewaehlt=val("f_art");
+  if(!gewaehlt){toast(t("Bitte die Vertragsart wählen."),true);var fa=$("#f_art");if(fa){fa.focus();fa.classList.add("bad");}return;}
+  if(gewaehlt!==FORM.art){artWechseln(gewaehlt);return;}   /* Felder der neuen Art erst zeigen */
   var a=artInfo(FORM.art);
   var anbieter=a.kein_anbieter?"":val("f_anbieter");
   if(!a.kein_anbieter&&!anbieter){toast(t("Bitte mindestens den Anbieter angeben."),true);return;}
   var zahlFelder=["f_kosten","f_ml","f_kf","f_vl"].concat(artFelder(a.key)
     .filter(function(fd){return fd.t==="eur"||fd.t==="num";}).map(function(fd){return "f_d_"+fd.k;}));
   if(zahlFehlt(zahlFelder)){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
-  var det={};
+  /* Details: Felder der Art aus dem Formular; Angaben, die die Art nicht kennt
+     (z. B. nach einem Art-Wechsel), bleiben erhalten statt still zu verschwinden. */
+  var altDet=(FORM.id&&vertragById(FORM.id)&&vertragById(FORM.id).details)||{};
+  var det=Object.assign({},altDet);
   artFelder(a.key).forEach(function(fd){
     var raw=val("f_d_"+fd.k);
+    delete det[fd.k];
     if(!raw)return;
+    if(fd.k==="kennzeichen")raw=kzNorm(raw);
+    else if(FELD_GROSS[fd.k])raw=raw.toUpperCase().replace(/\s+/g,"");
     det[fd.k]=(fd.t==="eur"||fd.t==="num")?numOrNull(raw):raw;
   });
   var spalten={
@@ -2534,6 +2725,7 @@ async function speichereVertrag(){
     warn.push(tf("Monatliche Kosten von {0} sind ungewöhnlich hoch – Tippfehler?",eur(spalten.kosten)));
   if(!FORM.id&&a.einzig&&vertraegeDerArt(a.key).some(function(c){return c.status==="aktiv";}))
     warn.push(tf("Für „{0}“ gibt es schon einen aktiven Vertrag. Doppelt versichert?",a.label));
+  warn=warn.concat(fahrzeugWarnungen(det));
   if(warn.length&&!confirm("🏠 "+t("All-Home ist stutzig:")+"\n\n• "+warn.join("\n• ")+"\n\n"+t("Trotzdem speichern?")))return;
   try{
     if(FORM.id){
@@ -2659,14 +2851,15 @@ function dokListe(c){
   }).join("");
   /* Dokumenten-Lücken: welche Unterlage fehlt? */
   var vorhanden={};doks.forEach(function(d){vorhanden[d.doc_type]=1;});
-  var luecken=Object.keys(SOLL_DOKS).filter(function(k){
+  var soll=(c.art==="fahrzeug")?{fahrzeugschein:"Fahrzeugschein"}:SOLL_DOKS;
+  var luecken=Object.keys(soll).filter(function(k){
     if(vorhanden[k])return false;
     if(k==="police")return artInfo(c.art||"sonstiges").g==="vers";  /* Police nur bei Versicherungen */
     return true;
   }).map(function(k){
     return '<a class="drow3 fehlt" href="#/neu?vertrag='+c.id+'">'+
       '<span class="di">'+ic("plus",16)+'</span>'+
-      '<span class="db"><span class="dn">'+t(SOLL_DOKS[k])+' '+t("fehlt")+'</span>'+
+      '<span class="db"><span class="dn">'+t(soll[k])+' '+t("fehlt")+'</span>'+
       '<span class="dm"><span>'+t("tippen zum Hinzufügen")+'</span></span></span></a>';
   }).join("");
   if(!zeilen&&!luecken)return '<p class="hint">'+t("Noch keine Dokumente zugeordnet.")+'</p>';
@@ -2693,6 +2886,7 @@ function viewNeu(){
       '<div class="sx">'+t("Was dabei herauskommt, landet in dieser Art.")+'</div></div></div>':"")+
     '<section class="card">'+
       '<p class="hint" style="margin:0 0 14px">'+t("Hochladen – All-Home liest aus und sortiert ein.")+'</p>'+
+      kiStufenWahl()+
       '<div class="tiles">'+
         '<button class="tile" data-a="pick-cam"><span class="hd">'+ic("camera",22)+'<span class="nm">'+t("Brief fotografieren")+'</span></span>'+
           '<span class="mt" style="display:block;margin-top:6px">'+t("Die Kamera öffnet sich direkt")+'</span></button>'+
@@ -2707,7 +2901,7 @@ function viewNeu(){
     '<div class="sect">'+t("Oder von Hand")+'</div>'+
     '<section class="card">'+
       '<p class="hint" style="margin:0 0 12px">'+t("Vertrag ohne Dokument anlegen – Angaben selbst eintragen.")+'</p>'+
-      '<button class="btn ghost full" data-a="v-neu" data-k="'+(p.art||"sonstiges")+'">'+ic("pencil")+' '+t("Vertrag eintragen")+'</button>'+
+      '<button class="btn ghost full" data-a="v-neu" data-k="'+esc(p.art||"")+'">'+ic("pencil")+' '+t("Vertrag eintragen")+'</button>'+
     '</section>';
 }
 function zeigeArbeit(txt){
@@ -2877,13 +3071,13 @@ async function edgeRuf(fn,body){
   if(b.error){var e2=new Error(b.error);e2.code=b.code||null;throw e2;}
   return b;
 }
-function kiStufe(){try{return PREFS.ai_level||"advanced";}catch(e){return "advanced";}}
 
 /* ================= Bestätigung nach dem Einlesen ================= */
 /* Welche Art passt zu dem, was die KI gelesen hat? */
 function artAusExtrakt(ext){
   if(!ext)return "sonstiges";
   if(ext.istMedizin)return "sonstiges";
+  if(ext.docType==="fahrzeugschein")return "fahrzeug";
   var k=ext.kategorie;
   /* Die groben KI-Kategorien auf den feinen Katalog abbilden */
   var karte={strom:"strom",gas:"gas",wasser:"wasser",internet:"internet",mobilfunk:"mobilfunk",
@@ -3387,13 +3581,13 @@ async function medZuVertrag(id){
 /* ---- Personen (nur im Gesundheits-Bereich) ---- */
 function personenVerwalten(){
   openModal('<h2 class="mhead">'+ic("user")+' '+t("Personen")+'</h2>'+
-    '<p class="hint">'+t("Personen dienen nur dazu, Arztdokumente einem Familienmitglied zuzuordnen – für die Steuerübersicht.")+'</p>'+
-    '<div class="mlist">'+(PERSONS.length?PERSONS.map(function(p){
+    '<p class="hint" style="margin:0 4px 14px">'+t("Personen dienen nur dazu, Arztdokumente einem Familienmitglied zuzuordnen – für die Steuerübersicht.")+'</p>'+
+    (PERSONS.length?'<div class="mlist" style="margin-bottom:18px">'+PERSONS.map(function(p){
       var n=DOCS.filter(function(d){return d.person_id===p.id;}).length;
-      return '<div class="mrow"><span>'+esc(p.name)+'</span>'+
-        '<span class="mut" style="font-size:.82rem">'+tf("{0} Dok.",n)+'</span>'+
-        '<button class="ibtn" data-a="pers-del" data-id="'+p.id+'">'+ic("trash",16)+'</button></div>';
-    }).join(""):'<p class="hint">'+t("Noch keine Personen.")+'</p>')+'</div>'+
+      return '<div class="mrow2"><span class="mi">'+ic("user",18)+'</span>'+
+        '<span class="mt2"><b>'+esc(p.name)+'</b><small>'+tf("{0} Dok.",n)+'</small></span>'+
+        '<button class="ibtn" data-a="pers-del" data-id="'+p.id+'" aria-label="'+esc(t("Löschen"))+'">'+ic("trash",16)+'</button></div>';
+    }).join("")+'</div>':'<p class="hint" style="margin:0 4px 18px">'+t("Noch keine Personen.")+'</p>')+
     '<form id="persForm" novalidate>'+
       fld(t("Neue Person"),inp("p_name","","text",' placeholder="'+t("Name")+'"'))+
       '<div class="factions"><button class="btn" type="submit">'+ic("plus")+' '+t("Anlegen")+'</button>'+
@@ -4067,6 +4261,322 @@ async function hausLoeschen(hid){
   finally{hhBusy=false;}
 }
 
+/* ================= Fahrzeuge =================
+   Bei KFZ-Versicherung, Fahrzeug, Leasing und KFZ-Steuer soll man auf einen
+   Blick sehen, um welches Auto es geht: Kennzeichen als Schild, dazu Marke und
+   Modell. Werte aus dem Fahrzeugschein (FIN, HSN/TSN) stehen in den Details. */
+function istFahrzeugArt(k){return artFelder(k).some(function(f){return f.k==="kennzeichen";});}
+/* Kennzeichen vereinheitlichen: Großbuchstaben, einfache Leerzeichen */
+function kzNorm(s){return String(s||"").toUpperCase().replace(/\s+/g," ").replace(/\s*-\s*/g,"-").trim();}
+function fahrzeugVon(c){
+  if(!c||!istFahrzeugArt(c.art))return null;
+  var d=c.details||{};
+  var kz=kzNorm(d.kennzeichen),name=[d.marke,d.modell].filter(function(x){return x&&String(x).trim();}).join(" ");
+  if(!kz&&!name)return null;
+  return {kz:kz,name:name};
+}
+/* Kennzeichen als kleines Schild (EU-Streifen links) */
+function kzHtml(kz,gross){
+  if(!kz)return "";
+  return '<span class="kz'+(gross?" gross":"")+'" title="'+esc(t("Kennzeichen"))+'"><span>'+esc(kz)+'</span></span>';
+}
+/* Eine Zeile „[FB-SK 1990] VW Golf" für Listen */
+function fahrzeugZeile(c,gross){
+  var f=fahrzeugVon(c);if(!f)return "";
+  return '<span class="fzg">'+kzHtml(f.kz,gross)+(f.name?'<span class="fzn">'+esc(f.name)+'</span>':"")+'</span>';
+}
+
+/* KI-Schlüssel → Felder des Katalogs. Nur Felder, die die Art kennt, werden übernommen. */
+var KI_DETAIL_KARTE={
+  versichertesObjekt:"versichert",deckungsart:"deckungsart",deckungssumme:"deckungssumme",
+  selbstbeteiligung:"selbstbeteiligung",schadenfreiheitsklasse:"sf_klasse",sfProzent:"sf_prozent",
+  kennzeichen:"kennzeichen",marke:"marke",modell:"modell",fin:"fin",hsn:"hsn",tsn:"tsn",
+  erstzulassung:"erstzulassung",huBis:"hu_bis",
+  rufnummer:"rufnummer",datenvolumen:"datenvolumen",endgeraet:"endgeraet",
+  geschwindigkeit:"geschwindigkeit",router:"router",
+  zaehlernummer:"zaehlernummer",jahresverbrauch:"jahresverbrauch",arbeitspreis:"arbeitspreis",grundpreis:"grundpreis",
+  aboStufe:"tarif_stufe",profile:"profile",zinssatz:"zinssatz",iban:"iban",
+  objekt:"objekt",flaeche:"flaeche",nebenkosten:"nebenkosten",
+  leistungsumfang:"leistungsumfang",mitgliedsnummer:"mitgliedsnummer"
+};
+function detailsAusExtrakt(ext,art){
+  var roh=(ext&&ext.details)||{},erlaubt={},aus={};
+  artFelder(art).forEach(function(f){erlaubt[f.k]=f;});
+  Object.keys(roh).forEach(function(k){
+    var feld=KI_DETAIL_KARTE[k]||k,v=roh[k];
+    if(!erlaubt[feld]||v==null||v==="")return;
+    var typ=erlaubt[feld].t;
+    if(typ==="eur"||typ==="num"){v=numOrNull(v);if(v==null)return;}
+    else if(typ==="date"){v=String(v).slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return;}
+    else v=String(v).trim();
+    if(feld==="kennzeichen")v=kzNorm(v);
+    if(feld==="fin"||feld==="hsn"||feld==="tsn")v=String(v).toUpperCase().replace(/\s+/g,"");
+    aus[feld]=v;
+  });
+  return aus;
+}
+/* Plausibilität der Fahrzeugnummern: warnen, nie blockieren */
+function fahrzeugWarnungen(det){
+  var w=[];
+  if(det.fin&&!/^[A-HJ-NPR-Z0-9]{17}$/.test(det.fin))w.push(t("Die FIN hat normalerweise 17 Zeichen (ohne I, O, Q)."));
+  if(det.hsn&&!/^\d{4}$/.test(det.hsn))w.push(t("Die HSN (zu 2.1) besteht aus 4 Ziffern."));
+  if(det.tsn&&!/^[A-Z0-9]{3,10}$/.test(det.tsn))w.push(t("Die TSN (zu 2.2) besteht aus Buchstaben und Ziffern – für die Versicherung zählen die ersten 3."));
+  return w;
+}
+
+/* ================= KI-Stufen =================
+   Wie in AllTrack: Schnell · Gründlich · Maximal. Das Modell ordnet die Edge
+   Function fest zu (butler-extract, -med-explain, -research), hier wird nur die
+   Stufe gewählt. Gilt je Person, Standard „Gründlich“. */
+var KI_STUFEN={
+  basic:   {name:"Schnell",  model:"Claude Haiku 4.5",  sub:"Klare Fotos und einfache Belege",            kosten:"€"},
+  advanced:{name:"Gründlich",model:"Claude Sonnet 5.5", sub:"Mehrseitige Verträge, schwierige Fotos",     kosten:"€€"},
+  max:     {name:"Maximal",  model:"Claude Opus 5.5",   sub:"Stärkstes Modell für knifflige Dokumente",    kosten:"€€€"}
+};
+function kiStufe(){
+  var v=PREFS&&PREFS.ai_level;
+  if(!KI_STUFEN[v]){try{v=localStorage.getItem("ah_ki");}catch(e){v=null;}}
+  return KI_STUFEN[v]?v:"advanced";
+}
+async function setzeKiStufe(v){
+  if(!KI_STUFEN[v])return;
+  PREFS=PREFS||{};PREFS.ai_level=v;
+  try{localStorage.setItem("ah_ki",v);}catch(e){}
+  closeModal(true);render();
+  if(!me)return;
+  try{
+    var r=await sb.from("user_settings").upsert({user_id:me.id,ai_level:v,updated_at:new Date().toISOString()});
+    if(r&&r.error)throw r.error;
+  }catch(e){toast(t("KI-Stufe konnte nicht dauerhaft gespeichert werden.")+" "+errMsg(e),true);}
+}
+/* Auswahl direkt beim Einlesen: drei Knöpfe nebeneinander */
+function kiStufenWahl(){
+  var akt=kiStufe();
+  return '<div class="kil">'+t("KI-Stufe")+'</div>'+
+    '<div class="kiw" role="radiogroup" aria-label="'+esc(t("KI-Stufe"))+'">'+
+    Object.keys(KI_STUFEN).map(function(k){
+      var s=KI_STUFEN[k],on=k===akt;
+      return '<button class="kib'+(on?" on":"")+'" role="radio" aria-checked="'+on+'" data-a="ki-set" data-v="'+k+'">'+
+        '<b>'+t(s.name)+'</b><small>'+esc(s.model.replace("Claude ",""))+'</small><i>'+s.kosten+'</i></button>';
+    }).join("")+'</div>'+
+    '<p class="hint kih">'+ic("sparkles",14)+' '+t(KI_STUFEN[akt].sub)+'</p>';
+}
+/* Blatt aus „Mehr“ */
+function kiStufeBlatt(){
+  var akt=kiStufe();
+  openModal('<h2 class="mhead">'+t("KI-Stufe")+'</h2>'+
+    '<div class="mlist">'+Object.keys(KI_STUFEN).map(function(k){
+      var s=KI_STUFEN[k];
+      return '<button class="setupcat'+(k===akt?" on":"")+'" data-a="ki-set" data-v="'+k+'">'+ic("sparkles")+
+        '<span style="min-width:0;flex:1"><span class="hhw">'+t(s.name)+' · '+esc(s.model)+'</span>'+
+        '<span class="hhwa">'+t(s.sub)+' · '+s.kosten+'</span></span>'+
+        '<span class="ck">'+ic("check",18)+'</span></button>';
+    }).join("")+'</div>'+
+    '<p class="hint" style="margin:12px 4px 0">'+t("Gilt fürs Einlesen, für Arzt-Erklärungen und die Markt-Recherche.")+'</p>'+
+    '<div class="factions"><button class="btn ghost full" data-a="modal-close">'+t("Schließen")+'</button></div>');
+}
+
+/* ================= Logo-Verzeichnis =================
+   butler.anbieter_logos: Name, Suchwörter, Bild. Für alle lesbar, pflegen dürfen
+   nur App-Admins (butler.app_admins). Erstausstattung liegt als PNG unter logos/,
+   Nachträge im öffentlichen Bucket „anbieter-logos“. Vorrang vor den
+   eingebetteten Markenzeichen aus 19-logos.js. */
+var LOGO_REG=[],LOGO_CACHE={},IST_APP_ADMIN=false;
+var LOGO_BUCKET="anbieter-logos",EDGE_LOGO="allhome-logo";
+
+async function ladeLogos(){
+  try{
+    var r=await sb.from("anbieter_logos").select("id,name,muster,domain,bild_url,aktiv,updated_at").order("name",{ascending:true});
+    LOGO_REG=(r&&!r.error&&r.data)?r.data:[];
+  }catch(e){LOGO_REG=[];}
+  LOGO_CACHE={};
+}
+async function ladeAppAdmin(){
+  IST_APP_ADMIN=false;if(!me)return;
+  try{
+    var r=await sb.from("app_admins").select("user_id").eq("user_id",me.id).maybeSingle();
+    IST_APP_ADMIN=!!(r&&!r.error&&r.data);
+  }catch(e){}
+}
+/* Trifft ein Suchwort den Anbieternamen? Liefert die Länge des besten Treffers (0 = keiner).
+   Wörter zählen nur als ganze Wörter; „=new“ trifft nur genau „NEW“. */
+function normName(s){return String(s||"").toLowerCase().replace(/\s+/g," ").trim();}
+function musterTrifft(muster,name){
+  var n=normName(name),best=0,B=/[a-z0-9äöüß]/;
+  if(!n)return 0;
+  String(muster||"").split(",").forEach(function(w){
+    w=normName(w);if(!w)return;
+    if(w.charAt(0)==="="){if(n===w.slice(1).trim())best=Math.max(best,w.length+100);return;}
+    var i=n.indexOf(w);
+    while(i>=0){
+      var vor=i?n.charAt(i-1):"",nach=n.charAt(i+w.length);
+      if(!B.test(vor)&&!B.test(nach)){best=Math.max(best,w.length);break;}
+      i=n.indexOf(w,i+1);
+    }
+  });
+  return best;
+}
+function logoEintragVon(name){
+  var k=normName(name);if(!k)return null;
+  if(k in LOGO_CACHE)return LOGO_CACHE[k];
+  var best=null,bp=0;
+  LOGO_REG.forEach(function(e){
+    if(!e.aktiv)return;
+    var p=musterTrifft(e.muster,k);
+    if(p>bp){bp=p;best=e;}
+  });
+  LOGO_CACHE[k]=best;
+  return best;
+}
+/* Kachel mit Bild; fällt beim Ladefehler auf das Ersatzsymbol zurück (siehe unten) */
+function logoBildKachel(e,ersatz,cls){
+  return '<span class="'+(cls||"ai")+' logo bild" data-ersatz="'+esc(ersatz)+'" title="'+esc(e.name)+'">'+
+    '<img class="logo-img" src="'+esc(e.bild_url)+'" alt="" loading="lazy" decoding="async"></span>';
+}
+document.addEventListener("error",function(ev){
+  var img=ev.target;
+  if(!img||!img.classList||!img.classList.contains("logo-img"))return;
+  var sp=img.parentNode;if(!sp)return;
+  sp.classList.remove("logo","bild");sp.innerHTML=sp.getAttribute("data-ersatz")||"";
+},true);
+
+/* ---- Verwaltung (nur App-Admins) ---- */
+function anbieterOhneLogo(){
+  var namen={},liste=[];
+  CONTRACTS.forEach(function(c){if(c.anbieter)namen[c.anbieter.trim()]=1;});
+  Object.keys(ENERGIE||{}).forEach(function(k){var e=ENERGIE[k];if(e&&e.anbieter)namen[String(e.anbieter).trim()]=1;});
+  Object.keys(namen).sort().forEach(function(n){if(!logoEintragVon(n)&&!logoVon(n))liste.push(n);});
+  return liste;
+}
+function viewLogos(){
+  if(!IST_APP_ADMIN)return zurueck("#/mehr",t("Mehr"))+seitenTitel(t("Anbieter-Logos"))+
+    '<section class="card"><p class="hint">'+t("Nur für App-Admins.")+'</p></section>';
+  var ohne=anbieterOhneLogo();
+  return zurueck("#/mehr",t("Mehr"))+seitenTitel(t("Anbieter-Logos"))+
+    (ohne.length?'<div class="sect">'+t("Ohne Logo")+'<span class="more">'+ohne.length+'</span></div>'+
+      '<section class="card"><div class="dlist">'+ohne.map(function(n){
+        return '<button class="drow3" data-a="logo-neu" data-name="'+esc(n)+'"><span class="di">'+ic("plus",16)+'</span>'+
+          '<span class="db"><span class="dn">'+esc(n)+'</span><span class="dm"><span>'+t("Logo hinzufügen")+'</span></span></span>'+
+          '<span class="go">'+ic("right",16)+'</span></button>';
+      }).join("")+'</div></section>':"")+
+    '<div class="sect">'+t("Verzeichnis")+'<span class="more">'+LOGO_REG.length+'</span></div>'+
+    '<div class="filt"><input class="inp" id="lsuche" type="search" placeholder="'+esc(t("Anbieter suchen"))+'" autocomplete="off"></div>'+
+    '<section class="card"><div class="dlist" id="lliste">'+LOGO_REG.map(function(e){
+      return '<button class="drow3'+(e.aktiv?"":" aus")+'" data-a="logo-edit" data-id="'+esc(e.id)+'" data-such="'+esc(normName(e.name+" "+e.muster))+'">'+
+        logoBildKachel(e,ic("doc",16),"di")+
+        '<span class="db"><span class="dn">'+esc(e.name)+'</span><span class="dm"><span>'+esc(e.muster)+'</span>'+
+        (e.aktiv?"":'<span class="pill">'+t("aus")+'</span>')+'</span></span>'+
+        '<span class="go">'+ic("pencil",16)+'</span></button>';
+    }).join("")+'</div></section>'+
+    '<div class="factions"><button class="btn" data-a="logo-neu">'+ic("plus")+' '+t("Neues Logo")+'</button></div>';
+}
+/* Live-Filter der Liste ohne neu zu zeichnen */
+function logoFilter(q){
+  q=normName(q);
+  document.querySelectorAll("#lliste .drow3").forEach(function(b){
+    b.hidden=!!q&&String(b.getAttribute("data-such")||"").indexOf(q)<0;
+  });
+}
+function logoTreffer(muster){
+  var namen={};
+  CONTRACTS.forEach(function(c){if(c.anbieter&&musterTrifft(muster,c.anbieter))namen[c.anbieter]=1;});
+  var l=Object.keys(namen);
+  return l.length?t("Trifft hier auf:")+" "+l.map(esc).join(", "):t("Trifft im aktuellen Haus auf keinen Vertrag.");
+}
+var LOGO_FORM=null;
+function logoFormular(id,vorName){
+  var e=id?LOGO_REG.filter(function(x){return x.id===id;})[0]:null;
+  var name=e?e.name:(vorName||"");
+  var muster=e?e.muster:normName(String(vorName||"").split(/[\s,]+/).filter(function(w){return w.length>2;})[0]||"");
+  LOGO_FORM={id:e?e.id:null,url:e?e.bild_url:""};
+  openModal('<h2 class="mhead">'+(e?t("Logo bearbeiten"):t("Neues Logo"))+'</h2>'+
+    '<form data-form="logo">'+
+      '<div class="lvor"><span class="ai logo bild" id="l_vorschau">'+(LOGO_FORM.url?'<img src="'+esc(LOGO_FORM.url)+'" alt="">':ic("doc",18))+'</span>'+
+        '<div class="lvb"><button class="btn ghost sm" type="button" data-a="logo-datei">'+ic("folder",16)+' '+t("Bild hochladen")+'</button>'+
+        '<input type="file" id="l_file" accept="image/png,image/jpeg,image/webp" hidden></div></div>'+
+      fld(t("Name"),'<input class="inp" id="l_name" maxlength="80" value="'+esc(name)+'" required>')+
+      fld(t("Suchwörter (mit Komma)"),'<input class="inp" id="l_muster" maxlength="300" value="'+esc(muster)+'" autocomplete="off">')+
+      '<p class="hint" id="l_treffer" style="margin:-4px 4px 12px">'+logoTreffer(muster)+'</p>'+
+      fld(t("Website"),'<div class="inrow"><input class="inp" id="l_domain" maxlength="120" value="'+esc(e&&e.domain||"")+'" placeholder="axa.de" autocomplete="off" inputmode="url">'+
+        '<button class="btn ghost" type="button" data-a="logo-holen">'+ic("globe",16)+' '+t("Holen")+'</button></div>')+
+      '<label class="chk"><input type="checkbox" id="l_aktiv"'+(!e||e.aktiv?" checked":"")+'> '+t("Aktiv")+'</label>'+
+      '<div class="factions">'+
+        '<button class="btn" type="submit">'+ic("check")+' '+t("Speichern")+'</button>'+
+        (e?'<button class="btn danger" type="button" data-a="logo-del" data-id="'+esc(e.id)+'">'+ic("trash")+' '+t("Löschen")+'</button>':"")+
+        '<button class="btn ghost" type="button" data-a="modal-close">'+t("Abbrechen")+'</button>'+
+      '</div>'+
+    '</form>');
+}
+function logoVorschau(url){
+  LOGO_FORM.url=url;
+  var v=$("#l_vorschau");if(v)v.innerHTML='<img src="'+esc(url)+'" alt="">';
+}
+async function logoHolen(){
+  var dom=val("l_domain");
+  if(!dom){toast(t("Bitte zuerst die Website eintragen, z. B. axa.de."),true);return;}
+  var k=document.querySelector('[data-a="logo-holen"]');if(k){k.disabled=true;}
+  try{
+    var b=await edgeRuf(EDGE_LOGO,{domain:dom});
+    logoVorschau(b.url);
+    toast(t("Logo gefunden")+" ✅");
+  }catch(e){toast(errMsg(e),true);}
+  finally{if(k)k.disabled=false;}
+}
+/* Hochgeladenes Bild auf 128×128 PNG bringen (einheitlich, klein, ohne Metadaten) */
+function logoVerkleinern(file){
+  return new Promise(function(ok,fehler){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var cv=document.createElement("canvas");cv.width=128;cv.height=128;
+      var s=Math.min(128/img.naturalWidth,128/img.naturalHeight),w=img.naturalWidth*s,h=img.naturalHeight*s;
+      cv.getContext("2d").drawImage(img,(128-w)/2,(128-h)/2,w,h);
+      URL.revokeObjectURL(url);
+      cv.toBlob(function(b){b?ok(b):fehler(new Error(t("Bild konnte nicht verarbeitet werden.")));},"image/png");
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);fehler(new Error(t("Bildformat wird nicht unterstützt. Bitte PNG, JPG oder WebP.")));};
+    img.src=url;
+  });
+}
+async function logoDatei(file){
+  if(!file)return;
+  if(!/^image\/(png|jpeg|webp)$/.test(file.type)){toast(t("Bildformat wird nicht unterstützt. Bitte PNG, JPG oder WebP."),true);return;}
+  if(file.size>5*1024*1024){toast(t("Das Bild ist zu groß (max. 5 MB)."),true);return;}
+  try{
+    var blob=await logoVerkleinern(file);
+    var pfad="upload-"+pfadName(val("l_name")||"logo").toLowerCase()+"-"+Date.now()+".png";
+    var up=await sb.storage.from(LOGO_BUCKET).upload(pfad,blob,{contentType:"image/png",upsert:false});
+    if(up.error)throw up.error;
+    logoVorschau(sb.storage.from(LOGO_BUCKET).getPublicUrl(pfad).data.publicUrl);
+    toast(t("Bild übernommen")+" ✅");
+  }catch(e){toast(t("Hochladen fehlgeschlagen")+": "+errMsg(e),true);}
+}
+async function logoSpeichern(){
+  var name=val("l_name"),muster=val("l_muster"),dom=val("l_domain").toLowerCase().replace(/^https?:\/\//,"").replace(/[\/?#].*$/,"").replace(/^www\./,"");
+  var aktiv=!!($("#l_aktiv")&&$("#l_aktiv").checked);
+  if(!name||!muster){toast(t("Name und mindestens ein Suchwort angeben."),true);return;}
+  if(!LOGO_FORM||!LOGO_FORM.url){toast(t("Bitte ein Bild hochladen oder von der Website holen."),true);return;}
+  var reihe={name:name,muster:muster,domain:dom||null,bild_url:LOGO_FORM.url,aktiv:aktiv,updated_at:new Date().toISOString()};
+  try{
+    var r=LOGO_FORM.id?await sb.from("anbieter_logos").update(reihe).eq("id",LOGO_FORM.id)
+                      :await sb.from("anbieter_logos").insert(reihe);
+    if(r.error)throw r.error;
+    closeModal(true);await ladeLogos();render();
+    toast(t("Gespeichert")+" ✅");
+  }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+}
+async function logoLoeschen(id){
+  var e=LOGO_REG.filter(function(x){return x.id===id;})[0];if(!e)return;
+  if(!confirm(tf("Logo „{0}“ löschen?",e.name)))return;
+  try{
+    var r=await sb.from("anbieter_logos").delete().eq("id",id);
+    if(r.error)throw r.error;
+    var m=String(e.bild_url).split("/"+LOGO_BUCKET+"/")[1];
+    if(m)try{await sb.storage.from(LOGO_BUCKET).remove([decodeURIComponent(m)]);}catch(x){}
+    closeModal(true);await ladeLogos();render();
+    toast(t("Gelöscht"));
+  }catch(x){toast(t("Löschen fehlgeschlagen")+": "+errMsg(x),true);}
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 document.addEventListener("click",function(ev){
@@ -4091,6 +4601,13 @@ document.addEventListener("click",function(ev){
   /* --- Haushalt --- */
   if(a==="hh-switch"){haushaltWaehlen();return;}
   if(a==="hh-pick"){haushaltSetzen(b.dataset.id);return;}
+  if(a==="ki-set"){setzeKiStufe(b.dataset.v);return;}
+  if(a==="ki-blatt"){kiStufeBlatt();return;}
+  if(a==="logo-neu"){logoFormular(null,b.dataset.name||"");return;}
+  if(a==="logo-edit"){logoFormular(id);return;}
+  if(a==="logo-holen"){logoHolen();return;}
+  if(a==="logo-datei"){var lf=$("#l_file");if(lf)lf.click();return;}
+  if(a==="logo-del"){logoLoeschen(id);return;}
   if(a==="hh-neu"){hausFormular(null);return;}
   if(a==="hh-edit"){hausFormular(id);return;}
   if(a==="hh-join"){beitretenFormular();return;}
@@ -4169,6 +4686,7 @@ document.addEventListener("submit",function(ev){
   }
   if(f.id==="vForm"){ev.preventDefault();speichereVertrag();return;}
   if(f.dataset.form==="haus"){ev.preventDefault();hausSpeichern(f.dataset.id||null);return;}
+  if(f.dataset.form==="logo"){ev.preventDefault();logoSpeichern();return;}
   if(f.dataset.form==="beitreten"){ev.preventDefault();beitreten();return;}
   if(f.dataset.form==="haus-loeschen"){ev.preventDefault();hausLoeschen(f.dataset.id);return;}
   if(f.id==="medForm"){ev.preventDefault();medSpeichern(f.dataset.id);return;}
@@ -4181,7 +4699,11 @@ document.addEventListener("submit",function(ev){
 });
 /* Live-Vorschau im Vertragsformular + Filter in Gesundheit */
 document.addEventListener("input",function(ev){
-  if(ev.target&&/^f_/.test(ev.target.id||""))formVorschau();
+  var tid=(ev.target&&ev.target.id)||"";
+  if(/^f_/.test(tid))formVorschau();
+  if(tid==="lsuche")logoFilter(ev.target.value);
+  if(tid==="l_muster"){var lt=$("#l_treffer");if(lt)lt.innerHTML=logoTreffer(ev.target.value);}
+  if(ev.target&&ev.target.classList&&ev.target.classList.contains("bad"))ev.target.classList.remove("bad");
 });
 document.addEventListener("change",function(ev){
   var el=ev.target;if(!el)return;
@@ -4190,6 +4712,8 @@ document.addEventListener("change",function(ev){
     dateienVerarbeiten(el.files,{vertrag:p.vertrag||null,art:p.art||null});
     el.value="";return;
   }
+  if(el.id==="f_art"){el.classList.remove("bad");if(el.value)artWechseln(el.value);return;}
+  if(el.id==="l_file"){logoDatei(el.files&&el.files[0]);el.value="";return;}
   if(el.id==="mfFach"){medFilter.fach=el.value;render();return;}
   if(el.id==="mfPerson"){medFilter.person=el.value;render();return;}
   if(el.id==="mfJahr"){medFilter.jahr=el.value;render();return;}
@@ -4230,13 +4754,18 @@ async function ergaenzeAusDokument(cid,ext){
   ["mindestlaufzeit_monate","verlaengerung_monate"].forEach(function(k){
     if(neu[k]!=null)neu[k]=Math.round(Number(neu[k]));
   });
+  var vorher=c.details||{},dazu=detailsAusExtrakt(ext,c.art||"sonstiges"),det=Object.assign({},vorher),nd=0;
+  Object.keys(dazu).forEach(function(k){if(vorher[k]==null||vorher[k]===""){det[k]=dazu[k];nd++;}});
+  if(nd){neu.details=det;n++;}
   if(!n)return;
   try{await sb.from("contracts").update(neu).eq("id",cid);}catch(e){}
 }
 function reviewNeuerVertrag(art){
   if(!REVIEW)return;
   var ext=REVIEW.extracted||{};
-  oeffneForm(art||artAusExtrakt(ext),null,{
+  art=art||artAusExtrakt(ext);
+  oeffneForm(art,null,{
+    details:detailsAusExtrakt(ext,art),
     anbieter:ext.anbieter||"",produkt:ext.produkt||"",
     kundennummer:ext.kundennummer||"",vertragsnummer:ext.vertragsnummer||"",
     vertragsstart:ext.vertragsstart||"",
@@ -4262,7 +4791,9 @@ function sucheLaufen(){
   if(!box)return;
   if(q.length<2){box.innerHTML='<p class="hint">'+t("Tippe, um zu suchen.")+'</p>';return;}
   var vt=CONTRACTS.filter(function(c){
-    return ((c.anbieter||"")+" "+(c.produkt||"")+" "+(c.kundennummer||"")+" "+(c.vertragsnummer||"")+" "+artInfo(c.art).label).toLowerCase().indexOf(q)>=0;
+    var d=c.details||{};
+    return ((c.anbieter||"")+" "+(c.produkt||"")+" "+(c.kundennummer||"")+" "+(c.vertragsnummer||"")+" "+artInfo(c.art).label+" "+
+      [d.kennzeichen,d.marke,d.modell,d.fin,d.versnummer].filter(Boolean).join(" ")).toLowerCase().indexOf(q)>=0;
   }).slice(0,6);
   var dk=DOCS.filter(function(d){
     return ((d.titel||"")+" "+(d.filename||"")+" "+(d.zusammenfassung||"")+" "+(d.arzt||"")).toLowerCase().indexOf(q)>=0;

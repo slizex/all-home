@@ -34,9 +34,19 @@ Steuerübersicht als CSV — nach Person getrennt.
 kommen per Einladungscode dazu; Admins verwalten Haus, Rollen und Einladungen. Es gibt
 immer mindestens einen Admin — das erzwingt die Datenbank selbst.
 
-**Anbieter-Logos** bekannter Marken (Telekom, Vodafone, O2, Banken, Streaming, Autohersteller)
-aus [Simple Icons](https://simpleicons.org) (CC0), direkt eingebettet — es wird kein fremder
-Server gefragt, bei wem der Haushalt Kunde ist.
+**Anbieter-Logos.** Rund 85 deutsche Versicherer, Krankenkassen, Versorger, Banken, Mobilfunker
+und Streamingdienste liegen als 128-px-Bilder unter `logos/`; dazu ~50 Marken aus
+[Simple Icons](https://simpleicons.org) (CC0), direkt eingebettet. Welches Logo zu welchem Anbieter
+gehört, steht im Verzeichnis `butler.anbieter_logos` (Suchwörter). **App-Admins** pflegen es in der
+App unter Mehr › Anbieter-Logos: Anbieter ohne Logo werden aufgelistet, ein Logo lässt sich von der
+Website holen (Edge Function `allhome-logo`) oder als Bild hochladen (Bucket `anbieter-logos`).
+
+**Fahrzeuge auf einen Blick.** Bei KFZ-Versicherung, Fahrzeug, Leasing und KFZ-Steuer stehen
+Kennzeichen (als Schild), Marke und Modell direkt am Vertrag. FIN und Schlüsselnummern (HSN/TSN)
+aus dem Fahrzeugschein werden mit ausgelesen.
+
+**Drei KI-Stufen wie in AllTrack:** Schnell (Haiku 4.5) · Gründlich (Sonnet 5.5) · Maximal (Opus 5.5),
+wählbar direkt beim Einlesen und unter Mehr.
 
 **Zweisprachig** Deutsch/Russisch, umschaltbar pro Benutzer. Deutsche Fachbegriffe
 stehen in Klammern hinter der Übersetzung, damit man sie auf dem Papier wiedererkennt.
