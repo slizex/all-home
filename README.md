@@ -1,12 +1,50 @@
-# 🎩 Dokumenten-Butler
+# 🏠 All-Home
 
-Dein persönlicher Butler für Verträge, Rechnungen und Fristen — eine schlanke PWA (Smartphone + Desktop).
+Alle Verträge, Dokumente und Termine deines Haushalts an einem Ort — eine schlanke PWA
+(Handy + Desktop), ohne Build-Schritt: eine einzige `index.html`.
 
-**Was er kann:**
-- 📄 Dokumente hochladen oder Briefe fotografieren — die KI liest Laufzeit, Kündigungsfrist, Preise, Kundennummern automatisch aus
-- ⏰ Fristen-Ampel: sieht auf einen Blick, was bald gekündigt werden muss (inkl. Gesetz für faire Verbraucherverträge ab 3/2022)
-- 📅 Kündigungsfristen per Klick in den Kalender übernehmen (.ics)
-- 📁 Privates Dokumentenarchiv je Haushalt (RLS-geschützt in Supabase)
-- 👥 Haushalt teilbar per Einladungs-Code
+## Was All-Home macht
 
-**Technik:** eine einzige `index.html` (kein Build-Step), Supabase (Auth, Postgres, Storage, Edge Function mit Claude-KI), GitHub Pages Hosting. In diesem Repo liegen nur Code und der öffentliche (RLS-geschützte) API-Schlüssel — niemals Dokumente oder persönliche Daten.
+**Dein Haushalt als Checkliste.** Du hakst einmal ab, welche Vertragsarten es bei dir gibt
+(53 Arten in 7 Gruppen — von Strom über KFZ-Versicherung bis Rundfunkbeitrag). Jede
+angehakte Art ist danach ein Platz: gefüllt oder sichtbar leer. Nicht Angehaktes
+erscheint nirgends.
+
+**Dokumente gehören zum Vertrag.** PDF oder Foto hochladen, die KI liest Anbieter,
+Laufzeit, Kündigungsfrist, Kosten und Nummern aus und schlägt die Zuordnung vor.
+Gespeichert wird erst, wenn du bestätigst.
+
+**Sieben Helfer, die mitdenken**
+- Kündigungsfristen mit Ampel, Warnung und Kalender-Export
+- Vollständigkeits-Check: welche Verträge fehlen dem Haushalt noch
+- Preiserhöhung erkannt → Uhr fürs Sonderkündigungsrecht läuft
+- Wiederkehrende Pflichttermine: HU/TÜV, Ausweis, Pass, Führerschein, Wartung
+- Haushaltskosten je Art plus Markt-Recherche beim größten Posten
+- Doppelt-versichert-Warnung
+- Dokumenten-Lücken: fehlende Police, Rechnung, Unterlagen
+
+Jeder Helfer ist einzeln abschaltbar.
+
+**Gesundheit** als eigener Bereich: Arztrechnungen und Befunde, Erklärung der
+Abrechnungsziffern (GOÄ/GOZ) in Alltagssprache samt verwendeter Materialien, und eine
+Steuerübersicht als CSV — nach Person getrennt.
+
+**Zweisprachig** Deutsch/Russisch, umschaltbar pro Benutzer. Deutsche Fachbegriffe
+stehen in Klammern hinter der Übersetzung, damit man sie auf dem Papier wiedererkennt.
+
+## Verhältnis zu AllTrack
+
+Strom, Gas und Wasser werden in [AllTrack](https://github.com/slizex/verbrauchs-tracker)
+geführt — mit Tarifen, Ablesungen und Jahresabrechnung. All-Home **spiegelt** sie nur:
+es zeigt den aktuellen Stand und verlinkt dorthin. Keine Doppelpflege.
+
+Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Domäne).
+
+## Technik
+
+- Eine `index.html`, kein Build. Design und Rahmen aus AllTrack (Nunito, warme Palette).
+- Supabase: Schema `butler` (Verträge, Dokumente, Personen, Einrichtung),
+  Haushalte aus `public` wiederverwendet, privater Bucket `butler-documents`.
+- Edge Functions: `butler-extract` (auslesen), `butler-research` (Markt),
+  `butler-med-explain` (Abrechnungsziffern), `butler-translate` (Nachübersetzen).
+- PWA mit network-first Service Worker.

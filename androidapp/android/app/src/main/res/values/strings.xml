@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Dokumenten-Butler</string>
-    <string name="title_activity_main">Dokumenten-Butler</string>
-    <string name="package_name">de.slizex.dokumentenbutler</string>
-    <string name="custom_url_scheme">de.slizex.dokumentenbutler</string>
-</resources>

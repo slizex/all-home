@@ -1,5 +1,5 @@
-/* Dokumenten-Butler Service Worker — network-first (immer frisch, offline Fallback) */
-var CACHE = "butler-shell-v1";
+/* All-Home Service Worker — network-first (immer frisch, offline Fallback) */
+var CACHE = "allhome-shell-v1";
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(["./index.html"]); }).then(function () { return self.skipWaiting(); }));

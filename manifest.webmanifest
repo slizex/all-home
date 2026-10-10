@@ -1,15 +1,18 @@
 {
-  "name": "Dokumenten-Butler",
-  "short_name": "Butler",
-  "description": "Dein persönlicher Butler für Verträge, Rechnungen und Fristen.",
+  "name": "All-Home",
+  "short_name": "All-Home",
+  "description": "Alle Verträge, Dokumente und Termine deines Haushalts an einem Ort.",
+  "lang": "de",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#fafafa",
-  "theme_color": "#6366f1",
-  "lang": "de",
+  "orientation": "portrait",
+  "background_color": "#f7f4ef",
+  "theme_color": "#f7f4ef",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "icon-192.png?v=1", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-192.png?v=1", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-maskable-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

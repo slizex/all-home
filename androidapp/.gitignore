@@ -1,8 +1,0 @@
-# Node
-node_modules/
-
-# Generierte Web-Bündelung (wird im Build aus dem Repo-Root erzeugt)
-www/
-
-# Build-Artefakte
-*.apk
