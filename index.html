@@ -724,7 +724,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.3.1";
+var APP_VERSION="1.3.2";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -778,6 +778,12 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.3.2: Löschen nachprüfen ---- */
+  "Es wurde nichts gelöscht – fehlende Berechtigung oder das Dokument ist schon weg.":"Ничего не удалено — нет прав или документ уже удалён.",
+  "Nur {0} von {1} Dokumenten wurden gelöscht – fehlende Berechtigung?":"Удалено только {0} из {1} документов — нет прав?",
+  "Es wurde nichts gelöscht – fehlende Berechtigung oder der Vertrag ist schon weg.":"Ничего не удалено — нет прав или договор уже удалён.",
+
 
 /* ---- 1.3.1: Ablage-Auswahl ---- */
   "Auswählen":"Выбрать",
@@ -2888,8 +2894,9 @@ async function loescheVertrag(id){
   var c=vertragById(id);if(!c)return;
   if(!confirm(tf("Vertrag „{0}“ wirklich löschen? Zugeordnete Dokumente bleiben im Archiv.",c.anbieter||artInfo(c.art).label)))return;
   try{
-    var r=await sb.from("contracts").delete().eq("id",id);
+    var r=await sb.from("contracts").delete().eq("id",id).select("id");
     if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts gelöscht – fehlende Berechtigung oder der Vertrag ist schon weg."));
     await ladeDaten();
     toast(t("Vertrag gelöscht ✅"));
     go("#/vertraege");
@@ -3330,8 +3337,11 @@ async function dokumentLoeschen(id){
       var rm=await sb.storage.from(BUCKET).remove([d.storage_path]);
       if(rm&&rm.error)throw rm.error;
     }
-    var r=await sb.from("documents").delete().eq("id",id);
+    /* gelöschte Zeilen zurückgeben lassen: ohne Berechtigung meldet die Schnittstelle
+       sonst „Erfolg“ mit 0 Zeilen, und es sähe gelöscht aus, obwohl nichts passiert ist */
+    var r=await sb.from("documents").delete().eq("id",id).select("id");
     if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts gelöscht – fehlende Berechtigung oder das Dokument ist schon weg."));
     closeModal(true);await ladeDaten();render();
     toast(t("Dokument gelöscht ✅"));
   }catch(e){toast(t("Löschen fehlgeschlagen")+": "+errMsg(e),true);}
@@ -3382,8 +3392,10 @@ async function dokumenteAuswahlLoeschen(){
       var rm=await sb.storage.from(BUCKET).remove(pfade.slice(i,i+100));
       if(rm&&rm.error)throw rm.error;
     }
-    var r=await sb.from("documents").delete().in("id",liste.map(function(d){return d.id;}));
+    var r=await sb.from("documents").delete().in("id",liste.map(function(d){return d.id;})).select("id");
     if(r.error)throw r.error;
+    var weg=(r.data||[]).length;
+    if(weg<liste.length)throw new Error(tf("Nur {0} von {1} Dokumenten wurden gelöscht – fehlende Berechtigung?",weg,liste.length));
     ABLAGE_WAHL={};
     await ladeDaten();render();
     toast(tn(liste.length,"{0} Dokument gelöscht","{0} Dokumente gelöscht")+" ✅");
