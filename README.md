@@ -12,7 +12,8 @@ erscheint nirgends.
 
 **Dokumente gehören zum Vertrag.** PDF oder Foto hochladen, die KI liest Anbieter,
 Laufzeit, Kündigungsfrist, Kosten und Nummern aus und schlägt die Zuordnung vor.
-Gespeichert wird erst, wenn du bestätigst.
+Gespeichert wird erst, wenn du bestätigst. Alle Dokumente zusammen findest du unter
+**Mehr › Dokumente**: mit Suche, dem Filter „Ohne Vertrag“ und einer Auswahl zum gezielten Löschen.
 
 **Sieben Helfer, die mitdenken**
 - Kündigungsfristen mit Ampel, Warnung und Kalender-Export

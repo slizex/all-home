@@ -707,6 +707,14 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .drow3.wahl .wtxt .dn{display:block;font-weight:800;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .drow3.wahl .wtxt .dm{color:var(--muted);font-size:.79rem;font-weight:700;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap}
 .drow3.wahl.an{background:var(--neg-bg);border-radius:10px}
+
+/* Dokumente unter Mehr */
+.dokf{margin-bottom:12px}
+.dokf .lb{padding:10px 12px}
+.dokf .lb.on .pill{background:var(--surface)}
+.filt.dsrow{flex-wrap:nowrap;align-items:center}
+.filt.dsrow .inp{flex:1 1 auto;min-width:0}
+.filt.dsrow .btn{flex:none}
 </style>
 </head>
 <body>
@@ -724,7 +732,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.3.2";
+var APP_VERSION="1.4.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -778,6 +786,15 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- Dokumente unter Mehr ---- */
+  "{0} ohne Vertrag":"{0} без договора",
+  "Noch keine Dokumente":"Документов пока нет",
+  "Hochladen":"Загрузить",
+  "Alle":"Все",
+  "Dokument suchen":"Найти документ",
+  "Nichts gefunden.":"Ничего не найдено.",
+
 
 /* ---- 1.3.2: Löschen nachprüfen ---- */
   "Es wurde nichts gelöscht – fehlende Berechtigung oder das Dokument ist schon weg.":"Ничего не удалено — нет прав или документ уже удалён.",
@@ -1825,7 +1842,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -1913,10 +1930,11 @@ function render(){
   /* Daten kamen nicht an? Das muss man sehen, nicht erraten. */
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
+  if(rt.name!=="dokumente"&&rt.name!=="ablage")DOK_Q="";   /* Suche gilt nur, solange man dort bleibt */
   var inhalt="",cur=rt.name;
   if(rt.name==="start")           inhalt=viewStart();
   else if(rt.name==="vertraege")  inhalt=viewVertraege();
@@ -1932,7 +1950,7 @@ function render(){
   else if(rt.name==="haushalte") {inhalt=viewHaushalte();cur="mehr";}
   else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
   else if(rt.name==="logos")     {inhalt=viewLogos();cur="mehr";}
-  else if(rt.name==="ablage")    {inhalt=viewAblage();cur="start";}
+  else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
 }
@@ -2475,6 +2493,11 @@ function viewMehr(){
   return topBar()+seitenTitel(t("Mehr"))+
     '<div class="mgrp">'+t("Haushalt")+'</div>'+
     '<section class="card">'+
+      '<a class="drow3" href="#/dokumente"><span class="di">'+ic("folder")+'</span>'+
+        '<span class="db"><span class="dn">'+t("Dokumente")+'</span>'+
+        '<span class="dm"><span>'+tn(alleDokumente().length,"{0} Dokument","{0} Dokumente")+
+          (dokumenteOhneVertrag().length?' · '+tf("{0} ohne Vertrag",dokumenteOhneVertrag().length):"")+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a>'+
       '<a class="drow3" href="#/einrichten"><span class="di">'+ic("tool")+'</span>'+
         '<span class="db"><span class="dn">'+t("Vertragsarten anpassen")+'</span>'+
         '<span class="dm">'+tf("{0} von {1} angehakt",aktiveArten().length,Object.keys(ARTEN).length-1)+'</span></span>'+
@@ -3346,38 +3369,92 @@ async function dokumentLoeschen(id){
     toast(t("Dokument gelöscht ✅"));
   }catch(e){toast(t("Löschen fehlgeschlagen")+": "+errMsg(e),true);}
 }
-/* ---- Ablage: Dokumente ohne Vertrag ---- */
-function dokumenteOhneVertrag(){return DOCS.filter(function(d){return !istMed(d)&&!d.contract_id&&!d.ki_pending;});}
+/* ---- Dokumente: alle an einem Ort, erreichbar über Mehr ----
+   Gesundheits-Dokumente bleiben in ihrem Bereich. Filter, Auswahl-Modus und
+   Herkunft stehen in der Adresse (#/dokumente?f=ohne&wahl=1&von=start). */
+/* Zugeordnet ist nur, was an einem Vertrag DIESES Hauses hängt – ein Verweis auf
+   einen Vertrag, den es hier nicht gibt, ließe das Dokument sonst nirgends erscheinen. */
+function hatVertrag(d){return !!(d.contract_id&&vertragById(d.contract_id));}
+function dokumenteOhneVertrag(){return DOCS.filter(function(d){return !istMed(d)&&!hatVertrag(d)&&!d.ki_pending;});}
+function alleDokumente(){
+  return DOCS.filter(function(d){return !istMed(d);})
+    .sort(function(x,y){return String(docDatum(y)||"").localeCompare(String(docDatum(x)||""));});
+}
 /* Gezielte Auswahl – nie „alle“ auf einen Schlag: In der Ablage liegen oft
    auch Dokumente, die bleiben sollen (Bescheide, Mitteilungen). */
-var ABLAGE_WAHL={};
-function ablageAuswahl(){var l=dokumenteOhneVertrag();return l.filter(function(d){return ABLAGE_WAHL[d.id];});}
-function viewAblage(){
-  var liste=dokumenteOhneVertrag();
+var ABLAGE_WAHL={},DOK_Q="";
+function dokAdresse(p,neu){
+  var q=Object.assign({f:p.f,wahl:p.wahl,von:p.von},neu||{});
+  var teile=Object.keys(q).filter(function(k){return q[k];}).map(function(k){return k+"="+encodeURIComponent(q[k]);});
+  return "#/dokumente"+(teile.length?"?"+teile.join("&"):"");
+}
+function dokFilterAktiv(){var rt=route();return (rt.name==="ablage"||rt.params.f==="ohne")?"ohne":"alle";}
+function dokListeAktuell(){return dokFilterAktiv()==="ohne"?dokumenteOhneVertrag():alleDokumente();}
+function dokSuchtext(d){
+  var c=hatVertrag(d)?vertragById(d.contract_id):null,ext=d.extracted||{};
+  return [docTitel(d),d.filename,dtInfo(d.doc_type).label,fmtDate(docDatum(d)),
+    c?c.anbieter:"",c?artInfo(c.art||"sonstiges").label:"",ext.anbieter].filter(Boolean).join(" ").toLowerCase();
+}
+function dokPasst(d){var q=DOK_Q.trim().toLowerCase();return !q||dokSuchtext(d).indexOf(q)>=0;}
+function ablageAuswahl(){return dokListeAktuell().filter(function(d){return ABLAGE_WAHL[d.id];});}
+function dokZeile(d,wahl,mitVertrag){
+  var ty=dtInfo(d.doc_type),c=hatVertrag(d)?vertragById(d.contract_id):null,an=!!ABLAGE_WAHL[d.id];
+  var such=' data-such="'+esc(dokSuchtext(d))+'"'+(dokPasst(d)?"":" hidden");
+  var meta='<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span>'+
+    (!mitVertrag?"":c?'<span>'+esc(c.anbieter||artInfo(c.art||"sonstiges").label)+'</span>'
+      :'<span class="pill">'+(d.ki_pending?t("Noch nicht ausgelesen"):t("nicht zugeordnet"))+'</span>')+'</span>';
+  if(wahl)return '<div class="drow3 wahl'+(an?" an":"")+'"'+such+'>'+
+    '<button class="wbox" data-a="ab-wahl" data-id="'+d.id+'" role="checkbox" aria-checked="'+an+'" aria-label="'+esc(t("Auswählen"))+'">'+(an?ic("check",16):"")+'</button>'+
+    '<button class="wtxt" data-a="ab-wahl" data-id="'+d.id+'"><span class="dn">'+esc(docTitel(d))+'</span>'+meta+'</button>'+
+    '<button class="ibtn" data-a="d-open" data-id="'+d.id+'" aria-label="'+esc(t("Öffnen"))+'">'+ic("doc",18)+'</button></div>';
+  return '<button class="drow3" data-a="d-open" data-id="'+d.id+'"'+such+'>'+
+    '<span class="di">'+ty.icon+'</span>'+
+    '<span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+meta+'</span>'+
+    '<span class="go">'+ic("right",16)+'</span></button>';
+}
+function viewDokumente(){
+  var rt=route(),p=rt.params;
+  if(rt.name==="ablage")p.f="ohne";
+  var f=dokFilterAktiv(),wahl=p.wahl==="1";
+  var liste=dokListeAktuell(),nAlle=alleDokumente().length,nOhne=dokumenteOhneVertrag().length;
+  if(!wahl)ABLAGE_WAHL={};
   Object.keys(ABLAGE_WAHL).forEach(function(id){if(!liste.some(function(d){return d.id===id;}))delete ABLAGE_WAHL[id];});
-  var n=ablageAuswahl().length,alle=liste.length&&n===liste.length;
-  return zurueck("#/start",t("Start"))+seitenTitel(t("Ohne Vertrag"))+
+  var n=ablageAuswahl().length,sicht=liste.filter(dokPasst);
+  var alle=sicht.length&&sicht.every(function(d){return ABLAGE_WAHL[d.id];});
+  var kopf=(p.von==="start"?zurueck("#/start",t("Start")):zurueck("#/mehr",t("Mehr")))+seitenTitel(t("Dokumente"));
+  if(!nAlle)return kopf+'<section class="card"><div class="empty"><div class="ei">'+ic("folder",28)+'</div>'+
+    '<h3>'+t("Noch keine Dokumente")+'</h3></div>'+
+    '<div class="factions"><a class="btn" href="#/neu">'+ic("plus")+' '+t("Hochladen")+'</a></div></section>';
+  return kopf+
+    '<div class="langrow dokf">'+
+      '<a class="lb'+(f==="alle"?" on":"")+'" href="'+dokAdresse(p,{f:"",wahl:""})+'">'+t("Alle")+' <span class="pill">'+nAlle+'</span></a>'+
+      '<a class="lb'+(f==="ohne"?" on":"")+'" href="'+dokAdresse(p,{f:"ohne",wahl:""})+'">'+t("Ohne Vertrag")+' <span class="pill">'+nOhne+'</span></a>'+
+    '</div>'+
     (liste.length
-      ?'<section class="card"><div class="dlist">'+liste.map(function(d){
-          var ty=dtInfo(d.doc_type),an=!!ABLAGE_WAHL[d.id];
-          return '<div class="drow3 wahl'+(an?" an":"")+'">'+
-            '<button class="wbox" data-a="ab-wahl" data-id="'+d.id+'" role="checkbox" aria-checked="'+an+'" aria-label="'+esc(t("Auswählen"))+'">'+(an?ic("check",16):"")+'</button>'+
-            '<button class="wtxt" data-a="ab-wahl" data-id="'+d.id+'"><span class="dn">'+esc(docTitel(d))+'</span>'+
-              '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span></span></button>'+
-            '<button class="ibtn" data-a="d-open" data-id="'+d.id+'" aria-label="'+esc(t("Öffnen"))+'">'+ic("doc",18)+'</button>'+
-          '</div>';
-        }).join("")+'</div></section>'+
-        '<div class="factions">'+
+      ?'<div class="filt dsrow"><input class="inp" id="dsuche" type="search" value="'+esc(DOK_Q)+'" placeholder="'+esc(t("Dokument suchen"))+'" autocomplete="off">'+
+          '<a class="btn ghost sm" href="'+dokAdresse(p,{wahl:wahl?"":"1"})+'">'+(wahl?t("Fertig"):t("Auswählen"))+'</a></div>'+
+        '<section class="card"><div class="dlist" id="dliste">'+liste.map(function(d){return dokZeile(d,wahl,f==="alle");}).join("")+'</div>'+
+          '<p class="hint" id="dleer"'+(sicht.length?" hidden":"")+'>'+t("Nichts gefunden.")+'</p></section>'+
+        (wahl?'<div class="factions">'+
           '<button class="btn danger" data-a="d-del-wahl"'+(n?"":" disabled")+'>'+ic("trash")+' '+
             (n?tn(n,"{0} ausgewähltes löschen","{0} ausgewählte löschen"):t("Dokumente zum Löschen antippen"))+'</button>'+
           '<button class="btn ghost" data-a="ab-alle">'+(alle?t("Auswahl aufheben"):t("Alle auswählen"))+'</button>'+
-        '</div>'
+        '</div>':"")
       :'<section class="card"><div class="empty"><div class="ei">'+ic("check",28)+'</div><h3>'+t("Alles zugeordnet")+'</h3></div></section>');
 }
+/* Live-Suche ohne neu zu zeichnen – der Begriff bleibt für die nächste Zeichnung stehen */
+function dokFilter(q){
+  DOK_Q=String(q||"");var nq=DOK_Q.trim().toLowerCase(),treffer=0;
+  document.querySelectorAll("#dliste>[data-such]").forEach(function(z){
+    var ja=!nq||String(z.getAttribute("data-such")).indexOf(nq)>=0;z.hidden=!ja;if(ja)treffer++;
+  });
+  var leer=$("#dleer");if(leer)leer.hidden=!!treffer;
+}
 function ablageWahl(id){if(ABLAGE_WAHL[id])delete ABLAGE_WAHL[id];else ABLAGE_WAHL[id]=1;render();}
+/* „Alle auswählen“ meint alle, die gerade zu sehen sind (Filter + Suche) */
 function ablageAlle(){
-  var liste=dokumenteOhneVertrag(),alle=liste.length&&ablageAuswahl().length===liste.length;
-  ABLAGE_WAHL={};if(!alle)liste.forEach(function(d){ABLAGE_WAHL[d.id]=1;});
+  var sicht=dokListeAktuell().filter(dokPasst),alle=sicht.length&&sicht.every(function(d){return ABLAGE_WAHL[d.id];});
+  sicht.forEach(function(d){if(alle)delete ABLAGE_WAHL[d.id];else ABLAGE_WAHL[d.id]=1;});
   render();
 }
 async function dokumenteAuswahlLoeschen(){
@@ -3990,12 +4067,12 @@ function vorschlaege(){
         knopf:t("Verträge"),href:"#/vertraege"});
     }
     /* Dokumente, die keinem Vertrag zugeordnet sind */
-    var frei=DOCS.filter(function(d){return !istMed(d)&&!d.contract_id&&!d.ki_pending;});
+    var frei=dokumenteOhneVertrag();
     if(frei.length){
       v.push({key:"frei:"+frei.length,art:"info",icon:"link",
         titel:tn(frei.length,"{0} Dokument ohne Vertrag","{0} Dokumente ohne Vertrag"),
         text:t("Zuordnen hilft dem Archiv und den Fristen."),
-        knopf:t("Ansehen"),href:"#/ablage"});
+        knopf:t("Ansehen"),href:"#/dokumente?f=ohne&von=start"});
     }
     /* Noch nicht ausgelesen (Guthaben war leer) */
     var offen=DOCS.filter(function(d){return d.ki_pending;});
@@ -4890,6 +4967,7 @@ document.addEventListener("input",function(ev){
   var tid=(ev.target&&ev.target.id)||"";
   if(/^f_/.test(tid))formVorschau();
   if(tid==="lsuche")logoFilter(ev.target.value);
+  if(tid==="dsuche")dokFilter(ev.target.value);
   if(tid==="l_muster"){var lt=$("#l_treffer");if(lt)lt.innerHTML=logoTreffer(ev.target.value);}
   if(ev.target&&ev.target.classList&&ev.target.classList.contains("bad"))ev.target.classList.remove("bad");
 });
