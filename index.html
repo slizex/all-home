@@ -698,6 +698,15 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .kil{font-weight:800;font-size:.88rem;margin:0 0 6px 4px}
 /* Zweispaltige Formularzeilen: Felder bündig, auch wenn eine Beschriftung umbricht */
 .two{align-items:end}
+
+/* Ablage: Auswahl zum Löschen */
+.drow3.wahl{padding:8px 4px;gap:10px}
+.drow3.wahl .wbox{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line-2);display:grid;place-items:center;color:var(--ink-fg);background:var(--surface)}
+.drow3.wahl.an .wbox{background:var(--neg);border-color:var(--neg)}
+.drow3.wahl .wtxt{flex:1;min-width:0;text-align:left;padding:3px 0}
+.drow3.wahl .wtxt .dn{display:block;font-weight:800;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow3.wahl .wtxt .dm{color:var(--muted);font-size:.79rem;font-weight:700;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap}
+.drow3.wahl.an{background:var(--neg-bg);border-radius:10px}
 </style>
 </head>
 <body>
@@ -769,6 +778,17 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.3.1: Ablage-Auswahl ---- */
+  "Auswählen":"Выбрать",
+  "Dokumente zum Löschen antippen":"Отметьте документы для удаления",
+  "Auswahl aufheben":"Снять выбор",
+  "Alle auswählen":"Выбрать все",
+  "{0} ausgewähltes löschen":"Удалить выбранные ({0})",
+  "{0} ausgewählte löschen":"Удалить выбранные ({0})",
+  "{0} Dokument endgültig löschen? Die Datei wird mit gelöscht.":"Окончательно удалить документов: {0}? Файл тоже будет удалён.",
+  "{0} Dokumente endgültig löschen? Die Dateien werden mit gelöscht.":"Окончательно удалить документов: {0}? Файлы тоже будут удалены.",
+
 
 /* ---- 1.3.1: Ablage ---- */
   "Ohne Vertrag":"Без договора",
@@ -3318,27 +3338,45 @@ async function dokumentLoeschen(id){
 }
 /* ---- Ablage: Dokumente ohne Vertrag ---- */
 function dokumenteOhneVertrag(){return DOCS.filter(function(d){return !istMed(d)&&!d.contract_id&&!d.ki_pending;});}
+/* Gezielte Auswahl – nie „alle“ auf einen Schlag: In der Ablage liegen oft
+   auch Dokumente, die bleiben sollen (Bescheide, Mitteilungen). */
+var ABLAGE_WAHL={};
+function ablageAuswahl(){var l=dokumenteOhneVertrag();return l.filter(function(d){return ABLAGE_WAHL[d.id];});}
 function viewAblage(){
   var liste=dokumenteOhneVertrag();
+  Object.keys(ABLAGE_WAHL).forEach(function(id){if(!liste.some(function(d){return d.id===id;}))delete ABLAGE_WAHL[id];});
+  var n=ablageAuswahl().length,alle=liste.length&&n===liste.length;
   return zurueck("#/start",t("Start"))+seitenTitel(t("Ohne Vertrag"))+
     (liste.length
       ?'<section class="card"><div class="dlist">'+liste.map(function(d){
-          var ty=dtInfo(d.doc_type);
-          return '<button class="drow3" data-a="d-open" data-id="'+d.id+'"><span class="di">'+ty.icon+'</span>'+
-            '<span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
-            '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span></span></span>'+
-            '<span class="go">'+ic("right",16)+'</span></button>';
+          var ty=dtInfo(d.doc_type),an=!!ABLAGE_WAHL[d.id];
+          return '<div class="drow3 wahl'+(an?" an":"")+'">'+
+            '<button class="wbox" data-a="ab-wahl" data-id="'+d.id+'" role="checkbox" aria-checked="'+an+'" aria-label="'+esc(t("Auswählen"))+'">'+(an?ic("check",16):"")+'</button>'+
+            '<button class="wtxt" data-a="ab-wahl" data-id="'+d.id+'"><span class="dn">'+esc(docTitel(d))+'</span>'+
+              '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span></span></button>'+
+            '<button class="ibtn" data-a="d-open" data-id="'+d.id+'" aria-label="'+esc(t("Öffnen"))+'">'+ic("doc",18)+'</button>'+
+          '</div>';
         }).join("")+'</div></section>'+
         '<div class="factions">'+
-          '<button class="btn danger" data-a="d-del-alle">'+ic("trash")+' '+tn(liste.length,"{0} Dokument löschen","Alle {0} löschen")+'</button>'+
+          '<button class="btn danger" data-a="d-del-wahl"'+(n?"":" disabled")+'>'+ic("trash")+' '+
+            (n?tn(n,"{0} ausgewähltes löschen","{0} ausgewählte löschen"):t("Dokumente zum Löschen antippen"))+'</button>'+
+          '<button class="btn ghost" data-a="ab-alle">'+(alle?t("Auswahl aufheben"):t("Alle auswählen"))+'</button>'+
         '</div>'
       :'<section class="card"><div class="empty"><div class="ei">'+ic("check",28)+'</div><h3>'+t("Alles zugeordnet")+'</h3></div></section>');
 }
-async function dokumenteAlleLoeschen(){
-  var liste=dokumenteOhneVertrag();if(!liste.length)return;
-  if(!confirm(tn(liste.length,"{0} Dokument ohne Vertrag endgültig löschen? Die Datei wird mit gelöscht.","{0} Dokumente ohne Vertrag endgültig löschen? Die Dateien werden mit gelöscht.")))return;
-  var knopf=document.querySelector('[data-a="d-del-alle"]');if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gelöscht …");}
+function ablageWahl(id){if(ABLAGE_WAHL[id])delete ABLAGE_WAHL[id];else ABLAGE_WAHL[id]=1;render();}
+function ablageAlle(){
+  var liste=dokumenteOhneVertrag(),alle=liste.length&&ablageAuswahl().length===liste.length;
+  ABLAGE_WAHL={};if(!alle)liste.forEach(function(d){ABLAGE_WAHL[d.id]=1;});
+  render();
+}
+async function dokumenteAuswahlLoeschen(){
+  var liste=ablageAuswahl();if(!liste.length)return;
+  var namen=liste.slice(0,6).map(function(d){return "• "+docTitel(d);}).join("\n")+(liste.length>6?"\n…":"");
+  if(!confirm(tn(liste.length,"{0} Dokument endgültig löschen? Die Datei wird mit gelöscht.","{0} Dokumente endgültig löschen? Die Dateien werden mit gelöscht.")+"\n\n"+namen))return;
+  var knopf=document.querySelector('[data-a="d-del-wahl"]');if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gelöscht …");}
   try{
+    /* erst die Dateien, nur bei Erfolg die Einträge */
     var pfade=liste.map(function(d){return d.storage_path;}).filter(Boolean);
     for(var i=0;i<pfade.length;i+=100){
       var rm=await sb.storage.from(BUCKET).remove(pfade.slice(i,i+100));
@@ -3346,10 +3384,11 @@ async function dokumenteAlleLoeschen(){
     }
     var r=await sb.from("documents").delete().in("id",liste.map(function(d){return d.id;}));
     if(r.error)throw r.error;
+    ABLAGE_WAHL={};
     await ladeDaten();render();
     toast(tn(liste.length,"{0} Dokument gelöscht","{0} Dokumente gelöscht")+" ✅");
-  }catch(e){
-    toast(t("Löschen fehlgeschlagen")+": "+errMsg(e),true);
+  }catch(x){
+    toast(t("Löschen fehlgeschlagen")+": "+errMsg(x),true);
     await ladeDaten();render();
   }
 }
@@ -4788,7 +4827,9 @@ document.addEventListener("click",function(ev){
   if(a==="d-open"){dokumentOeffnen(id);return;}
   if(a==="d-view"){dokumentAnzeigen(id);return;}
   if(a==="d-del"){dokumentLoeschen(id);return;}
-  if(a==="d-del-alle"){dokumenteAlleLoeschen();return;}
+  if(a==="d-del-wahl"){dokumenteAuswahlLoeschen();return;}
+  if(a==="ab-wahl"){ablageWahl(id);return;}
+  if(a==="ab-alle"){ablageAlle();return;}
   if(a==="d-link"){dokumentZuordnen(id);return;}
   if(a==="d-link-pick"){dokumentVerknuepfen(id,b.dataset.cid);return;}
   if(a==="d-reanalyze"){analyseNachholen(id);return;}
