@@ -47,7 +47,12 @@ Kennzeichen (als Schild), Marke und Modell direkt am Vertrag. FIN und Schlüssel
 aus dem Fahrzeugschein werden mit ausgelesen.
 
 **Drei KI-Stufen wie in AllTrack:** Schnell (Haiku 4.5) · Gründlich (Sonnet 5.5) · Maximal (Opus 5.5),
-wählbar direkt beim Einlesen und unter Mehr.
+wählbar direkt beim Einlesen und unter Mehr. **Admins** sehen unter Mehr › KI-Kosten, wann wer welche
+Auswertung gemacht hat und was sie gekostet hat (gemeinsames Protokoll mit AllTrack).
+
+**Felder, die zur Art passen.** Jede der 53 Arten hat ein Profil: Ausweise und Fahrzeuge zeigen keine
+Kosten oder Kündigungsfristen, Rundfunk und Steuern keine Laufzeit, Versicherungen heißen „Versicherer“
+und „Beitrag“. Pflichtangaben sind dezent mit * markiert, übliche Fristen stehen als Platzhalter im Feld.
 
 **Zweisprachig** Deutsch/Russisch, umschaltbar pro Benutzer. Deutsche Fachbegriffe
 stehen in Klammern hinter der Übersetzung, damit man sie auf dem Papier wiedererkennt.
@@ -70,5 +75,9 @@ Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Do
 - Supabase: Schema `butler` (Verträge, Dokumente, Personen, Einrichtung),
   Haushalte aus `public` wiederverwendet, privater Bucket `butler-documents`.
 - Edge Functions: `butler-extract` (auslesen), `butler-research` (Markt),
-  `butler-med-explain` (Abrechnungsziffern), `butler-translate` (Nachübersetzen).
+  `butler-med-explain` (Abrechnungsziffern), `butler-translate` (Nachübersetzen) –
+  mit gemeinsamem Kern `gemeinsam.ts` (Anmeldung, Limits, Kosten in `public.ai_calls`).
 - PWA mit network-first Service Worker.
+- Sicherheit: Content-Security-Policy mit Skript-Hashes (setzt der Build), supabase-js mit fester
+  Version und Prüfsumme (SRI), KI-Funktionen nur für angemeldete Nutzer mit Tageslimit und
+  Tagesbudget, Datenbank verhindert Zuordnungen über Hausgrenzen.

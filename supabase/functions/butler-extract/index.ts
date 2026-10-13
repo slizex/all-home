@@ -1,0 +1,107 @@
+// Supabase Edge Function: butler-extract
+// Liest Haushalts-Dokumente per Claude aus und liefert strukturierte Felder als JSON.
+// v16: nur angemeldete Nutzer, Tageslimit/Budget, jede Auswertung mit Kosten in public.ai_calls.
+// Gemeinsamer Kern (Anmeldung, Limits, Kosten-Protokoll, Claude-Aufruf): gemeinsam.ts
+
+import { ANTHROPIC_API_KEY, antwortText, claude, claudeFehler, cors, json, level, protokoll, pruefeAufruf, repairJson, stufe } from "./gemeinsam.ts";
+
+const ALLOWED_MIME = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_BASE64_LEN = 20_000_000;
+
+// Sprachvorgabe: nur Freitexte uebersetzen. Die Schluesselwerte sind feste Codes,
+// die der Client zum Einsortieren braucht - sie duerfen NIE uebersetzt werden.
+function langHinweis(lang: string): string {
+  if (lang !== "ru") return "";
+  return [
+    ``,
+    `WICHTIG - SPRACHE: Schreibe NUR diese Freitextfelder auf RUSSISCH:`,
+    `"titel", "zusammenfassung", "wichtig" (alle Eintraege), "hinweise", "behandlung".`,
+    ``,
+    `ALLES ANDERE bleibt unveraendert:`,
+    `- "docType", "kategorie", "fachrichtung", "medTyp" sind feste Codes und MUESSEN exakt die oben`,
+    `  genannten deutschen Kleinbuchstaben-Werte behalten (z. B. "rechnung", "strom", "zahnarzt").`,
+    `- Eigennamen ("anbieter", "produkt", "arzt", "vertragspartner") NICHT uebersetzen.`,
+    `- Nummern, Datumsangaben, Betraege, "details"-Schluessel und deren Werte bleiben wie sie sind.`,
+    `- Deutsche Fachbegriffe im Freitext uebersetzen UND den deutschen Begriff in Klammern dahinter`,
+    `  setzen, z. B. "Право на досрочное расторжение (Sonderkuendigungsrecht)".`,
+  ].join("\n");
+}
+
+const PROMPT = [
+  `Du bist der praezise Lese-Assistent eines deutschen Privathaushalts (\"Dokumenten-Butler\").`,
+  `Das angehaengte Dokument ist ein privates Haushaltsdokument (Vertrag, Rechnung, Police, Tarifbestaetigung, Kuendigung, Preiserhoehung, E-Mail, Fahrzeugschein) ODER ein MEDIZINISCHES Dokument (Arztrechnung, Befund, Rezept, Attest, Laborwerte, Ueberweisung, Impfung, Roentgen, Arztbrief, Klinik/Apotheke/Physio) oder ein sonstiges Anschreiben.`,
+  ``,
+  `Gib AUSSCHLIESSLICH ein JSON-Objekt zurueck (kein Markdown) mit genau diesen Schluesseln:`,
+  `- \"titel\": kurzer sprechender Titel fuer die Dokumentenliste (max. 60 Zeichen), Muster: Anbieter/Arzt + Dokumentart + Zeitraum/Jahr. Beispiele: \"AXA Kfz-Beitragsrechnung 2026\", \"NEW Gas SEPA-Mandat\", \"Fahrzeugschein VW Golf FB-SK 1990\", \"Hautarzt Dr. Meier Befund 06/2026\". IMMER setzen.`,
+  `- \"docType\": \"vertrag\"|\"rechnung\"|\"police\"|\"kuendigung\"|\"preisaenderung\"|\"schreiben\"|\"fahrzeugschein\"|\"sonstiges\". \"fahrzeugschein\" = Zulassungsbescheinigung Teil I oder Teil II (Fahrzeugbrief).`,
+  `- \"kategorie\": \"mobilfunk\",\"internet\",\"strom\",\"gas\",\"wasser\",\"versicherung\",\"streaming\",\"bank\",\"kfz\",\"wohnen\",\"gesundheit\",\"mitgliedschaft\",\"sonstiges\". KFZ-Versicherungen und Fahrzeugscheine: \"kfz\".`,
+  `- \"anbieter\": Name des Anbieters/Versicherers/Unternehmens (string|null). Nimm den offiziellen Firmennamen; bei Marken den Markennamen (z. B. \"naturstrom\"). Beim Fahrzeugschein null (die Zulassungsstelle ist kein Anbieter).`,
+  `- \"vertragspartner\": Vor- und Nachname der PRIVATPERSON (Vertragsinhaber/Versicherungsnehmer/Halter/Rechnungsempfaenger/Patient/Adressat), NICHT der Anbieter/Arzt. string|null.`,
+  `- \"produkt\": Tarif-/Produkt-/Policenname (string|null).`,
+  `- \"kundennummer\": Kunden-/Patientennummer (string|null).`,
+  `- \"vertragsnummer\": Vertrags-/Policen-/Versicherungsscheinnummer oder Rechnungsnummer (string|null).`,
+  `- \"datum\": Dokumentdatum ISO YYYY-MM-DD|null.`,
+  `- \"vertragsstart\": Vertragsbeginn/Lieferbeginn/Versicherungsbeginn ISO|null.`,
+  `- \"mindestlaufzeitMonate\": Zahl (0 = keine; null unbekannt).`,
+  `- \"kuendigungsfristMonate\": Zahl, Wochen als Dezimal (2 Wochen=0.5, 6 Wochen=1.5). null unbekannt.`,
+  `- \"verlaengerungMonate\": Zahl (1 = monatlich; null unbekannt).`,
+  `- \"kosten\": die regelmaessig faellige Zahlung in EURO brutto pro Intervall als Zahl. Bei Strom/Gas/Wasser ist das der MONATLICHE ABSCHLAG. null wenn nicht vorhanden.`,
+  `- \"kostenIntervall\": \"monatlich\"|\"vierteljaehrlich\"|\"halbjaehrlich\"|\"jaehrlich\"|\"einmalig\"|null.`,
+  `- \"betrag\": bei Rechnungen der Rechnungsbetrag in EURO brutto als Zahl, sonst null.`,
+  `- \"zeitraumVon\"/\"zeitraumBis\": bei Rechnungen Leistungszeitraum ISO|null.`,
+  `- \"details\": Objekt mit KATEGORIE-SPEZIFISCHEN Zusatzangaben, NUR im Dokument vorhandene Schluessel (leer {} sonst). Erlaubte Schluessel:`,
+  `  * versicherung: \"versichertesObjekt\",\"deckungsart\",\"deckungssumme\"(EUR),\"selbstbeteiligung\"(EUR),\"schadenfreiheitsklasse\"(z. B. \"SF 16\"),\"sfProzent\"(Zahl).`,
+  `  * kfz (Versicherung UND Fahrzeugschein): \"kennzeichen\"(amtliches Kennzeichen wie gedruckt, z. B. \"FB-SK 1990\"; Feld A),\"marke\"(Hersteller, z. B. \"Volkswagen\"; Feld D.1),\"modell\"(Handelsbezeichnung, z. B. \"Golf\"; Feld D.3),\"fin\"(Fahrzeug-Identifizierungsnummer, 17 Zeichen ohne Leerzeichen; Feld E),\"hsn\"(Herstellerschluessel, 4 Ziffern; Feld 2.1 bzw. \"zu 2\"),\"tsn\"(Typschluessel, die ersten 3 Zeichen aus Feld 2.2),\"erstzulassung\"(ISO; Feld B),\"huBis\"(naechste Hauptuntersuchung ISO, nur wenn angegeben),\"deckungsart\"(Haftpflicht/Teilkasko/Vollkasko inkl. SB),\"schadenfreiheitsklasse\",\"sfProzent\"(Zahl),\"selbstbeteiligung\"(EUR). WICHTIG: Kennzeichen, Marke/Modell und Schluesselnummern stehen meist im Dokument - suche sie sorgfaeltig, auch im Kleingedruckten der Police.`,
+  `  * mobilfunk: \"rufnummer\",\"datenvolumen\",\"endgeraet\".`,
+  `  * internet: \"geschwindigkeit\",\"router\".`,
+  `  * strom/gas: \"zaehlernummer\",\"jahresverbrauch\"(kWh Zahl),\"arbeitspreis\"(ct/kWh Zahl),\"grundpreis\"(EUR pro Monat Zahl). Den monatlichen Abschlag NICHT hier, sondern in \"kosten\".`,
+  `  * wasser: \"zaehlernummer\".`,
+  `  * streaming: \"aboStufe\",\"profile\". bank: \"kontoart\",\"zinssatz\"(Zahl),\"iban\". wohnen: \"objekt\",\"flaeche\"(m2 Zahl),\"nebenkosten\"(EUR Zahl). mitgliedschaft: \"leistungsumfang\",\"mitgliedsnummer\".`,
+  `- \"istMedizin\": true bei medizinischem Dokument, sonst false.`,
+  `- \"fachrichtung\": bei Medizin Kleinbuchstaben-Schluessel aus hausarzt/zahnarzt/kieferorthopaede/augenarzt/orthopaede/hautarzt/hno/frauenarzt/urologe/neurologe/kardiologe/radiologe/kinderarzt/psychotherapie/physiotherapie/apotheke/labor/krankenhaus/sonstiges. sonst null.`,
+  `- \"arzt\": Name Arzt/Praxis/Klinik/Apotheke (string)|null.`,
+  `- \"medTyp\": rechnung/befund/rezept/attest/laborwerte/ueberweisung/impfung/roentgen/arztbrief/sonstiges|null.`,
+  `- \"behandlung\": kurze sachliche Angabe (1 Satz)|null.`,
+  `- \"zusammenfassung\": 2-3 Saetze.`,
+  `- \"wichtig\": Array kurzer Stichpunkte (Preiserhoehung, Sonderkuendigungsrecht, Frist, Erstattung, Folgetermin, HU faellig ...). Leeres Array wenn nichts.`,
+  `- \"hinweise\": kurzer Hinweis (1-2 Saetze) zu Annahmen/Unsicherheiten; leer \"\" wenn eindeutig.`,
+  ``,
+  `Regeln: Geldbetraege BRUTTO in EURO, ct/100, Punkt als Dezimaltrennzeichen, keine Tausenderpunkte/Einheiten im Wert. \"1.234,56 EUR\"=1234.56. Medizin: kategorie=gesundheit, istMedizin=true. Unbekannt: null, nicht raten. Preisaenderung: neuer Preis in kosten, alter Preis als wichtig-Stichpunkt, Sonderkuendigungsrecht immer erwaehnen. E-Mail: Absender-Firma=anbieter, Angeschriebener=vertragspartner.`,
+].join("\n");
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
+  if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
+  let p: { fileBase64?: string; mimeType?: string; textContent?: string; model?: string; level?: string; lang?: string; household_id?: string };
+  try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
+  const chk = await pruefeAufruf(req, p.household_id);
+  if ("antwort" in chk) return chk.antwort;
+  const { fileBase64, mimeType, textContent } = p;
+  if (!fileBase64 && !textContent) return json({ error: "Keine Datei empfangen." }, 400);
+  const st = stufe(p.level || p.model);
+  const lv = level(st, { basic: 4000, advanced: 8000, max: 10000 });
+  const lang = (p.lang === "ru") ? "ru" : "de";
+  let docBlock: Record<string, unknown>;
+  if (textContent) {
+    docBlock = { type: "text", text: "--- BEGINN DOKUMENT ---\n" + String(textContent).slice(0, 60000) + "\n--- ENDE DOKUMENT ---" };
+  } else {
+    if (typeof fileBase64 !== "string" || fileBase64.length > MAX_BASE64_LEN) return json({ error: "Datei zu gross fuer die Analyse (max. ca. 14 MB)." }, 413);
+    const mt = mimeType || "application/pdf";
+    if (!ALLOWED_MIME.has(mt)) return json({ error: "Dateityp wird nicht unterstuetzt (nur PDF und Fotos)." }, 415);
+    docBlock = mt === "application/pdf"
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: fileBase64 } }
+      : { type: "image", source: { type: "base64", media_type: mt, data: fileBase64 } };
+  }
+  const body = { messages: [{ role: "user", content: [docBlock, { type: "text", text: PROMPT + langHinweis(lang) }] }] };
+  let r;
+  try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
+  if (!r.resp.ok) return await claudeFehler(r.resp, "Auswertung");
+  const data = await r.resp.json();
+  if (data.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
+  const parsed = repairJson(antwortText(data));
+  const modell = String(data.model || r.lv.model);
+  const kosten = await protokoll(chk.wer, "allhome-extract", st, modell, data.usage, !!parsed);
+  if (!parsed) return json({ error: "Antwort konnte nicht gelesen werden." }, 500);
+  return json({ dokument: parsed, modell, stufe: st, lang, usage: { input: data.usage?.input_tokens ?? null, output: data.usage?.output_tokens ?? null }, kosten_usd: kosten });
+});

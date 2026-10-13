@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-eeYi3yMGzEsdsKaKayS8L8YWtaCVS3wjITkl2bf40iY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
 <meta name="robots" content="noindex">
@@ -16,6 +18,8 @@
 <link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="preload" href="fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
+/* Nicht in fremden Seiten einbetten lassen (Clickjacking). */
+if(window.top!==window.self){try{window.top.location.replace(window.location.href);}catch(e){document.documentElement.style.display="none";}}
 /* Alte Merker des Dokumenten-Butlers aufräumen (die App heißt jetzt All-Home). */
 (function(){try{["dbTheme","db_tips_dismissed"].forEach(function(k){localStorage.removeItem(k);});}catch(e){}})();
 /* Hell/Dunkel sofort setzen, bevor etwas gezeichnet wird (kein Aufblitzen). */
@@ -25,8 +29,8 @@
 @font-face{font-family:"Nunito";src:url("fonts/nunito-latin-wght-normal.woff2") format("woff2");font-weight:200 1000;font-style:normal;font-display:swap}
 </style>
 <style>
-
 /* ================= Farben & Maße ================= */
+
 :root{
   --bg:#f7f4ef;--surface:#ffffff;--surface-2:#f2eee7;--surface-3:#e9e3d9;
   --line:#e7e0d5;--line-2:#d9d0c2;
@@ -51,9 +55,9 @@ html.dark{
   --sh-1:0 1px 2px rgba(0,0,0,.35);
   --sh-2:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6);
   --sh-3:0 18px 50px -18px rgba(0,0,0,.75);
-}
+}/* ================= Grundlagen ================= */
 
-/* ================= Grundlagen ================= */
+
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
@@ -65,21 +69,21 @@ a{color:inherit;text-decoration:none}
 .num{font-variant-numeric:tabular-nums}
 .ico{display:inline-block;vertical-align:middle;flex:none}
 :focus-visible{outline:3px solid color-mix(in srgb,var(--info) 55%,transparent);outline-offset:2px;border-radius:10px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}/* ================= App-Rahmen ================= */
 
-/* ================= App-Rahmen ================= */
-.shell{min-height:100vh}
-/* width:100% – sonst schrumpft die Rasterzelle (margin:auto) auf Inhaltsbreite und jede Seite sitzt woanders */
+
+.shell{min-height:100vh}/* width:100% – sonst schrumpft die Rasterzelle (margin:auto) auf Inhaltsbreite und jede Seite sitzt woanders */
+
 .main{padding:18px 16px calc(var(--nav-h) + 52px + env(safe-area-inset-bottom));width:100%;max-width:1180px;margin:0 auto;min-width:0}
 .side{display:none}
 .bnav{position:fixed;left:0;right:0;bottom:0;z-index:40;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding:6px 8px env(safe-area-inset-bottom);background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:stretch}
 .nb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;padding:0 0 10px;color:var(--muted);font-size:.72rem;font-weight:700;border-radius:14px;transition:color .15s}
 .nb[aria-current="page"]{color:var(--text)}
 .nb[aria-current="page"] .nbi{background:var(--surface-2)}
-.nbi{display:grid;place-items:center;width:44px;height:30px;border-radius:12px;transition:background .15s}
-/* Der runde Neu-Knopf schwebt ueber der Leiste und macht sie nicht hoeher. */
-.nb-add{position:relative}
-/* Farbring als Verlaufsrand: haengt nicht von der Ebenen-Reihenfolge ab (transform erzeugt eine eigene). */
+.nbi{display:grid;place-items:center;width:44px;height:30px;border-radius:12px;transition:background .15s}/* Der runde Neu-Knopf schwebt ueber der Leiste und macht sie nicht hoeher. */
+
+.nb-add{position:relative}/* Farbring als Verlaufsrand: haengt nicht von der Ebenen-Reihenfolge ab (transform erzeugt eine eigene). */
+
 .nb-add .fab{position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:var(--ink-fg);border:4px solid transparent;background:linear-gradient(var(--ink),var(--ink)) padding-box,conic-gradient(from 200deg,var(--strom),var(--wasser),var(--gas),var(--strom)) border-box;box-shadow:var(--sh-3)}
 .nb-add .lbl{margin-top:0}
 @media (min-width:900px){
@@ -95,60 +99,33 @@ a{color:inherit;text-decoration:none}
   .sb-add:hover{background:var(--ink);filter:brightness(1.08)}
   .sb-add[aria-current="page"]{background:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 22%,transparent)}
   .main{padding:30px 34px 48px}
-}
+}/* ================= Kopfzeile ================= */
 
-/* ================= Kopfzeile ================= */
+
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 2px 18px}
 .greet{color:var(--muted);font-weight:700;font-size:.92rem}
 .hh{display:inline-flex;align-items:center;gap:6px;font-size:1.55rem;font-weight:900;letter-spacing:-.01em;line-height:1.15;border-radius:12px;padding:2px 4px;margin-left:-4px}
 .hh.can:hover{background:var(--surface-2)}
-.pt{font-size:1.55rem;font-weight:900;letter-spacing:-.01em;margin:4px 2px 16px}
+.pt{font-size:1.55rem;font-weight:900;letter-spacing:-.01em;margin:4px 2px 16px}/* ================= Karten ================= */
 
-/* ================= Karten ================= */
+
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:18px}
-.grid{display:grid;gap:14px}
-/* Rasterzellen duerfen schrumpfen – sonst sprengt breiter Inhalt (Tabellen) die Seitenbreite */
+.grid{display:grid;gap:14px}/* Rasterzellen duerfen schrumpfen – sonst sprengt breiter Inhalt (Tabellen) die Seitenbreite */
+
 .grid>*{min-width:0}
-@media (min-width:900px){.grid-2{grid-template-columns:1.25fr 1fr;align-items:start}}
 .sect{display:flex;align-items:center;justify-content:space-between;margin:22px 4px 10px;font-weight:900;font-size:1.05rem}
-.sect .more{font-size:.86rem;font-weight:800;color:var(--muted)}
-
-/* Hero */
-.hero{position:relative;overflow:hidden;border-radius:var(--r-xl);padding:22px 22px 18px;border:1px solid var(--line);box-shadow:var(--sh-2);background:var(--surface)}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,var(--hero-tint) 0%,transparent 60%),radial-gradient(90% 80% at 0% 100%,var(--hero-tint-2) 0%,transparent 55%);opacity:1;pointer-events:none}
-.hero.pos{--hero-tint:color-mix(in srgb,var(--pos) 22%,transparent);--hero-tint-2:color-mix(in srgb,var(--wasser) 14%,transparent)}
-.hero.neg{--hero-tint:color-mix(in srgb,var(--neg) 20%,transparent);--hero-tint-2:color-mix(in srgb,var(--strom) 14%,transparent)}
-.hero>*{position:relative}
-.hero .lbl{font-weight:800;color:var(--muted);font-size:.9rem}
-.hero .big{font-size:2.9rem;font-weight:900;letter-spacing:-.02em;line-height:1.05;margin:6px 0 2px}
-.hero.pos .big{color:var(--pos)}.hero.neg .big{color:var(--neg)}
-.hero .state{font-weight:800}
-.hero .sub{color:var(--muted);font-size:.88rem;margin-top:4px}
-.hero .tog{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:.88rem;color:var(--muted)}
-.hbreak{margin-top:12px;display:grid;gap:8px}
+.sect .more{font-size:.86rem;font-weight:800;color:var(--muted)}/* Hero */
 .hrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line)}
-.hrow .v{margin-left:auto;font-weight:900}
+.hrow .v{margin-left:auto;font-weight:900}/* Bereichs-Abzeichen */
 
-/* Bereichs-Abzeichen */
+
 .cb{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:none}
 .cb.strom{background:var(--strom-bg);color:var(--strom)}.cb.wasser{background:var(--wasser-bg);color:var(--wasser)}.cb.gas{background:var(--gas-bg);color:var(--gas)}
-.cb.sm{width:30px;height:30px;border-radius:10px}
+.cb.sm{width:30px;height:30px;border-radius:10px}/* Faellig-Karte *//* Kacheln */
 
-/* Faellig-Karte */
-.due{display:flex;align-items:center;gap:14px;border-radius:var(--r-lg);padding:16px;background:var(--ink);color:var(--ink-fg);box-shadow:var(--sh-2)}
-.due .dots{display:flex}
-.due .dots .cb{border:3px solid var(--ink);margin-left:-8px}
-.due .dots .cb:first-child{margin-left:0}
-.due .t{font-weight:900}
-.due .s{opacity:.72;font-size:.86rem}
-.due .go{margin-left:auto}
-.done{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--r-lg);background:var(--pos-bg);color:var(--pos);font-weight:800}
-.done small{display:block;color:var(--muted);font-weight:700}
 
-/* Kacheln */
 .tiles{display:grid;gap:12px;grid-template-columns:1fr}
 @media (min-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
-@media (min-width:1100px){.tiles.t3{grid-template-columns:repeat(3,1fr)}}
 .tile{display:block;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-1);transition:transform .15s var(--ease),box-shadow .15s}
 .tile:hover{transform:translateY(-2px);box-shadow:var(--sh-2)}
 .tile .hd{display:flex;align-items:center;gap:10px}
@@ -156,15 +133,13 @@ a{color:inherit;text-decoration:none}
 .tile .mt{color:var(--muted);font-size:.84rem;font-weight:700}
 .tile .row{display:flex;align-items:baseline;gap:8px;margin-top:12px}
 .tile .cost{font-size:1.45rem;font-weight:900;letter-spacing:-.01em}
-.tile .spark{display:block;width:100%;height:38px;margin-top:10px}
-.tile .foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;color:var(--muted);font-size:.82rem;font-weight:700}
+.tile .spark{display:block;width:100%;height:38px;margin-top:10px}/* Pillen & Chips */
 
-/* Pillen & Chips */
+
 .pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font-weight:900;font-size:.8rem;white-space:nowrap}
-.pill.pos{background:var(--pos-bg);color:var(--pos)}.pill.neg{background:var(--neg-bg);color:var(--neg)}.pill.mut{background:var(--surface-2);color:var(--muted)}
-.pos-t{color:var(--pos)}.neg-t{color:var(--neg)}.mut-t{color:var(--muted)}
+.pill.pos{background:var(--pos-bg);color:var(--pos)}.pill.mut{background:var(--surface-2);color:var(--muted)}/* Vorschlaege */
 
-/* Vorschlaege */
+
 .sugs{display:grid;gap:10px}
 .sug{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 14px 14px 14px;box-shadow:var(--sh-1)}
 .sug .si{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
@@ -174,23 +149,21 @@ a{color:inherit;text-decoration:none}
 .sug .sx{color:var(--muted);font-size:.9rem;margin-top:1px}
 .sug .sa{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
 .sug .dis{color:var(--muted-2);padding:4px;border-radius:10px;margin:-4px -4px 0 0}
-.sug .dis:hover{color:var(--text);background:var(--surface-2)}
+.sug .dis:hover{color:var(--text);background:var(--surface-2)}/* Knoepfe */
 
-/* Knoepfe */
+
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;background:var(--ink);color:var(--ink-fg);font-weight:900;box-shadow:var(--sh-1);transition:filter .15s,transform .06s}
 .btn:hover{filter:brightness(1.1)}.btn:active{transform:translateY(1px)}
 .btn.lg{min-height:54px;font-size:1.05rem;padding:0 26px}
 .btn.full{width:100%}
-.btn.soft{background:var(--surface-2);color:var(--text);box-shadow:none}
 .btn.line{background:transparent;color:var(--text);border:1.5px solid var(--line-2);box-shadow:none}
-.btn.onink{background:var(--ink-fg);color:var(--ink)}
 .btn.sm{min-height:36px;padding:0 14px;font-size:.88rem}
 .btn:disabled{opacity:.55;cursor:default;filter:none}
 .lnk{font-weight:900;color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
 .ibtn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--muted)}
-.ibtn:hover{background:var(--surface-2);color:var(--text)}
+.ibtn:hover{background:var(--surface-2);color:var(--text)}/* Bottom-Sheet / Popover */
 
-/* Bottom-Sheet / Popover */
+
 .scrim{position:fixed;inset:0;z-index:80;background:rgba(21,19,15,.38);opacity:0;transition:opacity .2s}
 .scrim.on{opacity:1}
 .sheet{position:fixed;z-index:81;left:0;right:0;bottom:0;max-height:86vh;overflow:auto;background:var(--surface);border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:var(--sh-3);transform:translateY(100%);transition:transform .26s var(--ease)}
@@ -200,42 +173,28 @@ a{color:inherit;text-decoration:none}
 @media (min-width:900px){.sheet{left:50%;right:auto;bottom:auto;top:50%;width:480px;border-radius:24px;transform:translate(-50%,-46%);opacity:0;transition:transform .2s var(--ease),opacity .2s}.sheet.on{transform:translate(-50%,-50%);opacity:1}.sheet .grab{display:none}}
 .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 12px;border-radius:14px;font-weight:800}
 .opt:hover{background:var(--surface-2)}
-.opt .ck{margin-left:auto;color:var(--pos)}
-
-/* Hinweise, Leerzustaende, Laden */
-.note{display:flex;gap:12px;align-items:flex-start;border-radius:var(--r-lg);padding:14px 16px;background:var(--warn-bg);color:var(--text)}
-.note .ni{color:var(--warn);margin-top:1px}
-.note b{display:block}
+.opt .ck{margin-left:auto;color:var(--pos)}/* Hinweise, Leerzustaende, Laden */
 .empty{text-align:center;padding:34px 18px;color:var(--muted)}
 .empty .ei{width:64px;height:64px;border-radius:20px;background:var(--surface-2);display:grid;place-items:center;margin:0 auto 12px;color:var(--muted)}
 .empty h3{color:var(--text);margin:0 0 6px;font-weight:900}
 .sk{background:linear-gradient(90deg,var(--surface-2),var(--surface-3),var(--surface-2));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:14px}
 @keyframes sk{to{background-position:-200% 0}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}/* Toast */
 
-/* Toast */
+
 #toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:90;width:max-content;max-width:calc(100% - 28px);background:var(--ink);color:var(--ink-fg);padding:12px 16px;border-radius:16px;font-weight:800;box-shadow:var(--sh-3);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s var(--ease);display:flex;align-items:center;gap:12px}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-#toast.err{background:var(--neg);color:#fff}
-/* bei offenem Fenster oben, damit keine Knoepfe verdeckt werden */
+#toast.err{background:var(--neg);color:#fff}/* bei offenem Fenster oben, damit keine Knoepfe verdeckt werden */
+
 #toast.top{bottom:auto;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-20px)}
 #toast.top.on{transform:translate(-50%,0)}
 #toast button{font-weight:900;text-decoration:underline;text-underline-offset:3px}
-.updbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;background:var(--ink);color:var(--ink-fg);padding:8px 8px 8px 16px;border-radius:18px;font-weight:800;font-size:.9rem}
-.updbar>span{display:flex;align-items:center;gap:8px}
-html.testenv body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:#7c3aed;z-index:100;pointer-events:none}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;display:grid;gap:2px}
 .kpi span{color:var(--muted);font-weight:800;font-size:.84rem}.kpi b{font-size:1.5rem;font-weight:900}.kpi small{color:var(--muted);font-weight:700}
-.kirow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
-.mlist>.kirow:last-child{border-bottom:0}
-.kirow .kl{flex:1;min-width:0;display:grid;gap:1px}.kirow small{color:var(--muted);font-weight:700;font-size:.8rem}
-.kirow .kc{font-weight:900;white-space:nowrap}
-.kirow .kt{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.netbar{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 14px;border-radius:16px;background:var(--warn-bg);color:var(--warn);font-weight:800;font-size:.88rem}
-@media (min-width:900px){#toast{bottom:28px}}
+@media (min-width:900px){#toast{bottom:28px}}/* Anmeldung */
 
-/* Anmeldung */
+
 .auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
 .authc{width:100%;max-width:400px}
 .authc .logo{display:block;width:64px;height:64px;border-radius:18px;margin-bottom:18px;box-shadow:var(--sh-2)}
@@ -247,129 +206,39 @@ html.testenv body::before{content:"";position:fixed;top:0;left:0;right:0;height:
 .inp:focus{border-color:var(--ink);box-shadow:0 0 0 4px color-mix(in srgb,var(--ink) 10%,transparent)}
 .amsg{min-height:22px;margin:10px 4px;font-weight:800;font-size:.9rem}
 .amsg.err{color:var(--neg)}.amsg.ok{color:var(--pos)}
-.arow{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
-
-/* ================= Formular-Fluss ================= */
-.flow{max-width:560px;margin:0 auto}
-.fhead{display:flex;align-items:center;gap:10px;margin:0 0 16px}
-.fhead .prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-weight:800;color:var(--muted);font-size:.9rem}
-.dots2{display:flex;gap:5px;align-items:center}.dots2 i{width:8px;height:8px;border-radius:9px;background:var(--line-2);transition:width .2s}.dots2 i.on{background:var(--ink);width:22px}.dots2 i.ok{background:var(--pos)}
+.arow{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}/* ================= Formular-Fluss ================= */
 .mhead{display:flex;align-items:center;gap:14px}
 .mhead .cb{width:54px;height:54px;border-radius:17px}
 .mhead h2{margin:0;font-size:1.7rem;font-weight:900;letter-spacing:-.01em}
-.mmeta{color:var(--muted);font-weight:700;font-size:.88rem}
 .mrow{display:flex;gap:10px;align-items:stretch;margin-top:18px}
-.minp{flex:1;position:relative;display:block;min-width:0}
-.minp input{width:100%;height:78px;border-radius:22px;border:2px solid var(--line-2);background:var(--surface);font-size:2.2rem;font-weight:900;padding:0 64px 0 20px;font-variant-numeric:tabular-nums;outline:none;transition:border-color .15s,box-shadow .15s}
-.minp input:focus{border-color:var(--ink);box-shadow:0 0 0 5px color-mix(in srgb,var(--ink) 9%,transparent)}
-.minp .u{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-weight:900;color:var(--muted);pointer-events:none}
-.camb{width:78px;flex:none;border-radius:22px;background:var(--surface-2);display:grid;place-items:center;position:relative;color:var(--text)}
-.camb:hover{background:var(--surface-3)}
-.camb .ki{position:absolute;right:8px;bottom:8px;font-size:.6rem;font-weight:900;background:var(--ink);color:var(--ink-fg);border-radius:6px;padding:1px 5px}
-.camb:disabled{cursor:default}
 .spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--line-2);border-top-color:var(--ink);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .hint{display:flex;align-items:flex-start;gap:8px;margin:10px 4px 0;font-weight:800;font-size:.9rem;color:var(--muted);min-height:22px}
 .amp{width:10px;height:10px;border-radius:50%;flex:none;margin-top:5px;background:var(--line-2)}
-.amp.green{background:var(--pos)}.amp.yellow{background:var(--warn)}.amp.red{background:var(--neg)}
-.hint.red{color:var(--neg)}.hint.yellow{color:var(--warn)}.hint.green{color:var(--pos)}
-.fsec{margin-top:14px}
-.linkbtn{font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
-.linkbtn:hover{color:var(--text)}
-.dateline{display:flex;align-items:center;gap:10px;margin-top:18px;padding:12px 14px;border-radius:16px;background:var(--surface-2);font-weight:800;color:var(--muted)}
-.dateline input{margin-left:auto;border:0;background:transparent;font-weight:900;color:var(--text);outline:none;min-width:0}
-.factions{display:grid;gap:12px;margin-top:22px}
-.frow2{display:flex;justify-content:space-between;gap:10px;padding:0 4px}
-.mchange{margin-top:14px;padding:16px;border-radius:18px;border:1.5px dashed var(--line-2)}
-.allrow{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:center;padding:14px;border-radius:20px;background:var(--surface);border:1px solid var(--line);margin-bottom:10px}
-.allrow .minp input{height:60px;font-size:1.5rem;border-radius:16px;padding-right:54px}
-.allrow .camb{width:60px;border-radius:16px}
-.allrow .mrow{margin-top:10px}
-.allrow .hint{grid-column:1/-1;margin-top:6px}
-.donehero{text-align:center;padding:22px 10px 12px}
-.donehero .ok{width:78px;height:78px;border-radius:50%;background:var(--pos-bg);color:var(--pos);display:grid;place-items:center;margin:0 auto 14px}
-.donehero h2{margin:0 0 4px;font-size:1.8rem;font-weight:900}
-.sumrow{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
-.sumrow:last-child{border-bottom:0}
-.sumrow .v{margin-left:auto;text-align:right;display:grid;justify-items:end;gap:4px}
-
-/* ================= Verlauf ================= */
-.chips{display:flex;gap:8px;overflow-x:auto;margin:0 0 14px;padding:2px 0 4px;scrollbar-width:none}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);font-weight:800;white-space:nowrap;color:var(--muted)}
-.chip .ico{color:var(--c)}
-.chip.on{border-color:var(--c);color:var(--text);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
-.chartcard{padding:16px 14px 14px}
-.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
-.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:4px;gap:2px}
-.seg button{padding:7px 14px;border-radius:999px;font-weight:800;font-size:.88rem;color:var(--muted)}
-.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--sh-1)}
-.seg.wide{display:flex}.seg.wide button{flex:1}
+.amp.green{background:var(--pos)}.amp.red{background:var(--neg)}
+.hint.red{color:var(--neg)}.hint.green{color:var(--pos)}
+.factions{display:grid;gap:12px;margin-top:22px}/* ================= Verlauf ================= */
 .sel{min-height:38px;border-radius:999px;border:1.5px solid var(--line-2);background:var(--surface);padding:0 12px;font-weight:800}
 .chart{display:block;width:100%;height:auto;margin-top:6px;overflow:visible}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;font-weight:700;color:var(--muted);margin:4px 2px 0}
-.legend span{display:inline-flex;align-items:center;gap:6px}
 .lg{display:inline-block;width:14px;height:10px;border-radius:3px}
-.lg.dash{height:0;border-top:2px dashed var(--muted);border-radius:0}
 .lg.dot{height:0;border-top:2.5px dotted var(--text);border-radius:0}
 .lg.fc{border:1.5px dashed;background:transparent}
-.cinfo{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-weight:800}
-.vlist2{display:grid;gap:6px}
-.vsep{display:flex;align-items:center;gap:8px;padding:12px 6px 4px;color:var(--muted);font-weight:800;font-size:.84rem}
-.vsep b{margin-left:auto}
-.vrow2{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;width:100%;text-align:left;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
-.vrow2:hover{border-color:var(--line-2)}
-.vrow2 .vm{display:grid;min-width:0}.vrow2 .vm small{color:var(--muted);font-weight:700;font-size:.8rem}
-.vrow2 .vv{display:grid;justify-items:end;font-weight:800;font-size:.9rem}
-.vrow2.syn{background:transparent;border-style:dashed}
 .tag{display:inline-block;padding:0 7px;border-radius:7px;background:var(--surface-2);color:var(--muted);font-weight:800;font-size:.74rem}
 .dl{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}
 .dl span{color:var(--muted);font-weight:700}
-.ytab{width:100%;border-collapse:separate;border-spacing:0;font-size:.88rem}
-.ytab th,.ytab td{padding:8px;text-align:right;white-space:nowrap}
-.ytab thead th{color:var(--muted);font-weight:800}
-.ytab tbody th{text-align:left;color:var(--muted);font-weight:800}
-.ytab td{font-weight:800;border-radius:8px}
-.ytab td.na{color:var(--muted-2)}.ytab td.avg{color:var(--muted)}
-.ytab tr.sum th,.ytab tr.sum td{border-top:1px solid var(--line);font-weight:900}
 .chk{display:flex;align-items:center;gap:10px;font-weight:800;margin:4px 4px 12px}
-.chk input{width:20px;height:20px}
-.ferr{margin-top:6px;padding:12px 14px;border-radius:14px;background:var(--neg-bg);color:var(--neg);font-weight:800}
-
-/* ================= Vertraege ================= */
-@media (min-width:900px){.vgrid2{grid-template-columns:1fr 1fr;align-items:start}}
-.vcard{padding:18px}
-.vcard.focus{border-color:var(--line-2);box-shadow:var(--sh-2)}
-.vch{display:flex;align-items:center;gap:12px}
-.vch .nm{font-weight:900;font-size:1.1rem}.vch .mt{color:var(--muted);font-weight:700;font-size:.86rem}
-.vch .ibtn{margin-left:auto}
+.chk input{width:20px;height:20px}/* ================= Vertraege ================= */
 .kv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .kv>div{background:var(--surface-2);border-radius:14px;padding:10px 12px;display:grid;gap:2px;min-width:0}
 .kv span{color:var(--muted);font-weight:700;font-size:.8rem}.kv b{font-weight:900}
-.vlines{display:grid;gap:6px;margin-top:12px}
-.vline{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;font-weight:800;font-size:.88rem;text-align:left;width:100%}
-.vline.info{background:var(--info-bg);color:var(--info)}.vline.good{background:var(--pos-bg);color:var(--pos)}.vline.warn{background:var(--warn-bg);color:var(--warn)}
-.vline span{flex:1;color:var(--text)}
-.vline b{margin-left:auto;text-decoration:underline;text-underline-offset:3px}
 .drow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.dchip{display:flex;align-items:center;gap:8px;max-width:100%;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left;color:var(--muted)}
-.dchip span{display:grid;min-width:0}.dchip b{font-size:.84rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}.dchip small{font-weight:700;font-size:.74rem}
-.dchip.more{font-weight:800}
-.vact{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.vpast{display:flex;align-items:center;gap:6px;margin-top:14px;font-weight:800;color:var(--muted)}
-.vplist{display:grid;gap:6px;margin-top:8px}
-.vprow{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:14px;background:var(--surface-2)}
-.vprow span{display:grid;min-width:0}.vprow small{color:var(--muted);font-weight:700;font-size:.8rem}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .two .fld{min-width:0}
 details.more{margin:4px 0 8px}
 details.more summary{cursor:pointer;font-weight:800;color:var(--muted);padding:8px 2px}
-.drow2{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
-.dopen{display:flex;align-items:center;gap:10px;flex:1;text-align:left;padding:6px 2px;min-width:0}
-.dopen span{display:grid;min-width:0}.dopen b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dopen small{color:var(--muted);font-weight:700;font-size:.8rem}
-.ytab.abr th{text-align:left}
-select.inp{padding-right:10px}
+select.inp{padding-right:10px}/* ================= Mehr ================= */
 
-/* ================= Mehr ================= */
+
 .mgrp{margin:22px 6px 8px;font-size:.78rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .mlist{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
 .mrow2{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);min-height:58px}
@@ -379,75 +248,25 @@ button.mrow2:hover,a.mrow2:hover{background:var(--surface-2)}
 .mrow2 .mt2{flex:1;display:grid;min-width:0}.mrow2 .mt2 small{color:var(--muted);font-weight:700;font-size:.8rem}
 .mrow2 .mr{display:flex;align-items:center;gap:4px;color:var(--muted);font-weight:800;font-size:.86rem;white-space:nowrap}
 .mrow2.off{opacity:.5}
-.nssw{width:50px;height:30px;border-radius:99px;background:var(--line-2);position:relative;flex:none;transition:background .2s}
-.nssw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:var(--sh-1);transition:transform .2s var(--ease)}
-.nssw.on{background:var(--pos)}.nssw.on::after{transform:translateX(20px)}
-.nssw:disabled{opacity:.45;cursor:default}
 .back{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:var(--muted);margin:2px 0}
-.memcard{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px}
-.memcard .mi{width:38px;height:38px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;flex:none}
-.memcard small{display:block;color:var(--muted);font-weight:700}
-.macts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ell{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.invcode{font-size:1.8rem;font-weight:900;letter-spacing:.12em;margin:4px 0 8px;font-variant-numeric:tabular-nums}
-.rowin{display:flex;gap:8px}.rowin .inp{flex:1;min-width:0}
-.catpick{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.cpk{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:14px;background:var(--surface-2);font-weight:800}
-.calc{margin:0;padding-left:18px;display:grid;gap:6px}
 .setupcat{display:flex;align-items:center;gap:14px;width:100%;padding:16px;border-radius:var(--r-lg);border:2px solid var(--line);background:var(--surface);font-size:1.1rem;text-align:left}
 .setupcat .ck{margin-left:auto;color:var(--muted-2)}
-.setupcat.on{border-color:var(--ink)}.setupcat.on .ck{color:var(--pos)}
-
-/* ================= Mehrschritt-Ansichten ================= */
-.hlast{display:flex;align-items:center;gap:8px;margin-top:12px;padding:9px 12px;border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);font-weight:800;font-size:.86rem;color:var(--muted)}
-.hlast b{color:var(--text)}
-.vsep.open{color:var(--text)}
-a.vsep.abr{color:var(--pos);border-radius:12px;background:var(--pos-bg);padding:10px 12px;margin:6px 0 2px}
-a.vsep.abr span{color:var(--text)}
-.abrsteps{display:flex;gap:6px;margin:0 0 var(--gap)}
-.abrsteps span{flex:1;text-align:center;padding:7px 4px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-weight:800;font-size:.8rem}
-.abrsteps span.on{background:var(--ink);color:var(--ink-fg)}.abrsteps span.ok{background:var(--pos-bg);color:var(--pos)}
-.abrdoc{display:flex;align-items:center;gap:12px}.abrdoc>div{flex:1;min-width:0;display:grid}.abrdoc small{color:var(--muted);font-weight:700}
-.abrlvl{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:16px;border-radius:var(--r-lg);border:2px solid var(--line);background:var(--surface)}
-.abrlvl.on{border-color:var(--ink)}
-.abrlvl>span:nth-child(2){flex:1;display:grid;gap:2px}.abrlvl small{color:var(--muted);font-weight:700}
-.abrlvl .rd{width:24px;height:24px;border-radius:50%;border:2px solid var(--line-2);display:grid;place-items:center;flex:none;color:var(--ink-fg)}
-.abrlvl.on .rd{background:var(--ink);border-color:var(--ink)}
-.abrlvl .pr{font-weight:900;white-space:nowrap}
+.setupcat.on{border-color:var(--ink)}.setupcat.on .ck{color:var(--pos)}/* ================= Mehrschritt-Ansichten ================= */
+.abrlvl>span:nth-child(2){flex:1;display:grid;gap:2px}
 .abrbusy{display:grid;justify-items:center;gap:10px;padding:48px 20px;text-align:center}.abrbusy small{color:var(--muted);font-weight:700}
-.abrhead .vch{margin-bottom:6px}
-.abrres{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-.abrres>div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;display:grid;gap:2px}
-.abrres span{color:var(--muted);font-weight:800;font-size:.84rem}.abrres b{font-size:1.6rem;font-weight:900}.abrres small{color:var(--muted);font-weight:700}
-.abrexpl{margin:-4px 4px 0;font-weight:800;color:var(--muted);font-size:.9rem}
 .cause{border-radius:var(--r-lg);padding:14px 16px;border:1px solid var(--line);background:var(--surface);display:grid;gap:8px;justify-items:start}
 .cause .ct{display:flex;align-items:center;gap:8px}.cause p{margin:0;color:var(--text);font-size:.92rem}
 .cause.warn{border-color:color-mix(in srgb,var(--warn) 40%,var(--line))}.cause.warn .ct{color:var(--warn)}
-.cause.info .ct{color:var(--info)}
-.cause .vline{width:auto}
-.abrki{margin:0 4px;color:var(--muted);font-weight:700;font-size:.86rem}
-.abrmon{margin:0}
-.ytab.abr th small{display:block;font-weight:700;color:var(--muted-2);font-size:.74rem}
-.ytab.abr .pill{font-size:.76rem;padding:2px 8px}
-@media (min-width:1100px){.abrgrid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
-@media (min-width:900px){.abrgrid>.grid>.sect:first-child{margin-top:4px}}
-
-/* ================= Ein Abstandsraster für alle Seiten ================= */
+.cause.info .ct{color:var(--info)}/* ================= Ein Abstandsraster für alle Seiten ================= */
 /* --gap zwischen Karten, --sect vor Abschnittstiteln; auf dem Desktop größer */
+
+
+
 :root{--gap:14px;--sect:22px}
 .grid,.tiles,.sugs,.kpis{gap:var(--gap)}
 .sect{margin:var(--sect) 4px 12px}
-.mgrp{margin:var(--sect) 6px 10px}
-.mcols{display:grid;column-gap:var(--gap)}
-.mcols>div{display:contents}
-.mg-hh{order:1}.mg-pers{order:2}.mg-daten{order:3}.mg-info{order:4}
-.ycard{padding:10px;overflow-x:auto}
-.ytab{border-spacing:3px;font-size:.84rem}
-.ytab th,.ytab td{padding:8px 6px}
-@media (min-width:560px){.ytab{border-spacing:4px;font-size:.9rem}.ytab th,.ytab td{padding:9px 10px}}
-/* schmaler Desktop: Jahresvergleich unter das Diagramm, sonst wird die Tabelle gequetscht */
-@media (min-width:900px) and (max-width:1299px){.vlgrid.years{grid-template-columns:1fr}}
-.ytab tr.sum th,.ytab tr.sum td{border-top:0;background:var(--surface-2)}
+.mgrp{margin:var(--sect) 6px 10px}/* schmaler Desktop: Jahresvergleich unter das Diagramm, sonst wird die Tabelle gequetscht */
 @media (min-width:1100px){
   html{font-size:17px}
   :root{--gap:20px;--sect:34px}
@@ -456,41 +275,24 @@ a.vsep.abr span{color:var(--text)}
   .hh,.pt{font-size:2.05rem}
   .pt{margin:0 2px 26px}
   .card{padding:24px}
-  .hero{padding:30px 32px 26px}
-  .hero .big{font-size:3.5rem}
-  .due{padding:20px 22px}
-  .done{padding:18px 20px}
   .tile{padding:22px}
   .tile .spark{height:52px}
   .sug{padding:18px}
-  .chartcard{padding:22px 24px 20px}
-  .vlgrid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
-  .vlgrid>div:first-child{position:sticky;top:24px}
-  .vrow2{padding:14px 18px}
-  .vcard{padding:24px}
   .kv{gap:12px}.kv>div{padding:12px 14px}
-  .mcols{grid-template-columns:1fr 1fr;align-items:start}
-  .mcols>div{display:block}
-  .mcols>div>.mg:first-child>.mgrp{margin-top:0}
   .mrow2{padding:14px 18px;min-height:64px}
-  .msub{max-width:860px}
-  .flow{max-width:640px}
-  .ycard{padding:14px}
-  .ytab th,.ytab td{padding:10px 12px}
 }
-@media (min-width:1300px){.vlgrid.years{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)}}
 @media (min-width:1500px){
   .main{max-width:1560px}
-  .vgrid2{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
 }
-
 /* ================= All-Home: Vertragsarten ================= */
 /* Gruppenkopf in der Arten-Liste und in der Einrichtung */
+
+
 .grp{display:flex;align-items:center;gap:9px;margin:var(--sect) 4px 10px;font-weight:900;font-size:1.02rem}
 .grp .gi{width:30px;height:30px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;font-size:.95rem;flex:none}
-.grp .gn{color:var(--muted);font-weight:800;font-size:.84rem;margin-left:auto;white-space:nowrap;flex:none}
+.grp .gn{color:var(--muted);font-weight:800;font-size:.84rem;margin-left:auto;white-space:nowrap;flex:none}/* Platz einer Vertragsart: gefüllt oder sichtbar leer */
 
-/* Platz einer Vertragsart: gefüllt oder sichtbar leer */
+
 .slots{display:grid;gap:12px;grid-template-columns:1fr}
 .slot{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;box-shadow:var(--sh-1);transition:transform .15s var(--ease),box-shadow .15s,border-color .15s}
 .slot:hover{transform:translateY(-1px);box-shadow:var(--sh-2)}
@@ -500,23 +302,23 @@ a.vsep.abr span{color:var(--text)}
 .slot .ss{color:var(--muted);font-size:.84rem;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slot .srt{flex:none;display:flex;align-items:center;gap:8px}
 .slot .scost{font-weight:900;font-size:.95rem;white-space:nowrap}
-.slot .go{color:var(--muted-2);flex:none}
-/* Leerer Platz: gestrichelt, zurückgenommen – lädt zum Füllen ein */
+.slot .go{color:var(--muted-2);flex:none}/* Leerer Platz: gestrichelt, zurückgenommen – lädt zum Füllen ein */
+
 .slot.leer{border-style:dashed;border-color:var(--line-2);background:transparent;box-shadow:none}
 .slot.leer .ai{background:transparent;border:1.5px dashed var(--line-2);color:var(--muted-2)}
 .slot.leer .sn{color:var(--muted);font-weight:800}
-.slot.leer:hover{border-color:var(--ink);background:var(--surface)}
-/* Mehrere Verträge in einer Art */
-.slot .cnt{background:var(--surface-2);color:var(--muted);font-weight:800;font-size:.76rem;border-radius:999px;padding:2px 8px;flex:none}
-/* Aus AllTrack gespiegelt */
-.slot.mirror .ai{background:var(--info-bg);color:var(--info)}
-.mlink{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:.8rem;color:var(--info);background:var(--info-bg);border-radius:999px;padding:3px 10px}
+.slot.leer:hover{border-color:var(--ink);background:var(--surface)}/* Mehrere Verträge in einer Art */
 
-/* ================= All-Home: Einrichtung (Arten anhaken) ================= */
+.slot .cnt{background:var(--surface-2);color:var(--muted);font-weight:800;font-size:.76rem;border-radius:999px;padding:2px 8px;flex:none}/* Aus AllTrack gespiegelt */
+
+.slot.mirror .ai{background:var(--info-bg);color:var(--info)}
+.mlink{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:.8rem;color:var(--info);background:var(--info-bg);border-radius:999px;padding:3px 10px}/* ================= All-Home: Einrichtung (Arten anhaken) ================= */
+
+
 .setupgrid{display:grid;gap:10px;grid-template-columns:1fr}
 @media (min-width:620px){.setupgrid{grid-template-columns:1fr 1fr}}
-@media (min-width:1100px){.setupgrid{grid-template-columns:1fr 1fr 1fr}}
-/* schlanker als .setupcat: es sind über 50 Zeilen, die müssen ruhig wirken */
+@media (min-width:1100px){.setupgrid{grid-template-columns:1fr 1fr 1fr}}/* schlanker als .setupcat: es sind über 50 Zeilen, die müssen ruhig wirken */
+
 .artpick{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);text-align:left;font-weight:800;transition:border-color .12s,background .12s}
 .artpick .pi{width:32px;height:32px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;font-size:1rem;flex:none}
 .artpick .pn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -524,12 +326,13 @@ a.vsep.abr span{color:var(--text)}
 .artpick:hover{border-color:var(--line-2);background:var(--surface-2)}
 .artpick.on{border-color:var(--ink);background:var(--surface)}
 .artpick.on .ck{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}
-.artpick.on .pi{background:var(--surface-3)}
-/* Hinweis auf Arten, die der Haushalt vermutlich braucht */
-.artpick .rec{flex:none;font-size:.7rem;font-weight:900;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:2px 7px}
+.artpick.on .pi{background:var(--surface-3)}/* Hinweis auf Arten, die der Haushalt vermutlich braucht */
 
-/* ================= All-Home: Fristen & Termine ================= */
+.artpick .rec{flex:none;font-size:.7rem;font-weight:900;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:2px 7px}/* ================= All-Home: Fristen & Termine ================= */
 /* Ampel als farbiger Punkt vor der Zeile */
+
+
+
 .dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
 .dot.red{background:var(--neg)}.dot.amber{background:var(--warn)}.dot.green{background:var(--pos)}.dot.gray{background:var(--muted-2)}
 .trow{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid var(--line)}
@@ -538,9 +341,9 @@ a.vsep.abr span{color:var(--text)}
 .trow .tn{font-weight:800;font-size:.94rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .trow .tx{color:var(--muted);font-size:.82rem;font-weight:700;margin-top:1px}
 .trow .tw{flex:none;font-weight:900;font-size:.85rem;white-space:nowrap}
-.trow .tw.red{color:var(--neg)}.trow .tw.amber{color:var(--warn)}
+.trow .tw.red{color:var(--neg)}.trow .tw.amber{color:var(--warn)}/* ================= All-Home: Dokumente am Vertrag ================= */
 
-/* ================= All-Home: Dokumente am Vertrag ================= */
+
 .dlist{display:flex;flex-direction:column}
 .drow3{display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid var(--line);text-align:left;width:100%}
 .drow3:last-child{border-bottom:none}
@@ -548,114 +351,117 @@ a.vsep.abr span{color:var(--text)}
 .drow3 .di{width:34px;height:34px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;font-size:.95rem;flex:none}
 .drow3 .db{flex:1;min-width:0}
 .drow3 .dn{font-weight:800;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.drow3 .dm{color:var(--muted);font-size:.79rem;font-weight:700;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap}
-/* fehlendes Dokument: gestrichelter Platzhalter wie beim Vertrags-Platz */
+.drow3 .dm{color:var(--muted);font-size:.79rem;font-weight:700;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap}/* fehlendes Dokument: gestrichelter Platzhalter wie beim Vertrags-Platz */
+
 .drow3.fehlt{border:1.5px dashed var(--line-2);border-radius:var(--r-sm);margin:4px 0;padding:11px 10px}
 .drow3.fehlt .di{background:transparent;border:1.5px dashed var(--line-2);color:var(--muted-2)}
-.drow3.fehlt .dn{color:var(--muted);font-weight:800}
+.drow3.fehlt .dn{color:var(--muted);font-weight:800}/* ================= All-Home: Kostenaufschlüsselung ================= */
 
-/* ================= All-Home: Kostenaufschlüsselung ================= */
+
 .krow{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:.88rem}
 .krow .kl{width:150px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
 @media (max-width:560px){.krow .kl{width:108px}}
 .kbarw{flex:1;height:9px;background:var(--surface-2);border-radius:999px;overflow:hidden}
 .kbar{display:block;height:100%;border-radius:999px;background:var(--ink)}
-.krow .kv{flex:none;font-weight:900;white-space:nowrap;display:block;margin:0}
+.krow .kv{flex:none;font-weight:900;white-space:nowrap;display:block;margin:0}/* ================= All-Home: Sprache ================= */
 
-/* ================= All-Home: Sprache ================= */
+
 .langrow{display:flex;gap:8px}
 .langrow .lb{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);font-weight:800}
-.langrow .lb.on{border-color:var(--ink);background:var(--surface-2)}
-
-/* ================= All-Home: Breite im Griff ================= */
+.langrow .lb.on{border-color:var(--ink);background:var(--surface-2)}/* ================= All-Home: Breite im Griff ================= */
 /* Eine Zeile darf die Seite nie verbreitern. Sonst rechnet das Handy mit einer
    breiteren Fläche, und die untere Leiste rutscht aus dem Bild (10.10.2026).
    1) Rasterzellen dürfen schrumpfen – sonst wächst 1fr auf die Textbreite. */
-:where(.slots,.setupgrid,.tiles,.kpis,.kv,.two,.abrres,.mcols,.vgrid2)>*{min-width:0}
-/* 2) Text-Zeilen sind <span>: erst als Block greift das Abkürzen mit „…". */
-.slot .sn,.slot .ss,.trow .tn,.trow .tx,.drow3 .dn{display:block}
-/* 3) Sicherung: was trotzdem übersteht, wird abgeschnitten statt die Seite aufzublähen. */
-.main{overflow-x:clip}
-/* Filterzeile (Gesundheit): Auswahlfelder brechen um statt überzustehen */
-.filt{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.filt .sel{flex:1 1 140px;min-width:0;max-width:100%}
 
-/* ================= All-Home: Knopf-Varianten & Kennzahlen ================= */
+
+
+:where(.slots,.setupgrid,.tiles,.kpis,.kv,.two,.abrres,.mcols,.vgrid2)>*{min-width:0}/* 2) Text-Zeilen sind <span>: erst als Block greift das Abkürzen mit „…". */
+
+.slot .sn,.slot .ss,.trow .tn,.trow .tx,.drow3 .dn{display:block}/* 3) Sicherung: was trotzdem übersteht, wird abgeschnitten statt die Seite aufzublähen. */
+
+.main{overflow-x:clip}/* Filterzeile (Gesundheit): Auswahlfelder brechen um statt überzustehen */
+
+.filt{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.filt .sel{flex:1 1 140px;min-width:0;max-width:100%}/* ================= All-Home: Knopf-Varianten & Kennzahlen ================= */
 /* Zweitknopf: zurückgenommen neben dem Hauptknopf */
+
+
+
 .btn.ghost{background:var(--surface-2);color:var(--text);box-shadow:none}
-.btn.ghost:hover{filter:none;background:var(--surface-3)}
-/* Zerstörende Aktion: rot, aber nicht laut */
-.btn.danger{background:var(--neg-bg);color:var(--neg);box-shadow:none}
-/* Kennzahl-Kachel: Beschriftung · Wert · Zusatz */
+.btn.ghost:hover{filter:none;background:var(--surface-3)}/* Zerstörende Aktion: rot, aber nicht laut */
+
+.btn.danger{background:var(--neg-bg);color:var(--neg);box-shadow:none}/* Kennzahl-Kachel: Beschriftung · Wert · Zusatz */
+
 .kpi .kl{color:var(--muted);font-weight:800;font-size:.84rem}
 .kpi .kv{display:block;margin:0;font-size:1.5rem;font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .ks{color:var(--muted);font-weight:700;font-size:.84rem}
-a.kpi:hover{border-color:var(--line-2)}
-/* drei Kacheln: auf dem Handy die dritte über die volle Breite */
+a.kpi:hover{border-color:var(--line-2)}/* drei Kacheln: auf dem Handy die dritte über die volle Breite */
+
 .kpis.k3>.kpi:last-child{grid-column:1/-1}
-@media (min-width:620px){.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis.k3>.kpi:last-child{grid-column:auto}}
-/* Angaben als Liste: Bezeichnung links, Wert rechts.
+@media (min-width:620px){.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis.k3>.kpi:last-child{grid-column:auto}}/* Angaben als Liste: Bezeichnung links, Wert rechts.
    Eigene Klassen – .dl und .kv sind in AllTrack schon anders belegt. */
+
 .kvl{display:flex;flex-direction:column}
 .kvr{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 2px;border-bottom:1px solid var(--line)}
 .kvr:last-child{border-bottom:none}
 .kvr .kk{color:var(--muted);font-weight:700;font-size:.88rem;flex:none;max-width:48%}
-.kvr .kw{font-weight:800;text-align:right;min-width:0;overflow-wrap:anywhere}
-/* Kacheln nicht an die folgende Karte stoßen lassen */
-.kpis{margin-bottom:14px}
-/* Zurück zeigt nach links */
-.back .ico{transform:rotate(180deg)}
-/* Filter: Fachrichtung über die volle Breite, Person und Jahr darunter nebeneinander */
-.filt .sel:first-child{flex-basis:100%}
-/* .lg ist in AllTrack ein Legenden-Kästchen (14×10 px, 3 px Rundung) und
+.kvr .kw{font-weight:800;text-align:right;min-width:0;overflow-wrap:anywhere}/* Kacheln nicht an die folgende Karte stoßen lassen */
+
+.kpis{margin-bottom:14px}/* Zurück zeigt nach links */
+
+.back .ico{transform:rotate(180deg)}/* Filter: Fachrichtung über die volle Breite, Person und Jahr darunter nebeneinander */
+
+.filt .sel:first-child{flex-basis:100%}/* .lg ist in AllTrack ein Legenden-Kästchen (14×10 px, 3 px Rundung) und
    überschreibt sonst Form und Darstellung der großen Knöpfe */
+
 .btn.lg{display:inline-flex;width:auto;height:auto;border-radius:999px}
-.btn.lg.full{width:100%}
-/* Einrichtung: der Übernehmen-Knopf bleibt über der Leiste sichtbar */
+.btn.lg.full{width:100%}/* Einrichtung: der Übernehmen-Knopf bleibt über der Leiste sichtbar */
+
 .setupbar{position:sticky;z-index:5;margin-top:22px;bottom:calc(var(--nav-h) + 22px + env(safe-area-inset-bottom))}
 .setupbar .btn{box-shadow:var(--sh-3)}
-@media (min-width:900px){.setupbar{bottom:20px}}
-/* Zahlfeld mit unlesbarem Inhalt */
-.inp.bad{border-color:var(--neg);box-shadow:0 0 0 3px var(--neg-bg)}
+@media (min-width:900px){.setupbar{bottom:20px}}/* Zahlfeld mit unlesbarem Inhalt */
 
-/* ================= All-Home: Häuser & Mitglieder ================= */
+.inp.bad{border-color:var(--neg);box-shadow:0 0 0 3px var(--neg-bg)}/* ================= All-Home: Häuser & Mitglieder ================= */
+
+
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:900;border-radius:999px;padding:2px 8px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
 .pill.on{background:var(--pos-bg);color:var(--pos)}
 .pill.admin{background:var(--info-bg);color:var(--info)}
 .drow3 .di.av{border-radius:50%;font-weight:900;color:var(--text);background:var(--surface-3)}
-.drow3 .dm{align-items:center}
-/* Kopf eines Hauses */
+.drow3 .dm{align-items:center}/* Kopf eines Hauses */
+
 .hhkopf{display:flex;align-items:center;gap:14px;margin:6px 2px 18px}
 .hhi{width:54px;height:54px;border-radius:17px;background:var(--surface-2);display:grid;place-items:center;flex:none}
 .hhn{font-size:1.55rem;font-weight:900;letter-spacing:-.01em;line-height:1.15;overflow-wrap:anywhere}
 .hha{display:flex;align-items:center;gap:5px;color:var(--muted);font-weight:700;font-size:.9rem;margin-top:3px;overflow-wrap:anywhere}
-.hha .ico{flex:none}
-/* Umschalter: Name mit Adresse darunter */
+.hha .ico{flex:none}/* Umschalter: Name mit Adresse darunter */
+
 .hhw{display:block;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hhwa{display:block;font-size:.82rem;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mlist .setupcat{border-radius:0;border:0;border-bottom:1px solid var(--line)}
 .mlist .setupcat:last-child{border-bottom:0}
-.mlist .setupcat.on{background:var(--surface-2)}
-/* Einladungscode groß und gut abschreibbar */
+.mlist .setupcat.on{background:var(--surface-2)}/* Einladungscode groß und gut abschreibbar */
+
 .code{font-size:2rem;font-weight:900;letter-spacing:.2em;text-align:center;padding:18px 10px;border-radius:var(--r);background:var(--surface-2);font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all}
-.inp.code-in{text-transform:uppercase;letter-spacing:.2em;font-weight:900;text-align:center;font-size:1.2rem}
-/* Hausname oben: lang darf er sein, aber nicht die Kopfzeile sprengen */
-.top .hh{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inp.code-in{text-transform:uppercase;letter-spacing:.2em;font-weight:900;text-align:center;font-size:1.2rem}/* Hausname oben: lang darf er sein, aber nicht die Kopfzeile sprengen */
 
-/* ================= All-Home: Anbieter-Logos ================= */
+.top .hh{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}/* ================= All-Home: Anbieter-Logos ================= */
+
+
 .logo svg{display:block}
-html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
-/* Vertragskopf: Kachel neben Name und Art */
-.vkopf .vk{display:flex;align-items:center;gap:14px;min-width:0}
-.vkopf .hhi{font-size:1.6rem}
-/* Große Bildschirme: Plätze zweispaltig statt 1.100 px breiter Zeilen */
-@media (min-width:900px){.slots{grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}}
-/* Kopfzeilen: Titel einer Detailseite bricht um, der Hausname-Knopf kürzt mit „…" */
-.top>div{min-width:0}
-.top div.hh{white-space:normal;overflow-wrap:anywhere}
+html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf: Kachel neben Name und Art */
 
-/* ================= All-Home: Fahrzeuge ================= */
+.vkopf .vk{display:flex;align-items:center;gap:14px;min-width:0}
+.vkopf .hhi{font-size:1.6rem}/* Große Bildschirme: Plätze zweispaltig statt 1.100 px breiter Zeilen */
+
+@media (min-width:900px){.slots{grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}}/* Kopfzeilen: Titel einer Detailseite bricht um, der Hausname-Knopf kürzt mit „…" */
+
+.top>div{min-width:0}
+.top div.hh{white-space:normal;overflow-wrap:anywhere}/* ================= All-Home: Fahrzeuge ================= */
 /* Kennzeichen als Schild: weiß, schwarzer Rand, blauer EU-Streifen */
+
+
+
 .kz{display:inline-flex;align-items:stretch;flex:none;border:1.5px solid #231f1a;border-radius:5px;background:#fff;color:#111;
   font-weight:900;font-size:.74rem;line-height:1;letter-spacing:.04em;overflow:hidden;white-space:nowrap;vertical-align:middle}
 .kz::before{content:"D";display:flex;align-items:flex-end;justify-content:center;width:11px;padding-bottom:2px;
@@ -669,11 +475,11 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .slot .ss.fzss{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;overflow:visible}
 .slot .ss .fzn{color:var(--text)}
 .vfzg{margin:6px 0 2px}
-.vfzg .fzn{font-size:1rem}
-/* Großbuchstaben-Felder (Kennzeichen, FIN, HSN/TSN) */
-.inp.gross{text-transform:uppercase;letter-spacing:.03em}
+.vfzg .fzn{font-size:1rem}/* Großbuchstaben-Felder (Kennzeichen, FIN, HSN/TSN) */
 
-/* ================= All-Home: KI-Stufen ================= */
+.inp.gross{text-transform:uppercase;letter-spacing:.03em}/* ================= All-Home: KI-Stufen ================= */
+
+
 .kiw{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 8px}
 .kib{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);text-align:center;min-width:0}
 .kib b{font-weight:900;font-size:.9rem}
@@ -681,9 +487,9 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .kib i{font-style:normal;color:var(--muted-2);font-weight:900;font-size:.72rem;letter-spacing:.06em}
 .kib.on{border-color:var(--ink);background:var(--surface-2)}
 .kib.on i{color:var(--text)}
-.hint.kih{display:flex;align-items:center;gap:6px;margin:0 2px 14px}
+.hint.kih{display:flex;align-items:center;gap:6px;margin:0 2px 14px}/* ================= All-Home: Logo-Verwaltung ================= */
 
-/* ================= All-Home: Logo-Verwaltung ================= */
+
 .logo.bild{background:#fff;padding:0;overflow:hidden}
 .logo.bild img{display:block;width:100%;height:100%;object-fit:cover}
 .drow3.aus{opacity:.55}
@@ -692,36 +498,59 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .inrow{display:flex;gap:8px;align-items:stretch}
 .inrow .btn{flex:none}
 .chk{display:flex;align-items:center;gap:10px;font-weight:800;margin:4px 4px 0}
-.chk input{width:20px;height:20px;accent-color:var(--ink)}
-/* AllTrack-Hinweis in einer Karte: Abstand zur folgenden Angaben-Liste */
-.card>.sug+.kvl,.card>.sug+.hint{margin-top:14px}
-.kil{font-weight:800;font-size:.88rem;margin:0 0 6px 4px}
-/* Zweispaltige Formularzeilen: Felder bündig, auch wenn eine Beschriftung umbricht */
-.two{align-items:end}
+.chk input{width:20px;height:20px;accent-color:var(--ink)}/* AllTrack-Hinweis in einer Karte: Abstand zur folgenden Angaben-Liste */
 
-/* Ablage: Auswahl zum Löschen */
+.card>.sug+.kvl,.card>.sug+.hint{margin-top:14px}
+.kil{font-weight:800;font-size:.88rem;margin:0 0 6px 4px}/* Zweispaltige Formularzeilen: Felder bündig, auch wenn eine Beschriftung umbricht */
+
+.two{align-items:end}/* Ablage: Auswahl zum Löschen */
+
+
 .drow3.wahl{padding:8px 4px;gap:10px}
 .drow3.wahl .wbox{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line-2);display:grid;place-items:center;color:var(--ink-fg);background:var(--surface)}
 .drow3.wahl.an .wbox{background:var(--neg);border-color:var(--neg)}
 .drow3.wahl .wtxt{flex:1;min-width:0;text-align:left;padding:3px 0}
 .drow3.wahl .wtxt .dn{display:block;font-weight:800;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .drow3.wahl .wtxt .dm{color:var(--muted);font-size:.79rem;font-weight:700;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap}
-.drow3.wahl.an{background:var(--neg-bg);border-radius:10px}
+.drow3.wahl.an{background:var(--neg-bg);border-radius:10px}/* Dokumente unter Mehr */
 
-/* Dokumente unter Mehr */
+
 .dokf{margin-bottom:12px}
 .dokf .lb{padding:10px 12px}
 .dokf .lb.on .pill{background:var(--surface)}
 .filt.dsrow{flex-wrap:nowrap;align-items:center}
 .filt.dsrow .inp{flex:1 1 auto;min-width:0}
-.filt.dsrow .btn{flex:none}
+.filt.dsrow .btn{flex:none}/* Pflichtfelder: dezentes Sternchen, Legende am Formularende */
+
+
+.fld .pfl,.pfl-leg .pfl{color:var(--strom);font-weight:900;margin-left:3px}
+.pfl-leg{color:var(--muted);font-size:.78rem;font-weight:700;margin:4px 4px 0}/* KI-Kosten */
+
+
+.kibetrag{flex:none;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto;padding-left:10px}/* Gesamttest: Kennzahlen bündig oben (vorher sackte der Wert ab, wenn der Nachbar eine Zeile mehr hatte) */
+
+
+.kpi{align-content:start}/* Start: drei Kennzahlen nebeneinander, auch auf dem Handy */
+
+.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpis.k3>.kpi:last-child{grid-column:auto}
+@media (max-width:619px){.kpis.k3{gap:8px}.kpis.k3 .kpi{padding:12px 11px}.kpis.k3 .kpi .kv{font-size:1.18rem}.kpis.k3 .kpi .kl,.kpis.k3 .kpi .ks{font-size:.74rem}}/* Kostenseite: voller Name, Balken darunter */
+
+.krow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:6px;padding:8px 0}
+.krow .kl{width:auto;grid-column:1;grid-row:1}
+.krow .kv{grid-column:2;grid-row:1}
+.krow .kbarw{grid-column:1/-1;grid-row:2;height:7px}/* Vertragskopf: Name nutzt die volle Breite */
+
+.vkopf .vk{flex:1 1 auto}
+.vkopf .hh{display:block}
+.vkopf .hh{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="modal" hidden><div class="scrim" data-a="modal-close"></div><div class="sheet" id="modalBox"></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha256-WdOUh8NYmEO0EDItij1WLOAiq6HlzLFomO8/sqDaLs0=" crossorigin="anonymous"></script>
 <script>
 "use strict";
 (function(){
@@ -732,7 +561,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.4.0";
+var APP_VERSION="1.5.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -787,6 +616,77 @@ var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:
 var curLang="de";
 var T={ru:{
 
+/* ---- Kurze Fristbeschriftungen ---- */
+  "Mindestlaufzeit (Monate)":"Минимальный срок (Mindestlaufzeit, мес.)",
+  "Kündigungsfrist (Monate)":"Срок уведомления (Kündigungsfrist, мес.)",
+  "Verlängerung (Monate)":"Продление (мес.)",
+  "0 = keine":"0 = нет",
+  "0,5 = 2 Wochen":"0,5 = 2 недели",
+  "1 = monatlich":"1 = ежемесячно",
+
+
+/* ---- KI-Kosten ---- */
+  "KI-Kosten":"Расходы на ИИ",
+  "Wer, wann, wie viel":"Кто, когда, сколько",
+  "Nur für Admins des Hauses.":"Только для администраторов дома.",
+  "ehemaliges Mitglied":"бывший участник",
+  "Dieser Monat":"Этот месяц",
+  "Gesamt":"Всего",
+  "Nach Person":"По людям",
+  "{0} diesen Monat":"{0} в этом месяце",
+  "Einzelne Auswertungen":"Отдельные анализы",
+  "Fehler":"Ошибка",
+  "Noch keine KI-Auswertungen":"Анализов ИИ пока нет",
+  "Umgerechnet aus US-Dollar (1 $ ≈ {0} €).":"Пересчитано из долларов США (1 $ ≈ {0} €).",
+  "{0} Auswertung":"{0} анализ",
+  "{0} Auswertungen":"{0} анализов",
+  "Dokument auslesen":"Чтение документа",
+  "Arztdokument erklären":"Объяснение медицинского документа",
+  "Übersetzung":"Перевод",
+  "AllTrack · Zählerfoto":"AllTrack · фото счётчика",
+  "AllTrack · Tarif":"AllTrack · тариф",
+  "AllTrack · Jahresabrechnung":"AllTrack · годовой расчёт",
+
+
+/* ---- Feldprofile ---- */
+  "Pflichtangabe":"Обязательное поле",
+  "Bitte die mit * markierten Felder ausfüllen.":"Пожалуйста, заполните поля, отмеченные *.",
+  "Laufzeit & Kündigung":"Срок и расторжение",
+  "Laufzeit":"Срок",
+  "Miete (€)":"Аренда (€)",
+  "Abschlag / Gebühr (€)":"Аванс / сбор (€)",
+  "Gebühr (€)":"Сбор (€)",
+  "Rate (€)":"Платёж (€)",
+  "Sparrate (€)":"Взнос накоплений (€)",
+  "Vermieter":"Арендодатель (Vermieter)",
+  "Bank / Kreditgeber":"Банк / кредитор",
+  "Abschlag (€)":"Ежемесячный аванс (Abschlag, €)",
+  "Versorger":"Поставщик",
+  "Händler":"Продавец",
+  "Entsorger / Gemeinde":"Вывоз мусора / община",
+  "Zollamt":"Таможня (Zollamt)",
+  "Steuer (€)":"Налог (€)",
+  "Leasinggeber":"Лизингодатель",
+  "Bank":"Банк",
+  "Kontoführung (€)":"Обслуживание счёта (€)",
+  "Jahresgebühr (€)":"Годовая плата (€)",
+  "Bank / Broker":"Банк / брокер",
+  "Bausparkasse":"Строительная сберкасса (Bausparkasse)",
+  "Studio":"Студия",
+  "Beitrag (€)":"Взнос (€)",
+  "Club":"Клуб",
+  "Beitragsservice":"Служба взносов (Beitragsservice)",
+  "Gemeinde / Stadt":"Община / город",
+  "Versicherer":"Страховщик",
+  "Krankenkasse / Versicherer":"Больничная касса / страховщик",
+
+
+/* ---- Gesamttest Fristen ---- */
+  "Nach der Mindestlaufzeit jederzeit mit höchstens 1 Monat Frist kündbar – das ist hier schon eingerechnet.":"После минимального срока договор можно расторгнуть в любой момент с уведомлением не более чем за 1 месяц – это уже учтено.",
+  "Nichts gespeichert – fehlende Berechtigung oder der Vertrag ist weg.":"Ничего не сохранено – нет прав или договор уже удалён.",
+  "Letzter Kündigungstag für {0}. Kündbar zum {1} – ohne Kündigung verlängert sich der Vertrag.":"Последний день для расторжения договора {0}. Расторгнуть можно к {1} – без расторжения договор продлится.",
+
+
 /* ---- Dokumente unter Mehr ---- */
   "{0} ohne Vertrag":"{0} без договора",
   "Noch keine Dokumente":"Документов пока нет",
@@ -816,10 +716,6 @@ var T={ru:{
 /* ---- 1.3.1: Ablage ---- */
   "Ohne Vertrag":"Без договора",
   "Alles zugeordnet":"Всё распределено",
-  "{0} Dokument löschen":"Удалить документ ({0})",
-  "Alle {0} löschen":"Удалить все ({0})",
-  "{0} Dokument ohne Vertrag endgültig löschen? Die Datei wird mit gelöscht.":"Окончательно удалить документов без договора: {0}? Файл тоже будет удалён.",
-  "{0} Dokumente ohne Vertrag endgültig löschen? Die Dateien werden mit gelöscht.":"Окончательно удалить документов без договора: {0}? Файлы тоже будут удалены.",
   "{0} Dokument gelöscht":"Удалено документов: {0}",
   "{0} Dokumente gelöscht":"Удалено документов: {0}",
 
@@ -1030,7 +926,6 @@ var T={ru:{
   "Jetzt einrichten":"Настроить сейчас",
   "Monat":"месяц",
   "Arten anpassen":"Изменить виды",
-  "in AllTrack noch nicht erfasst":"в AllTrack пока не внесено",
   "aus AllTrack":"из AllTrack",
   "noch nichts hinterlegt":"пока ничего не внесено",
   "{0} Verträge":"Договоров: {0}",
@@ -1042,7 +937,6 @@ var T={ru:{
   "Trage bei deinen Verträgen die Kosten ein, dann erscheint hier die Aufschlüsselung.":"Укажите расходы в договорах — здесь появится разбивка.",
   "Vertragsarten anpassen":"Изменить виды договоров",
   "{0} von {1} angehakt":"отмечено {0} из {1}",
-  "Haushalt wechseln":"Сменить хозяйство",
   "Angemeldet als {0}":"Вы вошли как {0}",
   "Abmelden":"Выйти",
   "Wird in AllTrack geführt":"Ведётся в AllTrack",
@@ -1062,7 +956,6 @@ var T={ru:{
   "Von Hand eintragen":"Внести вручную",
   "Vertrag nicht gefunden.":"Договор не найден.",
   "Neues Recht":"Новый закон",
-  "Vertrag ab 3/2022: nach der Mindestlaufzeit jederzeit mit höchstens 1 Monat Frist kündbar – das ist hier schon eingerechnet.":"Договор с 03/2022: после минимального срока расторжение в любое время с уведомлением не более чем за 1 месяц — это уже учтено.",
   "Frist in den Kalender":"Срок в календарь",
   "Angaben":"Данные",
   "Kosten":"Расходы",
@@ -1083,14 +976,10 @@ var T={ru:{
   "Tarif / Produkt":"Тариф / продукт",
   "Kosten (€)":"Расходы (€)",
   "Zahlungsintervall":"Периодичность оплаты",
-  "Mindestlaufzeit (Monate, 0 = keine)":"Минимальный срок (мес., 0 = нет)",
-  "Kündigungsfrist (Monate, 0,5 = 2 Wochen)":"Срок расторжения (мес., 0,5 = 2 недели)",
-  "Verlängerung (Monate, 1 = monatlich)":"Продление (мес., 1 = ежемесячно)",
   "Zusätzliche Angaben":"Дополнительные данные",
   "Entspricht {0} pro Monat ({1} pro Jahr).":"Это {0} в месяц ({1} в год).",
   "{0} pro Jahr.":"{0} в год.",
   "Die Kündigungsfrist ist länger als die Mindestlaufzeit – bitte prüfen.":"Срок расторжения дольше минимального срока — проверьте.",
-  "Bitte mindestens den Anbieter angeben.":"Укажите хотя бы поставщика.",
   "Die Kündigungsfrist ({0}) ist länger als die Mindestlaufzeit.":"Срок расторжения ({0}) дольше минимального срока договора.",
   "Der Vertragsbeginn liegt weit in der Zukunft ({0}).":"Начало договора далеко в будущем ({0}).",
   "Monatliche Kosten von {0} sind ungewöhnlich hoch – Tippfehler?":"Ежемесячные расходы {0} необычно высоки — опечатка?",
@@ -1099,7 +988,6 @@ var T={ru:{
   "Trotzdem speichern?":"Всё равно сохранить?",
   "Gespeichert":"Сохранено",
   "Speichern fehlgeschlagen":"Не удалось сохранить",
-  "Gekündigt zum (JJJJ-MM-TT)":"Расторгнут с (ГГГГ-ММ-ДД)",
   "Als gekündigt markiert ✂️":"Отмечен как расторгнутый ✂️",
   "Wieder aktiv ✅":"Снова активен ✅",
   "Änderung fehlgeschlagen":"Не удалось изменить",
@@ -1108,7 +996,6 @@ var T={ru:{
   "Löschen fehlgeschlagen":"Не удалось удалить",
   "Für diesen Vertrag ist keine Frist berechenbar.":"Для этого договора срок рассчитать невозможно.",
   "Kündigungsfrist: {0}":"Срок расторжения: {0}",
-  "Letzter Kündigungstag für {0}. Sonst läuft der Vertrag weiter bis {1}.":"Последний день для расторжения договора {0}. Иначе он продлится до {1}.",
   "In 14 Tagen: Kündigungsfrist {0}":"Через 14 дней: срок расторжения {0}",
   "Kalender-Datei erstellt 📅":"Файл календаря создан 📅",
   "fehlt":"отсутствует",
@@ -1290,7 +1177,6 @@ var T={ru:{
   "Tippe, um zu suchen.":"Начните вводить для поиска.",
   "Nichts gefunden für „{0}“.":"Ничего не найдено по запросу «{0}».",
   "Hake mindestens eine Art an.":"Отметьте хотя бы один вид.",
-  "Daten konnten nicht geladen werden":"Не удалось загрузить данные",
   "Daten nicht erreichbar":"Нет доступа к данным",
   "All-Home kommt gerade nicht an deine Daten.":"All-Home сейчас не может получить ваши данные.",
   "Erneut versuchen":"Попробовать снова",
@@ -1474,7 +1360,6 @@ function $(s,r){return (r||document).querySelector(s);}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function ic(n,s){return '<svg class="ico" width="'+(s||20)+'" height="'+(s||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||"")+'</svg>';}
 function errMsg(e){if(!e)return t("Unbekannter Fehler");if(typeof e==="string")return e;return e.message||e.error_description||e.msg||JSON.stringify(e);}
-function numOr(v,d){var n=Number(String(v==null?"":v).replace(",","."));return isNaN(n)?d:n;}
 /* Zahl aus Eingabe oder Datenbank. Versteht „9,90", „9.90", „1.234,56", „12,50 €"
    und „65.000" (deutscher Tausenderpunkt). „0.086" bleibt 0,086. */
 function numOrNull(v){
@@ -1495,7 +1380,6 @@ function num(n,d){if(n==null||isNaN(n))return "–";return Number(n).toLocaleStr
 /* ---- Datum ---- */
 function todayISO(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function fmtDate(iso){if(!iso)return "–";var p=String(iso).slice(0,10).split("-");if(p.length<3)return String(iso);return p[2]+"."+p[1]+"."+p[0];}
-function monJahr(iso){if(!iso)return "";var p=String(iso).slice(0,7).split("-");return p.length===2?(p[1]+"/"+p[0]):"";}
 /* Monate addieren; Bruchteile als 30-Tage-Schritte. Monatsende wird geklemmt. */
 function addMonthsISO(iso,months){
   var p=String(iso).slice(0,10).split("-").map(Number);
@@ -1521,18 +1405,49 @@ function tageTxt(n){
 function ampel(days){return days==null?"gray":(days<=30?"red":(days<=90?"amber":"green"));}
 
 /* ================= Fristenlogik =================
-   Kündbar zum = Vertragsbeginn + Mindestlaufzeit.
-   Letzter Kündigungstag = dieses Datum minus Kündigungsfrist (0,5 = 2 Wochen).
+   Laufzeitende = letzter Vertragstag: Beginn 01.01. + 12 Monate → 31.12.
+   (§ 187 Abs. 2, § 188 Abs. 2/3 BGB; fehlt der Kalendertag im Zielmonat → Monatsletzter).
+   Letzter Kündigungstag = Ende minus Kündigungsfrist; endet der Vertrag am
+   Monatsletzten, ist es der Monatsletzte davor (Ende 30.04. → 31.03.).
    Fenster verpasst → in Verlängerungsschritten weiterrechnen.
-   Gesetz für faire Verbraucherverträge: Verträge ab 1.3.2022 sind nach der
-   Mindestlaufzeit jederzeit mit höchstens 1 Monat Frist kündbar.
+   Monatlich kündbar nach der Mindestlaufzeit nur, wo das Gesetz es vorschreibt:
+   TKG § 56 (Internet, Mobilfunk) und § 309 Nr. 9 BGB für Abos/Dienstleistungen
+   ab 1.3.2022 – NICHT für Versicherungen, Miete, Kredite, Energie. Im Zweifel
+   lieber erinnern als schweigen.
    Liefert {kind, level, end, lastDay, days, label, sub}. */
+var NEUES_RECHT_TKG={internet:1,mobilfunk:1};
+var NEUES_RECHT_BGB={streaming_video:1,streaming_musik:1,presse:1,cloud:1,fitness:1,oepnv:1,heizungswartung:1};
+function neuesRechtGilt(c){
+  var k=(c&&c.art)||"sonstiges";
+  if(NEUES_RECHT_TKG[k])return true;
+  return !!(NEUES_RECHT_BGB[k]&&c.vertragsstart&&c.vertragsstart>=NEUES_RECHT_AB);
+}
+function isoAusUTC(d){return d.toISOString().slice(0,10);}
+function monatsLetzter(j,m0){return new Date(Date.UTC(j,m0+1,0)).getUTCDate();}
+/* Letzter Tag einer Laufzeit von m ganzen Monaten ab Beginn (Beginn zählt mit) */
+function laufzeitEnde(start,m){
+  var p=String(start).slice(0,10).split("-").map(Number),m0=p[1]-1+m;
+  var tage=monatsLetzter(p[0],m0);
+  if(p[2]>tage)return isoAusUTC(new Date(Date.UTC(p[0],m0,tage)));
+  return isoAusUTC(new Date(Date.UTC(p[0],m0,p[2]-1)));
+}
+/* Bis wann muss die Kündigung spätestens zugehen? kf in Monaten, ,5 = 2 Wochen */
+function kuendigungBis(ende,kf){
+  var p=String(ende).slice(0,10).split("-").map(Number);
+  var ganz=Math.floor(kf),rest=kf-ganz,m0=p[1]-1-ganz;
+  var amEnde=p[2]===monatsLetzter(p[0],p[1]-1);
+  var tag=amEnde?monatsLetzter(p[0],m0):Math.min(p[2],monatsLetzter(p[0],m0));
+  var d=new Date(Date.UTC(p[0],m0,tag));
+  if(rest>0)d.setUTCDate(d.getUTCDate()-Math.round(rest*28));
+  return isoAusUTC(d);
+}
 function fristInfo(c){
   if(c.status==="beendet")  return {kind:"beendet",  level:"gray",label:t("Beendet"),sub:""};
   if(c.status==="gekuendigt")return {kind:"gekuendigt",level:"gray",
     label:c.gekuendigt_zum?tf("Gekündigt zum {0}",fmtDate(c.gekuendigt_zum)):t("Gekündigt"),sub:""};
-  var ml=c.mindestlaufzeit_monate,kf=c.kuendigungsfrist_monate,vl=c.verlaengerung_monate;
-  var neu=!!(c.vertragsstart&&c.vertragsstart>=NEUES_RECHT_AB);
+  if(!hatFristen(c.art))return {kind:"keine",level:"gray",label:"",sub:""};
+  var ml=numOrNull(c.mindestlaufzeit_monate),kf=numOrNull(c.kuendigungsfrist_monate),vl=numOrNull(c.verlaengerung_monate);
+  var neu=neuesRechtGilt(c);
   if(ml===0||(ml==null&&vl===1)){
     var f=(kf==null?1:kf);
     return {kind:"flex",level:"green",label:t("Jederzeit kündbar"),sub:tf("Kündigungsfrist {0}",fristTxt(f))};
@@ -1542,8 +1457,9 @@ function fristInfo(c){
             sub:t("Vertragsbeginn und Laufzeit ergänzen, dann rechnet All-Home.")};
   }
   if(kf==null)kf=1;
-  var ersteEnde=addMonthsISO(c.vertragsstart,ml);
-  var letzter=addMonthsISO(ersteEnde,-kf);
+  ml=Math.round(ml);
+  var ersteEnde=laufzeitEnde(c.vertragsstart,ml);
+  var letzter=kuendigungBis(ersteEnde,kf);
   var heute=todayISO();
   if(heute<=letzter){
     var d1=daysUntil(letzter);
@@ -1552,20 +1468,27 @@ function fristInfo(c){
             sub:tf("Letzter Kündigungstag: {0} ({1})",fmtDate(letzter),tageTxt(d1))};
   }
   /* Erstlaufzeit vorbei → Verlängerungsphase */
-  var effVl=neu?1:(vl==null?12:vl);
+  var effVl=neu?1:(vl==null?12:Math.max(1,Math.round(vl)));
   var effKf=neu?Math.min(kf,1):kf;
   if(effVl<=1){
     return {kind:"flex",level:"green",label:t("Jederzeit kündbar"),
             sub:tf("Kündigungsfrist {0}",fristTxt(effKf))+(neu?" · "+t("nach neuem Recht monatlich kündbar"):"")};
   }
-  var ende=ersteEnde,schutz=0;
-  while(addMonthsISO(ende,-effKf)<heute&&schutz<600){ende=addMonthsISO(ende,effVl);schutz++;}
-  var ld=addMonthsISO(ende,-effKf),d2=daysUntil(ld);
+  var n=0,ende=ersteEnde;
+  while(kuendigungBis(ende,effKf)<heute&&n<600){n++;ende=laufzeitEnde(c.vertragsstart,ml+n*effVl);}
+  var ld=kuendigungBis(ende,effKf),d2=daysUntil(ld);
   return {kind:"fest",level:ampel(d2),end:ende,lastDay:ld,days:d2,
           label:tf("Kündbar zum {0}",fmtDate(ende)),
           sub:tf("Letzter Kündigungstag: {0} ({1})",fmtDate(ld),tageTxt(d2))+" · "+tf("verlängert sich um {0} Monate",effVl)};
 }
+function terminInfo(c){
+  var a=artInfo(c.art||"sonstiges"),w=a.termin&&c.details?c.details[a.termin.k]:null;
+  if(!w)return null;
+  var d=daysUntil(w);
+  return {days:d,level:ampel(d),label:t(a.termin.l)+": "+fmtDate(w),sub:tageTxt(d)};
+}
 function fristTxt(m){
+  m=numOrNull(m);
   if(m==null)return t("unbekannt");
   if(m===0.5)return t("2 Wochen");
   if(m===1)return t("1 Monat");
@@ -1598,7 +1521,8 @@ function toast(msg,err){
      einzig        = sollte es nur einmal geben → Doppelt-Warnung
      felder        = artspezifische Zusatzfelder (Schlüssel aus FELDER)
      termin        = wiederkehrender Pflichttermin {k:Feldschlüssel, l:Beschriftung}
-     kein_anbieter = Art ohne Anbieter (z. B. Ausweis) → Formular blendet das Feld aus */
+     kein_anbieter = Art ohne Anbieter (z. B. Ausweis) → Formular blendet das Feld aus
+   Welche GRUNDFELDER (Kosten, Laufzeit …) eine Art zeigt, regelt ihr Profil (ART_PROFIL unten). */
 
 var GRUPPEN=[
   {k:"wohnen",  label:"Wohnen & Energie",      icon:"🏠"},
@@ -1634,7 +1558,6 @@ var FELDER={
   sf_klasse:      {l:"Schadenfreiheitsklasse (SF)", t:"text"},
   sf_prozent:     {l:"SF-Beitragssatz (%)",         t:"num"},
   versichert:     {l:"Versichert ist",              t:"text"},
-  versnummer:     {l:"Versicherungsnummer",         t:"text"},
   tarif_stufe:    {l:"Tarif / Stufe",               t:"text"},
   rufnummer:      {l:"Rufnummer",                   t:"text"},
   datenvolumen:   {l:"Datenvolumen",                t:"text"},
@@ -1645,7 +1568,6 @@ var FELDER={
   iban:           {l:"IBAN",                        t:"text"},
   zinssatz:       {l:"Zinssatz (%)",                t:"num"},
   restschuld:     {l:"Restschuld (€)",              t:"eur"},
-  rate:           {l:"Rate (€/Monat)",              t:"eur"},
   laufzeit_bis:   {l:"Laufzeit bis",                t:"date"},
   depotnummer:    {l:"Depot-/Vertragsnummer",       t:"text"},
   leistungsumfang:{l:"Leistungsumfang",             t:"text"},
@@ -1663,7 +1585,7 @@ var FELDER={
 var ARTEN={
   /* ---------- Wohnen & Energie ---------- */
   miete:          {g:"wohnen",label:"Miete",                      icon:"🔑",std:1,einzig:1,felder:["objekt","flaeche","zimmer","nebenkosten"]},
-  eigentum:       {g:"wohnen",label:"Wohneigentum / Finanzierung", icon:"🏡",felder:["objekt","flaeche","restschuld","rate","zinssatz","laufzeit_bis"]},
+  eigentum:       {g:"wohnen",label:"Wohneigentum / Finanzierung", icon:"🏡",felder:["objekt","flaeche","restschuld","zinssatz","laufzeit_bis"]},
   strom:          {g:"wohnen",label:"Strom",                      icon:"⚡",std:1,spiegel:"strom",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
   gas:            {g:"wohnen",label:"Gas",                        icon:"🔥",spiegel:"gas",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
   wasser:         {g:"wohnen",label:"Wasser & Abwasser",           icon:"💧",std:1,spiegel:"wasser",felder:["zaehlernummer","jahresverbrauch"]},
@@ -1676,29 +1598,29 @@ var ARTEN={
   garage:         {g:"wohnen",label:"Garage / Stellplatz",         icon:"🛖",felder:["objekt"]},
 
   /* ---------- Mobilität ---------- */
-  fahrzeug:       {g:"mobil",label:"Fahrzeug",                    icon:"🚗",std:1,felder:["kennzeichen","marke","modell","fin","hsn","tsn","erstzulassung","hu_bis"],termin:{k:"hu_bis",l:"HU / TÜV fällig"}},
+  fahrzeug:       {g:"mobil",label:"Fahrzeug",                    icon:"🚗",std:1,kein_anbieter:1,felder:["kennzeichen","marke","modell","fin","hsn","tsn","erstzulassung","hu_bis"],termin:{k:"hu_bis",l:"HU / TÜV fällig"}},
   kfz_steuer:     {g:"mobil",label:"KFZ-Steuer",                  icon:"🧾",felder:["kennzeichen","marke","modell","steuernummer"]},
-  leasing:        {g:"mobil",label:"Leasing / Autofinanzierung",    icon:"📄",felder:["kennzeichen","marke","modell","fin","rate","laufzeit_bis","restschuld"]},
+  leasing:        {g:"mobil",label:"Leasing / Autofinanzierung",    icon:"📄",felder:["kennzeichen","marke","modell","fin","laufzeit_bis","restschuld"]},
   oepnv:          {g:"mobil",label:"Deutschlandticket / ÖPNV",     icon:"🚆",felder:["tarif_stufe"]},
-  fahrrad:        {g:"mobil",label:"Fahrrad / E-Bike",            icon:"🚲",felder:["marke","modell"]},
+  fahrrad:        {g:"mobil",label:"Fahrrad / E-Bike",            icon:"🚲",kein_anbieter:1,felder:["marke","modell"]},
 
   /* ---------- Versicherungen ---------- */
-  haftpflicht:    {g:"vers",label:"Privathaftpflicht",            icon:"🛡️",std:1,einzig:1,felder:["versnummer","deckungssumme","selbstbeteiligung","versichert"]},
-  hausrat:        {g:"vers",label:"Hausrat",                      icon:"🛋️",std:1,einzig:1,felder:["versnummer","objekt","deckungssumme","selbstbeteiligung"]},
-  wohngebaeude:   {g:"vers",label:"Wohngebäude",                   icon:"🏠",einzig:1,felder:["versnummer","objekt","deckungssumme","selbstbeteiligung"]},
-  kfz_vers:       {g:"vers",label:"KFZ-Versicherung",             icon:"🚘",std:1,felder:["kennzeichen","marke","modell","fin","hsn","tsn","versnummer","deckungsart","sf_klasse","sf_prozent","selbstbeteiligung"]},
-  rechtsschutz:   {g:"vers",label:"Rechtsschutz",                  icon:"⚖️",einzig:1,felder:["versnummer","deckungsart","selbstbeteiligung"]},
-  kranken:        {g:"vers",label:"Krankenversicherung",          icon:"🏥",std:1,felder:["versnummer","tarif_stufe","inhaber"]},
-  zahnzusatz:     {g:"vers",label:"Zahnzusatz",                   icon:"🦷",felder:["versnummer","tarif_stufe","inhaber"]},
-  bu:             {g:"vers",label:"Berufsunfähigkeit",             icon:"💼",std:1,felder:["versnummer","deckungssumme","inhaber","laufzeit_bis"]},
-  unfall:         {g:"vers",label:"Unfallversicherung",            icon:"🩹",felder:["versnummer","deckungssumme","inhaber"]},
-  risikoleben:    {g:"vers",label:"Risikoleben",                   icon:"💜",felder:["versnummer","deckungssumme","inhaber","laufzeit_bis"]},
-  tierhalter:     {g:"vers",label:"Tierhalterhaftpflicht",         icon:"🐕",felder:["versnummer","versichert","deckungssumme"]},
-  tierkranken:    {g:"vers",label:"Tierkrankenversicherung",        icon:"🐾",felder:["versnummer","versichert","selbstbeteiligung"]},
-  reise_vers:     {g:"vers",label:"Reiseversicherung",             icon:"✈️",felder:["versnummer","deckungsart"]},
-  elektronik:     {g:"vers",label:"Handy / Elektronik",            icon:"📲",felder:["versnummer","versichert","selbstbeteiligung"]},
-  fahrrad_vers:   {g:"vers",label:"Fahrradversicherung",           icon:"🚴",felder:["versnummer","versichert","deckungssumme"]},
-  vers_sonst:     {g:"vers",label:"Weitere Versicherung",          icon:"🛡️",felder:["versnummer","versichert","deckungsart","deckungssumme"]},
+  haftpflicht:    {g:"vers",label:"Privathaftpflicht",            icon:"🛡️",std:1,einzig:1,felder:["deckungssumme","selbstbeteiligung","versichert"]},
+  hausrat:        {g:"vers",label:"Hausrat",                      icon:"🛋️",std:1,einzig:1,felder:["objekt","deckungssumme","selbstbeteiligung"]},
+  wohngebaeude:   {g:"vers",label:"Wohngebäude",                   icon:"🏠",einzig:1,felder:["objekt","deckungssumme","selbstbeteiligung"]},
+  kfz_vers:       {g:"vers",label:"KFZ-Versicherung",             icon:"🚘",std:1,felder:["kennzeichen","marke","modell","fin","hsn","tsn","deckungsart","sf_klasse","sf_prozent","selbstbeteiligung"]},
+  rechtsschutz:   {g:"vers",label:"Rechtsschutz",                  icon:"⚖️",einzig:1,felder:["deckungsart","selbstbeteiligung"]},
+  kranken:        {g:"vers",label:"Krankenversicherung",          icon:"🏥",std:1,felder:["tarif_stufe","inhaber"]},
+  zahnzusatz:     {g:"vers",label:"Zahnzusatz",                   icon:"🦷",felder:["tarif_stufe","inhaber"]},
+  bu:             {g:"vers",label:"Berufsunfähigkeit",             icon:"💼",std:1,felder:["deckungssumme","inhaber","laufzeit_bis"]},
+  unfall:         {g:"vers",label:"Unfallversicherung",            icon:"🩹",felder:["deckungssumme","inhaber"]},
+  risikoleben:    {g:"vers",label:"Risikoleben",                   icon:"💜",felder:["deckungssumme","inhaber","laufzeit_bis"]},
+  tierhalter:     {g:"vers",label:"Tierhalterhaftpflicht",         icon:"🐕",felder:["versichert","deckungssumme"]},
+  tierkranken:    {g:"vers",label:"Tierkrankenversicherung",        icon:"🐾",felder:["versichert","selbstbeteiligung"]},
+  reise_vers:     {g:"vers",label:"Reiseversicherung",             icon:"✈️",felder:["deckungsart"]},
+  elektronik:     {g:"vers",label:"Handy / Elektronik",            icon:"📲",felder:["versichert","selbstbeteiligung"]},
+  fahrrad_vers:   {g:"vers",label:"Fahrradversicherung",           icon:"🚴",felder:["versichert","deckungssumme"]},
+  vers_sonst:     {g:"vers",label:"Weitere Versicherung",          icon:"🛡️",felder:["versichert","deckungsart","deckungssumme"]},
 
   /* ---------- Kommunikation & Medien ---------- */
   internet:       {g:"komm",label:"Internet / Festnetz",          icon:"🌐",std:1,einzig:1,felder:["geschwindigkeit","router","rufnummer"]},
@@ -1709,12 +1631,12 @@ var ARTEN={
   cloud:          {g:"komm",label:"Cloud / Software-Abo",          icon:"☁️",felder:["tarif_stufe","profile"]},
 
   /* ---------- Finanzen ---------- */
-  girokonto:      {g:"geld",label:"Girokonto",                    icon:"🏦",std:1,felder:["iban","grundpreis"]},
+  girokonto:      {g:"geld",label:"Girokonto",                    icon:"🏦",std:1,felder:["iban"]},
   kreditkarte:    {g:"geld",label:"Kreditkarte",                  icon:"💳",felder:["tarif_stufe","zinssatz"]},
-  depot:          {g:"geld",label:"Depot / Sparplan",              icon:"📈",felder:["depotnummer","rate"]},
-  bauspar:        {g:"geld",label:"Bausparvertrag",                icon:"🏗️",felder:["depotnummer","rate","zinssatz","laufzeit_bis"]},
-  rente:          {g:"geld",label:"Private Rente / Riester",       icon:"👴",felder:["depotnummer","rate","inhaber","laufzeit_bis"]},
-  kredit:         {g:"geld",label:"Ratenkredit",                   icon:"💸",felder:["depotnummer","rate","zinssatz","restschuld","laufzeit_bis"]},
+  depot:          {g:"geld",label:"Depot / Sparplan",              icon:"📈",felder:["depotnummer"]},
+  bauspar:        {g:"geld",label:"Bausparvertrag",                icon:"🏗️",felder:["depotnummer","zinssatz","laufzeit_bis"]},
+  rente:          {g:"geld",label:"Private Rente / Riester",       icon:"👴",felder:["depotnummer","inhaber","laufzeit_bis"]},
+  kredit:         {g:"geld",label:"Ratenkredit",                   icon:"💸",felder:["depotnummer","zinssatz","restschuld","laufzeit_bis"]},
 
   /* ---------- Mitgliedschaften ---------- */
   fitness:        {g:"mitglied",label:"Fitnessstudio",            icon:"🏋️",felder:["mitgliedsnummer","leistungsumfang"]},
@@ -1723,7 +1645,7 @@ var ARTEN={
 
   /* ---------- Pflichten & Ausweise ---------- */
   rundfunk:       {g:"pflicht",label:"Rundfunkbeitrag",           icon:"📺",std:1,einzig:1,felder:["beitragsnummer","objekt"]},
-  grundsteuer:    {g:"pflicht",label:"Grundsteuer",               icon:"🏛️",kein_anbieter:1,felder:["objekt","steuernummer","gueltig_bis"],termin:{k:"gueltig_bis",l:"Nächste Fälligkeit"}},
+  grundsteuer:    {g:"pflicht",label:"Grundsteuer",               icon:"🏛️",felder:["objekt","steuernummer","gueltig_bis"],termin:{k:"gueltig_bis",l:"Nächste Fälligkeit"}},
   personalausweis:{g:"pflicht",label:"Personalausweis",            icon:"🪪",kein_anbieter:1,einzig:0,felder:["inhaber","dok_nummer","gueltig_bis","behoerde"],termin:{k:"gueltig_bis",l:"Läuft ab"}},
   reisepass:      {g:"pflicht",label:"Reisepass",                 icon:"🛂",kein_anbieter:1,felder:["inhaber","dok_nummer","gueltig_bis","behoerde"],termin:{k:"gueltig_bis",l:"Läuft ab"}},
   fuehrerschein:  {g:"pflicht",label:"Führerschein",               icon:"🪧",kein_anbieter:1,felder:["inhaber","dok_nummer","gueltig_bis","behoerde"],termin:{k:"gueltig_bis",l:"Umtausch fällig"}},
@@ -1731,16 +1653,62 @@ var ARTEN={
   sonstiges:      {g:"pflicht",label:"Sonstiges",                 icon:"📄",felder:[]}
 };
 
+/* ---------- Profile: welche Grundfelder eine Art braucht ----------
+   Alles, was ein Profil nicht nennt, blendet das Formular aus und die App
+   rechnet damit nicht (z. B. keine Kündigungsfristen für Ausweis oder Rundfunk).
+   kl = Bezeichnung des Kostenfelds */
+var PROFILE={
+  vertrag:     {felder:["produkt","kundennummer","vertragsnummer","kosten","beginn","ml","kf","vl"]},
+  miete:       {felder:["vertragsnummer","kosten","beginn","ml","kf"],kl:"Miete (€)",typ:{ml:0,kf:3}},
+  versorger:   {felder:["kundennummer","vertragsnummer","kosten"],kl:"Abschlag / Gebühr (€)"},
+  abgabe:      {felder:["kosten"],kl:"Betrag (€)"},
+  konto:       {felder:["produkt","kundennummer","kosten","beginn"],kl:"Gebühr (€)"},
+  finanzierung:{felder:["produkt","vertragsnummer","kosten","beginn"],kl:"Rate (€)"},
+  sparen:      {felder:["produkt","vertragsnummer","kosten","beginn","kf"],kl:"Sparrate (€)"},
+  dienst:      {felder:["kundennummer","kosten"]},
+  dokument:    {felder:[]},
+  sache:       {felder:[]}
+};
+/* Profil, Anbieter-Bezeichnung (al), Pflicht-Zusatzfelder (pf), Kostenbezeichnung (kl),
+   übliche Fristen (typ) je Art – ohne Eintrag gilt „vertrag“ mit „Anbieter“ */
+var ART_PROFIL={
+  miete:{p:"miete",al:"Vermieter"}, garage:{p:"miete",al:"Vermieter"},
+  eigentum:{p:"finanzierung",al:"Bank / Kreditgeber"},
+  strom:{kl:"Abschlag (€)",typ:{ml:12,kf:1,vl:12}}, gas:{kl:"Abschlag (€)",typ:{ml:12,kf:1,vl:12}},
+  fernwaerme:{kl:"Abschlag (€)"}, wasser:{p:"versorger",al:"Versorger"},
+  heizoel:{p:"dienst",al:"Händler"}, hausverwaltung:{al:"Verwaltung"},
+  schornsteinfeger:{p:"dienst",al:"Schornsteinfeger"}, muell:{p:"versorger",al:"Entsorger / Gemeinde"},
+  fahrzeug:{p:"sache",pf:["kennzeichen"]}, fahrrad:{p:"sache",pf:["marke"]},
+  kfz_steuer:{p:"abgabe",al:"Zollamt",kl:"Steuer (€)",iv:"jaehrlich"}, leasing:{p:"finanzierung",al:"Leasinggeber"},
+  girokonto:{p:"konto",al:"Bank",kl:"Kontoführung (€)"}, kreditkarte:{p:"konto",al:"Bank",kl:"Jahresgebühr (€)",iv:"jaehrlich"},
+  depot:{p:"konto",al:"Bank / Broker",kl:"Sparrate (€)"}, bauspar:{p:"sparen",al:"Bausparkasse"},
+  rente:{p:"sparen",al:"Anbieter"}, kredit:{p:"finanzierung",al:"Bank"},
+  fitness:{al:"Studio",kl:"Beitrag (€)",typ:{ml:12,kf:1,vl:1}}, verein:{al:"Verein",kl:"Beitrag (€)"}, autoclub:{al:"Club",kl:"Beitrag (€)",typ:{ml:12,kf:3,vl:12}},
+  internet:{typ:{ml:24,kf:1,vl:1}}, mobilfunk:{typ:{ml:24,kf:1,vl:1}},
+  rundfunk:{p:"abgabe",al:"Beitragsservice",kl:"Beitrag (€)",iv:"vierteljaehrlich"}, grundsteuer:{p:"abgabe",al:"Gemeinde / Stadt",kl:"Steuer (€)",iv:"vierteljaehrlich"},
+  personalausweis:{p:"dokument",pf:["inhaber","gueltig_bis"]}, reisepass:{p:"dokument",pf:["inhaber","gueltig_bis"]},
+  fuehrerschein:{p:"dokument",pf:["inhaber","gueltig_bis"]}
+};
+/* Versicherungen: Versicherer, Beitrag, Versicherungsnummer, meist 1 Jahr mit 1 Monat Frist */
+Object.keys(ARTEN).forEach(function(k){
+  if(ARTEN[k].g==="vers"&&!ART_PROFIL[k])ART_PROFIL[k]={al:k==="kranken"?"Krankenkasse / Versicherer":"Versicherer",kl:"Beitrag (€)",
+    vn:"Versicherungsnummer",iv:k==="kranken"?null:"jaehrlich",typ:k==="kranken"?null:{ml:12,kf:1,vl:12}};
+});
+function artProfil(k){
+  var ap=ART_PROFIL[k]||{},pr=PROFILE[ap.p||"vertrag"];
+  return {felder:pr.felder,kl:ap.kl||pr.kl||"Kosten (€)",al:ap.al||"Anbieter",vn:ap.vn||"Vertragsnummer",
+          pf:ap.pf||[],typ:ap.typ||pr.typ||null,iv:ap.iv||"monatlich"};
+}
+function grundfeld(k,f){return artProfil(k).felder.indexOf(f)>=0;}
+/* Rechnet All-Home für diese Art Kündigungsfristen? */
+function hatFristen(k){return grundfeld(k||"sonstiges","ml");}
+
 /* ---------- Helfer rund um den Katalog ---------- */
 function artInfo(k){
   var a=ARTEN[k];
   if(!a)return {key:"sonstiges",icon:"📄",label:t("Sonstiges"),g:"pflicht",felder:[]};
   return {key:k,icon:a.icon,label:t(a.label),g:a.g,spiegel:a.spiegel,einzig:a.einzig,
           felder:a.felder||[],termin:a.termin,kein_anbieter:a.kein_anbieter};
-}
-function gruppeInfo(k){
-  for(var i=0;i<GRUPPEN.length;i++)if(GRUPPEN[i].k===k)return {k:k,icon:GRUPPEN[i].icon,label:t(GRUPPEN[i].label)};
-  return {k:"pflicht",icon:"📄",label:t("Sonstiges")};
 }
 function artenDerGruppe(g){return Object.keys(ARTEN).filter(function(k){return ARTEN[k].g===g&&k!=="sonstiges";});}
 function standardArten(){return Object.keys(ARTEN).filter(function(k){return !!ARTEN[k].std;});}
@@ -1842,7 +1810,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -1905,6 +1873,7 @@ function openModal(html){
   var w=$("#modal");if(!w)return;
   var box=$("#modalBox"),scrim=w.querySelector(".scrim");
   box.innerHTML='<div class="grab"></div>'+html;
+  box.scrollTop=0;
   box.setAttribute("role","dialog");box.setAttribute("aria-modal","true");
   box.classList.remove("on");if(scrim)scrim.classList.remove("on");
   w.hidden=false;
@@ -1930,7 +1899,7 @@ function render(){
   /* Daten kamen nicht an? Das muss man sehen, nicht erraten. */
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -1950,6 +1919,7 @@ function render(){
   else if(rt.name==="haushalte") {inhalt=viewHaushalte();cur="mehr";}
   else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
   else if(rt.name==="logos")     {inhalt=viewLogos();cur="mehr";}
+  else if(rt.name==="kikosten")  {inhalt=viewKiKosten();cur="mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
@@ -2158,13 +2128,9 @@ async function setzeSprache(v){
 var LADEFEHLER=null;
 async function ladeAlles(){
   LADEFEHLER=null;
-  await ladePrefs();
-  await ladeHaushalte();
-  await ladeRollen();
-  await Promise.all([ladeLogos(),ladeAppAdmin()]);
-  await ladeSetup();
-  await ladeDaten();
-  await ladeEnergie();
+  /* Sprache und Häuser zuerst (alles Weitere hängt am aktiven Haus), dann alles gleichzeitig */
+  await Promise.all([ladePrefs(),ladeHaushalte()]);
+  await Promise.all([ladeRollen(),ladeLogos(),ladeAppAdmin(),ladeSetup(),ladeDaten(),ladeEnergie()]);
 }
 
 /* ================= Anmeldung =================
@@ -2411,6 +2377,8 @@ function artSlot(k){
   }
   /* Gefüllt: ein Vertrag direkt, mehrere über die Art-Ansicht */
   var kosten=artMonatskosten(k),fr=artFrist(k);
+  var ti=!fr&&liste.length===1?terminInfo(liste[0]):null;
+  if(ti)fr={level:ti.level,f:{label:ti.label}};
   var ziel=liste.length===1?("#/vertrag?id="+liste[0].id):("#/art?k="+k);
   var untertitel=liste.length===1
     ?(fr?esc(fr.f.label):esc(a.label))
@@ -2443,7 +2411,7 @@ function naheTermine(tage){
                    href:"#/vertrag?id="+c.id});
     }
     /* Pflichttermin aus den Zusatzfeldern */
-    if(a.termin&&c.details&&c.details[a.termin.k]){
+    if(c.status!=="beendet"&&a.termin&&c.details&&c.details[a.termin.k]){
       var d=daysUntil(c.details[a.termin.k]);
       if(d!=null&&d<=tage)
         raus.push({days:d,level:ampel(d),icon:a.icon,
@@ -2516,11 +2484,16 @@ function viewMehr(){
       '<span class="db"><span class="dn">'+t("KI-Stufe")+'</span>'+
       '<span class="dm"><span>'+t(KI_STUFEN[kiStufe()].name)+' · '+esc(KI_STUFEN[kiStufe()].model)+'</span></span></span>'+
       '<span class="go">'+ic("right",18)+'</span></button></section>'+
-    (IST_APP_ADMIN?'<div class="mgrp">'+t("Verwaltung")+'</div>'+
-      '<section class="card"><a class="drow3" href="#/logos"><span class="di">'+ic("folder")+'</span>'+
+    (IST_APP_ADMIN||(HH&&ichAdmin(HH.id))?'<div class="mgrp">'+t("Verwaltung")+'</div><section class="card">'+
+      (HH&&ichAdmin(HH.id)?'<a class="drow3" href="#/kikosten"><span class="di">'+ic("euro")+'</span>'+
+        '<span class="db"><span class="dn">'+t("KI-Kosten")+'</span>'+
+        '<span class="dm"><span>'+t("Wer, wann, wie viel")+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a>':"")+
+      (IST_APP_ADMIN?'<a class="drow3" href="#/logos"><span class="di">'+ic("folder")+'</span>'+
         '<span class="db"><span class="dn">'+t("Anbieter-Logos")+'</span>'+
         '<span class="dm"><span>'+tn(LOGO_REG.length,"{0} Logo","{0} Logos")+(anbieterOhneLogo().length?' · '+tn(anbieterOhneLogo().length,"{0} Anbieter ohne Logo","{0} Anbieter ohne Logo"):"")+'</span></span></span>'+
-        '<span class="go">'+ic("right",18)+'</span></a></section>':"")+
+        '<span class="go">'+ic("right",18)+'</span></a>':"")+
+      '</section>':"")+
     '<div class="mgrp">'+t("Sprache")+'</div>'+
     '<section class="card">'+
       '<p class="hint" style="margin:0 0 10px">'+t("Gilt nur für dich – andere im Haushalt behalten ihre Sprache.")+'</p>'+
@@ -2544,13 +2517,14 @@ function viewMehr(){
 }
 
 /* ================= Formular-Bausteine ================= */
-function fld(label,inner){return '<label class="fld"><span>'+esc(label)+'</span>'+inner+'</label>';}
+/* pflicht → dezentes Sternchen (Legende am Formularende) */
+function fld(label,inner,pflicht){return '<label class="fld"><span>'+esc(label)+(pflicht?'<b class="pfl" aria-hidden="true">*</b>':"")+'</span>'+inner+'</label>';}
 /* Zahlen als Textfeld mit Dezimal-Tastatur (wie AllTrack): type="number"
    verwirft „9,90" mit Komma stillschweigend – valNum() versteht beides. */
 function inp(id,val,typ,extra){
   if(typ==="number"){
     var anzeige=(val==null||val==="")?"":String(val).replace(".",",");
-    return '<input class="inp" id="'+id+'" type="text" inputmode="decimal" autocomplete="off" value="'+esc(anzeige)+'">';
+    return '<input class="inp" id="'+id+'" type="text" inputmode="decimal" autocomplete="off" value="'+esc(anzeige)+'"'+(extra||"")+'>';
   }
   return '<input class="inp" id="'+id+'" type="'+(typ||"text")+'" value="'+esc(val==null?"":val)+'"'+(extra||"")+'>';
 }
@@ -2624,6 +2598,13 @@ function viewArt(k){
     '</div>';
 }
 function kv(k,v){return '<div class="kvr"><span class="kk">'+esc(k)+'</span><span class="kw">'+v+'</span></div>';}
+/* Statt Kündigungsfrist: der Pflichttermin (Ausweis läuft ab, HU fällig …) */
+function terminKarte(c){
+  var ti=terminInfo(c);
+  if(!ti)return "";
+  return '<section class="card"><div style="display:flex;align-items:center;gap:10px"><span class="dot '+ti.level+'"></span>'+
+    '<b style="font-size:1.05rem">'+esc(ti.label)+'</b></div><p class="hint" style="margin:6px 0 0">'+esc(ti.sub)+'</p></section>';
+}
 
 /* ================= Vertragsdetail ================= */
 function vertragById(id){return CONTRACTS.filter(function(c){return c.id===id;})[0]||null;}
@@ -2632,7 +2613,7 @@ function viewVertrag(id){
   if(!c)return zurueck("#/vertraege",t("Verträge"))+'<section class="card"><p class="hint">'+t("Vertrag nicht gefunden.")+'</p></section>';
   var a=artInfo(c.art||"sonstiges"),f=fristInfo(c);
   var mk=monatskosten(c);
-  var neuesRecht=(c.vertragsstart&&c.vertragsstart>=NEUES_RECHT_AB&&(c.verlaengerung_monate==null||c.verlaengerung_monate>1));
+  var neuesRecht=neuesRechtGilt(c)&&!!c.vertragsstart&&(c.verlaengerung_monate==null||numOrNull(c.verlaengerung_monate)>1);
   var det=c.details||{};
   var zusatz=artFelder(a.key).map(function(fd){
     var v=det[fd.k];
@@ -2647,22 +2628,22 @@ function viewVertrag(id){
       (fahrzeugVon(c)?'<div class="vfzg">'+fahrzeugZeile(c,true)+'</div>':"")+
       (c.produkt?'<div class="greet">'+esc(c.produkt)+'</div>':"")+
     '</div></div></div>'+
-    /* Frist */
-    '<section class="card">'+
+    /* Frist bzw. Pflichttermin */
+    (!hatFristen(a.key)?terminKarte(c):'<section class="card">'+
       '<div style="display:flex;align-items:center;gap:10px"><span class="dot '+f.level+'"></span>'+
         '<b style="font-size:1.05rem">'+esc(f.label)+'</b></div>'+
       (f.sub?'<p class="hint" style="margin:6px 0 0">'+esc(f.sub)+'</p>':"")+
       (neuesRecht?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2">'+
-        '<div class="st">'+t("Neues Recht")+'</div><div class="sx">'+t("Vertrag ab 3/2022: nach der Mindestlaufzeit jederzeit mit höchstens 1 Monat Frist kündbar – das ist hier schon eingerechnet.")+'</div>'+
+        '<div class="st">'+t("Neues Recht")+'</div><div class="sx">'+t("Nach der Mindestlaufzeit jederzeit mit höchstens 1 Monat Frist kündbar – das ist hier schon eingerechnet.")+'</div>'+
       '</div></div>':"")+
       (f.lastDay?'<div class="factions" style="margin-top:12px"><button class="btn ghost" data-a="ics" data-id="'+c.id+'">'+ic("calendar")+' '+t("Frist in den Kalender")+'</button></div>':"")+
-    '</section>'+
+    '</section>')+
     /* Angaben */
     '<div class="sect">'+t("Angaben")+'</div>'+
     '<section class="card"><div class="kvl">'+
-      (c.kosten!=null?kv(t("Kosten"),eur(c.kosten)+" / "+ivLabel(c.kosten_intervall)+(mk&&c.kosten_intervall!=="monatlich"?" ("+eur(mk)+" / "+t("Monat")+")":"")):"")+
+      (c.kosten!=null?kv(t(artProfil(a.key).kl).replace(/\s*\(€\)$/,""),eur(c.kosten)+" / "+ivLabel(c.kosten_intervall)+(mk&&c.kosten_intervall!=="monatlich"?" ("+eur(mk)+" / "+t("Monat")+")":"")):"")+
       (c.kundennummer?kv(t("Kundennummer"),esc(c.kundennummer)):"")+
-      (c.vertragsnummer?kv(t("Vertragsnummer"),esc(c.vertragsnummer)):"")+
+      (c.vertragsnummer?kv(t(artProfil(a.key).vn),esc(c.vertragsnummer)):"")+
       (c.vertragsstart?kv(t("Vertragsbeginn"),fmtDate(c.vertragsstart)):"")+
       (c.mindestlaufzeit_monate!=null?kv(t("Mindestlaufzeit"),c.mindestlaufzeit_monate===0?t("keine"):tn(c.mindestlaufzeit_monate,"{0} Monat","{0} Monate")):"")+
       (c.kuendigungsfrist_monate!=null?kv(t("Kündigungsfrist"),fristTxt(c.kuendigungsfrist_monate)):"")+
@@ -2739,13 +2720,16 @@ function vertragFormular(){
   var det=(en&&en.details)||(c&&c.details)||p.details||{};
   var ivOpts=Object.keys(INTERVALL_LABEL).map(function(k){return [k,ivLabel(k)];});
   var felder=FORM.art?artFelder(a.key):[],genutzt={};
+  var pr=artProfil(FORM.art?a.key:"sonstiges"),g=function(f){return pr.felder.indexOf(f)>=0;};
+  var KONV={ml:"0 = keine",kf:"0,5 = 2 Wochen",vl:"1 = monatlich"};
+  function ph(f){return ' placeholder="'+esc(pr.typ&&pr.typ[f]!=null?t("üblich")+" "+String(pr.typ[f]).replace(".",","):t(KONV[f]))+'"';}
   function feldHtml(fd){
     var typ=fd.t==="date"?"date":((fd.t==="eur"||fd.t==="num")?"number":"text");
     var extra=(FELD_GROSS[fd.k]?' class="inp gross" autocapitalize="characters" spellcheck="false"':"")+
               (FELD_PLATZ[fd.k]?' placeholder="'+esc(FELD_PLATZ[fd.k])+'"':"")+(fd.k==="fin"?' maxlength="17"':"");
     var html=inp("f_d_"+fd.k,det[fd.k]==null?"":det[fd.k],typ,extra);
     if(FELD_GROSS[fd.k])html=html.replace('<input class="inp" ','<input ');
-    return fld(fd.l,html);
+    return fld(fd.l,html,pr.pf.indexOf(fd.k)>=0);
   }
   var zusatz=felder.map(function(fd,i){
     if(genutzt[fd.k])return "";
@@ -2756,27 +2740,31 @@ function vertragFormular(){
   var titel=c?t("Vertrag bearbeiten"):(FORM.art?a.label:t("Vertrag eintragen"));
   return '<h2 class="mhead">'+(FORM.art?a.icon+' ':"")+esc(titel)+'</h2>'+
     '<form id="vForm" novalidate>'+
-    fld(t("Vertragsart"),artAuswahl(FORM.art||""))+
-    (a.kein_anbieter?"":fld(t("Anbieter"),inp("f_anbieter",v("anbieter"),"text",' list="anbListe"')))+
-    '<datalist id="anbListe">'+anbieterListe()+'</datalist>'+
-    fld(t("Tarif / Produkt"),inp("f_produkt",v("produkt")))+
-    '<div class="two">'+
-      fld(t("Kundennummer"),inp("f_kundennummer",v("kundennummer")))+
-      fld(t("Vertragsnummer"),inp("f_vertragsnummer",v("vertragsnummer")))+
-    '</div>'+
-    '<div class="two">'+
-      fld(t("Kosten (€)"),inp("f_kosten",v("kosten"),"number",' step="0.01" min="0"'))+
-      fld(t("Zahlungsintervall"),sel("f_iv",ivOpts,(en&&en.kosten_intervall)||(c&&c.kosten_intervall)||p.kostenIntervall||"monatlich"))+
-    '</div>'+
-    fld(t("Vertragsbeginn"),inp("f_start",v("vertragsstart","vertragsstart"),"date"))+
-    '<div class="two">'+
-      fld(t("Mindestlaufzeit (Monate, 0 = keine)"),inp("f_ml",v("mindestlaufzeit_monate","mindestlaufzeitMonate"),"number",' step="1" min="0"'))+
-      fld(t("Kündigungsfrist (Monate, 0,5 = 2 Wochen)"),inp("f_kf",v("kuendigungsfrist_monate","kuendigungsfristMonate"),"number",' step="0.5" min="0"'))+
-    '</div>'+
-    fld(t("Verlängerung (Monate, 1 = monatlich)"),inp("f_vl",v("verlaengerung_monate","verlaengerungMonate"),"number",' step="1" min="1"'))+
-    (zusatz?'<div class="mgrp">'+t("Zusätzliche Angaben")+'</div>'+zusatz:"")+
+    fld(t("Vertragsart"),artAuswahl(FORM.art||""),true)+
+    (a.kein_anbieter?"":fld(t(pr.al),inp("f_anbieter",v("anbieter"),"text",' list="anbListe"'),true)+
+      '<datalist id="anbListe">'+anbieterListe()+'</datalist>')+
+    /* Dinge und Ausweise: die Zusatzfelder SIND der Inhalt – gleich oben */
+    (!pr.felder.length&&zusatz?zusatz:"")+
+    (g("produkt")?fld(t("Tarif / Produkt"),inp("f_produkt",v("produkt"))):"")+
+    (g("kundennummer")||g("vertragsnummer")?'<div class="two">'+
+      (g("kundennummer")?fld(t("Kundennummer"),inp("f_kundennummer",v("kundennummer"))):"")+
+      (g("vertragsnummer")?fld(t(pr.vn),inp("f_vertragsnummer",v("vertragsnummer"))):"")+
+    '</div>':"")+
+    (g("kosten")?'<div class="two">'+
+      fld(t(pr.kl),inp("f_kosten",v("kosten"),"number"))+
+      fld(t("Zahlungsintervall"),sel("f_iv",ivOpts,(en&&en.kosten_intervall)||(c&&c.kosten_intervall)||p.kostenIntervall||pr.iv))+
+    '</div>':"")+
+    (g("beginn")||g("ml")?'<div class="mgrp">'+t(g("ml")?"Laufzeit & Kündigung":"Laufzeit")+'</div>':"")+
+    (g("beginn")?fld(t("Vertragsbeginn"),inp("f_start",v("vertragsstart","vertragsstart"),"date")):"")+
+    (g("ml")||g("kf")?'<div class="two">'+
+      (g("ml")?fld(t("Mindestlaufzeit (Monate)"),inp("f_ml",v("mindestlaufzeit_monate","mindestlaufzeitMonate"),"number",ph("ml"))):"")+
+      (g("kf")?fld(t("Kündigungsfrist (Monate)"),inp("f_kf",v("kuendigungsfrist_monate","kuendigungsfristMonate"),"number",ph("kf"))):"")+
+    '</div>':"")+
+    (g("vl")?fld(t("Verlängerung (Monate)"),inp("f_vl",v("verlaengerung_monate","verlaengerungMonate"),"number",ph("vl"))):"")+
+    (pr.felder.length&&zusatz?'<div class="mgrp">'+t("Zusätzliche Angaben")+'</div>'+zusatz:"")+
     fld(t("Notizen"),'<textarea class="inp" id="f_notizen" rows="2">'+esc(v("notizen"))+'</textarea>')+
     '<div id="fVorschau" class="sug info" hidden><span class="si">'+ic("clock")+'</span><div class="sb2"><div class="sx" id="fVorschauTxt"></div></div></div>'+
+    '<p class="pfl-leg"><b class="pfl">*</b> '+t("Pflichtangabe")+'</p>'+
     '<div class="factions">'+
       '<button class="btn lg" type="submit">'+ic("check")+' '+t("Speichern")+'</button>'+
       '<button class="btn ghost" type="button" data-a="modal-close">'+t("Abbrechen")+'</button>'+
@@ -2818,9 +2806,16 @@ async function speichereVertrag(){
   var gewaehlt=val("f_art");
   if(!gewaehlt){toast(t("Bitte die Vertragsart wählen."),true);var fa=$("#f_art");if(fa){fa.focus();fa.classList.add("bad");}return;}
   if(gewaehlt!==FORM.art){artWechseln(gewaehlt);return;}   /* Felder der neuen Art erst zeigen */
-  var a=artInfo(FORM.art);
+  var a=artInfo(FORM.art),pr=artProfil(a.key);
   var anbieter=a.kein_anbieter?"":val("f_anbieter");
-  if(!a.kein_anbieter&&!anbieter){toast(t("Bitte mindestens den Anbieter angeben."),true);return;}
+  /* Pflichtfelder: Anbieter (wo es einen gibt) + die Pflicht-Zusatzfelder der Art */
+  var pflicht=(a.kein_anbieter?[]:["f_anbieter"]).concat(pr.pf.map(function(f){return "f_d_"+f;}));
+  var leer=pflicht.filter(function(id){return $("#"+id)&&!val(id);});
+  if(leer.length){
+    leer.forEach(function(id){$("#"+id).classList.add("bad");});
+    $("#"+leer[0]).focus();
+    toast(t("Bitte die mit * markierten Felder ausfüllen."),true);return;
+  }
   var zahlFelder=["f_kosten","f_ml","f_kf","f_vl"].concat(artFelder(a.key)
     .filter(function(fd){return fd.t==="eur"||fd.t==="num";}).map(function(fd){return "f_d_"+fd.k;}));
   if(zahlFehlt(zahlFelder)){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
@@ -2836,21 +2831,24 @@ async function speichereVertrag(){
     else if(FELD_GROSS[fd.k])raw=raw.toUpperCase().replace(/\s+/g,"");
     det[fd.k]=(fd.t==="eur"||fd.t==="num")?numOrNull(raw):raw;
   });
+  /* Ohne Anbieter (Ausweis, Fahrzeug): der Name kommt aus den Angaben */
+  var name=[det.marke,det.modell].filter(Boolean).join(" ");
   var spalten={
     art:a.key,
-    anbieter:anbieter||(a.kein_anbieter?(val("f_d_inhaber")||a.label):null),
-    produkt:val("f_produkt")||null,
-    kundennummer:val("f_kundennummer")||null,
-    vertragsnummer:val("f_vertragsnummer")||null,
-    vertragsstart:val("f_start")||null,
-    mindestlaufzeit_monate:valNum("f_ml"),
-    kuendigungsfrist_monate:valNum("f_kf"),
-    verlaengerung_monate:valNum("f_vl"),
-    kosten:valNum("f_kosten"),
-    kosten_intervall:val("f_iv")||"monatlich",
+    anbieter:anbieter||(a.kein_anbieter?(det.inhaber||name||det.kennzeichen||a.label):null),
     notizen:val("f_notizen")||null,
     details:Object.keys(det).length?det:null
   };
+  /* Grundfelder nur, wenn das Profil sie zeigt – sonst bleiben vorhandene Werte unberührt */
+  var g=function(f){return pr.felder.indexOf(f)>=0;};
+  if(g("produkt"))spalten.produkt=val("f_produkt")||null;
+  if(g("kundennummer"))spalten.kundennummer=val("f_kundennummer")||null;
+  if(g("vertragsnummer"))spalten.vertragsnummer=val("f_vertragsnummer")||null;
+  if(g("kosten")){spalten.kosten=valNum("f_kosten");spalten.kosten_intervall=val("f_iv")||"monatlich";}
+  if(g("beginn"))spalten.vertragsstart=val("f_start")||null;
+  if(g("ml"))spalten.mindestlaufzeit_monate=valNum("f_ml");
+  if(g("kf"))spalten.kuendigungsfrist_monate=valNum("f_kf");
+  if(g("vl"))spalten.verlaengerung_monate=valNum("f_vl");
   /* Ganzzahl-Spalten runden, egal woher der Wert kommt */
   ["mindestlaufzeit_monate","verlaengerung_monate"].forEach(function(k){
     if(spalten[k]!=null)spalten[k]=Math.round(spalten[k]);
@@ -2869,8 +2867,9 @@ async function speichereVertrag(){
   if(warn.length&&!confirm("🏠 "+t("All-Home ist stutzig:")+"\n\n• "+warn.join("\n• ")+"\n\n"+t("Trotzdem speichern?")))return;
   try{
     if(FORM.id){
-      var r=await sb.from("contracts").update(spalten).eq("id",FORM.id);
+      var r=await sb.from("contracts").update(spalten).eq("id",FORM.id).select("id");
       if(r.error)throw r.error;
+      if(!r.data||!r.data.length)throw new Error(t("Nichts gespeichert – fehlende Berechtigung oder der Vertrag ist weg."));
     }else{
       spalten.household_id=HH.id;spalten.status="aktiv";
       var r2=await sb.from("contracts").insert(spalten).select("id").single();
@@ -2939,7 +2938,7 @@ function icsExport(id){
   var zeilen=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//All-Home//DE","BEGIN:VEVENT",
     "UID:allhome-"+c.id+"-"+dt+"@all-home","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+dt,
     "SUMMARY:"+icsEsc("⏰ "+tf("Kündigungsfrist: {0}",name)),
-    "DESCRIPTION:"+icsEsc(tf("Letzter Kündigungstag für {0}. Sonst läuft der Vertrag weiter bis {1}.",name,fmtDate(f.end))),
+    "DESCRIPTION:"+icsEsc(tf("Letzter Kündigungstag für {0}. Kündbar zum {1} – ohne Kündigung verlängert sich der Vertrag.",name,fmtDate(f.end))),
     "BEGIN:VALARM","TRIGGER:-P14D","ACTION:DISPLAY",
     "DESCRIPTION:"+icsEsc(tf("In 14 Tagen: Kündigungsfrist {0}",name)),"END:VALARM",
     "END:VEVENT","END:VCALENDAR"];
@@ -2992,10 +2991,12 @@ function dokListe(c){
   }).join("");
   /* Dokumenten-Lücken: welche Unterlage fehlt? */
   var vorhanden={};doks.forEach(function(d){vorhanden[d.doc_type]=1;});
-  var soll=(c.art==="fahrzeug")?{fahrzeugschein:"Fahrzeugschein"}:SOLL_DOKS;
+  var soll=(c.art==="fahrzeug")?{fahrzeugschein:"Fahrzeugschein"}:(hatFristen(c.art)?SOLL_DOKS:{});
   var luecken=Object.keys(soll).filter(function(k){
     if(vorhanden[k])return false;
-    if(k==="police")return artInfo(c.art||"sonstiges").g==="vers";  /* Police nur bei Versicherungen */
+    var vers=artInfo(c.art||"sonstiges").g==="vers";
+    if(k==="police")return vers;      /* Police nur bei Versicherungen … */
+    if(k==="vertrag")return !vers;    /* … und dort ersetzt sie den Vertrag */
     return true;
   }).map(function(k){
     return '<a class="drow3 fehlt" href="#/neu?vertrag='+c.id+'">'+
@@ -3197,6 +3198,7 @@ async function einesVerarbeiten(file,ziel){
 }
 /* Edge-Function aufrufen und Guthaben-/Fehlercode herausziehen */
 async function edgeRuf(fn,body){
+  body=Object.assign({household_id:HH?HH.id:null},body);
   var r=await sb.functions.invoke(fn,{body:body});
   if(r.error){
     var code=null,msg=null;
@@ -3348,7 +3350,7 @@ async function dokumentAnzeigen(id){
   try{
     var r=await sb.storage.from(BUCKET).createSignedUrl(d.storage_path,120);
     if(r.error)throw r.error;
-    window.open(r.data.signedUrl,"_blank");
+    window.open(r.data.signedUrl,"_blank","noopener");
   }catch(e){toast(t("Konnte Dokument nicht öffnen")+": "+errMsg(e),true);}
 }
 async function dokumentLoeschen(id){
@@ -3883,7 +3885,9 @@ function medCsv(){
   meds=meds.slice().sort(function(a,b){
     return String(a.behandlungsdatum||a.doc_date||"").localeCompare(String(b.behandlungsdatum||b.doc_date||""));
   });
-  function z(s){s=String(s==null?"":s);return /[";\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+  /* Beginnt ein Text mit = + - @, würde Excel ihn als Formel ausführen → mit ' entschärfen */
+  function z(s){s=String(s==null?"":s);if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d+(,\d+)?$/.test(s))s="'"+s;
+    return /[";\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
   function geld(n){return Number(n).toFixed(2).replace(".",",");}
   var reihen=[[t("Jahr"),t("Datum"),t("Patient"),t("Arzt / Praxis"),t("Fachrichtung"),t("Art"),t("Betrag (EUR)")]];
   meds.forEach(function(d){
@@ -3958,7 +3962,7 @@ function vorschlaege(){
     });
     /* Fristdaten fehlen → kann nicht überwacht werden */
     CONTRACTS.forEach(function(c){
-      if(c.status!=="aktiv")return;
+      if(c.status!=="aktiv"||!hatFristen(c.art))return;
       if(fristInfo(c).kind!=="unbekannt")return;
       var a=artInfo(c.art||"sonstiges");
       v.push({key:"fristlos:"+c.id,art:"info",icon:"alert",
@@ -4009,7 +4013,7 @@ function vorschlaege(){
   if(smartAn("termine")){
     CONTRACTS.forEach(function(c){
       var a=artInfo(c.art||"sonstiges");
-      if(!a.termin||!c.details||!c.details[a.termin.k])return;
+      if(c.status==="beendet"||!a.termin||!c.details||!c.details[a.termin.k])return;
       var d=daysUntil(c.details[a.termin.k]);
       if(d==null||d>60)return;
       v.push({key:"termin:"+c.id+":"+c.details[a.termin.k],art:d<=14?"bad":"warn",icon:"calendar",
@@ -4057,7 +4061,7 @@ function vorschlaege(){
   /* 7 – Dokumenten-Lücken */
   if(smartAn("dokumente")){
     var ohne=CONTRACTS.filter(function(c){
-      if(c.status!=="aktiv")return false;
+      if(c.status!=="aktiv"||!hatFristen(c.art))return false;
       return !DOCS.some(function(d){return d.contract_id===c.id;});
     });
     if(ohne.length){
@@ -4102,7 +4106,8 @@ function vorschlagBlock(){
   var v=vorschlaege();
   if(!v.length)return "";
   var reihe={bad:0,warn:1,info:2};
-  v.sort(function(a,b){return (reihe[a.art]||3)-(reihe[b.art]||3);});
+  function rang(x){return (x.art in reihe)?reihe[x.art]:3;}
+  v.sort(function(a,b){return rang(a)-rang(b);});
   var zeige=v.slice(0,3);
   return '<div class="sect">'+t("All-Home schlägt vor")+'</div>'+
     '<div class="sugs">'+zeige.map(vorschlagHtml).join("")+'</div>'+
@@ -4835,6 +4840,67 @@ async function logoLoeschen(id){
     closeModal(true);await ladeLogos();render();
     toast(t("Gelöscht"));
   }catch(x){toast(t("Löschen fehlgeschlagen")+": "+errMsg(x),true);}
+}
+
+/* ================= KI-Kosten (nur Admins des Hauses) =================
+   Das Protokoll public.ai_calls schreiben die Edge Functions (All-Home und AllTrack);
+   lesen dürfen es nur Admins des Hauses (RLS über my_admin_household_ids). */
+var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
+var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
+  "allhome-translate":"Übersetzung",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
+var KI_MODELLNAME={"claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
+var KI_KOSTEN=null;   /* {hh, zeilen, fehler} */
+function kiEur(usd){
+  var e=(Number(usd)||0)*USD_EUR;
+  return e<1?"≈ "+num(e*100,e*100<10?1:0)+" ct":"≈ "+eur(e);
+}
+function kiModell(id){var m=String(id||"");for(var k in KI_MODELLNAME)if(m.indexOf(k)===0)return KI_MODELLNAME[k];return m||"–";}
+function datumZeit(iso){var d=new Date(iso);return isNaN(d)?"–":fmtDate(iso)+", "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+async function ladeKiKosten(){
+  var hh=HH?HH.id:null;KI_KOSTEN={hh:hh,zeilen:null,fehler:null};
+  try{
+    var r=await sbPub.from("ai_calls").select("created_at,user_id,user_email,mode,level,model,input_tokens,output_tokens,cost_usd,ok")
+      .eq("household_id",hh).order("created_at",{ascending:false}).limit(500);
+    if(r.error)throw r.error;
+    KI_KOSTEN.zeilen=r.data||[];
+  }catch(e){KI_KOSTEN.fehler=errMsg(e);KI_KOSTEN.zeilen=[];}
+  if(route().name==="kikosten")render();
+}
+function viewKiKosten(){
+  var kopf=zurueck("#/mehr",t("Mehr"))+seitenTitel(t("KI-Kosten"));
+  if(!HH||!ichAdmin(HH.id))return kopf+'<section class="card"><p class="hint">'+t("Nur für Admins des Hauses.")+'</p></section>';
+  if(!KI_KOSTEN||KI_KOSTEN.hh!==HH.id){ladeKiKosten();return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';}
+  if(!KI_KOSTEN.zeilen)return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';
+  var z=KI_KOSTEN.zeilen,monat=todayISO().slice(0,7);
+  var summe=function(l){return l.reduce(function(s,r){return s+(Number(r.cost_usd)||0);},0);};
+  var imMonat=z.filter(function(r){return String(r.created_at).slice(0,7)===monat;});
+  var wer={};
+  z.forEach(function(r){var k=r.user_email||t("ehemaliges Mitglied");(wer[k]=wer[k]||{alle:[],monat:[]}).alle.push(r);
+    if(String(r.created_at).slice(0,7)===monat)wer[k].monat.push(r);});
+  return kopf+
+    (KI_KOSTEN.fehler?fehlerKarte(KI_KOSTEN.fehler):"")+
+    '<div class="kpis">'+
+      '<div class="kpi"><div class="kl">'+t("Dieser Monat")+'</div><div class="kv">'+kiEur(summe(imMonat))+'</div><div class="ks">'+tn(imMonat.length,"{0} Auswertung","{0} Auswertungen")+'</div></div>'+
+      '<div class="kpi"><div class="kl">'+t("Gesamt")+'</div><div class="kv">'+kiEur(summe(z))+'</div><div class="ks">'+tn(z.length,"{0} Auswertung","{0} Auswertungen")+'</div></div>'+
+    '</div>'+
+    (z.length
+      ?'<div class="sect">'+t("Nach Person")+'</div><section class="card"><div class="dlist">'+
+          Object.keys(wer).sort(function(a,b){return summe(wer[b].alle)-summe(wer[a].alle);}).map(function(k){
+            var w=wer[k];
+            return '<div class="drow3"><span class="di">'+ic("user",18)+'</span>'+
+              '<span class="db"><span class="dn">'+esc(k)+'</span><span class="dm"><span>'+tn(w.alle.length,"{0} Auswertung","{0} Auswertungen")+
+              ' · '+tf("{0} diesen Monat",w.monat.length)+'</span></span></span><span class="kibetrag">'+kiEur(summe(w.alle))+'</span></div>';
+          }).join("")+'</div></section>'+
+        '<div class="sect">'+t("Einzelne Auswertungen")+'</div><section class="card"><div class="dlist">'+
+          z.slice(0,150).map(function(r){
+            return '<div class="drow3"><span class="db"><span class="dn">'+esc(t(KI_ZWECK[r.mode]||r.mode||"KI"))+
+                (r.ok===false?' <span class="pill">'+t("Fehler")+'</span>':"")+'</span>'+
+              '<span class="dm"><span>'+datumZeit(r.created_at)+'</span><span>'+esc(r.user_email||t("ehemaliges Mitglied"))+'</span></span>'+
+              '<span class="dm"><span>'+esc(kiModell(r.model))+'</span><span>'+num(Number(r.input_tokens)||0,0)+' / '+num(Number(r.output_tokens)||0,0)+' Tokens</span></span></span>'+
+              '<span class="kibetrag">'+kiEur(r.cost_usd)+'</span></div>';
+          }).join("")+'</div></section>'
+      :'<section class="card"><div class="empty"><div class="ei">'+ic("sparkles",28)+'</div><h3>'+t("Noch keine KI-Auswertungen")+'</h3></div></section>')+
+    '<p class="hint" style="text-align:center;margin-top:14px">'+tf("Umgerechnet aus US-Dollar (1 $ ≈ {0} €).",String(USD_EUR).replace(".",","))+'</p>';
 }
 
 /* ================= Bedienung =================
