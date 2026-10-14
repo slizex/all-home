@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-C9bCzagzCxd1xMcEk6q1Fu+AhM0iZQDbGUmR997tGZc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-uczW8R2vN6UCpKlenQw8e37qpNaS/TKJi1R555R4p0I='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -34,9 +34,9 @@ if(window.top!==window.self){try{window.top.location.replace(window.location.hre
 :root{
   --bg:#f7f4ef;--surface:#ffffff;--surface-2:#f2eee7;--surface-3:#e9e3d9;
   --line:#e7e0d5;--line-2:#d9d0c2;
-  --text:#231f1a;--muted:#7a7166;--muted-2:#a39a8d;
+  --text:#231f1a;--muted:#6a6156;--muted-2:#a39a8d;
   --ink:#231f1a;--ink-fg:#fffaf2;
-  --pos:#1f9d62;--pos-bg:#e3f5ec;--neg:#d8453a;--neg-bg:#fde8e5;--warn:#b86e00;--warn-bg:#fff1d6;--info:#3b6fd8;--info-bg:#e6eefc;
+  --pos:#147a4a;--pos-bg:#e3f5ec;--neg:#b8352b;--neg-bg:#fde8e5;--warn:#965800;--warn-bg:#fff1d6;--info:#2f5cbb;--info-bg:#e6eefc;
   --strom:#e8930c;--strom-bg:#fff2d9;--wasser:#1a9fd8;--wasser-bg:#e0f3fb;--gas:#ec6431;--gas-bg:#fde7dc;
   --r-xl:28px;--r-lg:22px;--r:16px;--r-sm:12px;
   --sh-1:0 1px 2px rgba(35,31,26,.05);
@@ -484,7 +484,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 .kib{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);text-align:center;min-width:0}
 .kib b{font-weight:900;font-size:.9rem}
 .kib small{color:var(--muted);font-weight:700;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.kib i{font-style:normal;color:var(--muted-2);font-weight:900;font-size:.72rem;letter-spacing:.06em}
+.kib i{font-style:normal;color:var(--muted);font-weight:900;font-size:.72rem;letter-spacing:.06em}
 .kib.on{border-color:var(--ink);background:var(--surface-2)}
 .kib.on i{color:var(--text)}
 .hint.kih{display:flex;align-items:center;gap:6px;margin:0 2px 14px}/* ================= All-Home: Logo-Verwaltung ================= */
@@ -544,6 +544,24 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 .vkopf .vk{flex:1 1 auto}
 .vkopf .hh{display:block}
 .vkopf .hh{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ================= 1.8.2: Lesbarkeit aus der Gesamtprüfung ================= */
+/* Zweizeilig statt abgeschnitten, wo sonst Wichtiges fehlt (Kennzeichen, Kündigungsdatum, lange Vertragsarten) */
+.trow .tn,.slot .sn,.slot .ss,.artpick .pn,.hhw,.hhwa,.fzn,.krow .kl,.drow3 .dn,.drow3.wahl .wtxt .dn{
+  white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+/* Trefferflächen mindestens 40 px hoch – Lage und Aussehen bleiben */
+.back{padding:9px 0;margin:-7px 0}
+main>a.lnk,.arow .lnk{display:inline-block;padding:9px 0;margin:-9px 0}
+.sug .dis{padding:12px;margin:-12px -12px -8px 0}
+.drow3.wahl .wbox{position:relative}
+.drow3.wahl .wbox::after{content:"";position:absolute;inset:-8px}
+/* Listen mit Hinweis-Farbe: untereinander (.hint ist sonst eine Flex-Zeile – die Punkte liefen ineinander) */
+ul.hint,ol.hint{display:block}
+ul.hint li+li,ol.hint li+li{margin-top:4px}
+/* Auswahl-Blätter: Häkchen nur beim Gewählten (blasse Häkchen sahen wie „auch gewählt“ aus) */
+.setupcat:not(.on) .ck{visibility:hidden}
+/* Pflicht-Sternchen lesbar */
+.fld .pfl,.pfl-leg .pfl{color:var(--warn)}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -738,7 +756,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.8.1";
+var APP_VERSION="1.8.2";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -793,6 +811,70 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- Gesamtprüfung (1.8.2) d ---- */
+  "Dich selbst nimmst du über „Haus verlassen“ heraus.":"Себя вы удаляете через «Покинуть дом».",
+
+
+/* ---- Gesamtprüfung (1.8.2) c ---- */
+  "Der Vertragsbeginn fehlt – ohne ihn kann All-Home nicht warnen.":"Не указано начало договора – без него All-Home не сможет предупредить.",
+  "Die Mindestlaufzeit fehlt (0 = jederzeit kündbar) – ohne sie kann All-Home nicht warnen.":"Не указан минимальный срок (0 = можно расторгнуть в любое время) – без него All-Home не сможет предупредить.",
+
+
+/* ---- Gesamtprüfung (1.8.2) b ---- */
+  "Verteilerschlüssel":"Ключ распределения",
+
+
+/* ---- Gesamtprüfung (1.8.2) ---- */
+  "Gute Nacht":"Доброй ночи",
+  "Guten Morgen":"Доброе утро",
+  "Hallo":"Привет",
+  "Guten Abend":"Добрый вечер",
+  "Hausarzt":"Терапевт (Hausarzt)",
+  "Zahnarzt":"Стоматолог",
+  "Kieferorthopäde":"Ортодонт",
+  "Augenarzt":"Офтальмолог",
+  "Orthopäde":"Ортопед",
+  "Hautarzt":"Дерматолог",
+  "HNO-Arzt":"Отоларинголог (HNO)",
+  "Frauenarzt":"Гинеколог",
+  "Urologe":"Уролог",
+  "Neurologe":"Невролог",
+  "Kardiologe":"Кардиолог",
+  "Radiologe":"Рентгенолог",
+  "Kinderarzt":"Педиатр",
+  "Psychotherapie":"Психотерапия",
+  "Physiotherapie":"Физиотерапия",
+  "Apotheke":"Аптека",
+  "Labor":"Лаборатория",
+  "Krankenhaus":"Больница",
+  "Arztrechnung":"Счёт врача",
+  "Befund":"Заключение (Befund)",
+  "Rezept":"Рецепт",
+  "Attest / AU":"Справка / больничный (AU)",
+  "Laborwerte":"Анализы",
+  "Überweisung":"Направление (Überweisung)",
+  "Impfung":"Прививка",
+  "Röntgen / Bild":"Рентген / снимок",
+  "Arztbrief":"Выписка врача (Arztbrief)",
+  "Kündigungsfristen":"Сроки расторжения",
+  "Warnt, bevor eine Frist abläuft.":"Предупреждает до истечения срока.",
+  "Vollständigkeits-Check":"Проверка полноты",
+  "Zeigt, welche Verträge dem Haushalt noch fehlen.":"Показывает, каких договоров ещё не хватает.",
+  "Preiserhöhungen":"Повышения цен",
+  "Startet die Uhr für das Sonderkündigungsrecht.":"Запускает отсчёт для права досрочного расторжения (Sonderkündigungsrecht).",
+  "Pflichttermine":"Обязательные сроки",
+  "HU/TÜV, Ausweise, Wartung.":"Техосмотр (HU/TÜV), документы, обслуживание.",
+  "Kosten & Wechsel":"Расходы и смена тарифа",
+  "Größte Posten und ob ein Wechsel lohnt.":"Крупнейшие статьи и стоит ли менять поставщика.",
+  "Doppelt versichert":"Двойная страховка",
+  "Zwei Verträge derselben Art.":"Два договора одного вида.",
+  "Dokumenten-Lücken":"Недостающие документы",
+  "Fehlende Police, Rechnung, Mandat.":"Нет полиса, счёта или мандата.",
+  "IBAN":"IBAN-номер",
+  "{0} Dokument löschen":"Удалить документы: {0}",
+  "{0} Dokumente löschen":"Удалить документы: {0}",
+
 
 /* ---- Scanner (1.8.1) ---- */
   "Objektiv wechseln":"Сменить объектив",
@@ -2533,11 +2615,11 @@ function fehlerKarte(txt){
 }
 function ladefehlerHtml(){
   return seitenTitel(t("Daten nicht erreichbar"))+
-    '<section class="card"><div class="sug bad"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+    '<div class="sugs"><div class="sug bad"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
       '<div class="st">'+t("All-Home kommt gerade nicht an deine Daten.")+'</div>'+
       '<div class="sx">'+esc(LADEFEHLER)+'</div>'+
       '<div class="sa"><button class="btn" data-a="neu-laden">'+ic("refresh")+' '+t("Erneut versuchen")+'</button></div>'+
-    '</div></div></section>';
+    '</div></div></div>';
 }
 function ladeHtml(){
   return '<div class="auth"><div class="authc" style="text-align:center">'+
@@ -3008,7 +3090,8 @@ function artSlot(k){
 }
 
 /* ================= Termine ================= */
-function terminTitel(c,a){var f=fahrzeugVon(c);return (c.anbieter||a.label)+(f&&f.kz?" · "+f.kz:"");}
+/* Kennzeichen zuerst: es unterscheidet zwei Autos beim selben Versicherer und darf nicht abgeschnitten werden */
+function terminTitel(c,a){var f=fahrzeugVon(c);return (f&&f.kz?f.kz+" · ":"")+(c.anbieter||a.label);}
 /* Sammelt Kündigungsfristen und Pflichttermine der nächsten n Tage */
 function naheTermine(tage){
   var raus=[];
@@ -4250,13 +4333,13 @@ function viewDokumente(){
       '<a class="lb'+(f==="ohne"?" on":"")+'" href="'+dokAdresse(p,{f:"ohne",wahl:""})+'">'+t("Ohne Vertrag")+' <span class="pill">'+nOhne+'</span></a>'+
     '</div>'+
     (liste.length
-      ?'<div class="filt dsrow"><input class="inp" id="dsuche" type="search" value="'+esc(DOK_Q)+'" placeholder="'+esc(t("Dokument suchen"))+'" autocomplete="off">'+
+      ?'<div class="filt dsrow"><input class="inp" id="dsuche" type="search" value="'+esc(DOK_Q)+'" placeholder="'+esc(t("Dokument suchen"))+'" aria-label="'+esc(t("Dokument suchen"))+'" autocomplete="off">'+
           '<a class="btn ghost sm" href="'+dokAdresse(p,{wahl:wahl?"":"1"})+'">'+(wahl?t("Fertig"):t("Auswählen"))+'</a></div>'+
         '<section class="card"><div class="dlist" id="dliste">'+liste.map(function(d){return dokZeile(d,wahl,f==="alle");}).join("")+'</div>'+
           '<p class="hint" id="dleer"'+(sicht.length?" hidden":"")+'>'+t("Nichts gefunden.")+'</p></section>'+
         (wahl?'<div class="factions">'+
           '<button class="btn danger" data-a="d-del-wahl"'+(n?"":" disabled")+'>'+ic("trash")+' '+
-            (n?tn(n,"{0} ausgewähltes löschen","{0} ausgewählte löschen"):t("Dokumente zum Löschen antippen"))+'</button>'+
+            (n?tn(n,"{0} Dokument löschen","{0} Dokumente löschen"):t("Dokumente zum Löschen antippen"))+'</button>'+
           '<button class="btn ghost" data-a="ab-alle">'+(alle?t("Auswahl aufheben"):t("Alle auswählen"))+'</button>'+
         '</div>':"")
       :'<section class="card"><div class="empty"><div class="ei">'+ic("check",28)+'</div><h3>'+t("Alles zugeordnet")+'</h3></div></section>');
@@ -4466,16 +4549,16 @@ function viewGesundheit(){
     '</div>'+
     (kostenGes>0?'<div class="factions" style="margin:0 0 14px"><button class="btn ghost" data-a="med-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button></div>':"")+
     '<div class="filt">'+
-      '<select class="sel" id="mfFach">'+
+      '<select class="sel" id="mfFach" aria-label="'+esc(t("Fachrichtung"))+'">'+
         '<option value="">'+t("Alle Fachrichtungen")+'</option>'+
         Object.keys(faecher).map(function(f){
           return '<option value="'+f+'"'+(medFilter.fach===f?" selected":"")+'>'+fachInfo(f).icon+' '+esc(fachInfo(f).label)+'</option>';
         }).join("")+'</select>'+
-      (PERSONS.length?'<select class="sel" id="mfPerson">'+
+      (PERSONS.length?'<select class="sel" id="mfPerson" aria-label="'+esc(t("Patient"))+'">'+
         '<option value="">'+t("Alle Personen")+'</option>'+
         PERSONS.map(function(p){return '<option value="'+p.id+'"'+(medFilter.person===p.id?" selected":"")+'>'+esc(p.name)+'</option>';}).join("")+
       '</select>':"")+
-      '<select class="sel" id="mfJahr">'+
+      '<select class="sel" id="mfJahr" aria-label="'+esc(t("Jahr"))+'">'+
         '<option value="">'+t("Alle Jahre")+'</option>'+
         Object.keys(jahre).sort().reverse().map(function(j){
           return '<option value="'+j+'"'+(medFilter.jahr===j?" selected":"")+'>'+j+'</option>';
@@ -4806,7 +4889,9 @@ function vorschlaege(){
       var a=artInfo(c.art||"sonstiges");
       v.push({key:"fristlos:"+c.id,art:"info",icon:"alert",
         titel:tf("{0}: Fristen unbekannt",c.anbieter||a.label),
-        text:t("Vertragsbeginn und Mindestlaufzeit fehlen – ohne sie kann All-Home nicht warnen."),
+        /* genau sagen, was fehlt */
+        text:(!c.vertragsstart&&numOrNull(c.mindestlaufzeit_monate)==null)?t("Vertragsbeginn und Mindestlaufzeit fehlen – ohne sie kann All-Home nicht warnen."):
+             (!c.vertragsstart?t("Der Vertragsbeginn fehlt – ohne ihn kann All-Home nicht warnen."):t("Die Mindestlaufzeit fehlt (0 = jederzeit kündbar) – ohne sie kann All-Home nicht warnen.")),
         knopf:t("Ergänzen"),aktion:"v-edit",id:c.id});
     });
   }
@@ -5073,7 +5158,7 @@ function hausFehler(e){
   if(/last_admin/.test(m))return t("Es muss immer mindestens einen Admin geben. Ernenne zuerst jemand anderen zum Admin.");
   if(/last_household/.test(m))return t("Das ist dein einziger Haushalt. Lege zuerst einen weiteren an.");
   if(/not_admin/.test(m))return t("Dafür brauchst du Admin-Rechte in diesem Haus.");
-  if(/cannot_remove_self/.test(m))return t("Dich selbst nimmst du über „Haushalt verlassen“ heraus.");
+  if(/cannot_remove_self/.test(m))return t("Dich selbst nimmst du über „Haus verlassen“ heraus.");
   if(/invalid_or_expired/.test(m))return t("Der Code ist ungültig oder abgelaufen.");
   if(/not.a.member/.test(m))return t("Du bist kein Mitglied dieses Hauses.");
   return m;
@@ -5131,7 +5216,7 @@ function viewHaushalt(id){
             :'<p class="hint" style="margin:12px 4px 0">'+t("Mitglieder verwalten können nur Admins.")+'</p>')+
     '</section>'+
     (einzigesHaus?'':'<div class="factions">'+
-      (allein?'':'<button class="btn ghost" data-a="hh-leave" data-id="'+esc(h.id)+'">'+ic("logout")+' '+t("Haushalt verlassen")+'</button>')+
+      (allein?'':'<button class="btn ghost" data-a="hh-leave" data-id="'+esc(h.id)+'">'+ic("logout")+' '+t("Haus verlassen")+'</button>')+
       (admin?'<button class="btn danger" data-a="hh-del" data-id="'+esc(h.id)+'">'+ic("trash")+' '+t("Haus löschen")+'</button>':"")+
     '</div>');
 }
@@ -5566,7 +5651,7 @@ function viewLogos(){
           '<span class="go">'+ic("right",16)+'</span></button>';
       }).join("")+'</div></section>':"")+
     '<div class="sect">'+t("Verzeichnis")+'<span class="more">'+LOGO_REG.length+'</span></div>'+
-    '<div class="filt"><input class="inp" id="lsuche" type="search" placeholder="'+esc(t("Anbieter suchen"))+'" autocomplete="off"></div>'+
+    '<div class="filt"><input class="inp" id="lsuche" type="search" placeholder="'+esc(t("Anbieter suchen"))+'" aria-label="'+esc(t("Anbieter suchen"))+'" autocomplete="off"></div>'+
     '<section class="card"><div class="dlist" id="lliste">'+LOGO_REG.map(function(e){
       return '<button class="drow3'+(e.aktiv?"":" aus")+'" data-a="logo-edit" data-id="'+esc(e.id)+'" data-such="'+esc(normName(e.name+" "+e.muster))+'">'+
         logoBildKachel(e,ic("doc",16),"di")+
@@ -8187,13 +8272,13 @@ function nkFormZeichnen(){
       '<div class="mgrp">'+t("Positionen")+' <span class="mut" id="nkSumme">'+eur(F.positionen.reduce(function(s,p){return s+(numOrNull(p.betrag)||0);},0))+'</span></div>'+
       '<div id="nkPosListe">'+F.positionen.map(function(p,i){
         return '<div class="nkp" data-i="'+i+'">'+
-          '<div class="nkp1">'+inp("np_bez_"+i,p.bez||"","text",' placeholder="'+esc(t("Bezeichnung wie auf der Abrechnung"))+'"')+
+          '<div class="nkp1">'+inp("np_bez_"+i,p.bez||"","text",' placeholder="'+esc(t("Bezeichnung wie auf der Abrechnung"))+'" aria-label="'+esc(t("Bezeichnung wie auf der Abrechnung"))+'"')+
             '<button type="button" class="ibtn" data-a="nk-pos-weg" data-i="'+i+'" aria-label="'+esc(t("Position entfernen"))+'">'+ic("trash",18)+'</button></div>'+
-          '<div class="two">'+sel("np_kat_"+i,katOpts,NK_KAT[p.kat]?p.kat:"sonstige")+inp("np_betrag_"+i,p.betrag,"number",' placeholder="'+esc(t("Dein Anteil €"))+'"')+'</div>'+
+          '<div class="two">'+nkBenannt(sel("np_kat_"+i,katOpts,NK_KAT[p.kat]?p.kat:"sonstige"),t("Kategorie"))+inp("np_betrag_"+i,p.betrag,"number",' placeholder="'+esc(t("Dein Anteil €"))+'" aria-label="'+esc(t("Dein Anteil €"))+'"')+'</div>'+
           '<details class="nkpm"'+(p.haus||p.schluessel||p.anteil||p.p35a?" open":"")+'><summary>'+t("Hauskosten, Schlüssel, Steuer")+'</summary>'+
-            '<div class="two">'+inp("np_haus_"+i,p.haus,"number",' placeholder="'+esc(t("Hauskosten gesamt €"))+'"')+sel("np_schl_"+i,schlOpts,p.schluessel||"")+'</div>'+
-            inp("np_anteil_"+i,p.anteil||"","text",' placeholder="'+esc(t("Anteil wie gedruckt, z. B. 82,5 von 1.240 m²"))+'"')+
-            '<div class="two">'+sel("np_p35_"+i,p35Opts,p.p35a||"")+inp("np_p35b_"+i,p.p35a_betrag,"number",' placeholder="'+esc(t("davon Arbeitskosten €"))+'"')+'</div>'+
+            '<div class="two">'+inp("np_haus_"+i,p.haus,"number",' placeholder="'+esc(t("Hauskosten gesamt €"))+'" aria-label="'+esc(t("Hauskosten gesamt €"))+'"')+nkBenannt(sel("np_schl_"+i,schlOpts,p.schluessel||""),t("Verteilerschlüssel"))+'</div>'+
+            inp("np_anteil_"+i,p.anteil||"","text",' placeholder="'+esc(t("Anteil wie gedruckt, z. B. 82,5 von 1.240 m²"))+'" aria-label="'+esc(t("Anteil wie gedruckt, z. B. 82,5 von 1.240 m²"))+'"')+
+            '<div class="two">'+nkBenannt(sel("np_p35_"+i,p35Opts,p.p35a||""),t("Art nach § 35a"))+inp("np_p35b_"+i,p.p35a_betrag,"number",' placeholder="'+esc(t("davon Arbeitskosten €"))+'" aria-label="'+esc(t("davon Arbeitskosten €"))+'"')+'</div>'+
           '</details></div>';
       }).join("")+'</div>'+
       '<button type="button" class="btn ghost full" data-a="nk-pos-neu">'+ic("plus")+' '+t("Position hinzufügen")+'</button>'+
@@ -8210,6 +8295,8 @@ function nkFormZeichnen(){
     '</form>');
 }
 /* Formular in den Zustand lesen (vor dem Hinzufügen/Entfernen von Positionen und beim Speichern) */
+/* Auswahlfeld ohne sichtbare Beschriftung: Namen für Screenreader nachtragen */
+function nkBenannt(html,name){return html.replace("<select ",'<select aria-label="'+esc(name)+'" ');}
 function nkFormLesen(){
   var F=NK_FORM;if(!F)return null;
   F.positionen=F.positionen.map(function(p,i){
