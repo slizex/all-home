@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-QVVlt42vuehYM6fh8LZ1Kt8COuW6hlvIfqWULT7Xu2M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-C9bCzagzCxd1xMcEk6q1Fu+AhM0iZQDbGUmR997tGZc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -738,7 +738,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.8.0";
+var APP_VERSION="1.8.1";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -793,6 +793,11 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- Scanner (1.8.1) ---- */
+  "Objektiv wechseln":"Сменить объектив",
+  "Objektiv {0} von {1}":"Объектив {0} из {1}",
+
 
 /* ---- Scanner (1.8.0) ---- */
   "Kein Rand zu sehen – Blatt auf dunklen Untergrund legen":"Края не видно – положи лист на тёмную поверхность",
@@ -6519,6 +6524,7 @@ function ebeneAnlegen(){
       '<div class="sc-oben">'+
         '<button class="sc-rund" data-s="zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x",22)+'</button>'+
         '<div class="sc-tipp" id="scTipp" role="status" aria-live="polite"></div>'+
+        '<button class="sc-rund" id="scLinse" data-s="linse" hidden aria-label="'+esc(t("Objektiv wechseln"))+'">'+ic("swap",22)+'</button>'+
         '<button class="sc-rund" id="scBlitz" data-s="blitz" hidden aria-label="'+esc(t("Licht"))+'">'+ic("blitz",22)+'</button>'+
       '</div>'+
       '<div class="sc-unten">'+
@@ -6563,22 +6569,76 @@ async function kameraAn(){
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){kameraFehlt("browser");return;}
   if(tipp)tipp.textContent=t("Kamera startet …");
   try{
-    var stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{
-      facingMode:{ideal:"environment"},width:{ideal:4032},height:{ideal:3024}}});
+    var gemerkt=kameraGemerkt(),stream;
+    try{stream=await navigator.mediaDevices.getUserMedia(kameraWunsch(gemerkt));}
+    catch(e1){if(!gemerkt)throw e1;kameraMerken(null);gemerkt=null;stream=await navigator.mediaDevices.getUserMedia(kameraWunsch(null));}
     if(!SCAN||SCAN.modus!=="kamera"){stream.getTracks().forEach(function(tr){tr.stop();});return;}
-    SCAN.stream=stream;
+    /* Ohne eigene Wahl: läuft nicht die Hauptkamera, einmal umschalten (erst schließen – viele Handys
+       öffnen keine zweite Kamera, solange die erste läuft) */
+    SCAN.kameras=await rueckKameras();
+    if(!gemerkt&&SCAN.kameras.length>1){
+      var haupt=hauptKamera(SCAN.kameras),jetzt=kameraIdVon(stream);
+      if(haupt&&jetzt&&haupt.deviceId!==jetzt){
+        stream.getTracks().forEach(function(tr){tr.stop();});
+        try{stream=await navigator.mediaDevices.getUserMedia(kameraWunsch(haupt.deviceId));}
+        catch(e2){stream=await navigator.mediaDevices.getUserMedia(kameraWunsch(null));}
+        if(!SCAN||SCAN.modus!=="kamera"){stream.getTracks().forEach(function(tr){tr.stop();});return;}
+      }
+    }
+    SCAN.stream=stream;SCAN.kameraId=kameraIdVon(stream);
     var vid=$("#scVid");vid.srcObject=stream;
     try{await vid.play();}catch(e){}
     var tr=stream.getVideoTracks()[0];SCAN.track=tr;
     var caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{};}catch(e){}
     if(caps.focusMode&&caps.focusMode.indexOf("continuous")>=0){try{await tr.applyConstraints({advanced:[{focusMode:"continuous"}]});}catch(e){}}
     var bl=$("#scBlitz");if(bl)bl.hidden=!caps.torch;
+    /* voreingestellten Zoom über 1 zurücknehmen – sonst wirkt das Bild herangezoomt */
+    try{var stl=tr.getSettings?tr.getSettings():{};if(caps.zoom&&stl.zoom>1)await tr.applyConstraints({advanced:[{zoom:Math.max(caps.zoom.min||1,1)}]});}catch(e){}
+    var li=$("#scLinse");if(li)li.hidden=!(SCAN.kameras&&SCAN.kameras.length>1);
     SCAN.ic=null;try{if(window.ImageCapture)SCAN.ic=new ImageCapture(tr);}catch(e){}
     erkennenStarten();
   }catch(e){
     var n=e&&e.name;
     kameraFehlt(n==="NotAllowedError"||n==="SecurityError"?"verboten":(n==="NotFoundError"||n==="OverconstrainedError"?"keine":"belegt"));
   }
+}
+/* ---- Welche Rückkamera? Viele Handys haben mehrere (Haupt-, Ultraweitwinkel-, Teleobjektiv). Mit
+   „Rückkamera“ allein wählt der Browser – manche nehmen das Teleobjektiv, das Bild wirkt dann stark
+   herangezoomt; iPhones springen über die „Dual“-Kamera zwischen den Objektiven. Darum: die gemerkte
+   Wahl, sonst die Hauptkamera (Android „camera2 0“, iPhone „Back Camera“ ohne Zusatz). ---- */
+var SCAN_KAMERA_KEY="ah_scan_kamera";
+function kameraGemerkt(){try{return localStorage.getItem(SCAN_KAMERA_KEY)||null;}catch(e){return null;}}
+function kameraMerken(id){try{if(id)localStorage.setItem(SCAN_KAMERA_KEY,id);else localStorage.removeItem(SCAN_KAMERA_KEY);}catch(e){}}
+/* Vorschau in 4:3. Das Foto selbst kommt bei Android über ImageCapture in voller Sensorauflösung –
+   ohne ImageCapture (iPhone) ist das Videobild das Foto, dann höher anfragen. */
+function kameraWunsch(id){
+  var v={width:{ideal:window.ImageCapture?1920:3840},height:{ideal:window.ImageCapture?1440:2880}};
+  if(id)v.deviceId={exact:id};else v.facingMode={ideal:"environment"};
+  return {audio:false,video:v};
+}
+function kameraIdVon(stream){try{return stream.getVideoTracks()[0].getSettings().deviceId||null;}catch(e){return null;}}
+async function rueckKameras(){
+  var l=[];try{l=await navigator.mediaDevices.enumerateDevices();}catch(e){return [];}
+  return (l||[]).filter(function(d){return d.kind==="videoinput"&&d.deviceId&&/back|rear|rück|rueck|hinten|environment|задн|тыл/i.test(d.label||"");});
+}
+/* Rang: kleiner = eher die Hauptkamera */
+function kameraRang(d){
+  var s=String(d.label||""),r=0,m=/camera2?\s*(\d+)/i.exec(s);
+  if(/tele/i.test(s))r+=100;
+  if(/ultra|weitwinkel|wide/i.test(s))r+=60;
+  if(/dual|triple/i.test(s))r+=30;
+  if(m)r+=Number(m[1]);
+  return r;
+}
+function hauptKamera(liste){return liste.slice().sort(function(a,b){return kameraRang(a)-kameraRang(b);})[0]||null;}
+/* Objektiv wechseln: der Reihe nach durch die Rückkameras, die Wahl gilt ab jetzt für jeden Scan */
+async function kameraWechseln(){
+  if(!SCAN||!SCAN.kameras||SCAN.kameras.length<2||SCAN.nimmt)return;
+  var ids=SCAN.kameras.map(function(d){return d.deviceId;}),n=SCAN.kameras[(ids.indexOf(SCAN.kameraId)+1)%ids.length];
+  kameraMerken(n.deviceId);
+  kameraAus();await kameraAn();
+  if(!SCAN)return;
+  toast(tf("Objektiv {0} von {1}",ids.indexOf(SCAN.kameraId)+1,ids.length)+(n.label?" · "+n.label:""));
 }
 function kameraAus(){
   clearTimeout(SCAN_UHR);SCAN_UHR=null;
@@ -7567,6 +7627,7 @@ function scanKlick(ev){
   }
   if(a==="ausloesen"){ausloesen(false);return;}
   if(a==="auto"){SCAN.auto=!SCAN.auto;SCAN.stabil=null;autoZeichnen();tippSetzen();return;}
+  if(a==="linse"){kameraWechseln();return;}
   if(a==="blitz"){
     SCAN.blitz=!SCAN.blitz;
     if(SCAN.track)SCAN.track.applyConstraints({advanced:[{torch:SCAN.blitz}]}).catch(function(){});
