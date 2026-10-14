@@ -10,6 +10,16 @@ Alle Verträge, Dokumente und Termine deines Haushalts an einem Ort — eine sch
 angehakte Art ist danach ein Platz: gefüllt oder sichtbar leer. Nicht Angehaktes
 erscheint nirgends.
 
+**Scanner wie in Google Drive.** Live-Sucher mit erkanntem Rahmen und Auto-Auslöser (abschaltbar), Seite um Seite
+ohne Unterbrechung. Danach Ecken nachziehen (mit Lupe), drehen, Filter (Auto: Schatten weg und Papier weiß,
+Farben bleiben · Original · Graustufen · Schwarzweiß), neu aufnehmen, Reihenfolge per Ziehen. Gespeichert wird
+als **ein PDF** oder als **ein Dokument mit mehreren JPG-Seiten**, 200 dpi, A4 bleibt A4. Seiten lassen sich
+später anfügen, auch an PDFs vom Anbieter. Beim Scannen am Vertrag zeigt ein **Abgleich**, was die KI gelesen hat
+und was im Vertrag steht: leere Felder sind vorab angehakt, abweichende Werte (z. B. ein neuer Preis) nicht.
+Der Volltext gescannter Seiten wird für die Suche mitgespeichert. Ausweise legt der Scanner standardmäßig
+ohne KI ab. Ein angefangener Scan bleibt als Entwurf nur auf dem Gerät. Ohne Kamerafreigabe geht es über die
+Kamera-App oder Fotos aus der Galerie. Langer Druck aufs App-Symbol (Android, PC): „Scannen“.
+
 **Dokumente gehören zum Vertrag.** PDF oder Foto hochladen, die KI liest Anbieter,
 Laufzeit, Kündigungsfrist, Kosten und Nummern aus und schlägt die Zuordnung vor.
 Gespeichert wird erst, wenn du bestätigst. Alle Dokumente zusammen findest du unter
@@ -74,9 +84,12 @@ Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Do
 - Eine `index.html`, kein Build. Design und Rahmen aus AllTrack (Nunito, warme Palette).
 - Supabase: Schema `butler` (Verträge, Dokumente, Personen, Einrichtung),
   Haushalte aus `public` wiederverwendet, privater Bucket `butler-documents`.
-- Edge Functions: `butler-extract` (auslesen), `butler-research` (Markt),
+- Edge Functions: `butler-extract` (auslesen; Seitenbilder eines Scans in einem Aufruf, Modus `text` für den Volltext), `butler-research` (Markt),
   `butler-med-explain` (Abrechnungsziffern), `butler-translate` (Nachübersetzen) –
   mit gemeinsamem Kern `gemeinsam.ts` (Anmeldung, Limits, Kosten in `public.ai_calls`).
+- Scanner ohne fremde Bibliothek: Kantenerkennung (Canny + Hough + Vierecks-Bewertung), Entzerrung über
+  Homographie mit Seitenverhältnis aus der Perspektive (Zhang/He), Filter und PDF-Schreiber im eigenen Code.
+  Nur fürs Anfügen an vorhandene PDFs lädt die App bei Bedarf pdf-lib 1.17.1 (feste Version, SRI).
 - PWA mit network-first Service Worker.
 - Sicherheit: Content-Security-Policy mit Skript-Hashes (setzt der Build), supabase-js mit fester
   Version und Prüfsumme (SRI), KI-Funktionen nur für angemeldete Nutzer mit Tageslimit und

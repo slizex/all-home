@@ -1,12 +1,24 @@
 // Supabase Edge Function: butler-extract
 // Liest Haushalts-Dokumente per Claude aus und liefert strukturierte Felder als JSON.
 // v16: nur angemeldete Nutzer, Tageslimit/Budget, jede Auswertung mit Kosten in public.ai_calls.
+// v17: Scanner – mehrere Seitenbilder in einem Aufruf (bilder), Modus "text" schreibt den Volltext ab
+//      (immer das guenstigste Modell, Protokoll als allhome-text).
 // Gemeinsamer Kern (Anmeldung, Limits, Kosten-Protokoll, Claude-Aufruf): gemeinsam.ts
 
 import { ANTHROPIC_API_KEY, antwortText, claude, claudeFehler, cors, json, level, protokoll, pruefeAufruf, repairJson, stufe } from "./gemeinsam.ts";
 
 const ALLOWED_MIME = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp", "image/gif"]);
 const MAX_BASE64_LEN = 20_000_000;
+const BILD_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_BILDER = 20;
+
+// Volltext fuer die Suche: nur abschreiben, nichts deuten
+const TEXT_PROMPT = [
+  "Schreibe den vollstaendigen sichtbaren Text dieser Dokumentseiten ab - Seite fuer Seite in der gegebenen Reihenfolge.",
+  "Nur den Text: keine Einleitung, keine Kommentare, keine Zusammenfassung, kein Markdown.",
+  "Tabellen zeilenweise, Spalten durch zwei Leerzeichen getrennt. Zwischen zwei Seiten eine Leerzeile.",
+  "Unleserliches als [...]. Nichts uebersetzen, nichts ergaenzen.",
+].join("\n");
 
 // Sprachvorgabe: nur Freitexte uebersetzen. Die Schluesselwerte sind feste Codes,
 // die der Client zum Einsortieren braucht - sie duerfen NIE uebersetzt werden.
@@ -73,17 +85,33 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
-  let p: { fileBase64?: string; mimeType?: string; textContent?: string; model?: string; level?: string; lang?: string; household_id?: string };
+  let p: { fileBase64?: string; mimeType?: string; textContent?: string; bilder?: { data?: string; mime?: string }[]; modus?: string; model?: string; level?: string; lang?: string; household_id?: string };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
   const chk = await pruefeAufruf(req, p.household_id);
   if ("antwort" in chk) return chk.antwort;
   const { fileBase64, mimeType, textContent } = p;
-  if (!fileBase64 && !textContent) return json({ error: "Keine Datei empfangen." }, 400);
+  const bilder = Array.isArray(p.bilder) ? p.bilder : null;
+  if (!fileBase64 && !textContent && !(bilder && bilder.length)) return json({ error: "Keine Datei empfangen." }, 400);
   const st = stufe(p.level || p.model);
   const lv = level(st, { basic: 4000, advanced: 8000, max: 10000 });
   const lang = (p.lang === "ru") ? "ru" : "de";
   let docBlock: Record<string, unknown>;
-  if (textContent) {
+  const bloecke: Record<string, unknown>[] = [];
+  if (bilder && bilder.length) {
+    // Seiten eines Scans: je Seite ein Bild, zusammen hoechstens so gross wie eine Datei
+    if (bilder.length > MAX_BILDER) return json({ error: "Zu viele Seiten auf einmal (max. 20)." }, 413);
+    let summe = 0;
+    for (const b of bilder) {
+      const mt = String(b?.mime || "image/jpeg");
+      if (typeof b?.data !== "string" || !b.data) return json({ error: "Seite ohne Inhalt." }, 400);
+      if (!BILD_MIME.has(mt)) return json({ error: "Dateityp wird nicht unterstuetzt (nur PDF und Fotos)." }, 415);
+      summe += b.data.length;
+      if (summe > MAX_BASE64_LEN) return json({ error: "Datei zu gross fuer die Analyse (max. ca. 14 MB)." }, 413);
+      bloecke.push({ type: "image", source: { type: "base64", media_type: mt, data: b.data } });
+    }
+    if (bloecke.length > 1) bloecke.push({ type: "text", text: "Die Bilder oben sind die " + bloecke.length + " Seiten EINES Dokuments, in dieser Reihenfolge." });
+    docBlock = bloecke.shift() as Record<string, unknown>;
+  } else if (textContent) {
     docBlock = { type: "text", text: "--- BEGINN DOKUMENT ---\n" + String(textContent).slice(0, 60000) + "\n--- ENDE DOKUMENT ---" };
   } else {
     if (typeof fileBase64 !== "string" || fileBase64.length > MAX_BASE64_LEN) return json({ error: "Datei zu gross fuer die Analyse (max. ca. 14 MB)." }, 413);
@@ -93,7 +121,21 @@ Deno.serve(async (req: Request) => {
       ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: fileBase64 } }
       : { type: "image", source: { type: "base64", media_type: mt, data: fileBase64 } };
   }
-  const body = { messages: [{ role: "user", content: [docBlock, { type: "text", text: PROMPT + langHinweis(lang) }] }] };
+  // Modus "text": Volltext abschreiben (fuer die Suche) - immer das guenstigste Modell
+  if (p.modus === "text") {
+    const lvT = level("basic", { basic: 16000, advanced: 16000, max: 16000 });
+    const bodyT = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: TEXT_PROMPT }] }] };
+    let rt;
+    try { rt = await claude(lvT, bodyT); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
+    if (!rt.resp.ok) return await claudeFehler(rt.resp, "Texterkennung");
+    const dt = await rt.resp.json();
+    if (dt.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
+    const text = antwortText(dt).trim();
+    const modellT = String(dt.model || rt.lv.model);
+    const kostenT = await protokoll(chk.wer, "allhome-text", "basic", modellT, dt.usage, !!text);
+    return json({ text, modell: modellT, stufe: "basic", kosten_usd: kostenT });
+  }
+  const body = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: PROMPT + langHinweis(lang) }] }] };
   let r;
   try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
   if (!r.resp.ok) return await claudeFehler(r.resp, "Auswertung");

@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-eeYi3yMGzEsdsKaKayS8L8YWtaCVS3wjITkl2bf40iY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-4tQbke+Sj+Cg+Qr/Am7h6q9Vo3Fak0jbVK1lbK/vujs='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -544,6 +544,125 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 .vkopf .vk{flex:1 1 auto}
 .vkopf .hh{display:block}
 .vkopf .hh{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* ================= Scanner =================
+   Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
+   das Speichern-Blatt in den Farben der App. */
+body.scan-open{overflow:hidden}
+/* sonst bleibt am PC der reservierte Rollbalken-Streifen neben dem Scanner sichtbar */
+html:has(body.scan-open){scrollbar-gutter:auto;overflow:hidden}
+body.scan-open #toast{bottom:auto;top:calc(72px + env(safe-area-inset-top));transform:translate(-50%,-16px)}
+body.scan-open #toast.on{transform:translate(-50%,0)}
+.scan{position:fixed;inset:0;z-index:75;background:#000;color:#fff;-webkit-user-select:none;user-select:none;overscroll-behavior:contain}
+.scan [hidden]{display:none!important}
+.scan .ico{flex:none}
+.sc-kam,.sc-inhalt{position:absolute;inset:0}
+.sc-inhalt{background:#121212;display:flex;flex-direction:column;overflow:auto}
+.sc-kam video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.sc-kam canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+/* Querformat (PC-Webcam, Tablet quer): Bild zwischen Kopf- und Fußleiste, nichts liegt auf dem Dokument */
+@media (min-aspect-ratio:1/1){.sc-kam video,.sc-kam canvas{top:64px;height:calc(100% - 64px - 150px)}}
+.sc-fx{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.sc-fx.an{animation:scfx .32s ease-out}
+@keyframes scfx{0%{opacity:.85}100%{opacity:0}}
+.sc-oben{position:absolute;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:10px}
+.sc-rund{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff}
+.sc-rund.an{background:#4f8cff;color:#fff}
+.sc-tipp{flex:1;min-width:0;text-align:center;font-weight:800;font-size:.92rem;line-height:1.3;padding:9px 14px;border-radius:999px;background:rgba(0,0,0,.45)}
+.sc-tipp:empty{visibility:hidden}
+.sc-unten{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;justify-items:center;padding:0 16px}
+.sc-klein{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:58px;padding:8px 10px;border-radius:16px;background:rgba(0,0,0,.4);color:#fff;font-size:.72rem;font-weight:800}
+.sc-ausl{position:relative;width:80px;height:80px;border-radius:50%;display:grid;place-items:center}
+.sc-ausl svg{position:absolute;inset:0;width:80px;height:80px;transform:rotate(-90deg)}
+.sc-ring{fill:none;stroke:rgba(255,255,255,.92);stroke-width:4}
+.sc-fort{fill:none;stroke:#4f8cff;stroke-width:6;stroke-linecap:round;stroke-dasharray:226.2;stroke-dashoffset:226.2;transition:stroke-dashoffset .09s linear}
+.sc-knopf{width:62px;height:62px;border-radius:50%;background:#fff;transition:transform .1s}
+.sc-ausl:active .sc-knopf{transform:scale(.9)}
+.sc-stapel{position:relative;padding:0;width:58px;height:74px;background:none}
+.sc-daumen{display:block;width:58px;height:74px;border-radius:10px;overflow:hidden;background:#333;border:2px solid #fff}
+.sc-daumen img{width:100%;height:100%;object-fit:cover;display:block}
+.sc-zahl{position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;background:#4f8cff;color:#fff;font-size:.8rem;font-weight:900;display:grid;place-items:center}
+.sc-auto{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom));padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);color:#fff;font-weight:800;font-size:.8rem}
+.sc-auto.an{background:rgba(79,140,255,.9)}
+/* Kopfzeile der dunklen Ansichten */
+.sc-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 12px 8px}
+.sc-titel{font-weight:900;font-size:1.02rem;text-align:center;flex:1;min-width:0}
+/* Seiten */
+.sc-seiten,.sc-zuschnitt{display:flex;flex-direction:column;min-height:100%;height:100%}
+.sc-buehne{flex:1;min-height:0;position:relative;display:grid;place-items:center;padding:6px 52px;touch-action:pan-y}
+.sc-buehne img{max-width:100%;max-height:100%;object-fit:contain;background:#fff;border-radius:4px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.sc-buehne img:not([src]){visibility:hidden}
+.sc-lade{position:absolute;left:50%;top:50%;margin:-11px 0 0 -11px}
+.sc-pfeil{position:absolute;top:50%;margin-top:-22px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);color:#fff}
+.sc-pfeil.l{left:4px}.sc-pfeil.r{right:4px}
+.sc-pfeil:disabled{opacity:.25}
+.sc-hinweis{position:absolute;left:16px;right:16px;bottom:10px;text-align:center;font-size:.84rem;font-weight:700;background:rgba(0,0,0,.7);border-radius:12px;padding:8px 12px}
+.sc-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:8px 10px 2px}
+.sc-chip{flex:none;padding:7px 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:.8rem}
+.sc-chip.an{background:#fff;color:#121212;border-color:#fff}
+.sc-chip.alle{border-style:dashed}
+.sc-leiste{display:flex;gap:10px;overflow-x:auto;padding:10px 12px 6px;scrollbar-width:none;touch-action:pan-x}
+.sc-mini{position:relative;flex:none;width:52px;height:70px;border-radius:8px;overflow:hidden;background:#2a2a2a;border:2px solid transparent;display:grid;place-items:center;transition:transform .12s}
+.sc-mini img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.sc-mini.an{border-color:#4f8cff}
+.sc-mini.neu{border:2px dashed rgba(255,255,255,.35);color:#fff}
+.sc-mini.zieht{z-index:2;transform:scale(1.08);box-shadow:0 8px 20px rgba(0,0,0,.6);transition:none}
+.sc-mini.ziel{outline:2px dashed #4f8cff;outline-offset:2px}
+.sc-nr{position:absolute;right:4px;bottom:2px;font-size:.72rem;font-weight:900;text-shadow:0 1px 3px #000}
+.sc-mini .spin{width:16px;height:16px;border-width:2px}
+.sc-werkzeug{display:flex;justify-content:space-around;gap:4px;padding:6px 6px 4px}
+.sc-wz{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:58px;padding:8px 4px;border-radius:12px;color:#fff;font-size:.72rem;font-weight:800}
+.sc-wz.an{color:#7fa9ff}
+.sc-fuss{padding:8px 16px calc(14px + env(safe-area-inset-bottom))}
+.scan .spin{border-color:rgba(255,255,255,.25);border-top-color:#fff}
+/* Knöpfe auf dunklem Grund */
+:where(.sc-leer,.sc-fuss) .btn{background:#fff;color:#121212}
+:where(.sc-leer,.sc-fuss) .btn.ghost{background:rgba(255,255,255,.12);color:#fff}
+:where(.sc-leer,.sc-fuss) .btn.danger{background:rgba(255,125,112,.16);color:#ff8f84}
+/* Zuschneiden */
+.sc-zfeld{flex:1;min-height:0;position:relative;display:grid;place-items:center;overflow:hidden}
+.sc-zbild{position:relative;touch-action:none}
+.sc-zbild img,.sc-zbild svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sc-zbild img{object-fit:fill;pointer-events:none}
+.sc-lupe{position:absolute;top:8px;left:8px;width:120px;height:120px;border-radius:50%;border:2px solid #fff;box-shadow:0 6px 20px rgba(0,0,0,.6);pointer-events:none}
+.sc-klein-hinweis{text-align:center;color:rgba(255,255,255,.65);font-size:.84rem;font-weight:700;margin:0;padding:2px 16px calc(14px + env(safe-area-inset-bottom))}
+/* Leer, Entwurf, Fehler, ohne Kamera */
+.sc-leer{display:flex;flex-direction:column;min-height:100%}
+.sc-mitte{margin:auto;max-width:420px;width:100%;text-align:center;padding:20px 22px calc(28px + env(safe-area-inset-bottom))}
+.sc-symbol{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;margin:0 auto 14px}
+.sc-mitte h2{margin:0 0 8px;font-size:1.3rem;font-weight:900}
+.sc-mitte p{margin:0 0 6px;color:rgba(255,255,255,.75);font-weight:600;line-height:1.45}
+.sc-knoepfe{display:grid;gap:10px;margin-top:20px}
+.sc-arbeit{margin:auto;text-align:center;padding:20px}
+.sc-arbeit .spin{width:34px;height:34px;margin:0 auto 14px}
+.sc-arbeit p{font-weight:800;margin:0}
+/* Speichern: Blatt in App-Farben */
+.sc-blatt{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55)}
+.sc-blatt-in{width:100%;max-width:560px;max-height:100%;overflow:auto;background:var(--surface);color:var(--text);border-radius:26px 26px 0 0;padding:12px 18px calc(22px + env(safe-area-inset-bottom))}
+@media (min-width:700px){.sc-blatt{align-items:center}.sc-blatt-in{border-radius:26px}}
+.sc-kopf.hell{padding:2px 0 10px}
+.sc-schalter{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 16px;border-radius:16px;background:var(--surface-2);color:var(--text)}
+.sc-sw-txt{flex:1;min-width:0}
+.sc-sw-txt b{display:block;font-weight:900}
+.sc-sw-txt span{display:block;color:var(--muted);font-size:.85rem;font-weight:700;margin-top:2px}
+.sc-sw{flex:none;position:relative;width:48px;height:28px;border-radius:14px;background:var(--line-2);transition:background .15s}
+.sc-sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+.sc-sw.an{background:var(--pos)}
+.sc-sw.an::after{left:23px}
+/* Abgleich mit dem Vertrag */
+.abgl{display:flex;flex-direction:column;gap:8px}
+.abz{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:12px;border-radius:14px;background:var(--surface-2);border:1.5px solid transparent;color:var(--text)}
+.abz.an{border-color:var(--ink)}
+.abz .wbox{flex:none;width:24px;height:24px;border-radius:8px;border:2px solid var(--line-2);display:grid;place-items:center;background:var(--surface);margin-top:1px}
+.abz.an .wbox{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}
+.abt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.abl{font-size:.8rem;font-weight:800;color:var(--muted)}
+.abw{font-weight:700;overflow-wrap:anywhere}
+.abw s{color:var(--muted)}
+/* Betrachter für mehrseitige Bilder-Dokumente */
+.bb{background:var(--surface-2);border-radius:16px;display:grid;place-items:center;min-height:200px;overflow:hidden}
+.bb img{display:block;max-width:100%;max-height:60vh;object-fit:contain}
+.bbnav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:10px;font-weight:800}
+.bbnav .ibtn:disabled{opacity:.35}
 </style>
 </head>
 <body>
@@ -561,7 +680,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.5.0";
+var APP_VERSION="1.6.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -615,6 +734,143 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- Scanner (1.6.0) 2 ---- */
+  "Anbieter und Vertragsart passen.":"Поставщик и вид договора совпадают.",
+
+
+/* ---- Scanner (1.6.0) ---- */
+  "Scannen":"Сканировать",
+  "Datei hochladen":"Загрузить файл",
+  "Mehrere Seiten · PDF oder JPG":"Несколько страниц · PDF или JPG",
+  "Das Dokument scheint von „{0}“ zu sein, der Vertrag ist bei „{1}“.":"Документ, похоже, от «{0}», а договор заключён с «{1}».",
+  "Bitte prüfen, bevor etwas übernommen wird.":"Пожалуйста, проверь, прежде чем что-то переносить.",
+  "Anderem Vertrag zuordnen":"Привязать к другому договору",
+  "Trotzdem bei „{0}“ lassen":"Всё равно оставить у «{0}»",
+  "Bestehendem Vertrag zuordnen":"Привязать к существующему договору",
+  "Abgleich mit „{0}“":"Сверка с «{0}»",
+  "Alles stimmt mit dem Vertrag überein.":"Всё совпадает с договором.",
+  "Angehakt wird übernommen. Abweichende Werte bitte prüfen.":"Отмеченное будет перенесено. Отличающиеся значения проверь.",
+  "Der Preis steigt":"Цена повышается",
+  "Bei einer Preiserhöhung besteht oft ein Sonderkündigungsrecht – meist 4 Wochen ab Zugang des Schreibens.":"При повышении цены часто есть право досрочного расторжения (Sonderkündigungsrecht) – обычно 4 недели с получения письма.",
+  "Nichts angehakt":"Ничего не отмечено",
+  "Nichts übernehmen":"Ничего не переносить",
+  "Es wurde nichts geändert – fehlende Berechtigung?":"Ничего не изменилось – нет прав?",
+  "Übernommen":"Перенесено",
+  "Ohne KI abgelegt":"Сохранено без ИИ",
+  "Auslesen lässt sich jederzeit nachholen.":"Считать можно в любой момент позже.",
+  "Jetzt auslesen":"Считать сейчас",
+  "Seiten":"Страницы",
+  "Seiten hinzufügen":"Добавить страницы",
+  "Nicht alle Seiten sind erreichbar.":"Не все страницы доступны.",
+  "Seite {0}":"Страница {0}",
+  "Vorherige Seite":"Предыдущая страница",
+  "Seite {0} von {1}":"Страница {0} из {1}",
+  "Nächste Seite":"Следующая страница",
+  "Seite in neuem Tab öffnen":"Открыть страницу в новой вкладке",
+  "All-Home liest …":"All-Home считывает …",
+  "Datei zu groß für die Analyse (max. ca. 14 MB).":"Файл слишком большой для анализа (макс. ок. 14 МБ).",
+  "Arztdokument scannen":"Сканировать медицинский документ",
+  "Scanner":"Сканер",
+  "Licht":"Свет",
+  "Fotos wählen":"Выбрать фото",
+  "Fotos":"Фото",
+  "Aufnehmen":"Снять",
+  "Seiten ansehen":"Посмотреть страницы",
+  "Dieser Browser gibt die Kamera nicht frei.":"Этот браузер не даёт доступ к камере.",
+  "Kamera startet …":"Камера запускается …",
+  "Kamerazugriff ist nicht erlaubt.":"Доступ к камере не разрешён.",
+  "Keine Kamera gefunden.":"Камера не найдена.",
+  "Die Kamera lässt sich nicht starten.":"Камеру не удаётся запустить.",
+  "Du kannst mit der Kamera-App fotografieren oder vorhandene Fotos wählen – zugeschnitten und aufbereitet wird hier.":"Можно сфотографировать приложением камеры или выбрать готовые фото – обрезка и обработка будут здесь.",
+  "Kamera-App öffnen":"Открыть приложение камеры",
+  "Halten …":"Держи …",
+  "Seite {0} aufgenommen – nächste Seite hinlegen":"Страница {0} снята – положи следующую",
+  "Dokument ins Bild halten":"Наведи камеру на документ",
+  "Ruhig halten – nimmt gleich auf":"Держи ровно – сейчас снимет",
+  "Erkannt – Auslöser drücken":"Распознано – нажми на спуск",
+  "Manuell":"Вручную",
+  "Höchstens {0} Seiten je Dokument.":"Не больше {0} страниц на документ.",
+  "Aufnahme fehlgeschlagen":"Снимок не удался",
+  "Fotos werden vorbereitet …":"Фото готовятся …",
+  "Foto {0} von {1} wird vorbereitet …":"Фото {0} из {1} готовится …",
+  "Foto wird vorbereitet …":"Фото готовится …",
+  "Seite hinzufügen":"Добавить страницу",
+  "Kein Rand erkannt – unter „Zuschneiden“ die Ecken setzen.":"Край не распознан – задай углы в «Обрезать».",
+  "Für alle Seiten":"Для всех страниц",
+  "Zuschneiden":"Обрезать",
+  "Drehen":"Повернуть",
+  "Filter":"Фильтр",
+  "Neu aufnehmen":"Переснять",
+  "Ganzes Bild":"Весь снимок",
+  "Ecken oder Kanten ziehen – die Lupe zeigt die genaue Stelle.":"Тяни углы или края – лупа покажет точное место.",
+  "Kein Rand erkannt – bitte die Ecken von Hand setzen.":"Край не распознан – задай углы вручную.",
+  "Wird an „{0}“ angefügt":"Будет добавлено к «{0}»",
+  "Landet im Bereich Gesundheit":"Попадёт в раздел «Здоровье»",
+  "All-Home liest aus und schlägt die Zuordnung vor.":"All-Home считает документ и предложит привязку.",
+  "Seiten anfügen":"Добавить страницы",
+  "Scan speichern":"Сохранить скан",
+  "Format":"Формат",
+  "Alle Seiten in einer PDF-Datei.":"Все страницы в одном PDF-файле.",
+  "Eine PDF-Datei.":"Один PDF-файл.",
+  "Ein Dokument mit einem Bild je Seite.":"Один документ, по изображению на страницу.",
+  "Ein Foto im JPG-Format.":"Одно фото в формате JPG.",
+  "Danach neu auslesen":"Затем считать заново",
+  "Mit KI auslesen":"Считать с помощью ИИ",
+  "Die KI liest das ganze Dokument noch einmal und gleicht mit dem Vertrag ab.":"ИИ заново прочитает весь документ и сверит с договором.",
+  "Erkennt Anbieter, Beträge und Fristen und macht den Text durchsuchbar.":"Распознаёт поставщика, суммы и сроки и делает текст доступным для поиска.",
+  "Nur ablegen – Auslesen lässt sich später nachholen.":"Только сохранить – считать можно позже.",
+  "Anfügen":"Добавить",
+  "Die Seiten bleiben als Entwurf auf diesem Gerät.":"Страницы остаются черновиком на этом устройстве.",
+  "Zurück zu den Seiten":"Назад к страницам",
+  "Seite {0} von {1} wird aufbereitet …":"Страница {0} из {1} обрабатывается …",
+  "Seite wird aufbereitet …":"Страница обрабатывается …",
+  "Keine Internetverbindung. Speichern, sobald du wieder online bist.":"Нет интернета. Сохрани, когда снова будешь онлайн.",
+  "Seiten werden aufbereitet …":"Страницы обрабатываются …",
+  "Das PDF wird größer als 15 MB – bitte auf mehrere Dokumente aufteilen.":"PDF получится больше 15 МБ – раздели на несколько документов.",
+  "Wird hochgeladen …":"Загрузка …",
+  "Seite {0} von {1} wird hochgeladen …":"Страница {0} из {1} загружается …",
+  "PDF wird erweitert …":"PDF дополняется …",
+  "Dieses PDF ist geschützt – Seiten lassen sich nicht anfügen. Scanne die Seiten als eigenes Dokument.":"Этот PDF защищён – страницы добавить нельзя. Отсканируй их как отдельный документ.",
+  "Dieses PDF lässt sich nicht erweitern.":"Этот PDF нельзя дополнить.",
+  "Das PDF wird größer als 15 MB – bitte als eigenes Dokument speichern.":"PDF получится больше 15 МБ – сохрани как отдельный документ.",
+  "Das Dokument ließ sich nicht ändern.":"Документ не удалось изменить.",
+  "PDF wird angehängt …":"PDF добавляется …",
+  "Eines der PDFs ist geschützt – Anhängen geht nicht.":"Один из PDF защищён – добавить нельзя.",
+  "Anhängen fehlgeschlagen":"Добавить не удалось",
+  "Mit der Kamera, hinten angefügt":"Камерой, добавляется в конец",
+  "PDF-Datei anhängen":"Добавить PDF-файл",
+  "Alle Seiten der Datei kommen hinten dazu":"Все страницы файла добавятся в конец",
+  "PDF-Werkzeug konnte nicht geladen werden.":"Не удалось загрузить инструмент PDF.",
+  "Angefangener Scan":"Начатый скан",
+  "{0} vom {1}, {2} Uhr – nur auf diesem Gerät gespeichert.":"{0} от {1}, {2} – сохранено только на этом устройстве.",
+  "Fortsetzen":"Продолжить",
+  "Verwerfen und neu beginnen":"Удалить и начать заново",
+  "Filter für alle Seiten übernommen":"Фильтр применён ко всем страницам",
+  "Die Ecken überkreuzen sich – bitte korrigieren.":"Углы пересекаются – исправь, пожалуйста.",
+  "Im Text gefunden":"Найдено в тексте",
+  "{0} Seite":"Страниц: {0}",
+  "{0} Seiten":"Страниц: {0}",
+  "{0} Angabe übernehmen":"Перенести данные: {0}",
+  "{0} Angaben übernehmen":"Перенести данные: {0}",
+  "{0} Seite ansehen":"Посмотреть страницы: {0}",
+  "{0} Seiten ansehen":"Посмотреть страницы: {0}",
+  "{0} Datei ist kein lesbares Foto.":"Нечитаемых фото: {0}.",
+  "{0} Dateien sind keine lesbaren Fotos.":"Нечитаемых фото: {0}.",
+  "{0} Seite anfügen":"Добавить страницы: {0}",
+  "{0} Seiten anfügen":"Добавить страницы: {0}",
+  "{0} Seite angefügt":"Добавлено страниц: {0}",
+  "{0} Seiten angefügt":"Добавлено страниц: {0}",
+  "{0} Seite angehängt":"Добавлено страниц: {0}",
+  "{0} Seiten angehängt":"Добавлено страниц: {0}",
+  "Scan verwerfen? Die Seite geht verloren.":"Удалить скан? Страница пропадёт.",
+  "Scan verwerfen? {0} Seiten gehen verloren.":"Удалить скан? Пропадёт страниц: {0}.",
+  "Auto":"Авто",
+  "Original":"Оригинал",
+  "Graustufen":"Оттенки серого",
+  "Schwarzweiß":"Чёрно-белый",
+  "Volltext für die Suche":"Полный текст для поиска",
+
 
 /* ---- Kurze Fristbeschriftungen ---- */
   "Mindestlaufzeit (Monate)":"Минимальный срок (Mindestlaufzeit, мес.)",
@@ -1352,7 +1608,16 @@ var ICONS={
   users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   share:'<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
   copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
-  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/>'
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/>',
+  /* Scanner */
+  left:'<path d="m15 6-6 6 6 6"/>',
+  links:'<path d="M19 12H5"/><path d="m11 6-6 6 6 6"/>',
+  bild:'<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/>',
+  blitz:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  crop:'<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
+  drehen:'<rect x="3" y="10" width="10" height="11" rx="1.5"/><path d="M10 3a8 8 0 0 1 8 8"/><path d="m15 8 3 3 3-3"/>',
+  filter:'<path d="m15 4 1.5 3L20 8.5 16.5 10 15 13l-1.5-3L10 8.5 13.5 7z"/><path d="M4 20 12 12"/>',
+  rahmen:'<path d="M4 8V5a1 1 0 0 1 1-1h3"/><path d="M16 4h3a1 1 0 0 1 1 1v3"/><path d="M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M8 20H5a1 1 0 0 1-1-1v-3"/>'
 };
 
 /* ================= Kleine Helfer ================= */
@@ -1810,7 +2075,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -1896,8 +2161,11 @@ function render(){
   if(booting){r.innerHTML=ladeHtml();return;}
   if(!me){r.innerHTML=authHtml();return;}
   var rt=route();
+  /* Scanner: eigene Ebene über der App; die Adresse hält ihn offen */
+  if(rt.name!=="scan"&&SCAN&&!SCAN_SPEICHERN)scannerAus();   /* beim Speichern bleibt er offen, bis alles oben ist */
   /* Daten kamen nicht an? Das muss man sehen, nicht erraten. */
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
+  if(rt.name==="scan"){r.innerHTML=shell("","neu");scannerZeigen(rt.params);return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
   if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
@@ -1989,12 +2257,16 @@ async function speichereSetup(arten,fertig){
   SETUP=(r&&r.data)||reihe;
 }
 
-/* Verträge, Dokumente, Personen des Haushalts */
+/* Verträge, Dokumente, Personen des Haushalts. Dokumente ohne den Volltext –
+   der kann je Scan einige Zehntausend Zeichen lang sein und wird nur gesucht. */
+var DOK_SPALTEN="id,household_id,user_id,contract_id,doc_type,filename,storage_path,mime_type,size_bytes,doc_date,extracted,"+
+  "zusammenfassung,note,created_at,person_id,bereich,arzt,fachrichtung,med_typ,betrag,behandlungsdatum,content_hash,ki_pending,"+
+  "med_recherche,med_recherche_am,titel,ai_lang,i18n,weitere_seiten,seiten,ohne_ki";
 async function ladeDaten(){
   if(!HH){CONTRACTS=[];DOCS=[];PERSONS=[];return;}
   var antw=await Promise.all([
     sb.from("contracts").select("*").eq("household_id",HH.id).order("created_at",{ascending:false}),
-    sb.from("documents").select("*").eq("household_id",HH.id).order("created_at",{ascending:false}),
+    sb.from("documents").select(DOK_SPALTEN).eq("household_id",HH.id).order("created_at",{ascending:false}),
     sb.from("persons").select("*").eq("household_id",HH.id).order("created_at",{ascending:true})
   ]);
   if(antw[0].error)throw antw[0].error;
@@ -2203,6 +2475,8 @@ async function doSetPass(){
   }catch(e){authMsg(loginFehler(e),"err");}
 }
 async function doLogout(){
+  if(SCAN)scannerAus();
+  await entwurfLoeschen();
   try{await sb.auth.signOut();}catch(e){}
   me=null;HH=null;SETUP=null;CONTRACTS=[];DOCS=[];PERSONS=[];ENERGIE={};
   curLang="de";applyLangAttr();   /* Anmelde-Bildschirm ist immer deutsch */
@@ -2656,7 +2930,8 @@ function viewVertrag(id){
     /* Dokumente */
     '<div class="sect">'+t("Dokumente")+'</div>'+
     '<section class="card">'+dokListe(c)+
-      '<div class="factions" style="margin-top:12px"><a class="btn ghost" href="#/neu?vertrag='+c.id+'">'+ic("plus")+' '+t("Dokument hinzufügen")+'</a></div>'+
+      '<div class="factions" style="margin-top:12px"><button class="btn" data-a="scan" data-vertrag="'+c.id+'">'+ic("camera")+' '+t("Scannen")+'</button>'+
+        '<a class="btn ghost" href="#/neu?vertrag='+c.id+'">'+ic("folder")+' '+t("Datei hochladen")+'</a></div>'+
     '</section>'+
     /* Aktionen */
     '<div class="factions" style="margin-top:20px">'+
@@ -3030,12 +3305,11 @@ function viewNeu(){
       '<p class="hint" style="margin:0 0 14px">'+t("Hochladen – All-Home liest aus und sortiert ein.")+'</p>'+
       kiStufenWahl()+
       '<div class="tiles">'+
-        '<button class="tile" data-a="pick-cam"><span class="hd">'+ic("camera",22)+'<span class="nm">'+t("Brief fotografieren")+'</span></span>'+
-          '<span class="mt" style="display:block;margin-top:6px">'+t("Die Kamera öffnet sich direkt")+'</span></button>'+
+        '<button class="tile" data-a="scan" data-vertrag="'+esc(p.vertrag||"")+'" data-art="'+esc(p.art||"")+'"><span class="hd">'+ic("camera",22)+'<span class="nm">'+t("Scannen")+'</span></span>'+
+          '<span class="mt" style="display:block;margin-top:6px">'+t("Mehrere Seiten · PDF oder JPG")+'</span></button>'+
         '<button class="tile" data-a="pick-file"><span class="hd">'+ic("folder",22)+'<span class="nm">'+t("Dateien auswählen")+'</span></span>'+
           '<span class="mt" style="display:block;margin-top:6px">'+t("PDF oder Fotos · mehrere möglich")+'</span></button>'+
       '</div>'+
-      '<input type="file" id="fCam" accept="image/*" capture="environment" hidden>'+
       '<input type="file" id="fPick" accept="application/pdf,image/*" multiple hidden>'+
       '<div id="aiWork" class="abrbusy" hidden><span class="spin"></span><span id="aiMsg"></span></div>'+
       '<p class="hint" style="margin-top:14px">🔒 '+t("Verschlüsselt und privat – nur dein Haushalt sieht die Dokumente.")+'</p>'+
@@ -3180,21 +3454,24 @@ async function einesVerarbeiten(file,ziel){
     IMPORT.ergebnisse.push({name:name,icon:"⚠️",text:t("abgelegt, nichts erkannt"),docId:reihe.id});
     return;
   }
-  /* Ergebnis speichern */
+  try{await sb.from("documents").update(kiFelder(ext,name,false)).eq("id",reihe.id);}catch(e){}
+  IMPORT.ergebnisse.push({name:name,icon:"✅",text:t("eingelesen"),docId:reihe.id});
+}
+/* Was die KI gelesen hat → Spalten des Dokuments. med: im Gesundheitsbereich gescannt */
+function kiFelder(ext,name,med){
   var upd={extracted:ext,ai_lang:curLang,
     doc_type:(ext.docType&&DOCTYPE[ext.docType])?ext.docType:"sonstiges",
     doc_date:ext.datum||null,zusammenfassung:ext.zusammenfassung||null,
-    titel:(ext.titel||name).slice(0,80)};
-  if(ext.istMedizin){
+    titel:(ext.titel||name||"").slice(0,80)};
+  if(ext.istMedizin||med){
     upd.bereich="medizin";
     upd.fachrichtung=(ext.fachrichtung&&FACH[ext.fachrichtung])?ext.fachrichtung:"sonstiges";
     upd.arzt=ext.arzt||null;
     upd.med_typ=(ext.medTyp&&MEDTYP[ext.medTyp])?ext.medTyp:(ext.docType==="rechnung"?"rechnung":"sonstiges");
-    upd.betrag=ext.betrag!=null?Number(ext.betrag):null;
+    upd.betrag=ext.betrag!=null?numOrNull(ext.betrag):null;
     upd.behandlungsdatum=ext.datum||null;
   }
-  try{await sb.from("documents").update(upd).eq("id",reihe.id);}catch(e){}
-  IMPORT.ergebnisse.push({name:name,icon:"✅",text:t("eingelesen"),docId:reihe.id});
+  return upd;
 }
 /* Edge-Function aufrufen und Guthaben-/Fehlercode herausziehen */
 async function edgeRuf(fn,body){
@@ -3245,54 +3522,191 @@ function artAusExtrakt(ext){
   return ARTEN[art]?art:"sonstiges";
 }
 /* Passt das zu einem bestehenden Vertrag? */
-function findeVertrag(ext){
+/* Liefert {c, grund}: grund "nummer" (Kunden-/Vertragsnummer gleich) oder "name" (Anbieter + Art).
+   Bei Namen gewinnt die genaue Art vor der Gruppe – Telekom-Mobilfunk-Rechnung → Mobilfunk-, nicht Internetvertrag. */
+function findeVertragMitGrund(ext){
   if(!ext)return null;
-  var kn=(ext.kundennummer||"").trim(),vn=(ext.vertragsnummer||"").trim();
-  var treffer=null;
-  CONTRACTS.forEach(function(c){
-    if(treffer)return;
-    if(kn&&c.kundennummer&&String(c.kundennummer).trim()===kn)treffer=c;
-    else if(vn&&c.vertragsnummer&&String(c.vertragsnummer).trim()===vn)treffer=c;
-  });
-  if(treffer)return treffer;
+  var nr=CONTRACTS.filter(function(c){return nummerGleich(c.kundennummer,ext.kundennummer)||nummerGleich(c.vertragsnummer,ext.vertragsnummer);})[0];
+  if(nr)return {c:nr,grund:"nummer"};
   var ab=(ext.anbieter||"").trim().toLowerCase();
   if(!ab)return null;
   var art=artAusExtrakt(ext);
-  return CONTRACTS.filter(function(c){
+  var kandidaten=CONTRACTS.filter(function(c){
     var ca=(c.anbieter||"").trim().toLowerCase();
     if(!ca)return false;
     var passt=(ca===ab)||(ca.indexOf(ab)>=0)||(ab.indexOf(ca)>=0);
     return passt&&(c.art===art||artInfo(c.art).g===artInfo(art).g);
-  })[0]||null;
+  });
+  var genau=kandidaten.filter(function(c){return c.art===art;})[0]||kandidaten[0];
+  return genau?{c:genau,grund:"name"}:null;
 }
+function findeVertrag(ext){var f=findeVertragMitGrund(ext);return f?f.c:null;}
+/* Auswahl im Abgleich (Schlüssel → übernehmen?) und „trotzdem hier“ bei fremdem Anbieter */
+var REVIEW_WAHL=null,REVIEW_TROTZDEM=false;
 function reviewKarte(){
   var d=REVIEW;if(!d)return "";
   var ext=d.extracted||{};
   if(istMed(d))return medReviewKarte(d);
-  var art=artAusExtrakt(ext),a=artInfo(art);
-  var ty=dtInfo(d.doc_type);
-  var treffer=findeVertrag(ext);
-  var wichtig=aiExt(d,"wichtig");
-  var hinweise=aiExt(d,"hinweise");
-  return '<section class="card">'+
+  var art=artAusExtrakt(ext),a=artInfo(art),ty=dtInfo(d.doc_type);
+  var c=hatVertrag(d)?vertragById(d.contract_id):null;
+  var wichtig=aiExt(d,"wichtig"),hinweise=aiExt(d,"hinweise");
+  var kopf='<section class="card">'+
     '<div class="sug good"><span class="si">'+ic("sparkles")+'</span><div class="sb2">'+
       '<div class="st">'+esc(docTitel(d))+'</div>'+
       '<div class="sx">'+ty.icon+' '+ty.label+' · '+a.icon+' '+esc(a.label)+
-        (ext.anbieter?' · '+esc(ext.anbieter):"")+'</div>'+
+        (ext.anbieter?' · '+esc(ext.anbieter):"")+(d.seiten>1?' · '+tn(d.seiten,"{0} Seite","{0} Seiten"):"")+'</div>'+
     '</div></div>'+
     (aiVal(d,"zusammenfassung")?'<p style="margin:14px 0 0">'+esc(aiVal(d,"zusammenfassung"))+'</p>':"")+
     (Array.isArray(wichtig)&&wichtig.length
       ?'<ul class="hint" style="margin:10px 0 0;padding-left:20px">'+wichtig.map(function(w){return '<li>'+esc(w)+'</li>';}).join("")+'</ul>':"")+
-    (hinweise?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"")+
+    (hinweise?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"");
+  /* Schon einem Vertrag zugeordnet (Scan am Vertrag oder eben gewählt) → abgleichen */
+  if(c){
+    if(!REVIEW_TROTZDEM&&!anbieterPasst(c,ext))
+      return kopf+'<div class="sug warn" style="margin-top:12px"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+          '<div class="st">'+tf("Das Dokument scheint von „{0}“ zu sein, der Vertrag ist bei „{1}“.",esc(ext.anbieter||""),esc(c.anbieter||""))+'</div>'+
+          '<div class="sx">'+t("Bitte prüfen, bevor etwas übernommen wird.")+'</div></div></div>'+
+        '<div class="factions" style="margin-top:16px">'+
+          '<button class="btn" data-a="rv-anders">'+ic("link")+' '+t("Anderem Vertrag zuordnen")+'</button>'+
+          '<button class="btn ghost" data-a="rv-neu" data-k="'+art+'">'+ic("plus")+' '+t("Neuen Vertrag anlegen")+'</button>'+
+          '<button class="btn ghost" data-a="rv-trotzdem">'+tf("Trotzdem bei „{0}“ lassen",esc(c.anbieter||artInfo(c.art).label))+'</button>'+
+        '</div></section>';
+    return kopf+'</section>'+abgleichKarte(c,ext);
+  }
+  var fund=findeVertragMitGrund(ext),treffer=fund&&fund.c;
+  return kopf+
     (treffer?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("link")+'</span><div class="sb2">'+
-      '<div class="st">'+tf("Passt zu „{0}“",esc(treffer.anbieter||""))+'</div>'+
-      '<div class="sx">'+t("Kunden- oder Vertragsnummer stimmen überein.")+'</div></div></div>':"")+
+      '<div class="st">'+tf("Passt zu „{0}“",esc(treffer.anbieter||""))+' · '+esc(artInfo(treffer.art||"sonstiges").label)+'</div>'+
+      '<div class="sx">'+(fund.grund==="nummer"?t("Kunden- oder Vertragsnummer stimmen überein."):t("Anbieter und Vertragsart passen."))+'</div></div></div>':"")+
     '<div class="factions" style="margin-top:16px">'+
       (treffer?'<button class="btn" data-a="rv-link" data-id="'+treffer.id+'">'+ic("link")+' '+tf("Zu „{0}“ zuordnen",esc(treffer.anbieter||""))+'</button>':"")+
       '<button class="btn'+(treffer?" ghost":"")+'" data-a="rv-neu" data-k="'+art+'">'+ic("plus")+' '+t("Neuen Vertrag anlegen")+'</button>'+
+      (CONTRACTS.length?'<button class="btn ghost" data-a="rv-anders">'+ic("link")+' '+t("Bestehendem Vertrag zuordnen")+'</button>':"")+
       '<button class="btn ghost" data-a="rv-archiv">'+t("Nur ablegen")+'</button>'+
     '</div>'+
   '</section>';
+}
+/* Gehört das Dokument zu diesem Vertrag? Nummern oder Namenskern müssen passen. */
+function anbieterKern(s){
+  var weg={gmbh:1,ag:1,se:1,kg:1,kgaa:1,co:1,ohg:1,mbh:1,ug:1,ev:1,e:1,v:1,deutschland:1,germany:1,
+    versicherung:1,versicherungen:1,versicherungs:1,bank:1,und:1,der:1,die:1,das:1};
+  return String(s||"").toLowerCase().replace(/[.,&+()\/"'„“\-]/g," ").split(/\s+/).filter(function(w){return w&&!weg[w];});
+}
+function nummerGleich(a,b){
+  a=String(a||"").replace(/[\s\/.\-]/g,"").toLowerCase();b=String(b||"").replace(/[\s\/.\-]/g,"").toLowerCase();
+  return !!a&&a===b;
+}
+function anbieterPasst(c,ext){
+  if(!c||!ext||artInfo(c.art||"sonstiges").kein_anbieter)return true;
+  if(nummerGleich(c.kundennummer,ext.kundennummer)||nummerGleich(c.vertragsnummer,ext.vertragsnummer))return true;
+  var a=anbieterKern(c.anbieter),b=anbieterKern(ext.anbieter);
+  if(!a.length||!b.length)return true;
+  return a.some(function(w){return w.length>=3&&b.some(function(v){return v.length>=3&&(v.indexOf(w)>=0||w.indexOf(v)>=0);});});
+}
+/* ---- Abgleich: was die KI gelesen hat ↔ was im Vertrag steht ----
+   Leere Felder sind vorab angehakt, Abweichungen nicht – ein Lesefehler soll
+   nie unbemerkt einen richtigen Wert überschreiben. */
+function leerWert(v){return v==null||v==="";}
+/* Nummern und Kennzeichen: Schreibweise egal („9430 8559“ = „94308559“, „FB SK 1990“ = „FB-SK 1990“) */
+var ABGLEICH_KOMPAKT={kundennummer:1,vertragsnummer:1,kennzeichen:1,fin:1,hsn:1,tsn:1,iban:1,zaehlernummer:1,rufnummer:1,mitgliedsnummer:1};
+function kompakt(v){return String(v==null?"":v).toUpperCase().replace(/[\s\-\/.]/g,"");}
+function wertGleich(a,b,feld){
+  if(leerWert(a)&&leerWert(b))return true;
+  if(feld&&ABGLEICH_KOMPAKT[feld])return kompakt(a)===kompakt(b);
+  var na=numOrNull(a),nb=numOrNull(b);
+  if((typeof a==="number"||typeof b==="number")&&na!=null&&nb!=null)return Math.abs(na-nb)<0.005;
+  return String(a==null?"":a).replace(/\s+/g," ").trim().toLowerCase()===String(b==null?"":b).replace(/\s+/g," ").trim().toLowerCase();
+}
+function feldText(f,v){
+  if(leerWert(v))return "";
+  if(f.t==="date")return fmtDate(v);
+  if(f.t==="eur")return eur(numOrNull(v));
+  return String(v);
+}
+function abgleichZeilen(c,ext){
+  var art=c.art||"sonstiges",ap=artProfil(art),z=[];
+  function zeile(k,label,alt,neu,altTxt,neuTxt,spalten,details){
+    if(leerWert(neu)||wertGleich(alt,neu,k.replace(/^d_/,"")))return;
+    z.push({k:k,label:label,alt:altTxt!=null?altTxt:(leerWert(alt)?"":String(alt)),neu:neuTxt!=null?neuTxt:String(neu),
+            an:leerWert(alt),spalten:spalten||null,details:details||null});
+  }
+  function monate(v){var n=numOrNull(v);return n==null?null:n;}
+  function monTxt(v){return v==null?"":(v===0?t("keine"):tn(v,"{0} Monat","{0} Monate"));}
+  /* Anbieter nur, wenn der Vertrag noch keinen hat – „Telekom“ gegen „Telekom Deutschland GmbH“ wäre nur Rauschen,
+     und ein wirklich anderer Anbieter löst vorher die Warnung aus */
+  if(!artInfo(art).kein_anbieter&&ext.anbieter&&leerWert(c.anbieter))zeile("anbieter",t(ap.al),c.anbieter,ext.anbieter,null,null,{anbieter:String(ext.anbieter).trim()});
+  if(grundfeld(art,"produkt"))zeile("produkt",t("Tarif / Produkt"),c.produkt,ext.produkt,null,null,{produkt:ext.produkt});
+  if(grundfeld(art,"kundennummer"))zeile("kundennummer",t("Kundennummer"),c.kundennummer,ext.kundennummer,null,null,{kundennummer:ext.kundennummer});
+  if(grundfeld(art,"vertragsnummer"))zeile("vertragsnummer",t(ap.vn),c.vertragsnummer,ext.vertragsnummer,null,null,{vertragsnummer:ext.vertragsnummer});
+  if(grundfeld(art,"beginn")&&/^\d{4}-\d{2}-\d{2}$/.test(String(ext.vertragsstart||"")))
+    zeile("beginn",t("Vertragsbeginn"),c.vertragsstart,ext.vertragsstart,leerWert(c.vertragsstart)?"":fmtDate(c.vertragsstart),fmtDate(ext.vertragsstart),{vertragsstart:ext.vertragsstart});
+  var ml=monate(ext.mindestlaufzeitMonate),kf=monate(ext.kuendigungsfristMonate),vl=monate(ext.verlaengerungMonate);
+  if(grundfeld(art,"ml")&&ml!=null)zeile("ml",t("Mindestlaufzeit"),c.mindestlaufzeit_monate,ml,monTxt(c.mindestlaufzeit_monate),monTxt(ml),{mindestlaufzeit_monate:Math.round(ml)});
+  if(grundfeld(art,"kf")&&kf!=null)zeile("kf",t("Kündigungsfrist"),c.kuendigungsfrist_monate,kf,monTxt(c.kuendigungsfrist_monate),monTxt(kf),{kuendigungsfrist_monate:kf});
+  if(grundfeld(art,"vl")&&vl!=null)zeile("vl",t("Verlängerung"),c.verlaengerung_monate,vl,monTxt(c.verlaengerung_monate),monTxt(vl),{verlaengerung_monate:Math.round(vl)});
+  var k=numOrNull(ext.kosten);
+  if(grundfeld(art,"kosten")&&k!=null){
+    var iv=(ext.kostenIntervall&&INTERVALL_LABEL[ext.kostenIntervall])?ext.kostenIntervall:(c.kosten_intervall||ap.iv||"monatlich");
+    var altIv=c.kosten_intervall||"monatlich";
+    if(!(wertGleich(c.kosten,k)&&altIv===iv)){
+      var teurer=c.kosten!=null&&INTERVALL[iv]&&INTERVALL[altIv]&&(k/INTERVALL[iv])>(Number(c.kosten)/INTERVALL[altIv])+0.004;
+      z.push({k:"kosten",label:t(ap.kl).replace(/\s*\(€\)$/,""),alt:c.kosten==null?"":eur(Number(c.kosten))+" "+t(INTERVALL_LABEL[altIv]),
+        neu:eur(k)+" "+t(INTERVALL_LABEL[iv]),an:c.kosten==null,spalten:{kosten:k,kosten_intervall:iv},teurer:teurer});
+    }
+  }
+  var det=detailsAusExtrakt(ext,art),vorher=c.details||{};
+  artFelder(art).forEach(function(f){
+    if(det[f.k]==null)return;
+    var d1={};d1[f.k]=det[f.k];
+    zeile("d_"+f.k,f.l,vorher[f.k],det[f.k],feldText(f,vorher[f.k]),feldText(f,det[f.k]),null,d1);
+  });
+  return z;
+}
+function abgleichKarte(c,ext){
+  var zeilen=abgleichZeilen(c,ext),name=esc(c.anbieter||artInfo(c.art).label);
+  if(REVIEW_WAHL==null){REVIEW_WAHL={};zeilen.forEach(function(z){REVIEW_WAHL[z.k]=z.an;});}
+  if(!zeilen.length)return '<div class="sect">'+tf("Abgleich mit „{0}“",name)+'</div><section class="card">'+
+    '<div class="sug good"><span class="si">'+ic("check")+'</span><div class="sb2"><div class="st">'+t("Alles stimmt mit dem Vertrag überein.")+'</div></div></div>'+
+    '<div class="factions"><button class="btn" data-a="rv-fertig">'+t("Zum Vertrag")+'</button></div></section>';
+  var n=zeilen.filter(function(z){return REVIEW_WAHL[z.k];}).length,teurer=zeilen.some(function(z){return z.teurer;});
+  return '<div class="sect">'+tf("Abgleich mit „{0}“",name)+'</div><section class="card">'+
+    '<p class="hint" style="margin:0 0 10px">'+t("Angehakt wird übernommen. Abweichende Werte bitte prüfen.")+'</p>'+
+    '<div class="abgl">'+zeilen.map(function(z){
+      var an=!!REVIEW_WAHL[z.k];
+      return '<button class="abz'+(an?" an":"")+'" data-a="ab-zeile" data-k="'+esc(z.k)+'" role="checkbox" aria-checked="'+an+'">'+
+        '<span class="wbox">'+(an?ic("check",16):"")+'</span>'+
+        '<span class="abt"><span class="abl">'+esc(z.label)+'</span>'+
+        '<span class="abw">'+(z.alt?'<s>'+esc(z.alt)+'</s> → ':'')+'<b>'+esc(z.neu)+'</b></span></span></button>';
+    }).join("")+'</div>'+
+    (teurer?'<div class="sug warn" style="margin-top:12px"><span class="si">'+ic("alert")+'</span><div class="sb2"><div class="st">'+t("Der Preis steigt")+'</div>'+
+      '<div class="sx">'+t("Bei einer Preiserhöhung besteht oft ein Sonderkündigungsrecht – meist 4 Wochen ab Zugang des Schreibens.")+'</div></div></div>':"")+
+    '<div class="factions">'+
+      '<button class="btn" data-a="rv-uebernehmen"'+(n?"":" disabled")+'>'+ic("check")+' '+(n?tn(n,"{0} Angabe übernehmen","{0} Angaben übernehmen"):t("Nichts angehakt"))+'</button>'+
+      '<button class="btn ghost" data-a="rv-fertig">'+t("Nichts übernehmen")+'</button>'+
+    '</div></section>';
+}
+async function abgleichUebernehmen(){
+  var d=REVIEW;if(!d)return;
+  var c=hatVertrag(d)?vertragById(d.contract_id):null;if(!c)return;
+  var upd={},det=null;
+  abgleichZeilen(c,d.extracted||{}).forEach(function(z){
+    if(!REVIEW_WAHL||!REVIEW_WAHL[z.k])return;
+    if(z.spalten)Object.keys(z.spalten).forEach(function(k){upd[k]=z.spalten[k];});
+    if(z.details){det=det||Object.assign({},c.details||{});Object.keys(z.details).forEach(function(k){det[k]=z.details[k];});}
+  });
+  if(det)upd.details=det;
+  if(!Object.keys(upd).length){abgleichFertig();return;}
+  try{
+    var r=await sb.from("contracts").update(upd).eq("id",c.id).select("id");
+    if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts geändert – fehlende Berechtigung?"));
+    await ladeDaten();toast(t("Übernommen")+" ✅");abgleichFertig();
+  }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+}
+function abgleichFertig(){
+  var d=REVIEW,cid=d&&d.contract_id;
+  REVIEW=null;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;
+  go(cid&&vertragById(cid)?"#/vertrag?id="+cid:"#/dokumente");
 }
 function importBericht(){
   return '<section class="card">'+
@@ -3326,6 +3740,10 @@ async function dokumentOeffnen(id){
       '<div class="st">'+t("Noch nicht ausgelesen")+'</div><div class="sx">'+t("Das KI-Guthaben war leer.")+'</div>'+
       '<div class="sa"><button class="btn" data-a="d-reanalyze" data-id="'+d.id+'">'+t("Jetzt nachholen")+'</button></div>'+
     '</div></div>':"")+
+    (d.ohne_ki&&!d.ki_pending?'<div class="sug info"><span class="si">'+ic("info")+'</span><div class="sb2">'+
+      '<div class="st">'+t("Ohne KI abgelegt")+'</div><div class="sx">'+t("Auslesen lässt sich jederzeit nachholen.")+'</div>'+
+      '<div class="sa"><button class="btn" data-a="d-reanalyze" data-id="'+d.id+'">'+ic("sparkles")+' '+t("Jetzt auslesen")+'</button></div>'+
+    '</div></div>':"")+
     (aiVal(d,"zusammenfassung")?'<p>'+esc(aiVal(d,"zusammenfassung"))+'</p>':"")+
     (Array.isArray(wichtig)&&wichtig.length?'<ul class="hint" style="padding-left:20px">'+wichtig.map(function(w){return '<li>'+esc(w)+'</li>';}).join("")+'</ul>':"")+
     (hinweise?'<div class="sug info"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"")+
@@ -3337,9 +3755,11 @@ async function dokumentOeffnen(id){
       (ext.kundennummer?kv(t("Kundennummer"),esc(ext.kundennummer)):"")+
       (ext.vertragsnummer?kv(t("Vertragsnummer"),esc(ext.vertragsnummer)):"")+
       kv(t("Datei"),esc(d.filename||"–"))+
+      (d.seiten>1?kv(t("Seiten"),String(d.seiten)):"")+
     '</div>'+
     '<div class="factions">'+
       '<button class="btn" data-a="d-view" data-id="'+d.id+'">'+ic("doc")+' '+t("Öffnen")+'</button>'+
+      '<button class="btn ghost" data-a="d-seiten" data-id="'+d.id+'">'+ic("plus")+' '+t("Seiten hinzufügen")+'</button>'+
       (c?"":'<button class="btn ghost" data-a="d-link" data-id="'+d.id+'">'+ic("link")+' '+t("Zuordnen")+'</button>')+
       '<button class="btn ghost danger" data-a="d-del" data-id="'+d.id+'">'+ic("trash")+' '+t("Löschen")+'</button>'+
       '<button class="btn ghost" data-a="modal-close">'+t("Schließen")+'</button>'+
@@ -3347,11 +3767,36 @@ async function dokumentOeffnen(id){
 }
 async function dokumentAnzeigen(id){
   var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d)return;
+  var pfade=[d.storage_path].concat(d.weitere_seiten||[]).filter(Boolean);
+  if(pfade.length>1){bildBetrachter(d,pfade);return;}
   try{
     var r=await sb.storage.from(BUCKET).createSignedUrl(d.storage_path,120);
     if(r.error)throw r.error;
     window.open(r.data.signedUrl,"_blank","noopener");
   }catch(e){toast(t("Konnte Dokument nicht öffnen")+": "+errMsg(e),true);}
+}
+/* Betrachter für Dokumente aus mehreren Bildern – blättern, einzeln im Tab öffnen */
+var BB=null;
+async function bildBetrachter(d,pfade){
+  try{
+    var r=await sb.storage.from(BUCKET).createSignedUrls(pfade,300);
+    if(r.error)throw r.error;
+    BB={urls:(r.data||[]).map(function(x){return x.signedUrl;}),i:0};
+    if(!BB.urls.length||BB.urls.some(function(u){return !u;}))throw new Error(t("Nicht alle Seiten sind erreichbar."));
+    openModal('<h2 class="mhead">'+esc(docTitel(d))+'</h2>'+
+      '<div class="bb"><img id="bbBild" src="'+esc(BB.urls[0])+'" alt="'+esc(tf("Seite {0}",1))+'"></div>'+
+      '<div class="bbnav"><button class="ibtn" data-a="bb" data-r="-1" id="bbZ" disabled aria-label="'+esc(t("Vorherige Seite"))+'">'+ic("left")+'</button>'+
+        '<span id="bbN">'+tf("Seite {0} von {1}",1,BB.urls.length)+'</span>'+
+        '<button class="ibtn" data-a="bb" data-r="1" id="bbV" aria-label="'+esc(t("Nächste Seite"))+'">'+ic("right")+'</button></div>'+
+      '<div class="factions"><button class="btn ghost" data-a="bb-tab">'+ic("share")+' '+t("Seite in neuem Tab öffnen")+'</button>'+
+      '<button class="btn ghost" data-a="modal-close">'+t("Schließen")+'</button></div>');
+  }catch(e){toast(t("Konnte Dokument nicht öffnen")+": "+errMsg(e),true);}
+}
+function bbBlaettern(r){
+  if(!BB)return;var n=BB.urls.length,i=Math.max(0,Math.min(n-1,BB.i+r));if(i===BB.i)return;BB.i=i;
+  var b=$("#bbBild");if(b){b.src=BB.urls[i];b.alt=tf("Seite {0}",i+1);}
+  var nn=$("#bbN");if(nn)nn.textContent=tf("Seite {0} von {1}",i+1,n);
+  var z=$("#bbZ"),v=$("#bbV");if(z)z.disabled=!i;if(v)v.disabled=i>=n-1;
 }
 async function dokumentLoeschen(id){
   var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d)return;
@@ -3359,7 +3804,7 @@ async function dokumentLoeschen(id){
   try{
     /* erst die Datei, nur bei Erfolg der Eintrag – sonst bliebe die Datei unbemerkt liegen */
     if(d.storage_path){
-      var rm=await sb.storage.from(BUCKET).remove([d.storage_path]);
+      var rm=await sb.storage.from(BUCKET).remove([d.storage_path].concat(d.weitere_seiten||[]));
       if(rm&&rm.error)throw rm.error;
     }
     /* gelöschte Zeilen zurückgeben lassen: ohne Berechtigung meldet die Schnittstelle
@@ -3397,7 +3842,17 @@ function dokSuchtext(d){
   return [docTitel(d),d.filename,dtInfo(d.doc_type).label,fmtDate(docDatum(d)),
     c?c.anbieter:"",c?artInfo(c.art||"sonstiges").label:"",ext.anbieter].filter(Boolean).join(" ").toLowerCase();
 }
-function dokPasst(d){var q=DOK_Q.trim().toLowerCase();return !q||dokSuchtext(d).indexOf(q)>=0;}
+function dokPasst(d){var q=DOK_Q.trim().toLowerCase();return !q||dokSuchtext(d).indexOf(q)>=0||(VT_CACHE.q===q&&!!VT_CACHE.ids[d.id]);}
+/* Suche im Text gescannter Dokumente – in der Datenbank, der Text wird nicht mitgeladen */
+var VT_CACHE={q:"",ids:{}},VT_UHR=null;
+async function volltextSuche(q){
+  if(!HH||q.length<3)return [];
+  var muster="%"+q.replace(/[\\%_]/g,function(c){return "\\"+c;})+"%";
+  try{
+    var r=await sb.from("documents").select("id").eq("household_id",HH.id).ilike("volltext",muster).limit(50);
+    return r&&!r.error?(r.data||[]).map(function(x){return x.id;}):[];
+  }catch(e){return [];}
+}
 function ablageAuswahl(){return dokListeAktuell().filter(function(d){return ABLAGE_WAHL[d.id];});}
 function dokZeile(d,wahl,mitVertrag){
   var ty=dtInfo(d.doc_type),c=hatVertrag(d)?vertragById(d.contract_id):null,an=!!ABLAGE_WAHL[d.id];
@@ -3405,6 +3860,7 @@ function dokZeile(d,wahl,mitVertrag){
   var meta='<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span>'+
     (!mitVertrag?"":c?'<span>'+esc(c.anbieter||artInfo(c.art||"sonstiges").label)+'</span>'
       :'<span class="pill">'+(d.ki_pending?t("Noch nicht ausgelesen"):t("nicht zugeordnet"))+'</span>')+'</span>';
+  such+=' data-dok="'+d.id+'"';
   if(wahl)return '<div class="drow3 wahl'+(an?" an":"")+'"'+such+'>'+
     '<button class="wbox" data-a="ab-wahl" data-id="'+d.id+'" role="checkbox" aria-checked="'+an+'" aria-label="'+esc(t("Auswählen"))+'">'+(an?ic("check",16):"")+'</button>'+
     '<button class="wtxt" data-a="ab-wahl" data-id="'+d.id+'"><span class="dn">'+esc(docTitel(d))+'</span>'+meta+'</button>'+
@@ -3451,6 +3907,17 @@ function dokFilter(q){
     var ja=!nq||String(z.getAttribute("data-such")).indexOf(nq)>=0;z.hidden=!ja;if(ja)treffer++;
   });
   var leer=$("#dleer");if(leer)leer.hidden=!!treffer;
+  clearTimeout(VT_UHR);
+  if(nq.length<3)return;
+  VT_UHR=setTimeout(function(){
+    volltextSuche(nq).then(function(ids){
+      if(DOK_Q.trim().toLowerCase()!==nq)return;
+      VT_CACHE={q:nq,ids:{}};ids.forEach(function(id){VT_CACHE.ids[id]=1;});
+      var mehr=0;
+      document.querySelectorAll("#dliste>[data-dok]").forEach(function(z){if(z.hidden&&VT_CACHE.ids[z.getAttribute("data-dok")]){z.hidden=false;mehr++;}});
+      if(mehr){var l=$("#dleer");if(l)l.hidden=true;}
+    });
+  },300);
 }
 function ablageWahl(id){if(ABLAGE_WAHL[id])delete ABLAGE_WAHL[id];else ABLAGE_WAHL[id]=1;render();}
 /* „Alle auswählen“ meint alle, die gerade zu sehen sind (Filter + Suche) */
@@ -3466,7 +3933,8 @@ async function dokumenteAuswahlLoeschen(){
   var knopf=document.querySelector('[data-a="d-del-wahl"]');if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gelöscht …");}
   try{
     /* erst die Dateien, nur bei Erfolg die Einträge */
-    var pfade=liste.map(function(d){return d.storage_path;}).filter(Boolean);
+    var pfade=[];liste.forEach(function(d){pfade.push(d.storage_path);(d.weitere_seiten||[]).forEach(function(p){pfade.push(p);});});
+    pfade=pfade.filter(Boolean);
     for(var i=0;i<pfade.length;i+=100){
       var rm=await sb.storage.from(BUCKET).remove(pfade.slice(i,i+100));
       if(rm&&rm.error)throw rm.error;
@@ -3497,31 +3965,37 @@ async function dokumentVerknuepfen(docId,cid){
   try{
     var r=await sb.from("documents").update({contract_id:cid||null}).eq("id",docId);
     if(r.error)throw r.error;
-    closeModal(true);await ladeDaten();render();
+    closeModal(true);await ladeDaten();
+    if(REVIEW&&REVIEW.id===docId){REVIEW=DOCS.filter(function(x){return x.id===docId;})[0]||REVIEW;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;}
+    render();
     toast(t("Dokument zugeordnet ✅"));
   }catch(e){toast(t("Zuordnen fehlgeschlagen")+": "+errMsg(e),true);}
 }
-/* Analyse nachholen, wenn das Guthaben wieder da ist */
+/* Auslesen nachholen (Guthaben war leer oder „ohne KI“ abgelegt) – danach prüfen und abgleichen */
+var NACHHOLEN=false;
 async function analyseNachholen(id){
-  var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d)return;
-  toast(t("Analyse wird nachgeholt …"));
+  var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d||NACHHOLEN)return;
+  NACHHOLEN=true;
+  var knopf=document.querySelector('[data-a="d-reanalyze"]');if(knopf){knopf.disabled=true;knopf.textContent=t("All-Home liest …");}
   try{
-    var dl=await sb.storage.from(BUCKET).download(d.storage_path);
-    if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
-    var bytes=new Uint8Array(await dl.data.arrayBuffer());
-    var b=await edgeRuf(EDGE_EXTRACT,{fileBase64:bytesBase64(bytes),mimeType:d.mime_type||"application/pdf",model:kiStufe(),lang:curLang});
-    var ext=b.dokument;
-    if(!ext)throw new Error(t("Nichts erkannt."));
-    await sb.from("documents").update({extracted:ext,ai_lang:curLang,ki_pending:false,
-      doc_type:(ext.docType&&DOCTYPE[ext.docType])?ext.docType:"sonstiges",
-      doc_date:ext.datum||null,zusammenfassung:ext.zusammenfassung||null,
-      titel:(ext.titel||d.filename||"").slice(0,80)}).eq("id",id);
-    closeModal(true);await ladeDaten();render();
+    var quelle,bild=(d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||"");
+    if(bild)quelle={bilder:await bilderDesDokuments(d)};
+    else{
+      var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+      if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+      quelle={pdf:new Uint8Array(await dl.data.arrayBuffer())};
+      if(quelle.pdf.length>14*1024*1024)throw new Error(t("Datei zu groß für die Analyse (max. ca. 14 MB)."));
+    }
+    var erg=await kiAuslesen(d,quelle,istMed(d));
+    if(erg!=="ok")return;
+    /* Volltext gibt es für Scans */
+    if(d.seiten){if(quelle.bilder)volltextHolen(d.id,quelle.bilder,"");else volltextAusPdf(d.id,quelle.pdf);}
+    closeModal(true);await ladeDaten();
+    REVIEW=DOCS.filter(function(x){return x.id===id;})[0]||null;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;
+    if(REVIEW)go("#/neu");else render();
     toast(t("Analyse nachgeholt ✅"));
-  }catch(e){
-    if(e&&e.code==="ki_guthaben")toast(t("Das KI-Guthaben ist noch leer."),true);
-    else toast(t("Nachholen fehlgeschlagen")+": "+errMsg(e),true);
-  }
+  }catch(e){toast(t("Nachholen fehlgeschlagen")+": "+errMsg(e),true);}
+  finally{NACHHOLEN=false;if(knopf&&knopf.isConnected){knopf.disabled=false;knopf.textContent=t("Jetzt auslesen");}}
 }
 /* ---- Nachübersetzen beim Öffnen ---- */
 var transBusy={};
@@ -3589,7 +4063,8 @@ function viewGesundheit(){
       '<section class="card"><div class="empty"><div class="ei">'+ic("health",28)+'</div>'+
       '<h3>'+t("Noch keine Arztdokumente")+'</h3>'+
       '<p>'+t("Lade eine Arztrechnung oder einen Befund hoch. All-Home erkennt Fachrichtung, Arzt und Betrag selbst – und erklärt dir auf Wunsch, was abgerechnet wurde.")+'</p>'+
-      '<a class="btn" href="#/neu" style="margin-top:12px">'+ic("plus")+' '+t("Arztdokument hochladen")+'</a></div></section>';
+      '<div class="factions" style="margin-top:12px"><button class="btn" data-a="scan" data-med="1">'+ic("camera")+' '+t("Arztdokument scannen")+'</button>'+
+      '<a class="btn ghost" href="#/neu">'+ic("folder")+' '+t("Datei hochladen")+'</a></div></div></section>';
   }
   var jahr=todayISO().slice(0,4);
   var kostenJahr=meds.reduce(function(s,d){
@@ -3647,7 +4122,8 @@ function viewGesundheit(){
     '</div>'+
     (reihen||'<section class="card"><p class="hint">'+t("Keine Dokumente für diese Auswahl.")+'</p></section>')+
     '<div class="factions" style="margin-top:18px">'+
-      '<a class="btn ghost" href="#/neu">'+ic("plus")+' '+t("Arztdokument hinzufügen")+'</a>'+
+      '<button class="btn" data-a="scan" data-med="1" data-person="'+esc(medFilter.person||"")+'">'+ic("camera")+' '+t("Arztdokument scannen")+'</button>'+
+      '<a class="btn ghost" href="#/neu">'+ic("folder")+' '+t("Datei hochladen")+'</a>'+
       '<button class="btn ghost" data-a="pers-verw">'+ic("user")+' '+t("Personen verwalten")+'</button>'+
     '</div>';
 }
@@ -3684,6 +4160,7 @@ function medDetail(d){
     (aiVal(d,"zusammenfassung")?'<p style="margin-top:12px">'+esc(aiVal(d,"zusammenfassung"))+'</p>':"")+
     '<div class="factions" style="margin-top:12px">'+
       '<button class="btn ghost" data-a="d-view" data-id="'+d.id+'">'+ic("doc")+' '+t("Öffnen")+'</button>'+
+      '<button class="btn ghost" data-a="d-seiten" data-id="'+d.id+'">'+ic("plus")+' '+t("Seiten hinzufügen")+'</button>'+
       '<button class="btn ghost" data-a="med-edit" data-id="'+d.id+'">'+ic("pencil")+' '+t("Bearbeiten")+'</button>'+
       '<button class="btn ghost danger" data-a="d-del" data-id="'+d.id+'">'+ic("trash")+' '+t("Löschen")+'</button>'+
     '</div></section>'+
@@ -4491,10 +4968,11 @@ function loeschenFormular(hid){
       '</div>'+
     '</form>');
 }
-async function dateienEntfernen(client,bucket,tabelle,hid){
-  var r=await client.from(tabelle).select("storage_path").eq("household_id",hid);
+async function dateienEntfernen(client,bucket,tabelle,hid,mitSeiten){
+  var r=await client.from(tabelle).select(mitSeiten?"storage_path,weitere_seiten":"storage_path").eq("household_id",hid);
   if(r.error)throw r.error;
-  var pfade=(r.data||[]).map(function(d){return d.storage_path;}).filter(Boolean);
+  var pfade=[];(r.data||[]).forEach(function(d){pfade.push(d.storage_path);(d.weitere_seiten||[]).forEach(function(p){pfade.push(p);});});
+  pfade=pfade.filter(Boolean);
   for(var i=0;i<pfade.length;i+=100){
     var x=await client.storage.from(bucket).remove(pfade.slice(i,i+100));
     if(x&&x.error)throw x.error;
@@ -4510,7 +4988,7 @@ async function hausLoeschen(hid){
   var knopf=document.querySelector('[data-form="haus-loeschen"] button[type=submit]');
   if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gelöscht …");}
   try{
-    await dateienEntfernen(sb,BUCKET,"documents",hid);          /* All-Home */
+    await dateienEntfernen(sb,BUCKET,"documents",hid,true);     /* All-Home (mit weiteren Seiten) */
     await dateienEntfernen(sbPub,"documents","documents",hid);  /* AllTrack */
     var r=await sbPub.rpc("delete_household",{p_household_id:hid});
     if(r.error)throw r.error;
@@ -4847,7 +5325,7 @@ async function logoLoeschen(id){
    lesen dürfen es nur Admins des Hauses (RLS über my_admin_household_ids). */
 var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
 var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
-  "allhome-translate":"Übersetzung",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
+  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
 var KI_MODELLNAME={"claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
 var KI_KOSTEN=null;   /* {hh, zeilen, fehler} */
 function kiEur(usd){
@@ -4901,6 +5379,1621 @@ function viewKiKosten(){
           }).join("")+'</div></section>'
       :'<section class="card"><div class="empty"><div class="ei">'+ic("sparkles",28)+'</div><h3>'+t("Noch keine KI-Auswertungen")+'</h3></div></section>')+
     '<p class="hint" style="text-align:center;margin-top:14px">'+tf("Umgerechnet aus US-Dollar (1 $ ≈ {0} €).",String(USD_EUR).replace(".",","))+'</p>';
+}
+
+/* ================= Scanner: Bildkern =================
+   Reine Rechenfunktionen auf Bildpuffern {w,h,d} (d = RGBA, Uint8ClampedArray) –
+   ohne DOM, damit sie sich auch außerhalb des Browsers prüfen lassen.
+   Ablauf: Kanten (Canny, farbig) → Geraden (Hough) → bestes Viereck → Ecken
+   verfeinern → entzerren (Homographie) → Filter → JPEG (Browser) → PDF. */
+var SCAN_DPI=200,SCAN_A4_LANG=2339;         /* A4 bei 200 dpi: 1654 × 2339 Pixel */
+
+function sbBild(w,h){return {w:w,h:h,d:new Uint8ClampedArray(w*h*4)};}
+/* Verkleinern über Flächenmittel (für die Erkennung; im Browser macht es die Leinwand) */
+function sbSkalieren(img,nw,nh){
+  var o=sbBild(nw,nh),sx=img.w/nw,sy=img.h/nh,s=img.d,d=o.d;
+  for(var y=0;y<nh;y++){
+    var y0=Math.floor(y*sy),y1=Math.max(y0+1,Math.floor((y+1)*sy));
+    for(var x=0;x<nw;x++){
+      var x0=Math.floor(x*sx),x1=Math.max(x0+1,Math.floor((x+1)*sx)),r=0,g=0,b=0,n=0;
+      for(var yy=y0;yy<y1;yy++)for(var xx=x0;xx<x1;xx++){var i=(yy*img.w+xx)*4;r+=s[i];g+=s[i+1];b+=s[i+2];n++;}
+      var j=(y*nw+x)*4;d[j]=r/n;d[j+1]=g/n;d[j+2]=b/n;d[j+3]=255;
+    }
+  }
+  return o;
+}
+function sbLum(img){
+  var n=img.w*img.h,L=new Float32Array(n),d=img.d;
+  for(var i=0,j=0;i<n;i++,j+=4)L[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2];
+  return L;
+}
+/* Gauß 5×5 (1 4 6 4 1), getrennt in zwei Durchgänge */
+function sbWeich(a,w,h){
+  var tmp=new Float32Array(a.length),o=new Float32Array(a.length),x,y,i;
+  for(y=0;y<h;y++){var r=y*w;for(x=0;x<w;x++){
+    var x1=x>0?x-1:0,x2=x>1?x-2:0,x3=x<w-1?x+1:w-1,x4=x<w-2?x+2:w-1;
+    tmp[r+x]=(a[r+x2]+4*a[r+x1]+6*a[r+x]+4*a[r+x3]+a[r+x4])/16;}}
+  for(y=0;y<h;y++){var y1=y>0?y-1:0,y2=y>1?y-2:0,y3=y<h-1?y+1:h-1,y4=y<h-2?y+2:h-1;
+    for(x=0;x<w;x++){i=y*w+x;o[i]=(tmp[y2*w+x]+4*tmp[y1*w+x]+6*tmp[i]+4*tmp[y3*w+x]+tmp[y4*w+x])/16;}}
+  return o;
+}
+
+/* Glättung 3×3 (1 2 1) – reicht nach dem Verkleinern und kostet ein Drittel */
+function sbWeich3(a,w,h){
+  var tmp=new Float32Array(a.length),o=new Float32Array(a.length),x,y,r;
+  for(y=0;y<h;y++){r=y*w;tmp[r]=(3*a[r]+a[r+1])/4;tmp[r+w-1]=(3*a[r+w-1]+a[r+w-2])/4;
+    for(x=1;x<w-1;x++)tmp[r+x]=(a[r+x-1]+2*a[r+x]+a[r+x+1])/4;}
+  for(x=0;x<w;x++){o[x]=(3*tmp[x]+tmp[x+w])/4;o[(h-1)*w+x]=(3*tmp[(h-1)*w+x]+tmp[(h-2)*w+x])/4;}
+  for(y=1;y<h-1;y++){r=y*w;for(x=0;x<w;x++)o[r+x]=(tmp[r+x-w]+2*tmp[r+x]+tmp[r+x+w])/4;}
+  return o;
+}
+/* ---- Kanten: Sobel je Farbkanal (der stärkste zählt), dünnen, Hysterese ----
+   Farbig, weil helles Papier auf hellem Tisch oft nur im Farbton abweicht. */
+function sbKanten(img){
+  var w=img.w,h=img.h,n=w*h,d=img.d,k=[new Float32Array(n),new Float32Array(n),new Float32Array(n)],c,i;
+  for(i=0;i<n;i++){k[0][i]=d[i*4];k[1][i]=d[i*4+1];k[2][i]=d[i*4+2];}
+  for(c=0;c<3;c++)k[c]=sbWeich3(k[c],w,h);
+  var mag=new Float32Array(n),gx=new Float32Array(n),gy=new Float32Array(n);
+  var R=k[0],Gc=k[1],Bc=k[2];
+  for(var y=1;y<h-1;y++)for(var x=1;x<w-1;x++){
+    i=y*w+x;var a=i-w,z=i+w;
+    var rx=(R[a+1]+2*R[i+1]+R[z+1])-(R[a-1]+2*R[i-1]+R[z-1]),ry=(R[z-1]+2*R[z]+R[z+1])-(R[a-1]+2*R[a]+R[a+1]);
+    var hx=(Gc[a+1]+2*Gc[i+1]+Gc[z+1])-(Gc[a-1]+2*Gc[i-1]+Gc[z-1]),hy=(Gc[z-1]+2*Gc[z]+Gc[z+1])-(Gc[a-1]+2*Gc[a]+Gc[a+1]);
+    var bx=(Bc[a+1]+2*Bc[i+1]+Bc[z+1])-(Bc[a-1]+2*Bc[i-1]+Bc[z-1]),by=(Bc[z-1]+2*Bc[z]+Bc[z+1])-(Bc[a-1]+2*Bc[a]+Bc[a+1]);
+    var mr=rx*rx+ry*ry,mg=hx*hx+hy*hy,mb=bx*bx+by*by;
+    if(mr>=mg&&mr>=mb){gx[i]=rx;gy[i]=ry;mag[i]=Math.sqrt(mr)/4;}
+    else if(mg>=mb){gx[i]=hx;gy[i]=hy;mag[i]=Math.sqrt(mg)/4;}
+    else{gx[i]=bx;gy[i]=by;mag[i]=Math.sqrt(mb)/4;}
+  }
+  /* dünnen: nur das Maximum quer zur Kante bleibt */
+  var nms=new Float32Array(n),hist=new Uint32Array(256),cnt=0;
+  for(y=1;y<h-1;y++)for(x=1;x<w-1;x++){
+    i=y*w+x;var m0=mag[i];if(m0<2)continue;
+    var ax=Math.abs(gx[i]),ay=Math.abs(gy[i]),q,o1,o2;
+    q=ay<=ax*0.4142?0:(ax<=ay*0.4142?2:(gx[i]*gy[i]>0?1:3));
+    if(q===0){o1=i-1;o2=i+1;}else if(q===2){o1=i-w;o2=i+w;}
+    else if(q===1){o1=i+w+1;o2=i-w-1;}else{o1=i+w-1;o2=i-w+1;}
+    if(m0>=mag[o1]&&m0>=mag[o2]){nms[i]=m0;hist[Math.min(255,m0|0)]++;cnt++;}
+  }
+  /* Schwellen am Rauschen messen, nicht an der Schrift: Text liefert die stärksten
+     Kanten und würde die schwache Blattkante (helles Papier auf hellem Tisch) sonst
+     unter die Schwelle drücken. Median aller Pixel ≈ Rauschpegel (die meisten sind flach). */
+  var hoch=255,sum=0,med=0,alle=new Uint32Array(256);
+  for(var b=255;b>=0;b--){sum+=hist[b];if(sum>=cnt*0.12){hoch=b;break;}}
+  for(i=0;i<n;i++)alle[Math.min(255,mag[i]*4|0)]++;
+  sum=0;for(b=0;b<256;b++){sum+=alle[b];if(sum>=n*0.5){med=b/4;break;}}
+  hoch=Math.max(7,Math.min(hoch,4*med+8));var tief=hoch*0.5;
+  var kante=new Uint8Array(n),stapel=[];
+  for(i=0;i<n;i++)if(nms[i]>=hoch){kante[i]=1;stapel.push(i);}
+  while(stapel.length){var p=stapel.pop(),px=p%w,py=(p-px)/w;
+    for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+      var qx=px+dx,qy=py+dy;if(qx<0||qy<0||qx>=w||qy>=h)continue;
+      var qi=qy*w+qx;if(!kante[qi]&&nms[qi]>=tief){kante[qi]=1;stapel.push(qi);}}}
+  var ux=new Float32Array(n),uy=new Float32Array(n);
+  for(i=0;i<n;i++)if(kante[i]){var gl=Math.sqrt(gx[i]*gx[i]+gy[i]*gy[i])||1;ux[i]=gx[i]/gl;uy[i]=gy[i]/gl;}
+  return {w:w,h:h,kante:kante,mag:mag,gx:gx,gy:gy,ux:ux,uy:uy};
+}
+
+/* ---- Geraden: Hough, jeder Kantenpunkt stimmt nur nahe seiner Gradientenrichtung ab ---- */
+function sbGeraden(K,maxN){
+  var w=K.w,h=K.h,NT=180,D=Math.ceil(Math.sqrt(w*w+h*h)),NR=2*D+1;
+  var acc=new Uint16Array(NT*NR),cs=new Float32Array(NT),sn=new Float32Array(NT),th;
+  for(th=0;th<NT;th++){cs[th]=Math.cos(th*Math.PI/NT);sn[th]=Math.sin(th*Math.PI/NT);}
+  var FEN=7;
+  for(var y=0;y<h;y++)for(var x=0;x<w;x++){
+    var i=y*w+x;if(!K.kante[i])continue;
+    var a=Math.atan2(K.gy[i],K.gx[i]);if(a<0)a+=Math.PI;
+    var t0=Math.round(a*NT/Math.PI);
+    for(var dt=-FEN;dt<=FEN;dt++){
+      th=((t0+dt)%NT+NT)%NT;
+      var r=Math.round(x*cs[th]+y*sn[th])+D;acc[th*NR+r]++;
+    }
+  }
+  /* Spitzen: lokale Maxima, dann Abstand halten (θ wickelt bei 180° mit ρ → −ρ) */
+  var minV=Math.max(12,Math.round(Math.min(w,h)*0.12)),kand=[];
+  for(th=0;th<NT;th++)for(var r2=1;r2<NR-1;r2++){
+    var v=acc[th*NR+r2];if(v<minV)continue;
+    var maxi=true;
+    for(var u=-2;u<=2&&maxi;u++)for(var s=-2;s<=2;s++){
+      if(!u&&!s)continue;var tt=th+u,rr=r2+s;
+      if(tt<0){tt+=NT;rr=2*D-rr;}else if(tt>=NT){tt-=NT;rr=2*D-rr;}
+      if(rr<0||rr>=NR)continue;
+      var v2=acc[tt*NR+rr];if(v2>v||(v2===v&&(u<0||(u===0&&s<0)))){maxi=false;break;}
+    }
+    if(maxi)kand.push({t:th*Math.PI/NT,r:r2-D,v:v});
+  }
+  kand.sort(function(p,q){return q.v-p.v;});
+  var aus=[];
+  for(var k=0;k<kand.length&&aus.length<(maxN||24);k++){
+    var L=kand[k],nah=false;
+    for(var m=0;m<aus.length&&!nah;m++){
+      var A=aus[m],dT=Math.abs(L.t-A.t),dR=Math.abs(L.r-A.r);
+      if(dT>Math.PI/2){dT=Math.PI-dT;dR=Math.abs(L.r+A.r);}
+      if(dT<5*Math.PI/180&&dR<Math.max(6,D*0.02))nah=true;
+    }
+    if(!nah)aus.push(L);
+  }
+  return aus;
+}
+function sbSchnitt(a,b){
+  var c1=Math.cos(a.t),s1=Math.sin(a.t),c2=Math.cos(b.t),s2=Math.sin(b.t),det=c1*s2-s1*c2;
+  if(Math.abs(det)<1e-6)return null;
+  return [(a.r*s2-s1*b.r)/det,(c1*b.r-a.r*c2)/det];
+}
+/* Wo schneidet die Gerade die Bildmitte? (zum Ordnen oben/unten bzw. links/rechts) */
+function sbLageY(L,x){var s=Math.sin(L.t);return Math.abs(s)<1e-6?null:(L.r-x*Math.cos(L.t))/s;}
+function sbLageX(L,y){var c=Math.cos(L.t);return Math.abs(c)<1e-6?null:(L.r-y*Math.sin(L.t))/c;}
+
+/* ---- Wie gut trägt eine Seite (p→q)? Kantenpunkte mit passender Richtung + Kontrast quer ---- */
+function sbSeitenwert(K,img,L,p,q,mitte){
+  var w=K.w,h=K.h,dx=q[0]-p[0],dy=q[1]-p[1],len=Math.sqrt(dx*dx+dy*dy);
+  if(len<4)return {len:len,halt:0,kontrast:0,innen:0};
+  var nx=-dy/len,ny=dx/len;
+  /* Normale zeigt nach innen (zur Mitte des Vierecks) */
+  var mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2;
+  if((mitte[0]-mx)*nx+(mitte[1]-my)*ny<0){nx=-nx;ny=-ny;}
+  var n=Math.floor(len),treffer=0,gezaehlt=0,kon=0,kn=0,inn=0,d=img.d;
+  for(var s=0;s<=n;s+=2){
+    var x=p[0]+dx*s/n,y=p[1]+dy*s/n,xi=Math.round(x),yi=Math.round(y);
+    if(xi<1||yi<1||xi>=w-1||yi>=h-1)continue;
+    gezaehlt++;
+    var gut=false;
+    for(var oy=-1;oy<=1&&!gut;oy++)for(var ox=-1;ox<=1;ox++){
+      var i=(yi+oy)*w+xi+ox;
+      if(K.kante[i]&&Math.abs(K.ux[i]*nx+K.uy[i]*ny)>0.85){gut=true;break;}
+    }
+    if(gut)treffer++;
+    if(s%4===0){
+      var ax=Math.round(x+nx*4),ay=Math.round(y+ny*4),bx=Math.round(x-nx*4),by=Math.round(y-ny*4);
+      if(ax>=0&&ay>=0&&ax<w&&ay<h&&bx>=0&&by>=0&&bx<w&&by<h){
+        var ia=(ay*w+ax)*4,ib=(by*w+bx)*4;
+        kon+=(Math.abs(d[ia]-d[ib])+Math.abs(d[ia+1]-d[ib+1])+Math.abs(d[ia+2]-d[ib+2]))/3;
+        inn+=(d[ia]+d[ia+1]+d[ia+2])/3-(d[ib]+d[ib+1]+d[ib+2])/3;kn++;
+      }
+    }
+  }
+  return {len:len,halt:gezaehlt?treffer/gezaehlt:0,kontrast:kn?kon/kn:0,innen:kn?inn/kn:0};
+}
+/* Anteil papierartiger Punkte im Inneren (hell, wenig Farbe) */
+function sbPapieranteil(img,E,ref){
+  var n=0,ja=0,d=img.d;
+  for(var a=1;a<8;a++)for(var b=1;b<8;b++){
+    var u=a/8,v=b/8;
+    var x=(1-u)*(1-v)*E[0][0]+u*(1-v)*E[1][0]+u*v*E[2][0]+(1-u)*v*E[3][0];
+    var y=(1-u)*(1-v)*E[0][1]+u*(1-v)*E[1][1]+u*v*E[2][1]+(1-u)*v*E[3][1];
+    var i=(Math.round(y)*img.w+Math.round(x))*4;if(i<0||i>=d.length)continue;
+    var mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);n++;
+    if(mx>=ref*0.72&&(mx-mn)<=mx*0.28)ja++;
+  }
+  return n?ja/n:0;
+}
+function sbFlaeche(E){var a=0;for(var i=0;i<4;i++){var p=E[i],q=E[(i+1)%4];a+=p[0]*q[1]-q[0]*p[1];}return Math.abs(a)/2;}
+function sbKonvex(E){
+  var vz=0;
+  for(var i=0;i<4;i++){
+    var a=E[i],b=E[(i+1)%4],c=E[(i+2)%4];
+    var z=(b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0]);
+    if(Math.abs(z)<1e-9)return false;
+    var sg=z>0?1:-1;if(!vz)vz=sg;else if(sg!==vz)return false;
+  }
+  return true;
+}
+function sbWinkelOk(E){
+  for(var i=0;i<4;i++){
+    var a=E[(i+3)%4],b=E[i],c=E[(i+1)%4];
+    var ux=a[0]-b[0],uy=a[1]-b[1],vx=c[0]-b[0],vy=c[1]-b[1];
+    var cosw=(ux*vx+uy*vy)/(Math.sqrt(ux*ux+uy*uy)*Math.sqrt(vx*vx+vy*vy)||1);
+    if(Math.abs(cosw)>0.82)return false;     /* zwischen etwa 35° und 145° */
+  }
+  return true;
+}
+
+/* ---- Bestes Viereck im (kleinen) Bild. Ecken im Uhrzeigersinn ab oben links. ---- */
+function sbViereck(img){
+  var w=img.w,h=img.h,K=sbKanten(img),G=sbGeraden(K,28);
+  var H=[],V=[];
+  G.forEach(function(L){(Math.abs(L.t-Math.PI/2)<=Math.PI/4?H:V).push(L);});
+  H=H.slice(0,9);V=V.slice(0,9);
+  /* Helligkeit des Papiers: 92. Perzentil */
+  var Lm=sbLum(img),hs=new Uint32Array(256);
+  for(var i=0;i<Lm.length;i++)hs[Math.min(255,Lm[i]|0)]++;
+  var ref=255,acc=0;for(var b=255;b>=0;b--){acc+=hs[b];if(acc>=Lm.length*0.08){ref=b;break;}}
+  var rand=0.03,best=null,minFl=w*h*0.10;
+  for(var a1=0;a1<H.length;a1++)for(var a2=a1+1;a2<H.length;a2++){
+    var ya=sbLageY(H[a1],w/2),yb=sbLageY(H[a2],w/2);if(ya==null||yb==null||Math.abs(ya-yb)<h*0.12)continue;
+    var oben=ya<yb?H[a1]:H[a2],unten=ya<yb?H[a2]:H[a1];
+    for(var b1=0;b1<V.length;b1++)for(var b2=b1+1;b2<V.length;b2++){
+      var xa=sbLageX(V[b1],h/2),xb=sbLageX(V[b2],h/2);if(xa==null||xb==null||Math.abs(xa-xb)<w*0.12)continue;
+      var li=xa<xb?V[b1]:V[b2],re=xa<xb?V[b2]:V[b1];
+      var E=[sbSchnitt(oben,li),sbSchnitt(oben,re),sbSchnitt(unten,re),sbSchnitt(unten,li)];
+      if(E.some(function(p){return !p||p[0]<-w*rand||p[1]<-h*rand||p[0]>w*(1+rand)||p[1]>h*(1+rand);}))continue;
+      if(!sbKonvex(E)||!sbWinkelOk(E))continue;
+      var fl=sbFlaeche(E);if(fl<minFl)continue;
+      var mitte=[(E[0][0]+E[1][0]+E[2][0]+E[3][0])/4,(E[0][1]+E[1][1]+E[2][1]+E[3][1])/4];
+      var linien=[oben,re,unten,li],wert=0,schwach=false,haltSum=0;
+      for(var s=0;s<4;s++){
+        var sw=sbSeitenwert(K,img,linien[s],E[s],E[(s+1)%4],mitte);
+        if(sw.halt<0.22){schwach=true;break;}
+        haltSum+=sw.halt;
+        var kf=0.55+0.45*Math.min(1,sw.kontrast/18)+0.25*Math.max(-1,Math.min(1,sw.innen/40));
+        wert+=sw.len*sw.halt*kf;
+      }
+      if(schwach)continue;
+      var pap=sbPapieranteil(img,E,ref);
+      wert*=(0.45+pap);
+      if(!best||wert>best.wert)best={ecken:E,wert:wert,halt:haltSum/4,papier:pap};
+    }
+  }
+  if(!best)return null;
+  var U=Math.max(w,h);
+  best.ecken=best.ecken.map(function(p){return [Math.min(w,Math.max(0,p[0]))/w,Math.min(h,Math.max(0,p[1]))/h];});
+  best.guete=Math.min(1,best.wert/(2*(w+h)*0.9));   /* ~1 = umlaufend klare Kante über fast das ganze Bild */
+  best.U=U;
+  return best;
+}
+
+/* ---- Ecken am größeren Bild nachschärfen: je Seite Kantenpunkte suchen, Gerade anpassen ---- */
+function sbVerfeinern(img,ecken){
+  var w=img.w,h=img.h,E=ecken.map(function(p){return [p[0]*w,p[1]*h];});
+  var L=sbWeich(sbLum(img),w,h),diag=Math.sqrt(w*w+h*h),R=Math.max(4,Math.round(diag*0.012));
+  var mitte=[(E[0][0]+E[1][0]+E[2][0]+E[3][0])/4,(E[0][1]+E[1][1]+E[2][1]+E[3][1])/4];
+  function wert(x,y){var xi=x|0,yi=y|0;if(xi<0||yi<0||xi>=w-1||yi>=h-1)return null;
+    var fx=x-xi,fy=y-yi,i=yi*w+xi;return L[i]*(1-fx)*(1-fy)+L[i+1]*fx*(1-fy)+L[i+w]*(1-fx)*fy+L[i+w+1]*fx*fy;}
+  var geraden=[];
+  for(var s=0;s<4;s++){
+    var p=E[s],q=E[(s+1)%4],dx=q[0]-p[0],dy=q[1]-p[1],len=Math.sqrt(dx*dx+dy*dy);
+    var nx=-dy/len,ny=dx/len;if((mitte[0]-p[0])*nx+(mitte[1]-p[1])*ny<0){nx=-nx;ny=-ny;}
+    var pts=[];
+    for(var k=2;k<=38;k++){
+      var bx=p[0]+dx*k/40,by=p[1]+dy*k/40,bestG=0,bestO=null;
+      for(var o=-R;o<=R;o++){
+        var a=wert(bx+nx*(o+1),by+ny*(o+1)),c=wert(bx+nx*(o-1),by+ny*(o-1));
+        if(a==null||c==null)continue;
+        var g=Math.abs(a-c);if(g>bestG){bestG=g;bestO=o;}
+      }
+      if(bestO!=null&&bestG>6)pts.push([bx+nx*bestO,by+ny*bestO]);
+    }
+    geraden.push(sbGeradeFit(pts,len));
+  }
+  var neu=[];
+  for(s=0;s<4;s++){
+    var A=geraden[(s+3)%4],B=geraden[s];
+    var P=(A&&B)?sbSchnittPN(A,B):null;
+    /* nur übernehmen, was plausibel nahe bleibt */
+    if(!P||Math.abs(P[0]-E[s][0])>R*2.5||Math.abs(P[1]-E[s][1])>R*2.5)P=E[s];
+    neu.push([Math.min(1,Math.max(0,P[0]/w)),Math.min(1,Math.max(0,P[1]/h))]);
+  }
+  return neu;
+}
+/* Gerade durch Punkte (Hauptachse), zweimal Ausreißer verwerfen. Rückgabe {px,py,dx,dy} */
+function sbGeradeFit(pts,len){
+  if(pts.length<8)return null;
+  for(var runde=0;runde<6;runde++){
+    var n=pts.length,mx=0,my=0;pts.forEach(function(p){mx+=p[0];my+=p[1];});mx/=n;my/=n;
+    var sxx=0,syy=0,sxy=0;pts.forEach(function(p){var a=p[0]-mx,b=p[1]-my;sxx+=a*a;syy+=b*b;sxy+=a*b;});
+    var th=0.5*Math.atan2(2*sxy,sxx-syy),dx=Math.cos(th),dy=Math.sin(th);
+    if(runde===2)return {px:mx,py:my,dx:dx,dy:dy};
+    var res=pts.map(function(p){return Math.abs((p[0]-mx)*(-dy)+(p[1]-my)*dx);});
+    var gr=res.slice().sort(function(a,b){return a-b;})[Math.floor(n*0.7)]*2+0.75;
+    var rest=pts.filter(function(p,i){return res[i]<=gr;});
+    if(rest.length<8)return {px:mx,py:my,dx:dx,dy:dy};
+    pts=rest;
+  }
+}
+function sbSchnittPN(A,B){
+  var det=A.dx*(-B.dy)-A.dy*(-B.dx);if(Math.abs(det)<1e-9)return null;
+  var bx=B.px-A.px,by=B.py-A.py,s=(bx*(-B.dy)-by*(-B.dx))/det;
+  return [A.px+A.dx*s,A.py+A.dy*s];
+}
+
+/* ---- Homographie: bildet die 4 Punkte src auf dst ab (3×3, h33 = 1) ---- */
+function sbHomographie(src,dst){
+  var A=[],bv=[];
+  for(var i=0;i<4;i++){
+    var x=src[i][0],y=src[i][1],u=dst[i][0],v=dst[i][1];
+    A.push([x,y,1,0,0,0,-u*x,-u*y]);bv.push(u);
+    A.push([0,0,0,x,y,1,-v*x,-v*y]);bv.push(v);
+  }
+  /* Gauß mit Pivotsuche */
+  for(var c=0;c<8;c++){
+    var p=c;for(var r=c+1;r<8;r++)if(Math.abs(A[r][c])>Math.abs(A[p][c]))p=r;
+    var tmp=A[c];A[c]=A[p];A[p]=tmp;var tb=bv[c];bv[c]=bv[p];bv[p]=tb;
+    if(Math.abs(A[c][c])<1e-12)return null;
+    for(r=0;r<8;r++){if(r===c)continue;var f=A[r][c]/A[c][c];
+      for(var k=c;k<8;k++)A[r][k]-=f*A[c][k];bv[r]-=f*bv[c];}
+  }
+  var hh=[];for(c=0;c<8;c++)hh.push(bv[c]/A[c][c]);
+  return [hh[0],hh[1],hh[2],hh[3],hh[4],hh[5],hh[6],hh[7],1];
+}
+
+/* ---- Wahres Seitenverhältnis aus der Perspektive (Zhang & He, Whiteboard-Scanning).
+   Ecken in Pixeln (oben links, oben rechts, unten rechts, unten links), Bildmitte als
+   Hauptpunkt. Liefert Breite/Höhe; rastet auf A4 und Scheckkarte ein. ---- */
+function sbSeitenverhaeltnis(E,w,h){
+  function seite(a,b){var dx=a[0]-b[0],dy=a[1]-b[1];return Math.sqrt(dx*dx+dy*dy);}
+  var breite=(seite(E[0],E[1])+seite(E[3],E[2]))/2,hoehe=(seite(E[0],E[3])+seite(E[1],E[2]))/2;
+  var naiv=breite/hoehe,r=naiv;
+  var u0=w/2,v0=h/2;
+  var m1=[E[0][0],E[0][1],1],m2=[E[1][0],E[1][1],1],m3=[E[3][0],E[3][1],1],m4=[E[2][0],E[2][1],1];
+  function kreuz(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+  function pkt(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+  var k2=pkt(kreuz(m1,m4),m3)/pkt(kreuz(m2,m4),m3),k3=pkt(kreuz(m1,m4),m2)/pkt(kreuz(m3,m4),m2);
+  var n2=[k2*m2[0]-m1[0],k2*m2[1]-m1[1],k2*m2[2]-m1[2]],n3=[k3*m3[0]-m1[0],k3*m3[1]-m1[1],k3*m3[2]-m1[2]];
+  var nn=n2[2]*n3[2],U=Math.max(w,h);
+  /* Laufen zwei Gegenseiten (fast) parallel, liegt ein Fluchtpunkt im Unendlichen –
+     dann ist die Brennweite aus dem Bild nicht bestimmbar. Dann gilt eine typische
+     Handy-Hauptkamera (rund 26 mm KB ≙ 0,8 × lange Bildseite). */
+  function winkel(a,b,c,d){var u1=b[0]-a[0],v1=b[1]-a[1],u2=c[0]-d[0],v2=c[1]-d[1];
+    return Math.abs(Math.atan2(u1*v2-v1*u2,u1*u2+v1*v2));}
+  var parallel=Math.min(winkel(E[0],E[1],E[2],E[3]),winkel(E[0],E[3],E[1],E[2]))<0.05;
+  if(isFinite(k2)&&isFinite(k3)&&Math.abs(nn)>1e-9){
+    var f2=-((n2[0]*n3[0]-(n2[0]*n3[2]+n2[2]*n3[0])*u0+n2[2]*n3[2]*u0*u0)+
+             (n2[1]*n3[1]-(n2[1]*n3[2]+n2[2]*n3[1])*v0+n2[2]*n3[2]*v0*v0))/nn;
+    /* nur glauben, wenn die Brennweite plausibel ist (0,5 … 2 lange Bildseiten) */
+    if(parallel||!(f2>0&&Math.sqrt(f2)>0.5*U&&Math.sqrt(f2)<2*U))f2=0.64*U*U;
+    var q=function(n){var a=(n[0]-u0*n[2]),b=(n[1]-v0*n[2]);return (a*a+b*b)/f2+n[2]*n[2];};
+    var rr=Math.sqrt(q(n2)/q(n3));
+    if(isFinite(rr)&&rr>0.2&&rr<5&&Math.abs(Math.log(rr/naiv))<0.5)r=rr;
+  }
+  var A4=1/Math.SQRT2,KARTE=85.6/53.98;
+  [[A4,0.045],[1/A4,0.045],[KARTE,0.03],[1/KARTE,0.03]].forEach(function(z){
+    if(Math.abs(r-z[0])/z[0]<z[1])r=z[0];
+  });
+  return r;
+}
+/* Zielgröße: höchstens A4 bei 200 dpi auf der langen Seite, nie größer als die Quelle */
+function sbZielgroesse(E,w,h){
+  function seite(a,b){var dx=a[0]-b[0],dy=a[1]-b[1];return Math.sqrt(dx*dx+dy*dy);}
+  var r=sbSeitenverhaeltnis(E,w,h);
+  var lang=Math.max(seite(E[0],E[1]),seite(E[3],E[2]),seite(E[0],E[3]),seite(E[1],E[2]));
+  lang=Math.min(SCAN_A4_LANG,Math.round(lang));
+  return r>=1?{w:lang,h:Math.max(1,Math.round(lang/r))}:{w:Math.max(1,Math.round(lang*r)),h:lang};
+}
+
+/* ---- Entzerren: jedes Zielpixel über die Homographie in der Quelle nachschlagen (bilinear) ---- */
+function sbEntzerren(img,E,ow,oh){
+  var H=sbHomographie([[0,0],[ow,0],[ow,oh],[0,oh]],E);
+  var o=sbBild(ow,oh),s=img.d,d=o.d,w=img.w,h=img.h;
+  for(var v=0;v<oh;v++){
+    var vv=v+0.5;
+    for(var u=0;u<ow;u++){
+      var uu=u+0.5,z=H[6]*uu+H[7]*vv+1;
+      var x=(H[0]*uu+H[1]*vv+H[2])/z-0.5,y=(H[3]*uu+H[4]*vv+H[5])/z-0.5;
+      if(x<0)x=0;if(y<0)y=0;if(x>w-1.001)x=w-1.001;if(y>h-1.001)y=h-1.001;
+      var xi=x|0,yi=y|0,fx=x-xi,fy=y-yi,i=(yi*w+xi)*4,j=(v*ow+u)*4;
+      var a=(1-fx)*(1-fy),b=fx*(1-fy),c=(1-fx)*fy,e=fx*fy,w4=w*4;
+      d[j]=s[i]*a+s[i+4]*b+s[i+w4]*c+s[i+w4+4]*e;
+      d[j+1]=s[i+1]*a+s[i+5]*b+s[i+w4+1]*c+s[i+w4+5]*e;
+      d[j+2]=s[i+2]*a+s[i+6]*b+s[i+w4+2]*c+s[i+w4+6]*e;
+      d[j+3]=255;
+    }
+  }
+  return o;
+}
+/* Vierteldrehungen im Uhrzeigersinn */
+function sbDrehen(img,q){
+  q=((q%4)+4)%4;if(!q)return img;
+  var w=img.w,h=img.h,ow=q%2?h:w,oh=q%2?w:h,o=sbBild(ow,oh),s=new Uint32Array(img.d.buffer,img.d.byteOffset,w*h),d=new Uint32Array(o.d.buffer);
+  for(var y=0;y<h;y++)for(var x=0;x<w;x++){
+    var nx,ny;
+    if(q===1){nx=h-1-y;ny=x;}else if(q===2){nx=w-1-x;ny=h-1-y;}else{nx=y;ny=w-1-x;}
+    d[ny*ow+nx]=s[y*w+x];
+  }
+  return o;
+}
+
+/* ---- Papierfarbe je Bereich schätzen (Schatten, Farbstich) ----
+   Je Block die hellsten 15 % mitteln; Blöcke, die viel dunkler sind als ihre
+   Nachbarn (Foto, Logo, Tabelle), übernehmen den Nachbar-Median. */
+function sbPapierRaster(img){
+  var w=img.w,h=img.h,d=img.d,B=Math.max(12,Math.round(Math.max(w,h)/48));
+  var gw=Math.ceil(w/B),gh=Math.ceil(h/B),R=new Float32Array(gw*gh*3),Lg=new Float32Array(gw*gh);
+  var hist=new Uint32Array(256);
+  for(var gy=0;gy<gh;gy++)for(var gx=0;gx<gw;gx++){
+    hist.fill(0);var x0=gx*B,y0=gy*B,x1=Math.min(w,x0+B),y1=Math.min(h,y0+B),n=0,x,y,i;
+    for(y=y0;y<y1;y+=2)for(x=x0;x<x1;x+=2){i=(y*w+x)*4;hist[(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2])|0]++;n++;}
+    var gr=255,acc=0;for(var b=255;b>=0;b--){acc+=hist[b];if(acc>=n*0.15){gr=b;break;}}
+    var r=0,g=0,bb=0,m=0;
+    for(y=y0;y<y1;y+=2)for(x=x0;x<x1;x+=2){i=(y*w+x)*4;
+      if((0.299*d[i]+0.587*d[i+1]+0.114*d[i+2])>=gr){r+=d[i];g+=d[i+1];bb+=d[i+2];m++;}}
+    var k=gy*gw+gx;m=m||1;R[k*3]=r/m;R[k*3+1]=g/m;R[k*3+2]=bb/m;Lg[k]=0.299*R[k*3]+0.587*R[k*3+1]+0.114*R[k*3+2];
+  }
+  for(var runde=0;runde<3;runde++){
+    var R2=R.slice(),L2=Lg.slice();
+    for(gy=0;gy<gh;gy++)for(gx=0;gx<gw;gx++){
+      var nb=[];
+      for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++){
+        var qx=gx+dx,qy=gy+dy;if(qx<0||qy<0||qx>=gw||qy>=gh||(!dx&&!dy))continue;nb.push(qy*gw+qx);}
+      nb.sort(function(a,c){return Lg[a]-Lg[c];});
+      var med=nb[Math.floor(nb.length*0.6)],k2=gy*gw+gx;
+      if(Lg[k2]<Lg[med]*0.82){L2[k2]=Lg[med];R2[k2*3]=R[med*3];R2[k2*3+1]=R[med*3+1];R2[k2*3+2]=R[med*3+2];}
+    }
+    R=R2;Lg=L2;
+  }
+  /* glätten (3×3) */
+  var S=new Float32Array(R.length);
+  for(gy=0;gy<gh;gy++)for(gx=0;gx<gw;gx++){
+    var s0=0,s1=0,s2=0,c=0;
+    for(dy=-1;dy<=1;dy++)for(dx=-1;dx<=1;dx++){qx=gx+dx;qy=gy+dy;if(qx<0||qy<0||qx>=gw||qy>=gh)continue;
+      var q=(qy*gw+qx)*3;s0+=R[q];s1+=R[q+1];s2+=R[q+2];c++;}
+    var kk=(gy*gw+gx)*3;S[kk]=s0/c;S[kk+1]=s1/c;S[kk+2]=s2/c;
+  }
+  return {B:B,gw:gw,gh:gh,R:S};
+}
+/* ---- Filter: auto (Schatten weg, Papier weiß, Farben bleiben), grau, sw, original ---- */
+function sbFilter(img,art){
+  if(art==="original")return img;
+  var w=img.w,h=img.h,d=img.d,P=sbPapierRaster(img),o=sbBild(w,h),od=o.d,n=w*h;
+  var B=P.B,gw=P.gw,gh=P.gh,R=P.R,x,y,k,i,j;
+  /* Papierfarbe für jede Spalte einer Zeile: erst zwischen den Blockzeilen, dann zwischen den Blockspalten */
+  var zeile=new Float32Array(gw*3),bgR=new Float32Array(w),bgG=new Float32Array(w),bgB=new Float32Array(w);
+  var gx0s=new Int32Array(w),fxs=new Float32Array(w);
+  for(x=0;x<w;x++){var gxf=(x+0.5)/B-0.5;if(gxf<0)gxf=0;if(gxf>gw-1)gxf=gw-1;gx0s[x]=gxf|0;fxs[x]=gxf-(gxf|0);}
+  function papierZeile(y){
+    var gyf=(y+0.5)/B-0.5;if(gyf<0)gyf=0;if(gyf>gh-1)gyf=gh-1;
+    var g0=gyf|0,g1=Math.min(gh-1,g0+1),fy=gyf-g0;
+    for(k=0;k<gw*3;k++)zeile[k]=R[g0*gw*3+k]*(1-fy)+R[g1*gw*3+k]*fy;
+    for(x=0;x<w;x++){
+      var c0=gx0s[x]*3,c1=Math.min(gw-1,gx0s[x]+1)*3,fx=fxs[x];
+      bgR[x]=Math.max(24,zeile[c0]*(1-fx)+zeile[c1]*fx);
+      bgG[x]=Math.max(24,zeile[c0+1]*(1-fx)+zeile[c1+1]*fx);
+      bgB[x]=Math.max(24,zeile[c0+2]*(1-fx)+zeile[c1+2]*fx);
+    }
+  }
+  /* 1. Schwarzpunkt aus einer Stichprobe – nur farblose Pixel (Schrift) zählen: sonst wird
+     ein großes farbiges Logo selbst zum „Schwarz“ und säuft ab (gemessen: Magenta → 6,6,6) */
+  var hist=new Uint32Array(256),tot=0;
+  for(y=1;y<h;y+=4){papierZeile(y);for(x=1;x<w;x+=4){j=(y*w+x)*4;
+    var qr=d[j]/bgR[x],qg=d[j+1]/bgG[x],qb=d[j+2]/bgB[x],mx=Math.max(qr,qg,qb),mn=Math.min(qr,qg,qb);
+    if(mx>0&&(mx-mn)>0.12*mx+0.04)continue;
+    hist[Math.min(255,((0.299*qr+0.587*qg+0.114*qb)*200)|0)]++;tot++;}}
+  var tief=0.05,acc=0;for(k=0;k<256;k++){acc+=hist[k];if(acc>=tot*0.01){tief=k/200;break;}}
+  tief=Math.min(0.25,Math.max(0.05,tief));
+  /* 2. Kurve als Tabelle über den normierten Wert ×1000: Papier → weiß, Schrift → dunkel */
+  var LUT=new Float32Array(1201),hoch=0.93,sw=art==="sw",grau=art==="grau";
+  for(k=0;k<=1200;k++){var v=k/1000,t2;
+    if(sw){t2=(v-0.58)/(0.80-0.58);t2=t2<0?0:t2>1?1:t2;LUT[k]=t2*255;}
+    else{t2=(v-tief)/(hoch-tief);t2=t2<0?0:t2>1?1:t2;LUT[k]=Math.pow(t2,1.18)*255;}}
+  var Y=sw?null:new Float32Array(n);
+  for(y=0;y<h;y++){
+    papierZeile(y);
+    for(x=0,i=y*w;x<w;x++,i++){
+      j=i*4;
+      var nr=(d[j]/bgR[x]*1000)|0,ng=(d[j+1]/bgG[x]*1000)|0,nb=(d[j+2]/bgB[x]*1000)|0;
+      if(nr>1200)nr=1200;if(ng>1200)ng=1200;if(nb>1200)nb=1200;
+      if(sw){var lv=(0.299*nr+0.587*ng+0.114*nb)|0;od[j]=od[j+1]=od[j+2]=LUT[lv];od[j+3]=255;continue;}
+      /* Kurve nur auf die Helligkeit, Farbe als Abstand dazu – so kippt kein Farbton
+         (vorher je Kanal: Magenta-Logo wurde rötlich) */
+      var yn=(0.299*nr+0.587*ng+0.114*nb)|0,ly=LUT[yn],r,g,bl;
+      if(grau){r=g=bl=ly;}
+      else{
+        r=ly+(nr-yn)*0.28;g=ly+(ng-yn)*0.28;bl=ly+(nb-yn)*0.28;   /* 0,28 = 255/1000 × 1,1: Farben leicht kräftiger */
+        /* Kräftige Farben (Logo, Stempel, Foto) nur aufhellen wie das Papier, nicht wie Schrift abdunkeln */
+        var cmx=nr>ng?(nr>nb?nr:nb):(ng>nb?ng:nb),cmn=nr<ng?(nr<nb?nr:nb):(ng<nb?ng:nb);
+        var sat=cmx>0?(cmx-cmn)/cmx:0;
+        if(sat>0.15){
+          var f=sat>=0.45?1:(sat-0.15)/0.3,lin=255/(hoch*1000);
+          r+=(nr*lin-r)*f;g+=(ng*lin-g)*f;bl+=(nb*lin-bl)*f;
+          ly=0.299*r+0.587*g+0.114*bl;
+        }
+      }
+      od[j]=r;od[j+1]=g;od[j+2]=bl;od[j+3]=255;Y[i]=ly;
+    }
+  }
+  if(sw)return o;
+  /* 3. leicht nachschärfen (3×3-Mittel abziehen), damit Schrift nach dem Entzerren knackig bleibt */
+  for(y=1;y<h-1;y++)for(x=1,i=y*w+1;x<w-1;x++,i++){
+    var yv=Y[i];if(yv>=254.5)continue;
+    var m=(Y[i-w-1]+Y[i-w]+Y[i-w+1]+Y[i-1]+yv+Y[i+1]+Y[i+w-1]+Y[i+w]+Y[i+w+1])/9;
+    var dl=(yv-m)*0.6;if(dl>-0.5&&dl<0.5)continue;
+    j=i*4;od[j]+=dl;od[j+1]+=dl;od[j+2]+=dl;
+  }
+  return o;
+}
+
+/* Seitengröße in Punkt (1/72 Zoll): Hat die Seite A4- oder Scheckkarten-Format, gilt genau dieses
+   Maß – sonst entstünde bei niedriger Kameraauflösung ein Mini-Blatt. Andere Formate: Pixel bei 200 dpi. */
+function sbSeitenMass(w,h){
+  var r=w/h,A4=[595.28,841.89],KARTE=[242.65,153.07];
+  if(Math.abs(r-A4[0]/A4[1])<0.006)return A4;
+  if(Math.abs(r-A4[1]/A4[0])<0.012)return [A4[1],A4[0]];
+  if(Math.abs(r-KARTE[0]/KARTE[1])<0.012)return KARTE;
+  if(Math.abs(r-KARTE[1]/KARTE[0])<0.006)return [KARTE[1],KARTE[0]];
+  return [w*72/SCAN_DPI,h*72/SCAN_DPI];
+}
+/* ================= PDF schreiben =================
+   Jede Seite ist ein JPEG-Bild (DCTDecode), Seitengröße aus den Pixeln bei 200 dpi.
+   seiten: [{jpeg:Uint8Array, w, h}] → Uint8Array */
+function sbPdf(seiten,titel){
+  var teile=[],laenge=0,offs=[];
+  function txt(s){var b=new Uint8Array(s.length);for(var i=0;i<s.length;i++)b[i]=s.charCodeAt(i)&255;return b;}
+  function dazu(b){teile.push(b);laenge+=b.length;}
+  function obj(nr,kopf,strom){
+    offs[nr]=laenge;
+    if(strom){dazu(txt(nr+" 0 obj\n"+kopf+"\nstream\n"));dazu(strom);dazu(txt("\nendstream\nendobj\n"));}
+    else dazu(txt(nr+" 0 obj\n"+kopf+"\nendobj\n"));
+  }
+  /* Titel als UTF-16BE (Umlaute), hexadezimal */
+  function hex16(s){var h="FEFF";for(var i=0;i<s.length;i++)h+=("0000"+s.charCodeAt(i).toString(16).toUpperCase()).slice(-4);return "<"+h+">";}
+  dazu(txt("%PDF-1.4\n%âãÏÓ\n"));
+  var n=seiten.length,kids=[];
+  for(var i=0;i<n;i++)kids.push((4+i*3)+" 0 R");
+  obj(1,"<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2,"<< /Type /Pages /Kids ["+kids.join(" ")+"] /Count "+n+" >>");
+  var jetzt=new Date(),zs="D:"+jetzt.getUTCFullYear()+("0"+(jetzt.getUTCMonth()+1)).slice(-2)+("0"+jetzt.getUTCDate()).slice(-2)+
+    ("0"+jetzt.getUTCHours()).slice(-2)+("0"+jetzt.getUTCMinutes()).slice(-2)+("0"+jetzt.getUTCSeconds()).slice(-2)+"Z";
+  obj(3,"<< /Producer (All-Home) /CreationDate ("+zs+")"+(titel?" /Title "+hex16(String(titel).slice(0,120)):"")+" >>");
+  seiten.forEach(function(s,k){
+    var pg=4+k*3,inh=pg+1,bild=pg+2;
+    var mass=sbSeitenMass(s.w,s.h),W=mass[0].toFixed(2),H=mass[1].toFixed(2);
+    obj(pg,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /XObject << /Im0 "+bild+" 0 R >> >> /Contents "+inh+" 0 R >>");
+    var c=txt("q "+W+" 0 0 "+H+" 0 0 cm /Im0 Do Q");
+    obj(inh,"<< /Length "+c.length+" >>",c);
+    obj(bild,"<< /Type /XObject /Subtype /Image /Width "+s.w+" /Height "+s.h+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+s.jpeg.length+" >>",s.jpeg);
+  });
+  var anzahl=4+n*3,xref=laenge,z="xref\n0 "+anzahl+"\n0000000000 65535 f \n";
+  for(var o=1;o<anzahl;o++)z+=("0000000000"+offs[o]).slice(-10)+" 00000 n \n";
+  z+="trailer\n<< /Size "+anzahl+" /Root 1 0 R /Info 3 0 R >>\nstartxref\n"+xref+"\n%%EOF\n";
+  dazu(txt(z));
+  var aus=new Uint8Array(laenge),pos=0;
+  teile.forEach(function(b){aus.set(b,pos);pos+=b.length;});
+  return aus;
+}
+/* Breite/Höhe aus einem JPEG lesen (SOF-Marker) – für fremde Fotos beim Anfügen */
+function sbJpegMasse(b){
+  if(b[0]!==0xFF||b[1]!==0xD8)return null;
+  var i=2;
+  while(i+9<b.length){
+    if(b[i]!==0xFF){i++;continue;}
+    var m=b[i+1];if(m===0xD8||m===0x01||(m>=0xD0&&m<=0xD7)){i+=2;continue;}
+    var len=(b[i+2]<<8)|b[i+3];
+    if((m>=0xC0&&m<=0xC3)||(m>=0xC5&&m<=0xC7)||(m>=0xC9&&m<=0xCB)||(m>=0xCD&&m<=0xCF))
+      return {h:(b[i+5]<<8)|b[i+6],w:(b[i+7]<<8)|b[i+8],k:b[i+9]};
+    i+=2+len;
+  }
+  return null;
+}
+
+/* ================= Scanner =================
+   Eigene Ebene über der App (#scan), damit Kamera und Seiten ein Neuzeichnen der
+   App überstehen. Die Adresse #/scan hält den Scanner offen – Zurück-Geste schließt
+   ihn, die Seiten bleiben als Entwurf auf dem Gerät (IndexedDB), bis gespeichert
+   oder verworfen wird. Ablauf: Kamera → Seiten → (Zuschneiden) → Speichern. */
+var SCAN=null,SCAN_INAPP=false,SCAN_UHR=null,SCAN_SPEICHERN=null;
+var SCAN_MAX_SEITEN=40,SCAN_KI_SEITEN=20;
+var SCAN_OHNE_KI={personalausweis:1,reisepass:1,fuehrerschein:1};
+var SCAN_FILTER=[["auto","Auto"],["original","Original"],["grau","Graustufen"],["sw","Schwarzweiß"]];
+
+/* ---- Einstieg: Knöpfe setzen die Adresse, das Zeichnen öffnet die Ebene ---- */
+function scanStart(z){
+  var q=[];
+  ["vertrag","art","med","person","doc"].forEach(function(k){if(z&&z[k])q.push(k+"="+encodeURIComponent(z[k]));});
+  SCAN_INAPP=true;
+  location.hash="#/scan"+(q.length?"?"+q.join("&"):"");
+}
+function scanZiel(p){
+  var z={vertrag:p.vertrag||null,art:p.art||null,med:p.med==="1",person:p.person||null,doc:p.doc||null};
+  if(z.vertrag&&!vertragById(z.vertrag))z.vertrag=null;
+  if(z.doc&&!DOCS.some(function(d){return d.id===z.doc;}))z.doc=null;
+  return z;
+}
+function zielSchluessel(z){return [z.vertrag,z.art,z.med?1:0,z.person,z.doc].join("|");}
+/* Vorgabe für die KI: Ausweise erst einmal nicht */
+function scanKiVorgabe(z){
+  var c=z.vertrag?vertragById(z.vertrag):null,art=(c&&c.art)||z.art;
+  return !SCAN_OHNE_KI[art];
+}
+function anfuegenDok(){return SCAN&&SCAN.ziel.doc?DOCS.filter(function(d){return d.id===SCAN.ziel.doc;})[0]||null:null;}
+function istPdfDok(d){return d&&(d.mime_type==="application/pdf"||/\.pdf$/i.test(d.storage_path||""));}
+
+/* Wird beim Zeichnen der Route #/scan aufgerufen – mehrfach harmlos */
+function scannerZeigen(p){
+  var z=scanZiel(p);
+  if(SCAN&&SCAN.zielKey===zielSchluessel(z))return;
+  if(SCAN)scannerAus();
+  SCAN={ziel:z,zielKey:zielSchluessel(z),seiten:[],akt:0,modus:"start",auto:true,blitz:false,
+        ki:scanKiVorgabe(z),format:scanFormatGemerkt(),person:z.person||"",filterRow:false};
+  var ad=anfuegenDok();
+  if(ad){SCAN.format=istPdfDok(ad)?"pdf":"jpg";SCAN.ki=false;}
+  ebeneAnlegen();
+  document.body.classList.add("scan-open");
+  entwurfLaden().then(function(e){
+    if(!SCAN)return;
+    if(e&&e.seiten&&e.seiten.length){SCAN.entwurf=e;scanModus("entwurf");}
+    else scanModus("kamera");
+  });
+}
+/* Ebene schließen, ohne etwas zu verwerfen (Entwurf bleibt) */
+function scannerAus(){
+  kameraAus();
+  if(SCAN)SCAN.seiten.forEach(function(s){if(s.vUrl)URL.revokeObjectURL(s.vUrl);});
+  SCAN=null;SCAN_BILD=null;
+  var e=$("#scan");if(e)e.remove();
+  document.body.classList.remove("scan-open");
+}
+function scanZurueck(){
+  if(SCAN_INAPP){SCAN_INAPP=false;history.back();}
+  else location.replace(location.pathname+location.search+"#/start");
+}
+function scanFormatGemerkt(){try{return localStorage.getItem("ah_scan_format")==="jpg"?"jpg":"pdf";}catch(e){return "pdf";}}
+
+/* ---- Ebene ---- */
+function ebeneAnlegen(){
+  var e=$("#scan");if(e)e.remove();
+  e=document.createElement("div");e.id="scan";e.className="scan";
+  e.setAttribute("role","dialog");e.setAttribute("aria-modal","true");e.setAttribute("aria-label",t("Scanner"));
+  e.innerHTML=
+    '<div class="sc-kam" id="scKam" hidden>'+
+      '<video id="scVid" playsinline muted autoplay></video>'+
+      '<canvas id="scOv" aria-hidden="true"></canvas>'+
+      '<div class="sc-fx" id="scFx"></div>'+
+      '<div class="sc-oben">'+
+        '<button class="sc-rund" data-s="zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x",22)+'</button>'+
+        '<div class="sc-tipp" id="scTipp" role="status" aria-live="polite"></div>'+
+        '<button class="sc-rund" id="scBlitz" data-s="blitz" hidden aria-label="'+esc(t("Licht"))+'">'+ic("blitz",22)+'</button>'+
+      '</div>'+
+      '<div class="sc-unten">'+
+        '<button class="sc-klein" data-s="galerie" aria-label="'+esc(t("Fotos wählen"))+'">'+ic("bild",24)+'<span>'+t("Fotos")+'</span></button>'+
+        '<button class="sc-ausl" data-s="ausloesen" aria-label="'+esc(t("Aufnehmen"))+'"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="sc-ring" cx="40" cy="40" r="36"/><circle class="sc-fort" id="scFort" cx="40" cy="40" r="36"/></svg><span class="sc-knopf"></span></button>'+
+        '<button class="sc-klein sc-stapel" data-s="seiten" id="scStapel" aria-label="'+esc(t("Seiten ansehen"))+'"></button>'+
+      '</div>'+
+      '<button class="sc-auto" data-s="auto" id="scAuto"></button>'+
+    '</div>'+
+    '<div class="sc-inhalt" id="scInhalt" hidden></div>'+
+    '<input type="file" id="scGal" accept="image/*" multiple hidden>'+
+    '<input type="file" id="scCam" accept="image/*" capture="environment" hidden>';
+  document.body.appendChild(e);
+  e.addEventListener("click",scanKlick);
+  e.addEventListener("change",function(ev){
+    var el=ev.target;
+    if(el.id==="scGal"||el.id==="scCam"){var f=Array.prototype.slice.call(el.files||[]);el.value="";fotosDazu(f);}
+    if(el.id==="scPerson"&&SCAN)SCAN.person=el.value;
+  });
+}
+function scanModus(m){
+  if(!SCAN)return;
+  SCAN.modus=m;
+  var kam=$("#scKam"),inh=$("#scInhalt");
+  if(m==="kamera"){
+    inh.hidden=true;inh.innerHTML="";kam.hidden=false;
+    stapelZeichnen();autoZeichnen();kameraAn();
+    return;
+  }
+  kameraAus();kam.hidden=true;inh.hidden=false;
+  if(m==="entwurf")inh.innerHTML=entwurfHtml();
+  else if(m==="seiten")seitenZeichnen();
+  else if(m==="zuschnitt")zuschnittZeichnen();
+  else if(m==="speichern")inh.innerHTML=speichernHtml();
+}
+
+/* ================= Kamera ================= */
+async function kameraAn(){
+  if(!SCAN)return;
+  var tipp=$("#scTipp");
+  if(SCAN.stream){erkennenStarten();return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){kameraFehlt(t("Dieser Browser gibt die Kamera nicht frei."));return;}
+  if(tipp)tipp.textContent=t("Kamera startet …");
+  try{
+    var stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{
+      facingMode:{ideal:"environment"},width:{ideal:4032},height:{ideal:3024}}});
+    if(!SCAN||SCAN.modus!=="kamera"){stream.getTracks().forEach(function(tr){tr.stop();});return;}
+    SCAN.stream=stream;
+    var vid=$("#scVid");vid.srcObject=stream;
+    try{await vid.play();}catch(e){}
+    var tr=stream.getVideoTracks()[0];SCAN.track=tr;
+    var caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{};}catch(e){}
+    if(caps.focusMode&&caps.focusMode.indexOf("continuous")>=0){try{await tr.applyConstraints({advanced:[{focusMode:"continuous"}]});}catch(e){}}
+    var bl=$("#scBlitz");if(bl)bl.hidden=!caps.torch;
+    SCAN.ic=null;try{if(window.ImageCapture)SCAN.ic=new ImageCapture(tr);}catch(e){}
+    erkennenStarten();
+  }catch(e){
+    var n=e&&e.name;
+    kameraFehlt(n==="NotAllowedError"||n==="SecurityError"?t("Kamerazugriff ist nicht erlaubt."):
+      (n==="NotFoundError"||n==="OverconstrainedError"?t("Keine Kamera gefunden."):t("Die Kamera lässt sich nicht starten.")));
+  }
+}
+function kameraAus(){
+  clearTimeout(SCAN_UHR);SCAN_UHR=null;
+  if(!SCAN)return;
+  if(SCAN.stream){SCAN.stream.getTracks().forEach(function(tr){try{tr.stop();}catch(e){}});}
+  SCAN.stream=null;SCAN.track=null;SCAN.ic=null;SCAN.blitz=false;SCAN.quad=null;SCAN.sperre=null;
+  var vid=$("#scVid");if(vid)vid.srcObject=null;
+}
+/* Ohne Live-Kamera: Kamera-App des Handys oder Fotos – danach dieselbe Bearbeitung */
+function kameraFehlt(grund){
+  kameraAus();
+  var kam=$("#scKam"),inh=$("#scInhalt");if(!kam||!inh)return;
+  kam.hidden=true;inh.hidden=false;SCAN.modus="ohnekamera";
+  inh.innerHTML='<div class="sc-leer">'+
+    '<div class="sc-kopf"><button class="sc-rund" data-s="zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x",22)+'</button><span></span><span></span></div>'+
+    '<div class="sc-mitte"><div class="sc-symbol">'+ic("camera",34)+'</div><h2>'+esc(grund)+'</h2>'+
+      '<p>'+t("Du kannst mit der Kamera-App fotografieren oder vorhandene Fotos wählen – zugeschnitten und aufbereitet wird hier.")+'</p>'+
+      '<div class="sc-knoepfe"><button class="btn lg" data-s="kamapp">'+ic("camera")+' '+t("Kamera-App öffnen")+'</button>'+
+      '<button class="btn lg ghost" data-s="galerie">'+ic("bild")+' '+t("Fotos wählen")+'</button>'+
+      (SCAN.seiten.length?'<button class="btn lg ghost" data-s="seiten">'+tn(SCAN.seiten.length,"{0} Seite ansehen","{0} Seiten ansehen")+'</button>':"")+
+    '</div></div></div>';
+}
+
+/* ---- Live-Erkennung: ~10× pro Sekunde auf einem 320-Pixel-Bild ---- */
+var SCAN_KLEIN=null;
+function erkennenStarten(){
+  clearTimeout(SCAN_UHR);
+  if(!SCAN)return;
+  SCAN.verlauf=[];SCAN.stabil=null;SCAN.fehlt=0;
+  tippSetzen();
+  SCAN_UHR=setTimeout(erkennenSchritt,120);
+}
+function kleinLeinwand(){
+  if(!SCAN_KLEIN){var c=document.createElement("canvas");SCAN_KLEIN={c:c,x:c.getContext("2d",{willReadFrequently:true})};}
+  return SCAN_KLEIN;
+}
+/* Bildquelle (Video, Bild, Leinwand) verkleinert als Puffer für den Bildkern */
+function puffer(quelle,qw,qh,lang){
+  var s=Math.min(1,lang/Math.max(qw,qh)),w=Math.max(1,Math.round(qw*s)),h=Math.max(1,Math.round(qh*s)),k=kleinLeinwand();
+  k.c.width=w;k.c.height=h;k.x.imageSmoothingEnabled=true;k.x.imageSmoothingQuality="high";
+  k.x.drawImage(quelle,0,0,w,h);
+  var id=k.x.getImageData(0,0,w,h);
+  return {w:w,h:h,d:id.data};
+}
+function eckenAbstand(a,b){var m=0;for(var i=0;i<4;i++)m=Math.max(m,Math.abs(a[i][0]-b[i][0]),Math.abs(a[i][1]-b[i][1]));return m;}
+function erkennenSchritt(){
+  SCAN_UHR=null;
+  if(!SCAN||SCAN.modus!=="kamera")return;
+  var vid=$("#scVid");
+  if(!vid||!vid.videoWidth){SCAN_UHR=setTimeout(erkennenSchritt,200);return;}
+  var jetzt=Date.now(),r=null,p=null;
+  try{p=puffer(vid,vid.videoWidth,vid.videoHeight,320);r=sbViereck(p);}catch(e){r=null;}
+  /* geglättet: nahe am letzten Rahmen → mitteln, sonst springen */
+  if(r&&r.guete>=0.3){
+    SCAN.fehlt=0;
+    if(SCAN.quad&&eckenAbstand(SCAN.quad,r.ecken)<0.05)
+      SCAN.quad=SCAN.quad.map(function(q,i){return [q[0]*0.45+r.ecken[i][0]*0.55,q[1]*0.45+r.ecken[i][1]*0.55];});
+    else SCAN.quad=r.ecken;
+    SCAN.guete=r.guete;
+    if(!SCAN.stabil||eckenAbstand(SCAN.stabil.ecken,SCAN.quad)>0.015)SCAN.stabil={ecken:SCAN.quad,seit:jetzt};
+  }else{
+    SCAN.fehlt++;SCAN.aussetzer=(SCAN.aussetzer||0)+1;
+    if(SCAN.fehlt>=3){SCAN.quad=null;SCAN.stabil=null;}
+  }
+  /* Nach einer Aufnahme erst wieder, wenn umgeblättert wurde: das Blatt war eine halbe
+     Sekunde aus dem Bild, liegt deutlich anders oder eine Hand ging durchs Bild.
+     Den Inhalt zu vergleichen taugt nicht – Seiten desselben Absenders sehen sich zu
+     ähnlich, und schon leichtes Wackeln verändert den Vergleich stärker (gemessen). */
+  if(SCAN.sperre&&p){
+    var sp=SCAN.sperre;
+    if(!r||r.guete<0.3){if(++sp.weg>=5)scanFrei();}
+    else{
+      sp.weg=0;
+      var bewegt=sp.quad&&eckenAbstand(sp.quad,SCAN.quad)>0.06;
+      var unruhe=bildUnterschied(daumen(p),sp.daumen)>22;
+      if(bewegt||unruhe||!sp.quad)scanFrei();
+    }
+  }
+  var fort=0;
+  if(SCAN.auto&&SCAN.quad&&SCAN.stabil&&!SCAN.sperre&&!SCAN.nimmt&&sbFlaeche(SCAN.quad)>=0.12&&SCAN.guete>=0.45)
+    fort=Math.min(1,(jetzt-SCAN.stabil.seit)/900);
+  overlayZeichnen(fort);
+  tippSetzen();
+  if(fort>=1){ausloesen(true);return;}
+  SCAN_UHR=setTimeout(erkennenSchritt,90);
+}
+function scanFrei(){if(SCAN){SCAN.sperre=null;SCAN.stabil=null;}}
+/* 24×32-Graubild zum Vergleichen zweier Aufnahmen */
+function daumen(p){
+  var w=24,h=32,o=new Float32Array(w*h);
+  for(var y=0;y<h;y++)for(var x=0;x<w;x++){
+    var sx=Math.floor((x+0.5)*p.w/w),sy=Math.floor((y+0.5)*p.h/h),i=(sy*p.w+sx)*4;
+    o[y*w+x]=0.299*p.d[i]+0.587*p.d[i+1]+0.114*p.d[i+2];
+  }
+  return o;
+}
+function bildUnterschied(a,b){var s=0;for(var i=0;i<a.length;i++)s+=Math.abs(a[i]-b[i]);return s/a.length;}
+function videoRechteck(){
+  var vid=$("#scVid"),cw=vid.clientWidth,ch=vid.clientHeight,vw=vid.videoWidth||1,vh=vid.videoHeight||1;
+  var s=Math.min(cw/vw,ch/vh);return {x:(cw-vw*s)/2,y:(ch-vh*s)/2,w:vw*s,h:vh*s,cw:cw,ch:ch};
+}
+function overlayZeichnen(fort){
+  var cv=$("#scOv"),vid=$("#scVid");if(!cv||!vid)return;
+  var R=videoRechteck(),dpr=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(R.cw*dpr)||cv.height!==Math.round(R.ch*dpr)){cv.width=Math.round(R.cw*dpr);cv.height=Math.round(R.ch*dpr);}
+  var x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,R.cw,R.ch);
+  var ring=$("#scFort");if(ring)ring.style.strokeDashoffset=String(226.2*(1-(fort||0)));
+  if(!SCAN||!SCAN.quad)return;
+  var P=SCAN.quad.map(function(q){return [R.x+q[0]*R.w,R.y+q[1]*R.h];});
+  x.beginPath();x.moveTo(P[0][0],P[0][1]);for(var i=1;i<4;i++)x.lineTo(P[i][0],P[i][1]);x.closePath();
+  x.fillStyle=SCAN.sperre?"rgba(255,255,255,.10)":"rgba(79,140,255,.20)";x.fill();
+  x.lineWidth=3;x.lineJoin="round";x.strokeStyle=SCAN.sperre?"rgba(255,255,255,.7)":"#4f8cff";x.stroke();
+  P.forEach(function(p){x.beginPath();x.arc(p[0],p[1],5,0,7);x.fillStyle="#fff";x.fill();});
+}
+function tippSetzen(){
+  var e=$("#scTipp");if(!e||!SCAN)return;
+  var txt;
+  if(SCAN.nimmt)txt=t("Halten …");
+  else if(SCAN.sperre)txt=SCAN.seiten.length?tf("Seite {0} aufgenommen – nächste Seite hinlegen",SCAN.seiten.length):"";
+  else if(!SCAN.stream)txt=t("Kamera startet …");
+  else if(!SCAN.quad)txt=t("Dokument ins Bild halten");
+  else if(SCAN.auto)txt=t("Ruhig halten – nimmt gleich auf");
+  else txt=t("Erkannt – Auslöser drücken");
+  if(e.textContent!==txt)e.textContent=txt;
+}
+function autoZeichnen(){var a=$("#scAuto");if(!a||!SCAN)return;a.innerHTML=(SCAN.auto?t("Automatisch"):t("Manuell"));a.classList.toggle("an",!!SCAN.auto);a.setAttribute("aria-pressed",SCAN.auto?"true":"false");}
+function stapelZeichnen(){
+  var e=$("#scStapel");if(!e||!SCAN)return;
+  var n=SCAN.seiten.length,letzte=n?SCAN.seiten[n-1]:null;
+  e.hidden=!n;
+  if(!n){e.innerHTML="";return;}
+  e.innerHTML='<span class="sc-daumen">'+(letzte&&letzte.vUrl?'<img src="'+letzte.vUrl+'" alt="">':"")+'</span><span class="sc-zahl">'+n+'</span>';
+  if(letzte&&!letzte.vUrl)seiteVorschau(letzte).then(function(){if(SCAN&&SCAN.modus==="kamera")stapelZeichnen();});
+}
+
+/* ---- Aufnehmen ---- */
+async function ausloesen(auto){
+  if(!SCAN||SCAN.nimmt||SCAN.modus!=="kamera")return;
+  if(SCAN.seiten.length>=SCAN_MAX_SEITEN){toast(tf("Höchstens {0} Seiten je Dokument.",SCAN_MAX_SEITEN),true);return;}
+  var vid=$("#scVid");if(!vid||!vid.videoWidth)return;
+  SCAN.nimmt=true;clearTimeout(SCAN_UHR);tippSetzen();
+  var fx=$("#scFx");if(fx){fx.classList.remove("an");void fx.offsetWidth;fx.classList.add("an");}
+  try{if(navigator.vibrate)navigator.vibrate(25);}catch(e){}
+  var quadVideo=SCAN.quad?SCAN.quad.map(function(q){return q.slice();}):null;
+  var vorher=puffer(vid,vid.videoWidth,vid.videoHeight,320),dm=daumen(vorher);
+  try{
+    var bild=await fotoMachen(vid,dm);
+    await seiteAusBild(bild.quelle,bild.w,bild.h,quadVideo&&Math.abs(bild.w/bild.h-vid.videoWidth/vid.videoHeight)<0.02?quadVideo:null);
+    SCAN.sperre={quad:quadVideo,daumen:dm,weg:0};SCAN.stabil=null;
+    entwurfMerken();
+    if(SCAN.ersetzt){SCAN.ersetzt=false;SCAN.nimmt=false;scanModus("seiten");return;}
+    stapelZeichnen();
+  }catch(e){toast(t("Aufnahme fehlgeschlagen")+": "+errMsg(e),true);}
+  finally{
+    if(SCAN){SCAN.nimmt=false;if(SCAN.modus==="kamera"){tippSetzen();SCAN_UHR=setTimeout(erkennenSchritt,150);}}
+  }
+}
+/* Foto in voller Auflösung (ImageCapture), sonst das Videobild. Manche Android-Geräte
+   liefern das Foto in Sensorlage (quer) – dann drehen, und zwar in die Richtung,
+   in der es dem Videobild am ähnlichsten sieht. */
+async function fotoMachen(vid,dmVideo){
+  var vw=vid.videoWidth,vh=vid.videoHeight;
+  if(SCAN.ic&&SCAN.ic.takePhoto){
+    try{
+      var blob=await mitZeitlimit(SCAN.ic.takePhoto(),3500);
+      var img=await bildLaden(blob),w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+      if(w&&h){
+        if((w>h)!==(vw>vh)){
+          var best=null;
+          [1,3].forEach(function(q){
+            var c=gedreht(img,w,h,q,640),p=puffer(c,c.width,c.height,320),u=bildUnterschied(daumen(p),dmVideo);
+            if(!best||u<best.u)best={u:u,q:q};
+          });
+          var voll=gedreht(img,w,h,best.q,4032);
+          return {quelle:voll,w:voll.width,h:voll.height};
+        }
+        return {quelle:img,w:w,h:h};
+      }
+    }catch(e){/* Rückfall aufs Videobild */}
+  }
+  var c=document.createElement("canvas");c.width=vw;c.height=vh;c.getContext("2d").drawImage(vid,0,0,vw,vh);
+  return {quelle:c,w:vw,h:vh};
+}
+function mitZeitlimit(pr,ms){return new Promise(function(ok,nein){var u=setTimeout(function(){nein(new Error("timeout"));},ms);pr.then(function(v){clearTimeout(u);ok(v);},function(e){clearTimeout(u);nein(e);});});}
+function gedreht(quelle,w,h,q,maxLang){
+  var s=Math.min(1,maxLang/Math.max(w,h)),sw=Math.round(w*s),sh=Math.round(h*s);
+  var c=document.createElement("canvas");c.width=q%2?sh:sw;c.height=q%2?sw:sh;
+  var x=c.getContext("2d");x.translate(c.width/2,c.height/2);x.rotate(q*Math.PI/2);x.drawImage(quelle,-sw/2,-sh/2,sw,sh);
+  return c;
+}
+function bildLaden(blob){
+  return new Promise(function(ok,nein){
+    var u=URL.createObjectURL(blob),img=new Image();
+    img.onload=function(){URL.revokeObjectURL(u);ok(img);};
+    img.onerror=function(){URL.revokeObjectURL(u);nein(new Error(t("Bildformat wird nicht unterstützt. Bitte JPG, PNG oder PDF.")));};
+    img.src=u;
+  });
+}
+function leinwandBlob(c,typ,q){return new Promise(function(ok,nein){c.toBlob(function(b){b?ok(b):nein(new Error(t("Bild konnte nicht verarbeitet werden.")));},typ||"image/jpeg",q||0.9);});}
+
+/* Aus einem Bild eine Seite machen: Original (≤ 3264 px) aufheben, Ecken suchen und schärfen */
+async function seiteAusBild(quelle,w,h,eckenHinweis){
+  var s=Math.min(1,3264/Math.max(w,h)),ow=Math.round(w*s),oh=Math.round(h*s);
+  var c=document.createElement("canvas");c.width=ow;c.height=oh;
+  var x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(quelle,0,0,ow,oh);
+  var blob=await leinwandBlob(c,"image/jpeg",0.9);
+  var ecken=null,klein=puffer(c,ow,oh,400),r=sbViereck(klein);
+  if(r&&r.guete>=0.25)ecken=r.ecken;
+  else if(eckenHinweis)ecken=eckenHinweis;
+  if(ecken){try{ecken=sbVerfeinern(puffer(c,ow,oh,1400),ecken);}catch(e){}}
+  else ecken=[[0.02,0.02],[0.98,0.02],[0.98,0.98],[0.02,0.98]];
+  var seite={id:"s"+Date.now()+Math.random().toString(36).slice(2,6),blob:blob,w:ow,h:oh,ecken:ecken,dreh:0,
+             filter:SCAN.filterStd||"auto",erkannt:!!(r||eckenHinweis)};
+  /* „Neu aufnehmen“: die neue Aufnahme tritt an die Stelle der alten */
+  var alt=SCAN.ersetzen?SCAN.seiten.map(function(p){return p.id;}).indexOf(SCAN.ersetzen):-1;
+  if(alt>=0){var weg=SCAN.seiten[alt];if(weg.vUrl)URL.revokeObjectURL(weg.vUrl);SCAN.seiten[alt]=seite;SCAN.akt=alt;SCAN.ersetzt=true;}
+  else SCAN.seiten.push(seite);
+  SCAN.ersetzen=null;
+  return seite;
+}
+async function fotosDazu(dateien){
+  if(!SCAN||!dateien.length)return;
+  var platz=SCAN_MAX_SEITEN-SCAN.seiten.length;
+  if(dateien.length>platz){toast(tf("Höchstens {0} Seiten je Dokument.",SCAN_MAX_SEITEN),true);dateien=dateien.slice(0,Math.max(0,platz));}
+  arbeitZeigen(t("Fotos werden vorbereitet …"));
+  var fehler=0;
+  for(var i=0;i<dateien.length;i++){
+    arbeitZeigen(dateien.length>1?tf("Foto {0} von {1} wird vorbereitet …",i+1,dateien.length):t("Foto wird vorbereitet …"));
+    try{var img=await bildLaden(dateien[i]);await seiteAusBild(img,img.naturalWidth,img.naturalHeight,null);}
+    catch(e){fehler++;}
+  }
+  if(!SCAN)return;
+  if(fehler)toast(tn(fehler,"{0} Datei ist kein lesbares Foto.","{0} Dateien sind keine lesbaren Fotos."),true);
+  entwurfMerken();
+  if(SCAN.seiten.length){if(SCAN.ersetzt)SCAN.ersetzt=false;else SCAN.akt=SCAN.seiten.length-1;scanModus("seiten");}
+  else if(SCAN.modus==="arbeit")scanModus("kamera");
+}
+function arbeitZeigen(txt){
+  if(!SCAN)return;
+  kameraAus();$("#scKam").hidden=true;
+  var inh=$("#scInhalt");inh.hidden=false;SCAN.modus="arbeit";
+  inh.innerHTML='<div class="sc-arbeit"><span class="spin"></span><p id="scArbeit">'+esc(txt)+'</p></div>';
+}
+
+/* ================= Seiten ================= */
+/* Vorschau einer Seite: entzerrt, gefiltert, gedreht – rund 1000 Pixel lang */
+var VORSCHAU_LAEUFT={},VORSCHAU_KETTE=Promise.resolve();
+async function seiteVorschau(s){
+  var key=s.ecken.map(function(p){return p[0].toFixed(4)+","+p[1].toFixed(4);}).join(";")+"|"+s.dreh+"|"+s.filter;
+  if(s.vKey===key&&s.vUrl)return s.vUrl;
+  if(VORSCHAU_LAEUFT[s.id+key])return VORSCHAU_LAEUFT[s.id+key];
+  var pr=VORSCHAU_KETTE.then(async function(){
+    if(s.vKey===key&&s.vUrl)return s.vUrl;
+    var c=await seiteRechnen(s,1000);
+    var b=await leinwandBlob(c,"image/jpeg",0.85);
+    if(s.vUrl)URL.revokeObjectURL(s.vUrl);
+    s.vUrl=URL.createObjectURL(b);s.vKey=key;s.vw=c.width;s.vh=c.height;
+    return s.vUrl;
+  });
+  VORSCHAU_KETTE=pr.catch(function(){});
+  VORSCHAU_LAEUFT[s.id+key]=pr;
+  try{return await pr;}finally{delete VORSCHAU_LAEUFT[s.id+key];}
+}
+/* Seite rechnen; lang = längste Seite des Ergebnisses (höchstens 200 dpi A4) */
+/* Nur EIN dekodiertes Original im Speicher (ein 8-MP-Foto belegt rund 32 MB) */
+var SCAN_BILD=null;
+async function seiteBild(s){
+  if(SCAN_BILD&&SCAN_BILD.id===s.id&&SCAN_BILD.blob===s.blob)return SCAN_BILD.img;
+  SCAN_BILD=null;
+  var img=await bildLaden(s.blob);SCAN_BILD={id:s.id,blob:s.blob,img:img};
+  return img;
+}
+async function seiteRechnen(s,lang){
+  var img=await seiteBild(s);
+  var E=s.ecken.map(function(p){return [p[0]*s.w,p[1]*s.h];});
+  var ziel=sbZielgroesse(E,s.w,s.h),f=Math.min(1,lang/Math.max(ziel.w,ziel.h));
+  var ow=Math.max(8,Math.round(ziel.w*f)),oh=Math.max(8,Math.round(ziel.h*f));
+  /* Quelle nur so groß wie nötig dekodieren */
+  var g=Math.min(1,f*1.5),cw=Math.round(s.w*g),ch=Math.round(s.h*g);
+  var c=document.createElement("canvas");c.width=cw;c.height=ch;
+  var x=c.getContext("2d",{willReadFrequently:true});x.imageSmoothingQuality="high";x.drawImage(img,0,0,cw,ch);
+  var quelle={w:cw,h:ch,d:x.getImageData(0,0,cw,ch).data};
+  /* minimal nach innen, damit kein Tischrand-Streifen bleibt */
+  var Eg=eckenEinruecken(E.map(function(p){return [p[0]*g,p[1]*g];}),0.004);
+  var aus=sbDrehen(sbFilter(sbEntzerren(quelle,Eg,ow,oh),s.filter),s.dreh);
+  var o=document.createElement("canvas");o.width=aus.w;o.height=aus.h;
+  o.getContext("2d").putImageData(new ImageData(aus.d,aus.w,aus.h),0,0);
+  return o;
+}
+function eckenEinruecken(E,anteil){
+  var mx=(E[0][0]+E[1][0]+E[2][0]+E[3][0])/4,my=(E[0][1]+E[1][1]+E[2][1]+E[3][1])/4;
+  return E.map(function(p){return [p[0]+(mx-p[0])*anteil*2,p[1]+(my-p[1])*anteil*2];});
+}
+function seitenZeichnen(){
+  if(!SCAN)return;
+  var inh=$("#scInhalt"),n=SCAN.seiten.length;
+  if(!n){scanModus("kamera");return;}
+  if(SCAN.akt>=n)SCAN.akt=n-1;
+  var s=SCAN.seiten[SCAN.akt],ad=anfuegenDok();
+  inh.innerHTML='<div class="sc-seiten">'+
+    '<div class="sc-kopf">'+
+      '<button class="sc-rund" data-s="zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x",22)+'</button>'+
+      '<span class="sc-titel">'+tf("Seite {0} von {1}",SCAN.akt+1,n)+'</span>'+
+      '<button class="sc-rund" data-s="kamera" aria-label="'+esc(t("Seite hinzufügen"))+'">'+ic("plus",22)+'</button>'+
+    '</div>'+
+    '<div class="sc-buehne" id="scBuehne">'+
+      (n>1?'<button class="sc-pfeil l" data-s="vor" aria-label="'+esc(t("Vorherige Seite"))+'"'+(SCAN.akt?"":" disabled")+'>'+ic("left",22)+'</button>':"")+
+      '<img id="scGross" alt="'+esc(tf("Seite {0}",SCAN.akt+1))+'"'+(s.vUrl&&s.vKey?' src="'+s.vUrl+'"':"")+'>'+
+      '<span class="spin sc-lade" id="scLade"></span>'+
+      (n>1?'<button class="sc-pfeil r" data-s="nach" aria-label="'+esc(t("Nächste Seite"))+'"'+(SCAN.akt<n-1?"":" disabled")+'>'+ic("right",22)+'</button>':"")+
+      (!s.erkannt?'<div class="sc-hinweis">'+t("Kein Rand erkannt – unter „Zuschneiden“ die Ecken setzen.")+'</div>':"")+
+    '</div>'+
+    (SCAN.filterRow?'<div class="sc-filter">'+SCAN_FILTER.map(function(f){
+        return '<button class="sc-chip'+(s.filter===f[0]?" an":"")+'" data-s="filter" data-f="'+f[0]+'">'+esc(t(f[1]))+'</button>';
+      }).join("")+(n>1?'<button class="sc-chip alle" data-s="filter-alle">'+t("Für alle Seiten")+'</button>':"")+'</div>':"")+
+    '<div class="sc-leiste" id="scLeiste">'+SCAN.seiten.map(function(p,i){
+        return '<button class="sc-mini'+(i===SCAN.akt?" an":"")+'" data-s="waehle" data-i="'+i+'" aria-label="'+esc(tf("Seite {0}",i+1))+'">'+
+          (p.vUrl?'<img src="'+p.vUrl+'" alt="">':'<span class="spin"></span>')+'<span class="sc-nr">'+(i+1)+'</span></button>';
+      }).join("")+
+      '<button class="sc-mini neu" data-s="kamera" aria-label="'+esc(t("Seite hinzufügen"))+'">'+ic("plus",22)+'</button>'+
+    '</div>'+
+    '<div class="sc-werkzeug">'+
+      werkzeug("zuschnitt","crop",t("Zuschneiden"))+
+      werkzeug("drehen","drehen",t("Drehen"))+
+      werkzeug("filterrow","filter",t("Filter"),SCAN.filterRow)+
+      werkzeug("nochmal","camera",t("Neu aufnehmen"))+
+      werkzeug("loeschen","trash",t("Löschen"))+
+    '</div>'+
+    '<div class="sc-fuss"><button class="btn lg full" data-s="weiter">'+ic("check")+' '+
+      (ad?tn(n,"{0} Seite anfügen","{0} Seiten anfügen"):t("Speichern"))+'</button></div>'+
+  '</div>';
+  /* Vorschauen nachladen: erst die aktuelle, dann die übrigen */
+  seiteVorschau(s).then(function(u){var g=$("#scGross"),l=$("#scLade");if(g&&SCAN&&SCAN.seiten[SCAN.akt]===s){g.src=u;var mi=document.querySelector(".sc-mini[data-i=\""+SCAN.akt+"\"] img");if(mi)mi.src=u;}if(l)l.hidden=true;})
+    .catch(function(e){toast(errMsg(e),true);});
+  SCAN.seiten.forEach(function(p,i){
+    if(p.vUrl)return;
+    seiteVorschau(p).then(function(u){var m=document.querySelector('.sc-mini[data-i="'+i+'"]');if(m&&SCAN&&SCAN.seiten[i]===p)m.innerHTML='<img src="'+u+'" alt=""><span class="sc-nr">'+(i+1)+'</span>';}).catch(function(){});
+  });
+  wischenAn($("#scBuehne"));ziehenAn($("#scLeiste"));
+}
+function werkzeug(a,icon,label,an){
+  return '<button class="sc-wz'+(an?" an":"")+'" data-s="'+a+'">'+ic(icon,22)+'<span>'+esc(label)+'</span></button>';
+}
+/* Wischen auf der großen Seite blättert */
+function wischenAn(el){
+  if(!el)return;var x0=null,y0=null;
+  el.addEventListener("pointerdown",function(e){x0=e.clientX;y0=e.clientY;});
+  el.addEventListener("pointerup",function(e){
+    if(x0==null)return;var dx=e.clientX-x0,dy=e.clientY-y0;x0=null;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)seiteBlaettern(dx<0?1:-1);
+  });
+}
+function seiteBlaettern(r){if(!SCAN)return;var n=SCAN.akt+r;if(n<0||n>=SCAN.seiten.length)return;SCAN.akt=n;seitenZeichnen();}
+/* Reihenfolge: Miniatur lange drücken (oder mit der Maus ziehen) und verschieben */
+function ziehenAn(leiste){
+  if(!leiste)return;
+  var zug=null;
+  leiste.addEventListener("pointerdown",function(e){
+    var m=e.target.closest(".sc-mini[data-i]");if(!m)return;
+    var i=+m.getAttribute("data-i");
+    zug={i:i,el:m,x0:e.clientX,y0:e.clientY,aktiv:false,id:e.pointerId,
+         uhr:setTimeout(function(){if(zug&&!zug.aktiv)ziehenBeginnen();},e.pointerType==="mouse"?99999:280)};
+  });
+  function ziehenBeginnen(){
+    zug.aktiv=true;zug.el.classList.add("zieht");
+    try{leiste.setPointerCapture(zug.id);}catch(x){}
+    try{if(navigator.vibrate)navigator.vibrate(15);}catch(x){}
+  }
+  leiste.addEventListener("pointermove",function(e){
+    if(!zug)return;
+    var dx=e.clientX-zug.x0;
+    if(!zug.aktiv){
+      if(Math.abs(e.clientY-zug.y0)>10||(e.pointerType!=="mouse"&&Math.abs(dx)>10)){clearTimeout(zug.uhr);zug=null;return;}  /* Wischen der Leiste */
+      if(e.pointerType==="mouse"&&Math.abs(dx)>8)ziehenBeginnen();else return;
+    }
+    e.preventDefault();
+    zug.el.style.transform="translateX("+dx+"px)";
+    zug.ziel=zielIndex(e.clientX);
+    leiste.querySelectorAll(".sc-mini[data-i]").forEach(function(m){m.classList.toggle("ziel",+m.getAttribute("data-i")===zug.ziel&&zug.ziel!==zug.i);});
+  });
+  function ende(){
+    if(!zug)return;clearTimeout(zug.uhr);
+    var z=zug;zug=null;
+    if(!z.aktiv)return;
+    leiste.__ziehen=Date.now();
+    if(z.ziel!=null&&z.ziel!==z.i){
+      var s=SCAN.seiten.splice(z.i,1)[0];SCAN.seiten.splice(z.ziel,0,s);SCAN.akt=z.ziel;entwurfMerken();
+    }
+    seitenZeichnen();
+  }
+  leiste.addEventListener("pointerup",ende);leiste.addEventListener("pointercancel",ende);
+  function zielIndex(cx){
+    var ms=leiste.querySelectorAll(".sc-mini[data-i]"),best=0,bd=1e9;
+    ms.forEach(function(m){var r=m.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-cx);if(d<bd){bd=d;best=+m.getAttribute("data-i");}});
+    return best;
+  }
+}
+
+/* ================= Zuschneiden ================= */
+function zuschnittZeichnen(){
+  var s=SCAN.seiten[SCAN.akt];if(!s){scanModus("seiten");return;}
+  SCAN.zEcken=s.ecken.map(function(p){return p.slice();});
+  if(SCAN.zUrl)URL.revokeObjectURL(SCAN.zUrl);
+  SCAN.zUrl=URL.createObjectURL(s.blob);
+  $("#scInhalt").innerHTML='<div class="sc-zuschnitt">'+
+    '<div class="sc-kopf">'+
+      '<button class="sc-rund" data-s="zs-ab" aria-label="'+esc(t("Abbrechen"))+'">'+ic("x",22)+'</button>'+
+      '<span class="sc-titel">'+t("Zuschneiden")+'</span>'+
+      '<button class="sc-rund an" data-s="zs-ok" aria-label="'+esc(t("Übernehmen"))+'">'+ic("check",22)+'</button>'+
+    '</div>'+
+    '<div class="sc-zfeld" id="scZFeld"><div class="sc-zbild" id="scZBild" style="aspect-ratio:'+s.w+'/'+s.h+'">'+
+      '<img src="'+SCAN.zUrl+'" alt="" draggable="false">'+
+      '<svg viewBox="0 0 '+s.w+' '+s.h+'" preserveAspectRatio="none" id="scZSvg"></svg>'+
+    '</div><canvas class="sc-lupe" id="scLupe" width="240" height="240" hidden></canvas></div>'+
+    '<div class="sc-werkzeug">'+
+      werkzeug("zs-auto","sparkles",t("Automatisch"))+
+      werkzeug("zs-ganz","rahmen",t("Ganzes Bild"))+
+    '</div>'+
+    '<p class="sc-klein-hinweis">'+t("Ecken oder Kanten ziehen – die Lupe zeigt die genaue Stelle.")+'</p>'+
+  '</div>';
+  zuschnittPassen();zuschnittSvg();zuschnittAn();
+}
+/* Bild so groß wie möglich ins Feld (Seitenverhältnis halten) */
+function zuschnittPassen(){
+  var f=$("#scZFeld"),b=$("#scZBild"),s=SCAN.seiten[SCAN.akt];if(!f||!b||!s)return;
+  var fw=f.clientWidth-24,fh=f.clientHeight-24,sc=Math.min(fw/s.w,fh/s.h);
+  b.style.width=Math.max(50,Math.floor(s.w*sc))+"px";b.style.height=Math.max(50,Math.floor(s.h*sc))+"px";
+}
+function zuschnittSvg(){
+  var svg=$("#scZSvg"),s=SCAN.seiten[SCAN.akt];if(!svg||!s)return;
+  var E=SCAN.zEcken.map(function(p){return [p[0]*s.w,p[1]*s.h];}),ok=sbKonvex(E);
+  var b=$("#scZBild"),px=s.w/Math.max(1,b.clientWidth);   /* Bildpixel je Bildschirmpixel */
+  var pts=E.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ");
+  var h='<path fill="rgba(0,0,0,.45)" fill-rule="evenodd" d="M0 0H'+s.w+'V'+s.h+'H0Z M'+pts.replace(/ /g," L")+'Z"/>'+
+    '<polygon points="'+pts+'" fill="none" stroke="'+(ok?"#4f8cff":"#ff5a4f")+'" stroke-width="'+(2.5*px)+'"/>';
+  for(var i=0;i<4;i++){
+    var q=E[(i+1)%4],m=[(E[i][0]+q[0])/2,(E[i][1]+q[1])/2];
+    h+='<rect x="'+(m[0]-9*px)+'" y="'+(m[1]-9*px)+'" width="'+(18*px)+'" height="'+(18*px)+'" rx="'+(9*px)+'" fill="#fff" stroke="#4f8cff" stroke-width="'+(2*px)+'"/>';
+  }
+  E.forEach(function(p){h+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(12*px)+'" fill="rgba(79,140,255,.25)" stroke="#fff" stroke-width="'+(3*px)+'"/>';});
+  svg.innerHTML=h;
+}
+function zuschnittAn(){
+  var b=$("#scZBild");if(!b)return;
+  var greif=null;
+  b.addEventListener("pointerdown",function(e){
+    var s=SCAN.seiten[SCAN.akt],r=b.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    var E=SCAN.zEcken,best=null,bd=1e9,i;
+    for(i=0;i<4;i++){var d=Math.hypot((E[i][0]-x)*r.width,(E[i][1]-y)*r.height);if(d<bd){bd=d;best={art:"ecke",i:i};}}
+    for(i=0;i<4;i++){var q=E[(i+1)%4],mx=(E[i][0]+q[0])/2,my=(E[i][1]+q[1])/2,d2=Math.hypot((mx-x)*r.width,(my-y)*r.height);
+      if(d2<bd){bd=d2;best={art:"kante",i:i};}}
+    if(bd>44)return;
+    e.preventDefault();greif=best;greif.x0=x;greif.y0=y;greif.start=E.map(function(p){return p.slice();});
+    try{b.setPointerCapture(e.pointerId);}catch(x2){}
+    lupe(e,s);
+  });
+  b.addEventListener("pointermove",function(e){
+    if(!greif)return;e.preventDefault();
+    var s=SCAN.seiten[SCAN.akt],r=b.getBoundingClientRect();
+    var x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
+    if(greif.art==="ecke")SCAN.zEcken[greif.i]=[x,y];
+    else{
+      var a=greif.i,c=(greif.i+1)%4,dx=x-greif.x0,dy=y-greif.y0;
+      [a,c].forEach(function(k){SCAN.zEcken[k]=[Math.min(1,Math.max(0,greif.start[k][0]+dx)),Math.min(1,Math.max(0,greif.start[k][1]+dy))];});
+    }
+    zuschnittSvg();lupe(e,s);
+  });
+  function los(){greif=null;var l=$("#scLupe");if(l)l.hidden=true;}
+  b.addEventListener("pointerup",los);b.addEventListener("pointercancel",los);
+}
+/* Lupe: 3-fach vergrößert um den Finger, oben in der anderen Bildhälfte */
+function lupe(e,s){
+  var l=$("#scLupe"),b=$("#scZBild"),img=b&&b.querySelector("img");if(!l||!img)return;
+  var r=b.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width,fy=(e.clientY-r.top)/r.height;
+  var x=l.getContext("2d"),n=240,zoom=3,qx=fx*s.w,qy=fy*s.h,qw=n/zoom*(s.w/r.width);
+  l.hidden=false;
+  var feld=$("#scZFeld").getBoundingClientRect();
+  l.style.left=(e.clientX-feld.left<feld.width/2?feld.width-128:8)+"px";
+  x.save();x.clearRect(0,0,n,n);x.beginPath();x.arc(n/2,n/2,n/2-2,0,7);x.clip();
+  x.fillStyle="#111";x.fillRect(0,0,n,n);
+  try{x.drawImage(img,qx-qw/2,qy-qw/2,qw,qw,0,0,n,n);}catch(x3){}
+  x.strokeStyle="#4f8cff";x.lineWidth=2;x.beginPath();x.moveTo(n/2-16,n/2);x.lineTo(n/2+16,n/2);x.moveTo(n/2,n/2-16);x.lineTo(n/2,n/2+16);x.stroke();
+  x.restore();
+}
+async function zuschnittAuto(){
+  var s=SCAN.seiten[SCAN.akt];if(!s)return;
+  try{
+    var img=await seiteBild(s);
+    var r=sbViereck(puffer(img,s.w,s.h,400));
+    if(!r){toast(t("Kein Rand erkannt – bitte die Ecken von Hand setzen."),true);return;}
+    SCAN.zEcken=sbVerfeinern(puffer(img,s.w,s.h,1400),r.ecken);zuschnittSvg();
+  }catch(e){toast(errMsg(e),true);}
+}
+
+/* ================= Speichern ================= */
+function speichernHtml(){
+  var n=SCAN.seiten.length,ad=anfuegenDok(),c=SCAN.ziel.vertrag?vertragById(SCAN.ziel.vertrag):null;
+  var wohin=ad?tf("Wird an „{0}“ angefügt",docTitel(ad)):(c?tf("Wird {0} zugeordnet",c.anbieter||artInfo(c.art).label):(SCAN.ziel.med?t("Landet im Bereich Gesundheit"):t("All-Home liest aus und schlägt die Zuordnung vor.")));
+  return '<div class="sc-blatt"><div class="sc-blatt-in">'+
+    '<div class="sc-kopf hell"><button class="ibtn" data-s="seiten" aria-label="'+esc(t("Zurück"))+'">'+ic("links")+'</button>'+
+      '<span class="sc-titel">'+(ad?t("Seiten anfügen"):t("Scan speichern"))+'</span><span></span></div>'+
+    '<p class="hint" style="margin:0 0 16px">'+esc(wohin)+' · '+tn(n,"{0} Seite","{0} Seiten")+'</p>'+
+    (ad?"":
+      '<div class="fld"><span>'+t("Format")+'</span><div class="langrow">'+
+        '<button class="lb'+(SCAN.format==="pdf"?" on":"")+'" data-s="format" data-v="pdf" aria-pressed="'+(SCAN.format==="pdf")+'">'+ic("doc")+' PDF</button>'+
+        '<button class="lb'+(SCAN.format==="jpg"?" on":"")+'" data-s="format" data-v="jpg" aria-pressed="'+(SCAN.format==="jpg")+'">'+ic("bild")+' JPG</button>'+
+      '</div><p class="hint" style="margin-top:8px">'+(SCAN.format==="pdf"?
+        (n>1?t("Alle Seiten in einer PDF-Datei."):t("Eine PDF-Datei.")):
+        (n>1?t("Ein Dokument mit einem Bild je Seite."):t("Ein Foto im JPG-Format.")))+'</p></div>')+
+    (SCAN.ziel.med&&!ad&&PERSONS.length?'<label class="fld"><span>'+t("Patient")+'</span><select class="inp" id="scPerson">'+
+      '<option value="">'+t("keine")+'</option>'+PERSONS.map(function(p){return '<option value="'+p.id+'"'+(SCAN.person===p.id?" selected":"")+'>'+esc(p.name)+'</option>';}).join("")+
+    '</select></label>':"")+
+    '<button class="sc-schalter" data-s="ki" role="switch" aria-checked="'+(SCAN.ki?"true":"false")+'">'+
+      '<span class="sc-sw-txt"><b>'+(ad?t("Danach neu auslesen"):t("Mit KI auslesen"))+'</b><span>'+
+        (ad?t("Die KI liest das ganze Dokument noch einmal und gleicht mit dem Vertrag ab."):
+         (SCAN.ki?t("Erkennt Anbieter, Beträge und Fristen und macht den Text durchsuchbar."):t("Nur ablegen – Auslesen lässt sich später nachholen.")))+'</span></span>'+
+      '<span class="sc-sw'+(SCAN.ki?" an":"")+'"></span></button>'+
+    '<div class="factions"><button class="btn lg" data-s="ok">'+ic("check")+' '+(ad?t("Anfügen"):t("Speichern"))+'</button></div>'+
+  '</div></div>';
+}
+function scanFehlerZeigen(txt){
+  if(!SCAN||!$("#scInhalt")){toast(txt,true);return;}
+  var inh=$("#scInhalt");SCAN.modus="fehler";
+  inh.innerHTML='<div class="sc-leer"><div class="sc-mitte">'+
+    '<div class="sc-symbol">'+ic("alert",34)+'</div><h2>'+t("Das hat nicht geklappt")+'</h2><p>'+esc(txt)+'</p>'+
+    '<p>'+t("Die Seiten bleiben als Entwurf auf diesem Gerät.")+'</p>'+
+    '<div class="sc-knoepfe"><button class="btn lg" data-s="ok">'+ic("refresh")+' '+t("Erneut versuchen")+'</button>'+
+    '<button class="btn lg ghost" data-s="seiten">'+t("Zurück zu den Seiten")+'</button></div></div></div>';
+}
+function arbeitText(txt){var e=$("#scArbeit");if(e)e.textContent=txt;}
+function jetztName(){
+  var d=new Date();function z(n){return String(n).padStart(2,"0");}
+  return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+"-"+z(d.getMinutes());
+}
+/* Alle Seiten in voller Qualität: 200 dpi, JPEG; dazu je Seite ein kleines Bild für die KI */
+async function seitenFertig(mitKi){
+  var aus=[];
+  for(var i=0;i<SCAN.seiten.length;i++){
+    arbeitText(SCAN.seiten.length>1?tf("Seite {0} von {1} wird aufbereitet …",i+1,SCAN.seiten.length):t("Seite wird aufbereitet …"));
+    await new Promise(function(r){setTimeout(r,16);});   /* Anzeige aktualisieren lassen */
+    var s=SCAN.seiten[i],c=await seiteRechnen(s,SCAN_A4_LANG);
+    var b=await leinwandBlob(c,"image/jpeg",s.filter==="original"?0.86:0.8);
+    var ki=null;
+    if(mitKi&&i<SCAN_KI_SEITEN){
+      var f=Math.min(1,1568/Math.max(c.width,c.height)),k=document.createElement("canvas");
+      k.width=Math.round(c.width*f);k.height=Math.round(c.height*f);
+      var kx=k.getContext("2d");kx.imageSmoothingQuality="high";kx.drawImage(c,0,0,k.width,k.height);
+      ki=new Uint8Array(await (await leinwandBlob(k,"image/jpeg",0.8)).arrayBuffer());
+    }
+    aus.push({jpeg:new Uint8Array(await b.arrayBuffer()),w:c.width,h:c.height,ki:ki});
+    c.width=c.height=0;
+  }
+  return aus;
+}
+async function inhaltHash(bytes){
+  try{var hb=await crypto.subtle.digest("SHA-256",bytes);
+    return Array.prototype.map.call(new Uint8Array(hb),function(x){return x.toString(16).padStart(2,"0");}).join("");}catch(e){return null;}
+}
+async function scanSpeichern(){
+  if(!SCAN||SCAN_SPEICHERN)return;
+  if(!HH){toast(t("Kein Haushalt aktiv."),true);return;}
+  if(!navigator.onLine){scanFehlerZeigen(t("Keine Internetverbindung. Speichern, sobald du wieder online bist."));return;}
+  SCAN_SPEICHERN=true;
+  /* Einstellungen jetzt festhalten – während des Hochladens kann sich die Ansicht ändern */
+  var ziel=SCAN.ziel,ad=anfuegenDok(),opt={ki:SCAN.ki,format:SCAN.format,person:SCAN.person};
+  arbeitZeigen(t("Seiten werden aufbereitet …"));
+  try{
+    var seiten=await seitenFertig(opt.ki);
+    if(ad){await anfuegenAusfuehren(ad,seiten,opt);return;}
+    var name="Scan "+jetztName(),basis=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_scan";
+    var pfade=[],mime,gesamt=0,hash=null;
+    if(opt.format==="pdf"){
+      var pdf=sbPdf(seiten,name);
+      if(pdf.length>15*1024*1024)throw new Error(t("Das PDF wird größer als 15 MB – bitte auf mehrere Dokumente aufteilen."));
+      arbeitText(t("Wird hochgeladen …"));
+      var up=await hochladenMitWiederholung(basis+".pdf",pdf,"application/pdf");
+      if(up.error)throw new Error(netzFehler(up.error));
+      pfade.push(basis+".pdf");mime="application/pdf";gesamt=pdf.length;hash=await inhaltHash(pdf);name+=".pdf";
+    }else{
+      mime="image/jpeg";
+      for(var i=0;i<seiten.length;i++){
+        arbeitText(seiten.length>1?tf("Seite {0} von {1} wird hochgeladen …",i+1,seiten.length):t("Wird hochgeladen …"));
+        var p=basis+(seiten.length>1?"_s"+(i+1):"")+".jpg";
+        var u=await hochladenMitWiederholung(p,seiten[i].jpeg,mime);
+        if(u.error){await dateienWeg(pfade);throw new Error(netzFehler(u.error));}
+        pfade.push(p);gesamt+=seiten[i].jpeg.length;
+      }
+      hash=await inhaltHash(seiten[0].jpeg);name+=".jpg";
+    }
+    var reihe={household_id:HH.id,filename:name,storage_path:pfade[0],weitere_seiten:pfade.slice(1),seiten:seiten.length,
+      mime_type:mime,size_bytes:gesamt,doc_type:"sonstiges",content_hash:hash,contract_id:ziel.vertrag||null,ohne_ki:!opt.ki};
+    if(ziel.med){reihe.bereich="medizin";reihe.person_id=opt.person||null;reihe.med_typ="sonstiges";reihe.fachrichtung="sonstiges";}
+    var ins=await sb.from("documents").insert(reihe).select("*").single();
+    if(ins.error){await dateienWeg(pfade);throw new Error(netzFehler(ins.error));}
+    var dok=ins.data;
+    await entwurfLoeschen();
+    var kiBilder=seiten.map(function(s){return s.ki;}).filter(Boolean);
+    if(opt.ki){
+      arbeitText(t("All-Home liest das Dokument … (10–30 Sek.)"));
+      var ergebnis=await kiAuslesen(dok,{bilder:kiBilder},ziel.med);
+      if(ergebnis==="ok")volltextHolen(dok.id,kiBilder,"");
+    }
+    await ladeDaten();
+    scanFertig(dok.id,opt.ki,ziel);
+  }catch(e){
+    scanFehlerZeigen(errMsg(e));
+  }finally{SCAN_SPEICHERN=null;}
+}
+async function dateienWeg(pfade){if(pfade&&pfade.length){try{await sb.storage.from(BUCKET).remove(pfade);}catch(e){}}}
+function bilderFuerKi(bilder){return bilder.map(function(b){return {data:bytesBase64(b),mime:"image/jpeg"};});}
+/* KI-Auslesung für ein gespeichertes Dokument. quelle: {bilder:[Uint8Array]} oder {pdf:Uint8Array}.
+   Liefert "ok", "guthaben" oder "fehler" – das Dokument ist in jedem Fall gespeichert. */
+async function kiAuslesen(dok,quelle,med){
+  try{
+    var body={model:kiStufe(),lang:curLang};
+    if(quelle.pdf){body.fileBase64=bytesBase64(quelle.pdf);body.mimeType="application/pdf";}
+    else{body.bilder=bilderFuerKi(quelle.bilder.slice(0,SCAN_KI_SEITEN));body.mimeType="image/jpeg";}
+    var antwort=await edgeRuf(EDGE_EXTRACT,body),ext=antwort.dokument||null;
+    if(!ext)return "fehler";
+    var upd=kiFelder(ext,dok.filename,med);
+    upd.ki_pending=false;upd.ohne_ki=false;
+    if(dok.seiten)upd.filename=dateiname(upd.titel,ext.datum,dok.filename);   /* nur Scans umbenennen */
+    var r=await sb.from("documents").update(upd).eq("id",dok.id);
+    if(r.error)throw r.error;
+    return "ok";
+  }catch(e){
+    if(e&&e.code==="ki_guthaben"){try{await sb.from("documents").update({ki_pending:true}).eq("id",dok.id);}catch(x){}
+      toast(t("gespeichert – KI-Guthaben leer, Analyse später"),true);return "guthaben";}
+    toast(t("abgelegt, aber KI-Analyse fehlgeschlagen")+": "+errMsg(e),true);
+    return "fehler";
+  }
+}
+/* Sprechender Dateiname aus dem KI-Titel: „2026-10-14 Telekom Rechnung.pdf“ */
+function dateiname(titel,datum,alt){
+  var endung=(String(alt||"").match(/\.[a-z0-9]{2,4}$/i)||[".pdf"])[0].toLowerCase();
+  var tt=String(titel||"").replace(/[\\\/:*?"<>|\u0000-\u001f]+/g," ").replace(/\s+/g," ").trim().slice(0,70);
+  if(!tt)return alt;
+  var d=/^\d{4}-\d{2}-\d{2}$/.test(String(datum||""))?datum+" ":"";
+  return d+tt+endung;
+}
+/* Volltext für die Suche: günstigstes Modell, 4 Seiten je Aufruf, zwei gleichzeitig.
+   Läuft im Hintergrund; ein Fehler kostet nur die Suche, nicht das Dokument. */
+async function volltextHolen(docId,bilder,vorher){
+  if(!bilder||!bilder.length)return;
+  var pakete=[];for(var i=0;i<bilder.length;i+=4)pakete.push(bilder.slice(i,i+4));
+  var teile=new Array(pakete.length),naechstes=0;
+  async function arbeiter(){
+    while(naechstes<pakete.length){
+      var k=naechstes++;
+      try{var b=await edgeRuf(EDGE_EXTRACT,{modus:"text",bilder:bilderFuerKi(pakete[k]),mimeType:"image/jpeg",lang:curLang});teile[k]=String(b.text||"").trim();}
+      catch(e){teile[k]="";}
+    }
+  }
+  await Promise.all([arbeiter(),arbeiter()]);
+  var text=[vorher||""].concat(teile).filter(Boolean).join("\n\n").slice(0,200000);
+  if(!text)return;
+  try{await sb.from("documents").update({volltext:text}).eq("id",docId);}catch(e){}
+}
+/* Volltext eines PDF-Scans, der erst später ausgelesen wird */
+async function volltextAusPdf(docId,pdf){
+  if(!pdf||pdf.length>10*1024*1024)return;
+  try{
+    var b=await edgeRuf(EDGE_EXTRACT,{modus:"text",fileBase64:bytesBase64(pdf),mimeType:"application/pdf",lang:curLang});
+    var text=String(b.text||"").trim().slice(0,200000);
+    if(text)await sb.from("documents").update({volltext:text}).eq("id",docId);
+  }catch(e){}
+}
+/* Nach dem Speichern: Scanner zu, Prüfen-Ansicht oder zurück, woher man kam */
+function scanFertig(docId,mitKi,ziel){
+  var d=DOCS.filter(function(x){return x.id===docId;})[0]||null;
+  ziel=ziel||{};SCAN_SPEICHERN=null;
+  scannerAus();SCAN_INAPP=false;
+  if(mitKi&&d&&!d.ki_pending&&d.extracted){REVIEW=d;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;location.replace("#/neu");return;}
+  toast(t("Gespeichert")+" ✅");
+  if(ziel.vertrag)location.replace("#/vertrag?id="+ziel.vertrag);
+  else if(ziel.med)location.replace(d?"#/gesundheit?doc="+d.id:"#/gesundheit");
+  else location.replace("#/dokumente");
+}
+
+/* ================= Seiten an ein bestehendes Dokument anfügen ================= */
+async function anfuegenAusfuehren(d,seiten,opt){
+  var neuPfade=[],alt=d.storage_path;
+  if(istPdfDok(d)){
+    arbeitText(t("PDF wird erweitert …"));
+    var lib=await ladePdfLib();
+    var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+    if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+    var doc;
+    try{doc=await lib.PDFDocument.load(new Uint8Array(await dl.data.arrayBuffer()));}
+    catch(e){throw new Error(/encrypt/i.test(errMsg(e))?t("Dieses PDF ist geschützt – Seiten lassen sich nicht anfügen. Scanne die Seiten als eigenes Dokument."):t("Dieses PDF lässt sich nicht erweitern."));}
+    for(var i=0;i<seiten.length;i++){
+      var bild=await doc.embedJpg(seiten[i].jpeg),mass=sbSeitenMass(seiten[i].w,seiten[i].h),W=mass[0],H=mass[1];
+      doc.addPage([W,H]).drawImage(bild,{x:0,y:0,width:W,height:H});
+    }
+    var bytes=await doc.save(),anzahl=doc.getPageCount();
+    if(bytes.length>15*1024*1024)throw new Error(t("Das PDF wird größer als 15 MB – bitte als eigenes Dokument speichern."));
+    arbeitText(t("Wird hochgeladen …"));
+    var pfad=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_"+pfadName(String(d.filename||"dokument").replace(/\.pdf$/i,""))+".pdf";
+    var up=await hochladenMitWiederholung(pfad,bytes,"application/pdf");
+    if(up.error)throw new Error(netzFehler(up.error));
+    var r=await sb.from("documents").update({storage_path:pfad,size_bytes:bytes.length,seiten:anzahl,content_hash:await inhaltHash(bytes)}).eq("id",d.id).select("id");
+    if(r.error||!r.data||!r.data.length){await dateienWeg([pfad]);throw new Error(r.error?netzFehler(r.error):t("Das Dokument ließ sich nicht ändern."));}
+    await dateienWeg([alt]);
+    neuPfade=[pfad];
+    var pdfFuerKi=bytes;
+  }else{
+    var basis=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_seite";
+    for(var k=0;k<seiten.length;k++){
+      arbeitText(tf("Seite {0} von {1} wird hochgeladen …",k+1,seiten.length));
+      var p=basis+(k+1)+".jpg",u=await hochladenMitWiederholung(p,seiten[k].jpeg,"image/jpeg");
+      if(u.error){await dateienWeg(neuPfade);throw new Error(netzFehler(u.error));}
+      neuPfade.push(p);
+    }
+    var alle=(d.weitere_seiten||[]).concat(neuPfade);
+    var r2=await sb.from("documents").update({weitere_seiten:alle,seiten:1+alle.length}).eq("id",d.id).select("id");
+    if(r2.error||!r2.data||!r2.data.length){await dateienWeg(neuPfade);throw new Error(r2.error?netzFehler(r2.error):t("Das Dokument ließ sich nicht ändern."));}
+  }
+  await entwurfLoeschen();
+  var kiNeu=opt.ki,kiBilder=seiten.map(function(s){return s.ki;}).filter(Boolean),med=istMed(d);
+  if(kiNeu){
+    arbeitText(t("All-Home liest das Dokument … (10–30 Sek.)"));
+    var quelle;
+    if(pdfFuerKi&&pdfFuerKi.length<=10*1024*1024)quelle={pdf:pdfFuerKi};
+    else if(!pdfFuerKi)quelle={bilder:(await bilderDesDokuments(d)).concat(kiBilder)};
+    if(quelle){var erg=await kiAuslesen(d,quelle,med);if(erg==="ok")volltextHolen(d.id,kiBilder,d.volltext||"");}
+  }
+  await ladeDaten();
+  var neu=DOCS.filter(function(x){return x.id===d.id;})[0]||d;
+  SCAN_SPEICHERN=null;scannerAus();SCAN_INAPP=false;
+  if(kiNeu&&neu.extracted&&!neu.ki_pending){REVIEW=neu;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;location.replace("#/neu");return;}
+  toast(tn(seiten.length,"{0} Seite angefügt","{0} Seiten angefügt")+" ✅");
+  location.replace(med?"#/gesundheit?doc="+d.id:(d.contract_id&&vertragById(d.contract_id)?"#/vertrag?id="+d.contract_id:"#/dokumente"));
+}
+/* Bilder eines JPG-Dokuments (für die KI): höchstens SCAN_KI_SEITEN */
+async function bilderDesDokuments(d){
+  var pfade=[d.storage_path].concat(d.weitere_seiten||[]).slice(0,SCAN_KI_SEITEN),aus=[];
+  for(var i=0;i<pfade.length;i++){
+    var dl=await sb.storage.from(BUCKET).download(pfade[i]);
+    if(!dl.error&&dl.data)aus.push(new Uint8Array(await dl.data.arrayBuffer()));
+  }
+  return aus;
+}
+/* Eine PDF-Datei an ein PDF-Dokument hängen (Seiten kopieren) */
+async function pdfAnhaengen(docId,datei){
+  var d=DOCS.filter(function(x){return x.id===docId;})[0];if(!d||!datei)return;
+  if(datei.size>12*1024*1024){toast(t("PDF größer als 12 MB"),true);return;}
+  toast(t("PDF wird angehängt …"));
+  try{
+    var lib=await ladePdfLib();
+    var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+    if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+    var doc,neu;
+    try{doc=await lib.PDFDocument.load(new Uint8Array(await dl.data.arrayBuffer()));neu=await lib.PDFDocument.load(new Uint8Array(await datei.arrayBuffer()));}
+    catch(e){throw new Error(/encrypt/i.test(errMsg(e))?t("Eines der PDFs ist geschützt – Anhängen geht nicht."):t("Dieses PDF lässt sich nicht erweitern."));}
+    var kopie=await doc.copyPages(neu,neu.getPageIndices());kopie.forEach(function(pg){doc.addPage(pg);});
+    var bytes=await doc.save();
+    if(bytes.length>15*1024*1024)throw new Error(t("Das PDF wird größer als 15 MB – bitte als eigenes Dokument speichern."));
+    var pfad=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_"+pfadName(String(d.filename||"dokument").replace(/\.pdf$/i,""))+".pdf";
+    var up=await hochladenMitWiederholung(pfad,bytes,"application/pdf");
+    if(up.error)throw new Error(netzFehler(up.error));
+    var r=await sb.from("documents").update({storage_path:pfad,size_bytes:bytes.length,seiten:doc.getPageCount(),content_hash:await inhaltHash(bytes)}).eq("id",d.id).select("id");
+    if(r.error||!r.data||!r.data.length){await dateienWeg([pfad]);throw new Error(r.error?netzFehler(r.error):t("Das Dokument ließ sich nicht ändern."));}
+    await dateienWeg([d.storage_path]);
+    closeModal(true);await ladeDaten();render();
+    toast(tn(neu.getPageCount(),"{0} Seite angehängt","{0} Seiten angehängt")+" ✅");
+  }catch(e){toast(t("Anhängen fehlgeschlagen")+": "+errMsg(e),true);}
+}
+/* Seiten hinzufügen: bei PDFs Wahl zwischen Scannen und PDF-Datei */
+function seitenHinzufuegen(docId){
+  var d=DOCS.filter(function(x){return x.id===docId;})[0];if(!d)return;
+  if(!istPdfDok(d)){closeModal(true);scanStart({doc:docId});return;}
+  openModal('<h2 class="mhead">'+t("Seiten hinzufügen")+'</h2>'+
+    '<div class="mlist">'+
+      '<button class="setupcat" data-a="scan" data-doc="'+docId+'">'+ic("camera")+'<span>'+t("Scannen")+'<br><span class="mut" style="font-size:.82rem">'+t("Mit der Kamera, hinten angefügt")+'</span></span></button>'+
+      '<button class="setupcat" data-a="d-pdf-an" data-id="'+docId+'">'+ic("doc")+'<span>'+t("PDF-Datei anhängen")+'<br><span class="mut" style="font-size:.82rem">'+t("Alle Seiten der Datei kommen hinten dazu")+'</span></span></button>'+
+    '</div><input type="file" id="pdfAn" data-id="'+docId+'" accept="application/pdf" hidden>'+
+    '<div class="factions"><button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button></div>');
+}
+/* pdf-lib nur bei Bedarf, feste Version mit Prüfsumme (die Seite erlaubt nur jsDelivr) */
+var PDFLIB_URL="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js";
+var PDFLIB_SRI="sha256-D5pcrQeUHwgmWGyU4InYm5GMRuXBfPLVo8b2ZuO8aU8=";
+var PDFLIB_LADEN=null;
+function ladePdfLib(){
+  if(window.PDFLib)return Promise.resolve(window.PDFLib);
+  if(PDFLIB_LADEN)return PDFLIB_LADEN;
+  PDFLIB_LADEN=new Promise(function(ok,nein){
+    var s=document.createElement("script");s.src=PDFLIB_URL;s.integrity=PDFLIB_SRI;s.crossOrigin="anonymous";
+    s.onload=function(){window.PDFLib?ok(window.PDFLib):nein(new Error(t("PDF-Werkzeug konnte nicht geladen werden.")));};
+    s.onerror=function(){PDFLIB_LADEN=null;s.remove();nein(new Error(t("PDF-Werkzeug konnte nicht geladen werden.")));};
+    document.head.appendChild(s);
+  });
+  return PDFLIB_LADEN;
+}
+
+/* ================= Entwurf (nur auf diesem Gerät) ================= */
+function entwurfDb(){
+  return new Promise(function(ok,nein){
+    try{
+      var r=indexedDB.open("allhome-scan",1);
+      r.onupgradeneeded=function(){r.result.createObjectStore("entwurf");};
+      r.onsuccess=function(){ok(r.result);};r.onerror=function(){nein(r.error);};
+    }catch(e){nein(e);}
+  });
+}
+async function entwurfLaden(){
+  try{
+    var db=await entwurfDb();
+    var e=await new Promise(function(ok){var q=db.transaction("entwurf").objectStore("entwurf").get("aktuell");q.onsuccess=function(){ok(q.result||null);};q.onerror=function(){ok(null);};});
+    db.close();
+    if(!e||!me||!HH||e.user!==me.id||e.hh!==HH.id)return null;
+    return e;
+  }catch(x){return null;}
+}
+var ENTWURF_UHR=null;
+function entwurfMerken(){
+  clearTimeout(ENTWURF_UHR);
+  ENTWURF_UHR=setTimeout(async function(){
+    if(!SCAN||!me||!HH)return;
+    if(!SCAN.seiten.length){entwurfLoeschen();return;}
+    var e={user:me.id,hh:HH.id,ziel:SCAN.ziel,format:SCAN.format,zeit:Date.now(),
+      seiten:SCAN.seiten.map(function(s){return {id:s.id,blob:s.blob,w:s.w,h:s.h,ecken:s.ecken,dreh:s.dreh,filter:s.filter,erkannt:s.erkannt};})};
+    try{var db=await entwurfDb();db.transaction("entwurf","readwrite").objectStore("entwurf").put(e,"aktuell");db.close();}catch(x){}
+  },300);
+}
+async function entwurfLoeschen(){
+  clearTimeout(ENTWURF_UHR);
+  try{var db=await entwurfDb();await new Promise(function(ok){var tx=db.transaction("entwurf","readwrite");tx.objectStore("entwurf").delete("aktuell");tx.oncomplete=ok;tx.onerror=ok;});db.close();}catch(x){}
+}
+function entwurfHtml(){
+  var e=SCAN.entwurf,n=e.seiten.length,wann=new Date(e.zeit);
+  return '<div class="sc-leer"><div class="sc-kopf"><button class="sc-rund" data-s="zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x",22)+'</button><span></span><span></span></div>'+
+    '<div class="sc-mitte"><div class="sc-symbol">'+ic("doc",34)+'</div>'+
+    '<h2>'+t("Angefangener Scan")+'</h2><p>'+tf("{0} vom {1}, {2} Uhr – nur auf diesem Gerät gespeichert.",tn(n,"{0} Seite","{0} Seiten"),fmtDate(todayISOvon(wann)),String(wann.getHours()).padStart(2,"0")+":"+String(wann.getMinutes()).padStart(2,"0"))+'</p>'+
+    '<div class="sc-knoepfe"><button class="btn lg" data-s="entwurf-weiter">'+t("Fortsetzen")+'</button>'+
+    '<button class="btn lg ghost danger" data-s="entwurf-weg">'+ic("trash")+' '+t("Verwerfen und neu beginnen")+'</button></div></div></div>';
+}
+function todayISOvon(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+
+/* ================= Bedienung im Scanner ================= */
+function scanKlick(ev){
+  var b=ev.target.closest("[data-s]");if(!b||!SCAN)return;
+  var a=b.getAttribute("data-s"),s=SCAN.seiten[SCAN.akt];
+  if(b.closest("#scLeiste")&&$("#scLeiste").__ziehen&&Date.now()-$("#scLeiste").__ziehen<400)return;  /* Ende eines Ziehens ist kein Tipp */
+  if(a==="zu"){
+    if(SCAN.seiten.length&&!confirm(tn(SCAN.seiten.length,"Scan verwerfen? Die Seite geht verloren.","Scan verwerfen? {0} Seiten gehen verloren.")))return;
+    entwurfLoeschen();scannerAus();scanZurueck();return;
+  }
+  if(a==="ausloesen"){ausloesen(false);return;}
+  if(a==="auto"){SCAN.auto=!SCAN.auto;SCAN.stabil=null;autoZeichnen();tippSetzen();return;}
+  if(a==="blitz"){
+    SCAN.blitz=!SCAN.blitz;
+    if(SCAN.track)SCAN.track.applyConstraints({advanced:[{torch:SCAN.blitz}]}).catch(function(){});
+    b.classList.toggle("an",SCAN.blitz);return;
+  }
+  if(a==="galerie"){$("#scGal").click();return;}
+  if(a==="kamapp"){$("#scCam").click();return;}
+  if(a==="kamera"){
+    if(SCAN.modus==="ohnekamera"){$("#scCam").click();return;}
+    scanModus("kamera");return;
+  }
+  if(a==="seiten"){SCAN.ersetzen=null;if(SCAN.seiten.length){SCAN.akt=Math.min(SCAN.akt,SCAN.seiten.length-1);if(SCAN.modus==="kamera")SCAN.akt=SCAN.seiten.length-1;scanModus("seiten");}return;}
+  if(a==="vor"){seiteBlaettern(-1);return;}
+  if(a==="nach"){seiteBlaettern(1);return;}
+  if(a==="waehle"){SCAN.akt=+b.getAttribute("data-i");seitenZeichnen();return;}
+  if(a==="filterrow"){SCAN.filterRow=!SCAN.filterRow;seitenZeichnen();return;}
+  if(a==="filter"){if(s){s.filter=b.getAttribute("data-f");SCAN.filterStd=s.filter;entwurfMerken();seitenZeichnen();}return;}
+  if(a==="filter-alle"){if(s){SCAN.seiten.forEach(function(p){p.filter=s.filter;});entwurfMerken();seitenZeichnen();toast(t("Filter für alle Seiten übernommen"));}return;}
+  if(a==="drehen"){if(s){s.dreh=(s.dreh+1)%4;entwurfMerken();seitenZeichnen();}return;}
+  if(a==="loeschen"){
+    if(!s)return;
+    if(s.vUrl)URL.revokeObjectURL(s.vUrl);
+    SCAN.seiten.splice(SCAN.akt,1);entwurfMerken();
+    if(!SCAN.seiten.length){scanModus("kamera");return;}
+    SCAN.akt=Math.min(SCAN.akt,SCAN.seiten.length-1);seitenZeichnen();return;
+  }
+  if(a==="nochmal"){
+    if(!s)return;
+    /* Seite ersetzen: Kamera auf, die nächste Aufnahme tritt an ihre Stelle – bis dahin bleibt die alte */
+    SCAN.ersetzen=s.id;scanModus("kamera");return;
+  }
+  if(a==="zuschnitt"){scanModus("zuschnitt");return;}
+  if(a==="zs-ab"){scanModus("seiten");return;}
+  if(a==="zs-ok"){
+    var E=SCAN.zEcken;
+    if(!sbKonvex(E)){toast(t("Die Ecken überkreuzen sich – bitte korrigieren."),true);return;}
+    s.ecken=E;s.erkannt=true;entwurfMerken();scanModus("seiten");return;
+  }
+  if(a==="zs-auto"){zuschnittAuto();return;}
+  if(a==="zs-ganz"){SCAN.zEcken=[[0,0],[1,0],[1,1],[0,1]];zuschnittSvg();return;}
+  if(a==="weiter"){scanModus("speichern");return;}
+  if(a==="format"){SCAN.format=b.getAttribute("data-v")==="jpg"?"jpg":"pdf";try{localStorage.setItem("ah_scan_format",SCAN.format);}catch(e){}entwurfMerken();scanModus("speichern");return;}
+  if(a==="ki"){SCAN.ki=!SCAN.ki;scanModus("speichern");return;}
+  if(a==="ok"){scanSpeichern();return;}
+  if(a==="entwurf-weiter"){
+    var e2=SCAN.entwurf;SCAN.entwurf=null;
+    SCAN.seiten=e2.seiten.map(function(p){return Object.assign({},p);});
+    if(e2.format)SCAN.format=e2.format;
+    /* Der Entwurf behält sein Ziel, wenn es das noch gibt */
+    if(e2.ziel){var z=scanZiel({vertrag:e2.ziel.vertrag,art:e2.ziel.art,med:e2.ziel.med?"1":"",person:e2.ziel.person,doc:e2.ziel.doc});
+      SCAN.ziel=z;SCAN.ki=scanKiVorgabe(z);if(anfuegenDok())SCAN.ki=false;}
+    SCAN.akt=0;scanModus("seiten");return;
+  }
+  if(a==="entwurf-weg"){entwurfLoeschen();SCAN.entwurf=null;scanModus("kamera");return;}
 }
 
 /* ================= Bedienung =================
@@ -4967,8 +7060,8 @@ document.addEventListener("click",function(ev){
   if(a==="v-aktiv"){setzeStatus(id,"aktiv");return;}
   if(a==="ics"){icsExport(id);return;}
 
-  /* --- Hochladen --- */
-  if(a==="pick-cam"){var fc=$("#fCam");if(fc)fc.click();return;}
+  /* --- Scannen und Hochladen --- */
+  if(a==="scan"){closeModal(true);scanStart({vertrag:b.dataset.vertrag||null,art:b.dataset.art||null,med:b.dataset.med||null,person:b.dataset.person||null,doc:b.dataset.doc||null});return;}
   if(a==="pick-file"){var fp=$("#fPick");if(fp)fp.click();return;}
   if(a==="imp-mehr"){IMPORT.ergebnisse=[];REVIEW=null;render();return;}
 
@@ -4976,6 +7069,11 @@ document.addEventListener("click",function(ev){
   if(a==="rv-link"){reviewZuordnen(id);return;}
   if(a==="rv-neu"){reviewNeuerVertrag(b.dataset.k);return;}
   if(a==="rv-archiv"){REVIEW=null;go("#/vertraege");return;}
+  if(a==="rv-anders"){if(REVIEW)dokumentZuordnen(REVIEW.id);return;}
+  if(a==="rv-trotzdem"){REVIEW_TROTZDEM=true;REVIEW_WAHL=null;render();return;}
+  if(a==="ab-zeile"){if(REVIEW_WAHL){var kz=b.dataset.k;REVIEW_WAHL[kz]=!REVIEW_WAHL[kz];render();}return;}
+  if(a==="rv-uebernehmen"){abgleichUebernehmen();return;}
+  if(a==="rv-fertig"){abgleichFertig();return;}
   if(a==="rv-med-ok"){REVIEW=null;go("#/gesundheit");return;}
 
   /* --- Dokumente --- */
@@ -4988,6 +7086,10 @@ document.addEventListener("click",function(ev){
   if(a==="d-link"){dokumentZuordnen(id);return;}
   if(a==="d-link-pick"){dokumentVerknuepfen(id,b.dataset.cid);return;}
   if(a==="d-reanalyze"){analyseNachholen(id);return;}
+  if(a==="d-seiten"){seitenHinzufuegen(id);return;}
+  if(a==="d-pdf-an"){var pa=$("#pdfAn");if(pa)pa.click();return;}
+  if(a==="bb"){bbBlaettern(Number(b.dataset.r)||0);return;}
+  if(a==="bb-tab"){if(BB&&BB.urls[BB.i])window.open(BB.urls[BB.i],"_blank","noopener");return;}
 
   /* --- Gesundheit --- */
   if(a==="med-open"){go("#/gesundheit?doc="+id);return;}
@@ -5039,7 +7141,8 @@ document.addEventListener("input",function(ev){
 });
 document.addEventListener("change",function(ev){
   var el=ev.target;if(!el)return;
-  if(el.id==="fCam"||el.id==="fPick"){
+  if(el.id==="pdfAn"){var pf=el.files&&el.files[0];el.value="";if(pf)pdfAnhaengen(el.dataset.id,pf);return;}
+  if(el.id==="fPick"){
     var p=route().params;
     dateienVerarbeiten(el.files,{vertrag:p.vertrag||null,art:p.art||null});
     el.value="";return;
@@ -5059,38 +7162,12 @@ async function reviewZuordnen(cid){
   try{
     var r=await sb.from("documents").update({contract_id:cid}).eq("id",docId);
     if(r.error)throw r.error;
-    /* Angaben aus dem Dokument am Vertrag nachtragen, wo sie fehlen */
-    await ergaenzeAusDokument(cid,REVIEW.extracted||{});
-    REVIEW=null;await ladeDaten();
+    await ladeDaten();
+    /* Danach der Abgleich: was soll vom Dokument in den Vertrag? */
+    REVIEW=DOCS.filter(function(d){return d.id===docId;})[0]||null;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;
+    render();window.scrollTo(0,0);
     toast(t("Dokument zugeordnet ✅"));
-    go("#/vertrag?id="+cid);
   }catch(e){toast(t("Zuordnen fehlgeschlagen")+": "+errMsg(e),true);}
-}
-/* Leere Vertragsfelder aus der KI-Auslesung füllen – nie überschreiben */
-async function ergaenzeAusDokument(cid,ext){
-  var c=vertragById(cid);if(!c||!ext)return;
-  var karte=[
-    ["kundennummer","kundennummer"],["vertragsnummer","vertragsnummer"],
-    ["vertragsstart","vertragsstart"],["produkt","produkt"],
-    ["mindestlaufzeit_monate","mindestlaufzeitMonate"],
-    ["kuendigungsfrist_monate","kuendigungsfristMonate"],
-    ["verlaengerung_monate","verlaengerungMonate"]
-  ];
-  var neu={},n=0;
-  karte.forEach(function(p){
-    var alt=c[p[0]],wert=ext[p[1]];
-    if(wert==null||wert==="")return;
-    if(alt!=null&&alt!=="")return;
-    neu[p[0]]=wert;n++;
-  });
-  ["mindestlaufzeit_monate","verlaengerung_monate"].forEach(function(k){
-    if(neu[k]!=null)neu[k]=Math.round(Number(neu[k]));
-  });
-  var vorher=c.details||{},dazu=detailsAusExtrakt(ext,c.art||"sonstiges"),det=Object.assign({},vorher),nd=0;
-  Object.keys(dazu).forEach(function(k){if(vorher[k]==null||vorher[k]===""){det[k]=dazu[k];nd++;}});
-  if(nd){neu.details=det;n++;}
-  if(!n)return;
-  try{await sb.from("contracts").update(neu).eq("id",cid);}catch(e){}
 }
 function reviewNeuerVertrag(art){
   if(!REVIEW)return;
@@ -5137,13 +7214,27 @@ function sucheLaufen(){
       anbieterKachel(c.anbieter,a.icon,"di",18)+'<span class="db"><span class="dn">'+esc(c.anbieter||a.label)+'</span>'+
       '<span class="dm"><span>'+esc(a.label)+'</span></span></span></a>';
   }).join("")+'</div>';
-  if(dk.length)html+='<div class="mgrp">'+t("Dokumente")+'</div><div class="dlist">'+dk.map(function(d){
-    var ty=istMed(d)?medTypInfo(d.med_typ):dtInfo(d.doc_type);
-    return '<button class="drow3" data-a="d-open" data-id="'+d.id+'">'+
-      '<span class="di">'+ty.icon+'</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
-      '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span></span></span></button>';
-  }).join("")+'</div>';
+  if(dk.length)html+='<div class="mgrp">'+t("Dokumente")+'</div><div class="dlist">'+dk.map(sucheDokZeile).join("")+'</div>';
   box.innerHTML=html||('<p class="hint">'+tf("Nichts gefunden für „{0}“.",esc(q))+'</p>');
+  /* Volltext: was die Namen nicht finden, steht vielleicht im Text eines Scans */
+  clearTimeout(SUCHE_UHR);
+  if(q.length<3)return;
+  var schon={};dk.forEach(function(d){schon[d.id]=1;});
+  SUCHE_UHR=setTimeout(function(){
+    volltextSuche(q).then(function(ids){
+      if((val("sq")||"").toLowerCase()!==q)return;
+      var mehr=DOCS.filter(function(d){return ids.indexOf(d.id)>=0&&!schon[d.id];}).slice(0,8);
+      var b2=$("#sErg");if(!mehr.length||!b2)return;
+      b2.innerHTML=html+'<div class="mgrp">'+t("Im Text gefunden")+'</div><div class="dlist">'+mehr.map(sucheDokZeile).join("")+'</div>';
+    });
+  },300);
+}
+var SUCHE_UHR=null;
+function sucheDokZeile(d){
+  var ty=istMed(d)?medTypInfo(d.med_typ):dtInfo(d.doc_type);
+  return '<button class="drow3" data-a="d-open" data-id="'+d.id+'">'+
+    '<span class="di">'+ty.icon+'</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
+    '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span></span></span></button>';
 }
 
 var setupBusy=false;
