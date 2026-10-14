@@ -11,12 +11,19 @@ angehakte Art ist danach ein Platz: gefüllt oder sichtbar leer. Nicht Angehakte
 erscheint nirgends.
 
 **Scanner wie in Google Drive.** Live-Sucher mit erkanntem Rahmen und Auto-Auslöser (abschaltbar), Seite um Seite
-ohne Unterbrechung. Danach Ecken nachziehen (mit Lupe), drehen, Filter (Auto: Schatten weg und Papier weiß,
-Farben bleiben · Original · Graustufen · Schwarzweiß), neu aufnehmen, Reihenfolge per Ziehen. Gespeichert wird
+ohne Unterbrechung. Hinweise im Sucher sagen, was zu tun ist: zu dunkel (mit Licht-Knopf), Spiegelung,
+näher heran, ganzes Blatt ins Bild, gerader halten, ruhig halten, dunkler Untergrund. Bei Dunkelheit, einem
+abgeschnittenen Rand oder starker Schräge wartet der Auslöser. Eine unscharfe Aufnahme (Kantenbreite gemessen)
+nimmt er einmal selbst neu auf. Danach Ecken nachziehen (mit Lupe), drehen, Filter (Auto: Schatten weg und Papier
+weiß, Farben bleiben, blasse Vorlagen wie Kassenbons oder Bleistift werden kräftig · Original · Graustufen ·
+Schwarzweiß mit örtlicher Schwelle), neu aufnehmen, Reihenfolge per Ziehen. Gespeichert wird
 als **ein PDF** oder als **ein Dokument mit mehreren JPG-Seiten**, 200 dpi, A4 bleibt A4. Seiten lassen sich
 später anfügen, auch an PDFs vom Anbieter. Beim Scannen am Vertrag zeigt ein **Abgleich**, was die KI gelesen hat
 und was im Vertrag steht: leere Felder sind vorab angehakt, abweichende Werte (z. B. ein neuer Preis) nicht.
-Der Volltext gescannter Seiten wird für die Suche mitgespeichert. Ausweise legt der Scanner standardmäßig
+Der Volltext gescannter Seiten wird für die Suche mitgespeichert. Er wird in voller Auflösung, in Streifen je
+Seite, abgeschrieben, damit auch Kleingedrucktes lesbar bleibt. Dabei bleiben Spalten, Tabellen und Handschrift
+erhalten, getrennte Wörter werden zusammengefügt. Die Suche findet alle Wörter in beliebiger Reihenfolge,
+Umlaute und ß auch umschrieben. Ausweise legt der Scanner standardmäßig
 ohne KI ab. Ein angefangener Scan bleibt als Entwurf nur auf dem Gerät. Ohne Kamerafreigabe geht es über die
 Kamera-App oder Fotos aus der Galerie. Langer Druck aufs App-Symbol (Android, PC): „Scannen“.
 
@@ -105,7 +112,8 @@ Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Do
 - Edge Functions: `butler-extract` (auslesen; Seitenbilder eines Scans in einem Aufruf, Modus `text` für den Volltext, Modi `nk` und `nk-bewertung` für Nebenkostenabrechnungen), `butler-research` (Markt),
   `butler-med-explain` (Abrechnungsziffern), `butler-translate` (Nachübersetzen) –
   mit gemeinsamem Kern `gemeinsam.ts` (Anmeldung, Limits, Kosten in `public.ai_calls`).
-- Scanner ohne fremde Bibliothek: Kantenerkennung (Canny + Hough + Vierecks-Bewertung), Entzerrung über
+- Scanner ohne fremde Bibliothek: Kantenerkennung (Canny + Hough + Vierecks-Bewertung, im Stresstest mit 1.200
+  Zufallsszenen rund 98 % genau), Licht- und Unschärfe-Prüfung (Kantenbreite nach Marziliano), Entzerrung über
   Homographie mit Seitenverhältnis aus der Perspektive (Zhang/He), Filter und PDF-Schreiber im eigenen Code.
   Nur fürs Anfügen an vorhandene PDFs lädt die App bei Bedarf pdf-lib 1.17.1 (feste Version, SRI).
 - PWA mit network-first Service Worker.

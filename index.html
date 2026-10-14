@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-6orSZ7+NgNLEejv+T2GEkesfu//GmMMWFo6IkOF+mHc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-QVVlt42vuehYM6fh8LZ1Kt8COuW6hlvIfqWULT7Xu2M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -569,6 +569,7 @@ body.scan-open #toast.on{transform:translate(-50%,0)}
 .sc-rund.an{background:#4f8cff;color:#fff}
 .sc-tipp{flex:1;min-width:0;text-align:center;font-weight:800;font-size:.92rem;line-height:1.3;padding:9px 14px;border-radius:999px;background:rgba(0,0,0,.45)}
 .sc-tipp:empty{visibility:hidden}
+.sc-tipp.warn{background:rgba(196,110,0,.88)}
 .sc-unten{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;justify-items:center;padding:0 16px}
 .sc-klein{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:58px;padding:8px 10px;border-radius:16px;background:rgba(0,0,0,.4);color:#fff;font-size:.72rem;font-weight:800}
 .sc-ausl{position:relative;width:80px;height:80px;border-radius:50%;display:grid;place-items:center}
@@ -737,7 +738,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.7.0";
+var APP_VERSION="1.8.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -792,6 +793,36 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- Scanner (1.8.0) ---- */
+  "Kein Rand zu sehen – Blatt auf dunklen Untergrund legen":"Края не видно – положи лист на тёмную поверхность",
+  "Zu dunkel – mehr Licht":"Слишком темно – нужно больше света",
+  "Zu dunkel – Licht oben rechts einschalten":"Слишком темно – включи свет справа вверху",
+  "Ganzes Blatt ins Bild – etwas weiter weg":"Весь лист в кадр – чуть дальше",
+  "Gerader von oben halten":"Держи ровнее, прямо сверху",
+  "Näher heran":"Ближе",
+  "Spiegelung – Handy etwas neigen":"Блик – слегка наклони телефон",
+  "Ruhig halten":"Держи неподвижно",
+  "Nicht bewegen – nimmt gleich auf":"Не двигай – сейчас снимет",
+  "Erkannt – jetzt auslösen":"Лист найден – снимай",
+  "Aufnahme …":"Съёмка …",
+  "Seite {0} im Kasten – nächste Seite hinlegen":"Страница {0} готова – положи следующую",
+  "Seite {0} im Kasten":"Страница {0} готова",
+  "Seite {0} wirkt unscharf – ruhig halten, sie wird neu aufgenommen":"Страница {0} нечёткая – держи неподвижно, она будет переснята",
+  "Seite {0} wirkt unscharf – unter „Seiten“ neu aufnehmen":"Страница {0} нечёткая – пересними её в просмотре страниц",
+  "Diese Seite wirkt unscharf – „Neu aufnehmen“ hilft.":"Страница нечёткая – поможет «Переснять».",
+  "Die Kamera ist für All-Home gesperrt":"Камера для All-Home заблокирована",
+  "Erlaube sie in den Browser-Einstellungen (Schloss-Symbol neben der Adresse) und lade die Seite neu. Bis dahin geht es mit der Kamera-App oder vorhandenen Fotos.":"Разреши её в настройках браузера (значок замка рядом с адресом) и перезагрузи страницу. А пока можно снимать приложением камеры или выбрать готовые фото.",
+  "Keine Kamera gefunden":"Камера не найдена",
+  "Fotografiere mit der Kamera-App eines anderen Geräts oder wähle vorhandene Fotos – zugeschnitten und aufbereitet wird hier.":"Сними приложением камеры на другом устройстве или выбери готовые фото – обрезка и обработка будут здесь.",
+  "Die Kamera startet nicht":"Камера не запускается",
+  "Vielleicht nutzt gerade eine andere App die Kamera. Schließe sie und versuche es noch einmal – oder nimm die Kamera-App.":"Возможно, камеру сейчас использует другое приложение. Закрой его и попробуй ещё раз – или воспользуйся приложением камеры.",
+  "Dieser Browser gibt die Kamera nicht frei":"Этот браузер не даёт доступа к камере",
+  "Mit der Kamera-App oder vorhandenen Fotos geht es trotzdem – zugeschnitten und aufbereitet wird hier.":"С приложением камеры или готовыми фото всё равно получится – обрезка и обработка будут здесь.",
+  "Liest jede Position der Abrechnung aus und macht den Text durchsuchbar.":"Считывает каждую позицию расчёта и делает текст доступным для поиска.",
+  "Erkennt Praxis, Datum und Betrag und macht den Text durchsuchbar.":"Распознаёт врача, дату и сумму и делает текст доступным для поиска.",
+  "Gleicht Preise, Fristen und Nummern mit dem Vertrag ab und macht den Text durchsuchbar.":"Сверяет цены, сроки и номера с договором и делает текст доступным для поиска.",
+
 
 /* ---- Nebenkosten (1.7.0) Nachtrag ---- */
   "Jahre einschätzen lassen":"Оценить годы",
@@ -4156,11 +4187,25 @@ function dokSuchtext(d){
 function dokPasst(d){var q=DOK_Q.trim().toLowerCase();return !q||dokSuchtext(d).indexOf(q)>=0||(VT_CACHE.q===q&&!!VT_CACHE.ids[d.id]);}
 /* Suche im Text gescannter Dokumente – in der Datenbank, der Text wird nicht mitgeladen */
 var VT_CACHE={q:"",ids:{}},VT_UHR=null;
+/* Schreibweisen eines Suchworts: Umlaute und ß auch umschrieben (Straße ↔ Strasse, Kündigung ↔ Kuendigung) */
+function suchVarianten(w){
+  var v=[w];
+  [w.replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss"),
+   w.replace(/ae/g,"ä").replace(/oe/g,"ö").replace(/ue/g,"ü"),
+   w.replace(/ss/g,"ß")].forEach(function(x){if(v.indexOf(x)<0)v.push(x);});
+  return v;
+}
+/* Volltext in der Datenbank: jedes Wort muss vorkommen, die Reihenfolge ist egal
+   („Telekom Rechnung“ findet auch „Rechnung … Telekom“). Zeichen, die die Filtersprache
+   von PostgREST stören, fallen weg. */
 async function volltextSuche(q){
-  if(!HH||q.length<3)return [];
-  var muster="%"+q.replace(/[\\%_]/g,function(c){return "\\"+c;})+"%";
+  if(!HH||String(q).trim().length<3)return [];
+  var woerter=String(q).toLowerCase().replace(/[,()"*%_\\:]/g," ").split(/\s+/).filter(function(w){return w.length>=2;}).slice(0,6);
+  if(!woerter.length)return [];
   try{
-    var r=await sb.from("documents").select("id").eq("household_id",HH.id).ilike("volltext",muster).limit(50);
+    var abfrage=sb.from("documents").select("id").eq("household_id",HH.id);
+    woerter.forEach(function(w){abfrage=abfrage.or(suchVarianten(w).map(function(x){return "volltext.ilike.*"+x+"*";}).join(","));});
+    var r=await abfrage.limit(50);
     return r&&!r.error?(r.data||[]).map(function(x){return x.id;}):[];
   }catch(e){return [];}
 }
@@ -5869,14 +5914,22 @@ function sbSeitenwert(K,img,L,p,q,mitte){
 }
 /* Anteil papierartiger Punkte im Inneren (hell, wenig Farbe) */
 function sbPapieranteil(img,E,ref){
-  var n=0,ja=0,d=img.d;
-  for(var a=1;a<8;a++)for(var b=1;b<8;b++){
-    var u=a/8,v=b/8;
-    var x=(1-u)*(1-v)*E[0][0]+u*(1-v)*E[1][0]+u*v*E[2][0]+(1-u)*v*E[3][0];
-    var y=(1-u)*(1-v)*E[0][1]+u*(1-v)*E[1][1]+u*v*E[2][1]+(1-u)*v*E[3][1];
-    var i=(Math.round(y)*img.w+Math.round(x))*4;if(i<0||i>=d.length)continue;
-    var mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);n++;
-    if(mx>=ref*0.72&&(mx-mn)<=mx*0.28)ja++;
+  /* 9×9 Stichpunkte; einer zählt als Papier, wenn in seiner Umgebung (±2 Pixel) Papier ist – sonst
+     entscheidet bei textreichen Seiten der Zufall, ob das Raster gerade eine Textzeile trifft (gemessen:
+     ±17 % für dasselbe Blatt, das überstimmte die Kanten) */
+  var n=0,ja=0,d=img.d,w=img.w,h=img.h;
+  function papier(xi,yi){
+    if(xi<0||yi<0||xi>=w||yi>=h)return false;
+    var i=(yi*w+xi)*4,mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+    /* Papier: hell und fast farblos – oder sehr hell und pastellfarben (gelber Durchschlag, rosa Formular) */
+    return (mx>=ref*0.72&&(mx-mn)<=mx*0.28)||(mx>=ref*0.86&&(mx-mn)<=mx*0.45);
+  }
+  for(var a=1;a<10;a++)for(var b=1;b<10;b++){
+    var u=a/10,v=b/10;
+    var x=Math.round((1-u)*(1-v)*E[0][0]+u*(1-v)*E[1][0]+u*v*E[2][0]+(1-u)*v*E[3][0]);
+    var y=Math.round((1-u)*(1-v)*E[0][1]+u*(1-v)*E[1][1]+u*v*E[2][1]+(1-u)*v*E[3][1]);
+    if(x<0||y<0||x>=w||y>=h)continue;n++;
+    if(papier(x,y)||papier(x,y-2)||papier(x,y+2)||papier(x-2,y)||papier(x+2,y))ja++;
   }
   return n?ja/n:0;
 }
@@ -6037,7 +6090,7 @@ function sbSeitenverhaeltnis(E,w,h){
      dann ist die Brennweite aus dem Bild nicht bestimmbar. Dann gilt eine typische
      Handy-Hauptkamera (rund 26 mm KB ≙ 0,8 × lange Bildseite). */
   function winkel(a,b,c,d){var u1=b[0]-a[0],v1=b[1]-a[1],u2=c[0]-d[0],v2=c[1]-d[1];
-    return Math.abs(Math.atan2(u1*v2-v1*u2,u1*u2+v1*v2));}
+    var w0=Math.abs(Math.atan2(u1*v2-v1*u2,u1*u2+v1*v2));return Math.min(w0,Math.PI-w0);}   /* Richtung egal: 0 und 180° sind beide parallel */
   var parallel=Math.min(winkel(E[0],E[1],E[2],E[3]),winkel(E[0],E[3],E[1],E[2]))<0.05;
   if(isFinite(k2)&&isFinite(k3)&&Math.abs(nn)>1e-9){
     var f2=-((n2[0]*n3[0]-(n2[0]*n3[2]+n2[2]*n3[0])*u0+n2[2]*n3[2]*u0*u0)+
@@ -6133,6 +6186,65 @@ function sbPapierRaster(img){
   }
   return {B:B,gw:gw,gh:gh,R:S};
 }
+/* Schwarzpunkt aus dem dunkelsten Prozent farbloser Pixel (normiert aufs Papier).
+   Kräftige Schrift: wie gehabt. Blasse Vorlage (Thermobon, Bleistift, schwacher Toner): dorthin
+   strecken, damit die Schrift dunkel wird. Fast so hell wie Papier (ab 0,82): Durchscheinendes
+   der Rückseite oder eine leere Seite – das bleibt hell. Dazwischen weich überblenden. */
+function sbSchwarzpunkt(p1){
+  if(p1<=0.25)return Math.max(0.05,p1);
+  if(p1<=0.78)return Math.min(0.62,p1);
+  if(p1>=0.82)return 0.25;
+  return 0.62-(p1-0.78)/0.04*0.37;
+}
+/* Schwarzweiß mit örtlicher Schwelle (Wolf/Jolion): folgt blasser Schrift und ungleichem Papier.
+   Statistik auf 4×4-Zellen, Fenster rund 2,5 mm, Schwelle je Pixel bilinear – spart Speicher.
+   N: Helligkeit normiert aufs Papier (1000 = Papier), tief: Schwarzpunkt der Seite. */
+function sbSchwelle(N,w,h,od,tief){
+  var q=4,cw=Math.ceil(w/q),ch=Math.ceil(h/q),nc=cw*ch,x,y,k;
+  var S1=new Float32Array(nc),S2=new Float32Array(nc),C=new Float32Array(nc);
+  for(y=0;y<h;y++){var zy=((y/q)|0)*cw;for(x=0;x<w;x++){var v=N[y*w+x]/1000;if(v>1.2)v=1.2;k=zy+((x/q)|0);S1[k]+=v;S2[k]+=v*v;C[k]++;}}
+  var r=Math.max(2,Math.round(Math.max(w,h)/(q*110)));
+  function kasten(A){
+    var T=new Float32Array(nc),O=new Float32Array(nc),s0,i;
+    for(y=0;y<ch;y++){var z=y*cw;s0=0;for(i=-r;i<=r;i++)s0+=A[z+Math.min(cw-1,Math.max(0,i))];
+      for(x=0;x<cw;x++){T[z+x]=s0;s0+=A[z+Math.min(cw-1,x+r+1)]-A[z+Math.max(0,x-r)];}}
+    for(x=0;x<cw;x++){s0=0;for(i=-r;i<=r;i++)s0+=T[Math.min(ch-1,Math.max(0,i))*cw+x];
+      for(y=0;y<ch;y++){O[y*cw+x]=s0;s0+=T[Math.min(ch-1,y+r+1)*cw+x]-T[Math.max(0,y-r)*cw+x];}}
+    return O;
+  }
+  var A1=kasten(S1),A2=kasten(S2),AC=kasten(C),Mi=new Float32Array(nc),Sd=new Float32Array(nc),hs=new Uint32Array(301);
+  for(k=0;k<nc;k++){var m=A1[k]/AC[k],va=A2[k]/AC[k]-m*m;Mi[k]=m;Sd[k]=va>0?Math.sqrt(va):0;hs[Math.min(300,(Sd[k]*500)|0)]++;}
+  /* größte örtliche Streuung (99,5 %), nach unten begrenzt: leere Seiten bleiben leer */
+  var Rmax=0.08,acc=0;for(k=300;k>=0;k--){acc+=hs[k];if(acc>=nc*0.005){Rmax=Math.max(0.08,k/500);break;}}
+  var M=tief,Tc=new Float32Array(nc);
+  /* oben begrenzt auf die Mitte zwischen Schrift und Papier: sonst zählt der unscharfe Saum
+     zur Schrift und die Buchstaben laufen zu */
+  var deckel=M+0.5*(1-M);
+  for(k=0;k<nc;k++){var tv=0.5*Mi[k]+0.5*M+0.5*(Sd[k]/Rmax)*(Mi[k]-M);Tc[k]=tv<deckel?tv:deckel;}
+  /* weiche Kante (±0,03) statt harter Stufe – Schrift bleibt glatt */
+  for(y=0;y<h;y++){
+    var fy=(y+0.5)/q-0.5;if(fy<0)fy=0;if(fy>ch-1)fy=ch-1;var y0=fy|0,y1=Math.min(ch-1,y0+1),ay=fy-y0;
+    for(x=0;x<w;x++){
+      var fx=(x+0.5)/q-0.5;if(fx<0)fx=0;if(fx>cw-1)fx=cw-1;var x0=fx|0,x1=Math.min(cw-1,x0+1),ax=fx-x0;
+      var T=(Tc[y0*cw+x0]*(1-ax)+Tc[y0*cw+x1]*ax)*(1-ay)+(Tc[y1*cw+x0]*(1-ax)+Tc[y1*cw+x1]*ax)*ay;
+      var o=(N[y*w+x]/1000-T)/0.06+0.5;o=o<0?0:o>1?255:o*255;
+      var j=(y*w+x)*4;od[j]=od[j+1]=od[j+2]=o;od[j+3]=255;
+    }
+  }
+}
+/* Korn glätten, Kanten erhalten: weicht ein Pixel kaum vom 3×3-Mittel ab, gilt das Mittel
+   (weich überblendet bis zur Schwelle). Schrift weicht stärker ab und bleibt scharf. */
+function sbGlaetten(G,O,w,h,schwelle){
+  var x,y,i;
+  for(i=0;i<w;i++){O[i]=G[i];O[(h-1)*w+i]=G[(h-1)*w+i];}
+  for(y=1;y<h-1;y++){
+    i=y*w;O[i]=G[i];O[i+w-1]=G[i+w-1];
+    for(x=1,i=y*w+1;x<w-1;x++,i++){
+      var v=G[i],m=(G[i-w-1]+G[i-w]+G[i-w+1]+G[i-1]+v+G[i+1]+G[i+w-1]+G[i+w]+G[i+w+1])/9;
+      var a=1-Math.abs(v-m)/schwelle;O[i]=a>0?v+(m-v)*a:v;
+    }
+  }
+}
 /* ---- Filter: auto (Schatten weg, Papier weiß, Farben bleiben), grau, sw, original ---- */
 function sbFilter(img,art){
   if(art==="original")return img;
@@ -6160,24 +6272,33 @@ function sbFilter(img,art){
     var qr=d[j]/bgR[x],qg=d[j+1]/bgG[x],qb=d[j+2]/bgB[x],mx=Math.max(qr,qg,qb),mn=Math.min(qr,qg,qb);
     if(mx>0&&(mx-mn)>0.12*mx+0.04)continue;
     hist[Math.min(255,((0.299*qr+0.587*qg+0.114*qb)*200)|0)]++;tot++;}}
-  var tief=0.05,acc=0;for(k=0;k<256;k++){acc+=hist[k];if(acc>=tot*0.01){tief=k/200;break;}}
-  tief=Math.min(0.25,Math.max(0.05,tief));
+  var p1=0.05,acc=0;for(k=0;k<256;k++){acc+=hist[k];if(acc>=tot*0.01){p1=k/200;break;}}
+  var tief=sbSchwarzpunkt(p1);
+  sbFilter.p1=p1;   /* zum Nachmessen */
   /* 2. Kurve als Tabelle über den normierten Wert ×1000: Papier → weiß, Schrift → dunkel */
   var LUT=new Float32Array(1201),hoch=0.93,sw=art==="sw",grau=art==="grau";
-  for(k=0;k<=1200;k++){var v=k/1000,t2;
-    if(sw){t2=(v-0.58)/(0.80-0.58);t2=t2<0?0:t2>1?1:t2;LUT[k]=t2*255;}
-    else{t2=(v-tief)/(hoch-tief);t2=t2<0?0:t2>1?1:t2;LUT[k]=Math.pow(t2,1.18)*255;}}
-  var Y=sw?null:new Float32Array(n);
+  for(k=0;k<=1200;k++){var v=k/1000,t2=(v-tief)/(hoch-tief);t2=t2<0?0:t2>1?1:t2;LUT[k]=Math.pow(t2,1.18)*255;}
+  /* a) Helligkeit normiert aufs Papier (×1000) für alle Pixel */
+  var G=new Float32Array(n),Y=new Float32Array(n);
+  for(y=0;y<h;y++){
+    papierZeile(y);
+    for(x=0,i=y*w;x<w;x++,i++){j=i*4;
+      var gv=(0.299*d[j]/bgR[x]+0.587*d[j+1]/bgG[x]+0.114*d[j+2]/bgB[x])*1000;G[i]=gv>1200?1200:gv;}
+  }
+  /* b) Korn glätten, Kanten lassen (Ergebnis in Y) – die steile Kurve blasser Vorlagen
+        machte aus dem Rauschen im Schatten sonst graue Punkte */
+  sbGlaetten(G,Y,w,h,30);G=null;
+  if(sw){sbSchwelle(Y,w,h,od,tief);return o;}
+  /* c) Kurve und Farbe */
   for(y=0;y<h;y++){
     papierZeile(y);
     for(x=0,i=y*w;x<w;x++,i++){
       j=i*4;
       var nr=(d[j]/bgR[x]*1000)|0,ng=(d[j+1]/bgG[x]*1000)|0,nb=(d[j+2]/bgB[x]*1000)|0;
       if(nr>1200)nr=1200;if(ng>1200)ng=1200;if(nb>1200)nb=1200;
-      if(sw){var lv=(0.299*nr+0.587*ng+0.114*nb)|0;od[j]=od[j+1]=od[j+2]=LUT[lv];od[j+3]=255;continue;}
-      /* Kurve nur auf die Helligkeit, Farbe als Abstand dazu – so kippt kein Farbton
+      /* Kurve nur auf die (geglättete) Helligkeit, Farbe als Abstand dazu – so kippt kein Farbton
          (vorher je Kanal: Magenta-Logo wurde rötlich) */
-      var yn=(0.299*nr+0.587*ng+0.114*nb)|0,ly=LUT[yn],r,g,bl;
+      var yn=(0.299*nr+0.587*ng+0.114*nb)|0,ly=LUT[Y[i]|0],r,g,bl;
       if(grau){r=g=bl=ly;}
       else{
         r=ly+(nr-yn)*0.28;g=ly+(ng-yn)*0.28;bl=ly+(nb-yn)*0.28;   /* 0,28 = 255/1000 × 1,1: Farben leicht kräftiger */
@@ -6193,7 +6314,6 @@ function sbFilter(img,art){
       od[j]=r;od[j+1]=g;od[j+2]=bl;od[j+3]=255;Y[i]=ly;
     }
   }
-  if(sw)return o;
   /* 3. leicht nachschärfen (3×3-Mittel abziehen), damit Schrift nach dem Entzerren knackig bleibt */
   for(y=1;y<h-1;y++)for(x=1,i=y*w+1;x<w-1;x++,i++){
     var yv=Y[i];if(yv>=254.5)continue;
@@ -6203,6 +6323,61 @@ function sbFilter(img,art){
   }
   return o;
 }
+
+/* ---- Unschärfe als mittlere Kantenbreite (Marziliano 2002): an jedem kräftigen Übergang
+   Papier ↔ Schrift von der steilsten Stelle aus nach beiden Seiten laufen, bis die Helligkeit
+   nicht mehr steigt bzw. fällt. Scharfe Schrift: rund 2 Pixel, deutlich unscharf: ab SB_UNSCHARF –
+   gemessen bei 150 dpi (A4 = 1754 Pixel hoch). Nur Kanten quer zur Laufrichtung zählen
+   (schräg angeschnittene sähen breiter aus); die breitere Richtung gilt. null = kein Urteil. ---- */
+var SB_UNSCHARF=8.2;   /* geeicht in scan-test/pruef-schaerfe.js (σ ≈ 2 px bei 150 dpi) */
+function sbKantenbreite(img){
+  var w=img.w,h=img.h,L=sbLum(img);
+  /* je Richtung getrennt: Verwackeln macht die Kanten nur in einer Richtung breit – oder löscht sie ganz */
+  var sum=0,n=0,erg=[],anzahl=[];
+  function linie(get,len,quer){
+    for(var x=2;x<len-2;x++){
+      var g=get(x+1)-get(x-1),ga=g<0?-g:g;if(ga<24)continue;
+      if(ga<Math.abs(get(x+2)-get(x))||ga<Math.abs(get(x)-get(x-2)))continue;
+      if(Math.abs(quer(x))*1.5>ga)continue;
+      /* laufen, solange es noch nennenswert steigt (8 % der steilsten Stelle) – nicht in Lichtverläufe hinein */
+      var sg=g>0?1:-1,a=x,b=x,min=Math.max(0.5,ga*0.04);
+      while(a>0&&x-a<20&&(get(a)-get(a-1))*sg>min)a--;
+      while(b<len-1&&b-x<20&&(get(b+1)-get(b))*sg>min)b++;
+      if(Math.abs(get(b)-get(a))<30)continue;
+      sum+=b-a;n++;
+    }
+  }
+  for(var y=2;y<h-2;y+=2)(function(y){linie(function(q){return L[y*w+q];},w,function(q){return L[(y+1)*w+q]-L[(y-1)*w+q];});})(y);
+  erg.push(n>100?sum/n:null);anzahl.push(n);sum=0;n=0;
+  for(var x=2;x<w-2;x+=2)(function(x){linie(function(q){return L[q*w+x];},h,function(q){return L[q*w+x+1]-L[q*w+x-1];});})(x);
+  erg.push(n>100?sum/n:null);anzahl.push(n);
+  if(erg[0]==null&&erg[1]==null)return null;
+  /* eine Richtung fast ohne Kanten, die andere mit vielen: verwackelt */
+  if((erg[0]==null||erg[1]==null)&&Math.max(anzahl[0],anzahl[1])>400)return 20;
+  return Math.max(erg[0]||0,erg[1]||0);
+}
+/* ---- Licht auf dem erkannten Blatt (kleines Live-Bild, Ecken 0…1):
+   papier = Helligkeit des Papiers (75. Perzentil), glanz = Anteil ausgebrannter, farbloser Stellen. ---- */
+function sbLicht(img,ecken){
+  var d=img.d,w=img.w,h=img.h,E=ecken.map(function(p){return [p[0]*w,p[1]*h];}),hs=new Uint32Array(256),n=0,aus=0;
+  for(var a=1;a<40;a++)for(var b=1;b<40;b++){
+    var u=a/40,v=b/40;
+    var x=(1-u)*(1-v)*E[0][0]+u*(1-v)*E[1][0]+u*v*E[2][0]+(1-u)*v*E[3][0];
+    var y=(1-u)*(1-v)*E[0][1]+u*(1-v)*E[1][1]+u*v*E[2][1]+(1-u)*v*E[3][1];
+    var xi=Math.round(x),yi=Math.round(y);if(xi<0||yi<0||xi>=w||yi>=h)continue;
+    var i=(yi*w+xi)*4,mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+    hs[(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2])|0]++;n++;
+    if(mn>=248&&mx-mn<=10)aus++;
+  }
+  if(!n)return null;
+  var p75=0,p50=0,acc=0;for(var k=0;k<256;k++){acc+=hs[k];if(!p50&&acc>=n*0.5)p50=k;if(acc>=n*0.75){p75=k;break;}}
+  var glanz=aus/n;
+  /* Spiegelung: ausgebrannte Flecken, während das übrige Papier (Median) sichtbar darunter liegt.
+     Ist fast alles ausgebrannt, ist das Papier nur hell belichtet – für die Schrift unschädlich. */
+  return {papier:p75,glanz:glanz,dunkel:p75<70,spiegelung:glanz>=0.004&&glanz<0.35&&p50<=240};
+}
+/* Helligkeit des ganzen Bildes (Mittel) – „zu dunkel“, auch wenn kein Blatt erkannt ist */
+function sbMittelhell(img){var d=img.d,s=0,n=0;for(var i=0;i<d.length;i+=16){s+=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];n++;}return n?s/n:0;}
 
 /* Seitengröße in Punkt (1/72 Zoll): Hat die Seite A4- oder Scheckkarten-Format, gilt genau dieses
    Maß – sonst entstünde bei niedriger Kameraauflösung ein Mini-Blatt. Andere Formate: Pixel bei 200 dpi. */
@@ -6385,7 +6560,7 @@ async function kameraAn(){
   if(!SCAN)return;
   var tipp=$("#scTipp");
   if(SCAN.stream){erkennenStarten();return;}
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){kameraFehlt(t("Dieser Browser gibt die Kamera nicht frei."));return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){kameraFehlt("browser");return;}
   if(tipp)tipp.textContent=t("Kamera startet …");
   try{
     var stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{
@@ -6402,8 +6577,7 @@ async function kameraAn(){
     erkennenStarten();
   }catch(e){
     var n=e&&e.name;
-    kameraFehlt(n==="NotAllowedError"||n==="SecurityError"?t("Kamerazugriff ist nicht erlaubt."):
-      (n==="NotFoundError"||n==="OverconstrainedError"?t("Keine Kamera gefunden."):t("Die Kamera lässt sich nicht starten.")));
+    kameraFehlt(n==="NotAllowedError"||n==="SecurityError"?"verboten":(n==="NotFoundError"||n==="OverconstrainedError"?"keine":"belegt"));
   }
 }
 function kameraAus(){
@@ -6413,16 +6587,25 @@ function kameraAus(){
   SCAN.stream=null;SCAN.track=null;SCAN.ic=null;SCAN.blitz=false;SCAN.quad=null;SCAN.sperre=null;
   var vid=$("#scVid");if(vid)vid.srcObject=null;
 }
-/* Ohne Live-Kamera: Kamera-App des Handys oder Fotos – danach dieselbe Bearbeitung */
+/* Ohne Live-Kamera: Kamera-App des Handys oder Fotos – danach dieselbe Bearbeitung.
+   Je Ursache ein eigener Text mit dem nächsten Schritt; ist die Kamera nur belegt, gibt es „Erneut versuchen“. */
+var KAMERA_FEHLER={
+  verboten:["Die Kamera ist für All-Home gesperrt","Erlaube sie in den Browser-Einstellungen (Schloss-Symbol neben der Adresse) und lade die Seite neu. Bis dahin geht es mit der Kamera-App oder vorhandenen Fotos."],
+  keine:["Keine Kamera gefunden","Fotografiere mit der Kamera-App eines anderen Geräts oder wähle vorhandene Fotos – zugeschnitten und aufbereitet wird hier."],
+  belegt:["Die Kamera startet nicht","Vielleicht nutzt gerade eine andere App die Kamera. Schließe sie und versuche es noch einmal – oder nimm die Kamera-App."],
+  browser:["Dieser Browser gibt die Kamera nicht frei","Mit der Kamera-App oder vorhandenen Fotos geht es trotzdem – zugeschnitten und aufbereitet wird hier."]
+};
 function kameraFehlt(grund){
   kameraAus();
   var kam=$("#scKam"),inh=$("#scInhalt");if(!kam||!inh)return;
   kam.hidden=true;inh.hidden=false;SCAN.modus="ohnekamera";
+  var f=KAMERA_FEHLER[grund]||KAMERA_FEHLER.belegt;
   inh.innerHTML='<div class="sc-leer">'+
     '<div class="sc-kopf"><button class="sc-rund" data-s="zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x",22)+'</button><span></span><span></span></div>'+
-    '<div class="sc-mitte"><div class="sc-symbol">'+ic("camera",34)+'</div><h2>'+esc(grund)+'</h2>'+
-      '<p>'+t("Du kannst mit der Kamera-App fotografieren oder vorhandene Fotos wählen – zugeschnitten und aufbereitet wird hier.")+'</p>'+
-      '<div class="sc-knoepfe"><button class="btn lg" data-s="kamapp">'+ic("camera")+' '+t("Kamera-App öffnen")+'</button>'+
+    '<div class="sc-mitte"><div class="sc-symbol">'+ic("camera",34)+'</div><h2>'+esc(t(f[0]))+'</h2>'+
+      '<p>'+esc(t(f[1]))+'</p>'+
+      '<div class="sc-knoepfe">'+(grund==="belegt"?'<button class="btn lg" data-s="kamera-neu">'+ic("refresh")+' '+t("Erneut versuchen")+'</button>':"")+
+      '<button class="btn lg'+(grund==="belegt"?" ghost":"")+'" data-s="kamapp">'+ic("camera")+' '+t("Kamera-App öffnen")+'</button>'+
       '<button class="btn lg ghost" data-s="galerie">'+ic("bild")+' '+t("Fotos wählen")+'</button>'+
       (SCAN.seiten.length?'<button class="btn lg ghost" data-s="seiten">'+tn(SCAN.seiten.length,"{0} Seite ansehen","{0} Seiten ansehen")+'</button>':"")+
     '</div></div></div>';
@@ -6433,7 +6616,7 @@ var SCAN_KLEIN=null;
 function erkennenStarten(){
   clearTimeout(SCAN_UHR);
   if(!SCAN)return;
-  SCAN.verlauf=[];SCAN.stabil=null;SCAN.fehlt=0;
+  SCAN.verlauf=[];SCAN.stabil=null;SCAN.fehlt=0;SCAN.suchtSeit=Date.now();SCAN.wackler=[];SCAN.lage=null;
   tippSetzen();
   SCAN_UHR=setTimeout(erkennenSchritt,120);
 }
@@ -6464,7 +6647,10 @@ function erkennenSchritt(){
       SCAN.quad=SCAN.quad.map(function(q,i){return [q[0]*0.45+r.ecken[i][0]*0.55,q[1]*0.45+r.ecken[i][1]*0.55];});
     else SCAN.quad=r.ecken;
     SCAN.guete=r.guete;
-    if(!SCAN.stabil||eckenAbstand(SCAN.stabil.ecken,SCAN.quad)>0.015)SCAN.stabil={ecken:SCAN.quad,seit:jetzt};
+    if(!SCAN.stabil||eckenAbstand(SCAN.stabil.ecken,SCAN.quad)>0.015){
+      if(SCAN.stabil)SCAN.wackler.push(jetzt);
+      SCAN.stabil={ecken:SCAN.quad,seit:jetzt};
+    }
   }else{
     SCAN.fehlt++;SCAN.aussetzer=(SCAN.aussetzer||0)+1;
     if(SCAN.fehlt>=3){SCAN.quad=null;SCAN.stabil=null;}
@@ -6483,15 +6669,46 @@ function erkennenSchritt(){
       if(bewegt||unruhe||!sp.quad)scanFrei();
     }
   }
+  /* Licht und Lage: für den Hinweis oben und ob der Auslöser warten soll */
+  SCAN.hell=p?sbMittelhell(p):128;SCAN.licht=null;
+  if(SCAN.quad&&p){try{SCAN.licht=sbLicht(p,SCAN.quad);}catch(e){}}
+  if(SCAN.quad)SCAN.suchtSeit=null;else if(!SCAN.suchtSeit)SCAN.suchtSeit=jetzt;
+  SCAN.wackler=SCAN.wackler.filter(function(z){return jetzt-z<1500;});
+  SCAN.lage=lageBewerten(p,jetzt);
   var fort=0;
-  if(SCAN.auto&&SCAN.quad&&SCAN.stabil&&!SCAN.sperre&&!SCAN.nimmt&&sbFlaeche(SCAN.quad)>=0.12&&SCAN.guete>=0.45)
-    fort=Math.min(1,(jetzt-SCAN.stabil.seit)/900);
+  if(SCAN.auto&&SCAN.quad&&SCAN.stabil&&!SCAN.sperre&&!SCAN.nimmt&&sbFlaeche(SCAN.quad)>=0.12&&SCAN.guete>=0.45&&!SCAN.lage.sperrt)
+    fort=Math.min(1,(jetzt-SCAN.stabil.seit)/(SCAN.lage.k==="spiegelung"?2600:(SCAN.lage.k==="klein"?1800:900)));   /* Spiegelung oder klein: länger warten – Zeit zum Kippen bzw. Näherkommen */
   overlayZeichnen(fort);
   tippSetzen();
   if(fort>=1){ausloesen(true);return;}
   SCAN_UHR=setTimeout(erkennenSchritt,90);
 }
 function scanFrei(){if(SCAN){SCAN.sperre=null;SCAN.stabil=null;}}
+/* Wie liegt das Blatt? k = Hinweis, sperrt = Auto-Auslöser wartet. Reihenfolge = Vorrang. */
+function lageBewerten(p,jetzt){
+  if(!SCAN.stream)return {k:"start"};
+  var q=SCAN.quad,l=SCAN.licht;
+  if(!q){
+    if(SCAN.hell<40)return {k:"dunkel"};
+    if(SCAN.suchtSeit&&jetzt-SCAN.suchtSeit>4000)return {k:"untergrund"};
+    return {k:"suche"};
+  }
+  if(l&&l.dunkel)return {k:"dunkel",sperrt:true};
+  if(q.some(function(e){return e[0]<0.012||e[1]<0.012||e[0]>0.988||e[1]>0.988;}))return {k:"rand",sperrt:true};
+  var sm=schraegMass(q,p?p.w:3,p?p.h:4);
+  if(sm>1.8)return {k:"schraeg",sperrt:true};
+  if(sbFlaeche(q)<0.2)return {k:"klein"};
+  if(l&&l.spiegelung)return {k:"spiegelung"};
+  if(sm>1.45)return {k:"schraeg"};
+  if(SCAN.wackler.length>=3)return {k:"ruhig"};
+  return {k:SCAN.auto?"gleich":"bereit"};
+}
+/* Perspektive: Verhältnis gegenüberliegender Kanten (1 = von oben fotografiert) */
+function schraegMass(q,w,h){
+  function l(a,b){return Math.hypot((q[a][0]-q[b][0])*w,(q[a][1]-q[b][1])*h);}
+  var o=l(0,1),u=l(3,2),li=l(0,3),re=l(1,2);
+  return Math.max(o/u,u/o,li/re,re/li);
+}
 /* 24×32-Graubild zum Vergleichen zweier Aufnahmen */
 function daumen(p){
   var w=24,h=32,o=new Float32Array(w*h);
@@ -6515,20 +6732,46 @@ function overlayZeichnen(fort){
   if(!SCAN||!SCAN.quad)return;
   var P=SCAN.quad.map(function(q){return [R.x+q[0]*R.w,R.y+q[1]*R.h];});
   x.beginPath();x.moveTo(P[0][0],P[0][1]);for(var i=1;i<4;i++)x.lineTo(P[i][0],P[i][1]);x.closePath();
-  x.fillStyle=SCAN.sperre?"rgba(255,255,255,.10)":"rgba(79,140,255,.20)";x.fill();
-  x.lineWidth=3;x.lineJoin="round";x.strokeStyle=SCAN.sperre?"rgba(255,255,255,.7)":"#4f8cff";x.stroke();
+  /* blau = bereit, bernstein = Auslöser wartet (zu dunkel, Rand, zu schräg), weiß = schon aufgenommen */
+  var warte=SCAN.lage&&SCAN.lage.sperrt;
+  x.fillStyle=SCAN.sperre?"rgba(255,255,255,.10)":(warte?"rgba(232,147,12,.18)":"rgba(79,140,255,.20)");x.fill();
+  x.lineWidth=3;x.lineJoin="round";x.strokeStyle=SCAN.sperre?"rgba(255,255,255,.7)":(warte?"#e8930c":"#4f8cff");x.stroke();
   P.forEach(function(p){x.beginPath();x.arc(p[0],p[1],5,0,7);x.fillStyle="#fff";x.fill();});
 }
+/* Hinweis oben im Sucher. Neue Hinweise erst nach drei gleichen Bildern – sonst flackert er. */
+var TIPPS={
+  start:"Kamera startet …",
+  suche:"Dokument ins Bild halten",
+  untergrund:"Kein Rand zu sehen – Blatt auf dunklen Untergrund legen",
+  dunkel:"Zu dunkel – mehr Licht",
+  rand:"Ganzes Blatt ins Bild – etwas weiter weg",
+  schraeg:"Gerader von oben halten",
+  klein:"Näher heran",
+  spiegelung:"Spiegelung – Handy etwas neigen",
+  ruhig:"Ruhig halten",
+  gleich:"Nicht bewegen – nimmt gleich auf",
+  bereit:"Erkannt – jetzt auslösen",
+  nimmt:"Aufnahme …"
+};
+var TIPP_WARN={untergrund:1,dunkel:1,rand:1,schraeg:1,klein:1,spiegelung:1,ruhig:1,meldung:1};
 function tippSetzen(){
   var e=$("#scTipp");if(!e||!SCAN)return;
-  var txt;
-  if(SCAN.nimmt)txt=t("Halten …");
-  else if(SCAN.sperre)txt=SCAN.seiten.length?tf("Seite {0} aufgenommen – nächste Seite hinlegen",SCAN.seiten.length):"";
-  else if(!SCAN.stream)txt=t("Kamera startet …");
-  else if(!SCAN.quad)txt=t("Dokument ins Bild halten");
-  else if(SCAN.auto)txt=t("Ruhig halten – nimmt gleich auf");
-  else txt=t("Erkannt – Auslöser drücken");
+  var k,txt;
+  if(SCAN.nimmt)k="nimmt";
+  else if(SCAN.meldung&&Date.now()<SCAN.meldung.bis)k="meldung";
+  else if(SCAN.sperre)k="weiter";
+  else k=(SCAN.lage&&SCAN.lage.k)||"start";
+  if(SCAN.tippK!==k&&!{nimmt:1,meldung:1,weiter:1,start:1}[k]&&SCAN.tippK&&!{nimmt:1,meldung:1,weiter:1,start:1}[SCAN.tippK]){
+    if(SCAN.tippNeu!==k){SCAN.tippNeu=k;SCAN.tippN=0;}
+    if(++SCAN.tippN<3)k=SCAN.tippK;
+  }
+  SCAN.tippK=k;
+  if(k==="meldung")txt=SCAN.meldung.txt;
+  else if(k==="weiter")txt=SCAN.seiten.length?(SCAN.auto?tf("Seite {0} im Kasten – nächste Seite hinlegen",SCAN.seiten.length):tf("Seite {0} im Kasten",SCAN.seiten.length)):"";
+  else if(k==="dunkel"&&SCAN.track&&!$("#scBlitz").hidden&&!SCAN.blitz)txt=t("Zu dunkel – Licht oben rechts einschalten");
+  else txt=t(TIPPS[k]||TIPPS.suche);
   if(e.textContent!==txt)e.textContent=txt;
+  e.classList.toggle("warn",!!TIPP_WARN[k]);
 }
 function autoZeichnen(){var a=$("#scAuto");if(!a||!SCAN)return;a.innerHTML=(SCAN.auto?t("Automatisch"):t("Manuell"));a.classList.toggle("an",!!SCAN.auto);a.setAttribute("aria-pressed",SCAN.auto?"true":"false");}
 function stapelZeichnen(){
@@ -6552,10 +6795,18 @@ async function ausloesen(auto){
   var vorher=puffer(vid,vid.videoWidth,vid.videoHeight,320),dm=daumen(vorher);
   try{
     var bild=await fotoMachen(vid,dm);
-    await seiteAusBild(bild.quelle,bild.w,bild.h,quadVideo&&Math.abs(bild.w/bild.h-vid.videoWidth/vid.videoHeight)<0.02?quadVideo:null);
+    var seite=await seiteAusBild(bild.quelle,bild.w,bild.h,quadVideo&&Math.abs(bild.w/bild.h-vid.videoWidth/vid.videoHeight)<0.02?quadVideo:null);
     SCAN.sperre={quad:quadVideo,daumen:dm,weg:0};SCAN.stabil=null;
     entwurfMerken();
     if(SCAN.ersetzt){SCAN.ersetzt=false;SCAN.nimmt=false;scanModus("seiten");return;}
+    var nr=SCAN.seiten.indexOf(seite)+1;
+    if(seite.unscharf&&auto&&!seite.wiederholt){
+      /* unscharf: gleich noch einmal – die nächste ruhige Aufnahme ersetzt diese Seite (nur einmal) */
+      SCAN.ersetzen=seite.id;SCAN.stillErsetzen=true;SCAN.sperre=null;
+      SCAN.meldung={txt:tf("Seite {0} wirkt unscharf – ruhig halten, sie wird neu aufgenommen",nr),bis:Date.now()+2600};
+    }else if(seite.unscharf){
+      SCAN.meldung={txt:tf("Seite {0} wirkt unscharf – unter „Seiten“ neu aufnehmen",nr),bis:Date.now()+3500};
+    }
     stapelZeichnen();
   }catch(e){toast(t("Aufnahme fehlgeschlagen")+": "+errMsg(e),true);}
   finally{
@@ -6617,13 +6868,32 @@ async function seiteAusBild(quelle,w,h,eckenHinweis){
   if(ecken){try{ecken=sbVerfeinern(puffer(c,ow,oh,1400),ecken);}catch(e){}}
   else ecken=[[0.02,0.02],[0.98,0.02],[0.98,0.98],[0.02,0.98]];
   var seite={id:"s"+Date.now()+Math.random().toString(36).slice(2,6),blob:blob,w:ow,h:oh,ecken:ecken,dreh:0,
-             filter:SCAN.filterStd||"auto",erkannt:!!(r||eckenHinweis)};
-  /* „Neu aufnehmen“: die neue Aufnahme tritt an die Stelle der alten */
+             filter:SCAN.filterStd||"auto",erkannt:!!(r||eckenHinweis),unscharf:seiteUnscharf(c,ecken)};
+  /* „Neu aufnehmen“: die neue Aufnahme tritt an die Stelle der alten. Still = Wiederholung wegen
+     Unschärfe im Sucher, ohne in die Seitenansicht zu springen. */
   var alt=SCAN.ersetzen?SCAN.seiten.map(function(p){return p.id;}).indexOf(SCAN.ersetzen):-1;
-  if(alt>=0){var weg=SCAN.seiten[alt];if(weg.vUrl)URL.revokeObjectURL(weg.vUrl);SCAN.seiten[alt]=seite;SCAN.akt=alt;SCAN.ersetzt=true;}
+  if(alt>=0){var weg=SCAN.seiten[alt];if(weg.vUrl)URL.revokeObjectURL(weg.vUrl);SCAN.seiten[alt]=seite;SCAN.akt=alt;
+    if(SCAN.stillErsetzen)seite.wiederholt=true;else SCAN.ersetzt=true;}
   else SCAN.seiten.push(seite);
-  SCAN.ersetzen=null;
+  SCAN.ersetzen=null;SCAN.stillErsetzen=false;
   return seite;
+}
+/* Unschärfe der Aufnahme: Mittelstück des Blatts, auf 150 dpi gerechnet (A4 = 1754 Pixel hoch),
+   Kantenbreite gegen die geeichte Grenze. null = kein Urteil (zu wenig Schrift). */
+function seiteUnscharf(c,ecken){
+  try{
+    var E=ecken.map(function(p){return [p[0]*c.width,p[1]*c.height];});
+    var lang=Math.max(Math.hypot(E[3][0]-E[0][0],E[3][1]-E[0][1]),Math.hypot(E[2][0]-E[1][0],E[2][1]-E[1][1]),
+                      Math.hypot(E[1][0]-E[0][0],E[1][1]-E[0][1]),Math.hypot(E[2][0]-E[3][0],E[2][1]-E[3][1]));
+    if(lang<200)return null;
+    var fs=1754/lang,f=Math.min(1,fs),mx=(E[0][0]+E[1][0]+E[2][0]+E[3][0])/4,my=(E[0][1]+E[1][1]+E[2][1]+E[3][1])/4;
+    var sw=Math.min(c.width,620/f),sh=Math.min(c.height,700/f),sx=Math.max(0,Math.min(c.width-sw,mx-sw/2)),sy=Math.max(0,Math.min(c.height-sh,my-sh/2));
+    var k=document.createElement("canvas");k.width=Math.round(sw*f);k.height=Math.round(sh*f);
+    var kx=k.getContext("2d",{willReadFrequently:true});kx.imageSmoothingQuality="high";kx.drawImage(c,sx,sy,sw,sh,0,0,k.width,k.height);
+    var b=sbKantenbreite({w:k.width,h:k.height,d:kx.getImageData(0,0,k.width,k.height).data});
+    if(b==null)return null;
+    return b*(fs/f)>=SB_UNSCHARF;   /* Foto kleiner als 150 dpi: es wird beim Speichern hochgerechnet – Breite mitwachsen lassen */
+  }catch(e){return null;}
 }
 async function fotosDazu(dateien){
   if(!SCAN||!dateien.length)return;
@@ -6715,7 +6985,8 @@ function seitenZeichnen(){
       '<img id="scGross" alt="'+esc(tf("Seite {0}",SCAN.akt+1))+'"'+(s.vUrl&&s.vKey?' src="'+s.vUrl+'"':"")+'>'+
       '<span class="spin sc-lade" id="scLade"></span>'+
       (n>1?'<button class="sc-pfeil r" data-s="nach" aria-label="'+esc(t("Nächste Seite"))+'"'+(SCAN.akt<n-1?"":" disabled")+'>'+ic("right",22)+'</button>':"")+
-      (!s.erkannt?'<div class="sc-hinweis">'+t("Kein Rand erkannt – unter „Zuschneiden“ die Ecken setzen.")+'</div>':"")+
+      (!s.erkannt?'<div class="sc-hinweis">'+t("Kein Rand erkannt – unter „Zuschneiden“ die Ecken setzen.")+'</div>':
+        (s.unscharf?'<div class="sc-hinweis">'+t("Diese Seite wirkt unscharf – „Neu aufnehmen“ hilft.")+'</div>':""))+
     '</div>'+
     (SCAN.filterRow?'<div class="sc-filter">'+SCAN_FILTER.map(function(f){
         return '<button class="sc-chip'+(s.filter===f[0]?" an":"")+'" data-s="filter" data-f="'+f[0]+'">'+esc(t(f[1]))+'</button>';
@@ -6921,7 +7192,11 @@ function speichernHtml(){
     '<button class="sc-schalter" data-s="ki" role="switch" aria-checked="'+(SCAN.ki?"true":"false")+'">'+
       '<span class="sc-sw-txt"><b>'+(ad?t("Danach neu auslesen"):t("Mit KI auslesen"))+'</b><span>'+
         (ad?t("Die KI liest das ganze Dokument noch einmal und gleicht mit dem Vertrag ab."):
-         (SCAN.ki?t("Erkennt Anbieter, Beträge und Fristen und macht den Text durchsuchbar."):t("Nur ablegen – Auslesen lässt sich später nachholen.")))+'</span></span>'+
+         (SCAN.ki?(SCAN.ziel.nk?t("Liest jede Position der Abrechnung aus und macht den Text durchsuchbar."):
+                   SCAN.ziel.med?t("Erkennt Praxis, Datum und Betrag und macht den Text durchsuchbar."):
+                   c?t("Gleicht Preise, Fristen und Nummern mit dem Vertrag ab und macht den Text durchsuchbar."):
+                   t("Erkennt Anbieter, Beträge und Fristen und macht den Text durchsuchbar.")):
+          t("Nur ablegen – Auslesen lässt sich später nachholen.")))+'</span></span>'+
       '<span class="sc-sw'+(SCAN.ki?" an":"")+'"></span></button>'+
     '<div class="factions"><button class="btn lg" data-s="ok">'+ic("check")+' '+(ad?t("Anfügen"):t("Speichern"))+'</button></div>'+
   '</div></div>';
@@ -6950,7 +7225,7 @@ async function seitenFertig(mitKi){
     var b=await leinwandBlob(c,"image/jpeg",s.filter==="original"?0.86:0.8);
     var ki=null;
     if(mitKi&&i<SCAN_KI_SEITEN){
-      var f=Math.min(1,1568/Math.max(c.width,c.height)),k=document.createElement("canvas");
+      var f=Math.min(1,(kiStufe()==="basic"?1568:2000)/Math.max(c.width,c.height)),k=document.createElement("canvas");
       k.width=Math.round(c.width*f);k.height=Math.round(c.height*f);
       var kx=k.getContext("2d");kx.imageSmoothingQuality="high";kx.drawImage(c,0,0,k.width,k.height);
       ki=new Uint8Array(await (await leinwandBlob(k,"image/jpeg",0.8)).arrayBuffer());
@@ -7014,7 +7289,7 @@ async function scanSpeichern(){
       await ladeDaten();
       var nkId=ziel.nk!=="neu"?ziel.nk:null;
       SCAN_SPEICHERN=null;scannerAus();SCAN_INAPP=false;
-      if(opt.ki)volltextHolen(dok.id,kiBilder,"");
+      if(opt.ki)volltextHolen(dok.id,seiten.map(function(x){return x.jpeg;}),"",1);
       nkNach("#/nebenkosten"+(nkId?"?id="+nkId:""),function(){
         if(opt.ki)nkAuslesen([dok.id],nkId,kiBilder);else nkFormular(nkId,null,[dok.id]);
       });
@@ -7023,7 +7298,7 @@ async function scanSpeichern(){
     if(opt.ki){
       arbeitText(t("All-Home liest das Dokument … (10–30 Sek.)"));
       var ergebnis=await kiAuslesen(dok,{bilder:kiBilder},ziel.med);
-      if(ergebnis==="ok")volltextHolen(dok.id,kiBilder,"");
+      if(ergebnis==="ok")volltextHolen(dok.id,seiten.map(function(x){return x.jpeg;}),"",1);
     }
     await ladeDaten();
     scanFertig(dok.id,opt.ki,ziel);
@@ -7063,17 +7338,37 @@ function dateiname(titel,datum,alt){
   var d=/^\d{4}-\d{2}-\d{2}$/.test(String(datum||""))?datum+" ":"";
   return d+tt+endung;
 }
-/* Volltext für die Suche: günstigstes Modell, 4 Seiten je Aufruf, zwei gleichzeitig.
-   Läuft im Hintergrund; ein Fehler kostet nur die Suche, nicht das Dokument. */
-async function volltextHolen(docId,bilder,vorher){
-  if(!bilder||!bilder.length)return;
-  var pakete=[];for(var i=0;i<bilder.length;i+=4)pakete.push(bilder.slice(i,i+4));
+/* Volltext für die Suche: günstigstes Modell (Haiku sieht höchstens 1568 px, gut 1,1 Megapixel).
+   Damit auch Kleingedrucktes lesbar bleibt, geht jede Seite in voller Auflösung als 1–4 leicht
+   überlappende Streifen hinaus. 4 Seiten je Aufruf, zwei Aufrufe gleichzeitig, im Hintergrund –
+   ein Fehler kostet nur die Suche, nicht das Dokument. seiten: JPEG-Bytes je Seite, ab: erste Seitennummer. */
+var STREIFEN_PIXEL=1150000;
+async function textStreifen(bytes){
+  var img=await bildLaden(new Blob([bytes],{type:"image/jpeg"})),W=img.naturalWidth,H=img.naturalHeight;
+  var n=Math.max(1,Math.min(4,Math.ceil(W*H/STREIFEN_PIXEL))),ueber=n>1?Math.round(H*0.025):0,aus=[];
+  for(var k=0;k<n;k++){
+    var y0=Math.max(0,Math.round(k*H/n)-ueber),y1=Math.min(H,Math.round((k+1)*H/n)+ueber);
+    var c=document.createElement("canvas");c.width=W;c.height=y1-y0;
+    c.getContext("2d").drawImage(img,0,y0,W,y1-y0,0,0,W,y1-y0);
+    aus.push(new Uint8Array(await (await leinwandBlob(c,"image/jpeg",0.85)).arrayBuffer()));
+    c.width=c.height=0;
+  }
+  return aus;
+}
+async function volltextHolen(docId,seiten,vorher,ab){
+  if(!seiten||!seiten.length)return;
+  ab=ab||1;
+  var pakete=[];for(var i=0;i<seiten.length;i+=4)pakete.push({ab:ab+i,seiten:seiten.slice(i,i+4)});
   var teile=new Array(pakete.length),naechstes=0;
   async function arbeiter(){
     while(naechstes<pakete.length){
-      var k=naechstes++;
-      try{var b=await edgeRuf(EDGE_EXTRACT,{modus:"text",bilder:bilderFuerKi(pakete[k]),mimeType:"image/jpeg",lang:curLang});teile[k]=String(b.text||"").trim();}
-      catch(e){teile[k]="";}
+      var k=naechstes++,pk=pakete[k];
+      try{
+        var bilder=[],streifen=[];
+        for(var j=0;j<pk.seiten.length;j++){var st=await textStreifen(pk.seiten[j]);streifen.push(st.length);bilder=bilder.concat(st);}
+        var b=await edgeRuf(EDGE_EXTRACT,{modus:"text",bilder:bilderFuerKi(bilder),streifen:streifen,ab:pk.ab,mimeType:"image/jpeg",lang:curLang});
+        teile[k]=String(b.text||"").trim();
+      }catch(e){teile[k]="";}
     }
   }
   await Promise.all([arbeiter(),arbeiter()]);
@@ -7147,7 +7442,7 @@ async function anfuegenAusfuehren(d,seiten,opt){
     var quelle;
     if(pdfFuerKi&&pdfFuerKi.length<=10*1024*1024)quelle={pdf:pdfFuerKi};
     else if(!pdfFuerKi)quelle={bilder:(await bilderDesDokuments(d)).concat(kiBilder)};
-    if(quelle){var erg=await kiAuslesen(d,quelle,med);if(erg==="ok")volltextHolen(d.id,kiBilder,d.volltext||"");}
+    if(quelle){var erg=await kiAuslesen(d,quelle,med);if(erg==="ok")volltextHolen(d.id,seiten.map(function(x){return x.jpeg;}),d.volltext||"",(d.seiten||1)+1);}
   }
   await ladeDaten();
   var neu=DOCS.filter(function(x){return x.id===d.id;})[0]||d;
@@ -7279,6 +7574,7 @@ function scanKlick(ev){
   }
   if(a==="galerie"){$("#scGal").click();return;}
   if(a==="kamapp"){$("#scCam").click();return;}
+  if(a==="kamera-neu"){scanModus("kamera");return;}
   if(a==="kamera"){
     if(SCAN.modus==="ohnekamera"){$("#scCam").click();return;}
     scanModus("kamera");return;
@@ -7321,7 +7617,7 @@ function scanKlick(ev){
     SCAN.seiten=e2.seiten.map(function(p){return Object.assign({},p);});
     if(e2.format)SCAN.format=e2.format;
     /* Der Entwurf behält sein Ziel, wenn es das noch gibt */
-    if(e2.ziel){var z=scanZiel({vertrag:e2.ziel.vertrag,art:e2.ziel.art,med:e2.ziel.med?"1":"",person:e2.ziel.person,doc:e2.ziel.doc});
+    if(e2.ziel){var z=scanZiel({vertrag:e2.ziel.vertrag,art:e2.ziel.art,med:e2.ziel.med?"1":"",person:e2.ziel.person,doc:e2.ziel.doc,nk:e2.ziel.nk});
       SCAN.ziel=z;SCAN.ki=scanKiVorgabe(z);if(anfuegenDok())SCAN.ki=false;}
     SCAN.akt=0;scanModus("seiten");return;
   }

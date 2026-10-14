@@ -5,6 +5,8 @@
 //      (immer das guenstigste Modell, Protokoll als allhome-text).
 // v18: Nebenkosten – "dateien" (PDF und Bilder gemischt), Modus "nk" liest eine Betriebskosten-/
 //      Heizkostenabrechnung strukturiert aus, Modus "nk-bewertung" ordnet alle Jahre ein (allhome-nk*).
+// v19: Volltext aus Streifen in voller Aufloesung (streifen = Anzahl je Seite, ab = erste Seitennummer),
+//      jedes Bild beschriftet; Auftrag mit Lesereihenfolge, Tabellen, Handschrift, Silbentrennung.
 // Gemeinsamer Kern (Anmeldung, Limits, Kosten-Protokoll, Claude-Aufruf): gemeinsam.ts
 
 import { ANTHROPIC_API_KEY, antwortText, claude, claudeFehler, cors, json, level, protokoll, pruefeAufruf, repairJson, stufe } from "./gemeinsam.ts";
@@ -49,10 +51,16 @@ const NK_BEWERTUNG = [
 
 // Volltext fuer die Suche: nur abschreiben, nichts deuten
 const TEXT_PROMPT = [
-  "Schreibe den vollstaendigen sichtbaren Text dieser Dokumentseiten ab - Seite fuer Seite in der gegebenen Reihenfolge.",
-  "Nur den Text: keine Einleitung, keine Kommentare, keine Zusammenfassung, kein Markdown.",
-  "Tabellen zeilenweise, Spalten durch zwei Leerzeichen getrennt. Zwischen zwei Seiten eine Leerzeile.",
-  "Unleserliches als [...]. Nichts uebersetzen, nichts ergaenzen.",
+  "Schreibe den vollstaendigen sichtbaren Text dieser Dokumentseiten ab - er dient der Volltextsuche. Nur abschreiben: nichts deuten, nichts uebersetzen, nichts ergaenzen, nichts weglassen.",
+  "- Vor jeder Seite eine eigene Zeile '--- Seite N ---' (N = Seitennummer; bei beschrifteten Bildern die Nummer aus der Beschriftung).",
+  "- Ist eine Seite in mehrere Streifen geteilt, ueberlappen sich die Streifen leicht: Zeilen im Ueberlappungsbereich nur EINMAL abschreiben, nichts doppelt.",
+  "- Lesereihenfolge wie ein Mensch: mehrspaltige Bereiche Spalte fuer Spalte (links vor rechts, jeweils von oben nach unten). Briefkopf, Absender, Fusszeile, Randnotizen und Stempel jeweils als eigene Zeilen.",
+  "- Tabellen: eine Tabellenzeile pro Textzeile, Zellen durch ' | ' getrennt, Kopfzeile zuerst; leere Zellen leer lassen.",
+  "- Am Zeilenende getrennte Woerter zusammenfuegen (\"Kuendi-\" + \"gungsfrist\" -> \"Kuendigungsfrist\"), echte Bindestriche behalten.",
+  "- Handschrift ebenfalls abschreiben; unsichere Woerter mit [?] dahinter, Unleserliches als [...].",
+  "- Zahlen, Betraege, Daten, IBAN, Kunden-, Vertrags- und Rechnungsnummern Zeichen fuer Zeichen genau. Text in jeder Sprache so, wie er dasteht.",
+  "- Ankreuzfelder als [x] bzw. [ ]. Logos und Bilder nur, wenn sie Text enthalten (dann den Text).",
+  "- Ausgabe nur der Text: kein Markdown, keine Einleitung, keine Kommentare, keine Zusammenfassung.",
 ].join("\n");
 
 // Sprachvorgabe: nur Freitexte uebersetzen. Die Schluesselwerte sind feste Codes,
@@ -120,7 +128,7 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
-  let p: { fileBase64?: string; mimeType?: string; textContent?: string; bilder?: { data?: string; mime?: string }[]; dateien?: { data?: string; mime?: string }[]; modus?: string; model?: string; level?: string; lang?: string; household_id?: string };
+  let p: { fileBase64?: string; mimeType?: string; textContent?: string; bilder?: { data?: string; mime?: string }[]; dateien?: { data?: string; mime?: string }[]; modus?: string; streifen?: number[]; ab?: number; model?: string; level?: string; lang?: string; household_id?: string };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
   const chk = await pruefeAufruf(req, p.household_id);
   if ("antwort" in chk) return chk.antwort;
@@ -165,7 +173,24 @@ Deno.serve(async (req: Request) => {
   // Modus "text": Volltext abschreiben (fuer die Suche) - immer das guenstigste Modell
   if (p.modus === "text") {
     const lvT = level("basic", { basic: 16000, advanced: 16000, max: 16000 });
-    const bodyT = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: TEXT_PROMPT }] }] };
+    let inhaltT: Record<string, unknown>[] = [docBlock, ...bloecke];
+    // Streifen je Seite: jedes Bild beschriften ("Seite 3 - Streifen 2 von 4"), Hinweissatz der Seiten weglassen
+    const streifen = Array.isArray(p.streifen) ? p.streifen.map((n: unknown) => Math.floor(Number(n))) : null;
+    if (streifen && bilder && bilder.length) {
+      const summe = streifen.reduce((a: number, b: number) => a + b, 0);
+      if (summe !== bilder.length || streifen.some((n: number) => !(n >= 1 && n <= 4))) return json({ error: "Streifen passen nicht zu den Bildern." }, 400);
+      const ab = Math.max(1, Math.min(9999, Math.floor(Number(p.ab) || 1)));
+      const bildBloecke = [docBlock, ...bloecke].filter((b) => b.type === "image");
+      inhaltT = [];
+      let k = 0;
+      streifen.forEach((n: number, si: number) => {
+        for (let j = 0; j < n; j++) {
+          inhaltT.push({ type: "text", text: "Seite " + (ab + si) + (n > 1 ? " - Streifen " + (j + 1) + " von " + n + " (von oben nach unten)" : "") + ":" });
+          inhaltT.push(bildBloecke[k++]);
+        }
+      });
+    }
+    const bodyT = { messages: [{ role: "user", content: [...inhaltT, { type: "text", text: TEXT_PROMPT }] }] };
     let rt;
     try { rt = await claude(lvT, bodyT); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
     if (!rt.resp.ok) return await claudeFehler(rt.resp, "Texterkennung");
