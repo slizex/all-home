@@ -40,6 +40,24 @@ Jeder Helfer ist einzeln abschaltbar.
 Abrechnungsziffern (GOÄ/GOZ) in Alltagssprache samt verwendeter Materialien, und eine
 Steuerübersicht als CSV — nach Person getrennt.
 
+**Nebenkostenabrechnung, Jahr für Jahr.** Unter Mehr › Nebenkosten und am Mietvertrag: Abrechnung scannen,
+hochladen oder von Hand eintragen. Die KI liest jede Position mit Kategorie nach § 2 BetrKV, Verteilerschlüssel,
+Hauskosten und Anteil aus, dazu Wohnfläche, Vorauszahlungen, Ergebnis und die Heizkosten-Angaben. Alles bleibt
+von Hand änderbar. Je Abrechnungszeitraum gibt es genau eine Abrechnung („2025“ oder „2024/25“). Eine Korrektur
+ersetzt die Werte, die Dokumente bleiben erhalten. Kürzere Zeiträume werden für den Vergleich auf 12 Monate
+hochgerechnet. Die Übersicht zeigt Kennzahlen, gestapelte Säulen je Kategorie, Euro je m² und Monat gegen den
+[Betriebskostenspiegel](https://mieterbund.de/aktuelles/meldungen/mieterbund-veroeffentlicht-aktuellen-betriebskostenspiegel-fuer-deutschland/)
+des Mieterbunds, eine Tabelle Kategorie × Jahr und die Kostentreiber. Geprüft wird ohne KI, mit festen Regeln:
+- **Fristen:** § 556 Abs. 3 BGB für Abrechnung und Einwände
+- **Umlagefähigkeit:** Verwaltung, Reparaturen, gemietete Rauchmelder, Kabel-TV ab 1.7.2024
+- **Heizkosten:** Kürzungsrechte in Euro für die 15 %-Regel, fehlende CO2-Aufteilung und fehlende monatliche
+  Verbrauchsinfo
+- **Vergleich:** Vergleich mit dem Vorjahr und Vorschlag für die Vorauszahlung
+- **Steuer:** § 35a EStG mit CSV-Ausgabe
+
+Eine KI-Einschätzung über alle Jahre gibt es auf Knopfdruck.
+Die Vorauszahlung zählt zu den Haushaltskosten. Fristen und offene Nachzahlungen erscheinen auf der Startseite.
+
 **Mehrere Häuser, mehrere Menschen.** Ein Konto kann mehrere Häuser mit Adresse führen
 (Wohnung, Ferienhaus, Elternhaus) und oben per Tipp auf den Namen wechseln. Mitglieder
 kommen per Einladungscode dazu; Admins verwalten Haus, Rollen und Einladungen. Es gibt
@@ -82,9 +100,9 @@ Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Do
 ## Technik
 
 - Eine `index.html`, kein Build. Design und Rahmen aus AllTrack (Nunito, warme Palette).
-- Supabase: Schema `butler` (Verträge, Dokumente, Personen, Einrichtung),
+- Supabase: Schema `butler` (Verträge, Dokumente, Personen, Einrichtung, Nebenkostenabrechnungen),
   Haushalte aus `public` wiederverwendet, privater Bucket `butler-documents`.
-- Edge Functions: `butler-extract` (auslesen; Seitenbilder eines Scans in einem Aufruf, Modus `text` für den Volltext), `butler-research` (Markt),
+- Edge Functions: `butler-extract` (auslesen; Seitenbilder eines Scans in einem Aufruf, Modus `text` für den Volltext, Modi `nk` und `nk-bewertung` für Nebenkostenabrechnungen), `butler-research` (Markt),
   `butler-med-explain` (Abrechnungsziffern), `butler-translate` (Nachübersetzen) –
   mit gemeinsamem Kern `gemeinsam.ts` (Anmeldung, Limits, Kosten in `public.ai_calls`).
 - Scanner ohne fremde Bibliothek: Kantenerkennung (Canny + Hough + Vierecks-Bewertung), Entzerrung über

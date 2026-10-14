@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-4tQbke+Sj+Cg+Qr/Am7h6q9Vo3Fak0jbVK1lbK/vujs='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-6orSZ7+NgNLEejv+T2GEkesfu//GmMMWFo6IkOF+mHc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -663,11 +663,68 @@ body.scan-open #toast.on{transform:translate(-50%,0)}
 .bb img{display:block;max-width:100%;max-height:60vh;object-fit:contain}
 .bbnav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:10px;font-weight:800}
 .bbnav .ibtn:disabled{opacity:.35}
+/* ================= Nebenkosten ================= */
+:root{--nk1:#e8930c;--nk2:#1a9fd8;--nk3:#7c5cd6;--nk4:#1f9d62;--nk5:#d8453a;--nk6:#b07d2b;--nk7:#3b6fd8}
+html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;--nk6:#d9a752;--nk7:#86a8ff}
+.nkkpi .ks{font-size:.78rem}
+.nkd{font-weight:800}
+.nkd.hoch{color:var(--neg)}
+.nkd.runter{color:var(--pos)}
+.nkbetrag{color:var(--neg);font-weight:900;white-space:nowrap}
+.pill.warnp{background:var(--warn-bg);color:var(--warn)}
+/* Grafiken: eigenes SVG, Beschriftung in Bildschirm-Pixeln lesbar (Breite begrenzt) */
+.nkchart{max-width:560px;margin:0 auto}
+.nkchart svg{display:block;width:100%;height:auto;overflow:visible}
+.nkgrid{stroke:var(--line);stroke-width:1}
+.nkax{fill:var(--muted);font-size:10.5px;font-weight:700}
+.nkwert{fill:var(--text);font-size:10.5px;font-weight:800}
+.nklinie{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round}
+.nkpunkt{fill:var(--surface);stroke:var(--ink);stroke-width:2.2}
+.nkspiegel{stroke:var(--warn);stroke-width:1.6;stroke-dasharray:5 4}
+.nkleg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:.8rem;font-weight:700;color:var(--muted)}
+.nkleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.nkkopf{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 12px;margin-bottom:6px}
+/* Tabelle Kategorie × Zeitraum */
+/* rtl am Rahmen: auf schmalen Schirmen startet die Ansicht beim neuesten Zeitraum, Kategorie bleibt stehen */
+.nktab{overflow-x:auto;margin:-4px;direction:rtl}
+.nkt{width:100%;border-collapse:collapse;font-size:.86rem;direction:ltr}
+.nkt th:first-child,.nkt td:first-child{position:sticky;left:0;z-index:1;background:var(--surface)}
+.nkt th,.nkt td{padding:7px 6px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+.nkt th:first-child,.nkt td:first-child{text-align:left;white-space:normal;min-width:120px}
+.nkt th{color:var(--muted);font-weight:800;font-size:.78rem}
+.nkt .nksum td{font-weight:900;border-bottom:0}
+@media (max-width:520px){.nkt{font-size:.8rem}.nkt th,.nkt td{padding:6px 5px}.nkt th:first-child,.nkt td:first-child{min-width:0;width:34%}}
+/* Kostentreiber */
+.nktreib{display:grid;gap:8px}
+.nktr{display:flex;justify-content:space-between;gap:12px;font-weight:700}
+.nktr>span:first-child{min-width:0}
+.nktr>span:last-child{white-space:nowrap;flex-shrink:0}
+/* Positionen eines Zeitraums */
+.nkgr{padding:10px 0;border-bottom:1px solid var(--line)}
+.nkgr:first-child{padding-top:0}
+.nkgk{display:flex;justify-content:space-between;gap:12px;font-weight:900}
+.nkgm{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.78rem;color:var(--muted);font-weight:700;margin:2px 0 4px}
+.nkpos{display:flex;justify-content:space-between;gap:12px;padding:4px 0 4px 26px;font-size:.92rem}
+.nkpb{min-width:0;overflow-wrap:anywhere}
+.nkps{display:block;color:var(--muted);font-size:.78rem;font-weight:700}
+.nkpw{white-space:nowrap;font-weight:700}
+.nkges{padding-top:12px}
+/* Formular: eine Position je Kästchen */
+.nkp{border:1.5px solid var(--line);border-radius:16px;padding:10px;margin-bottom:10px;display:grid;gap:8px}
+.nkp1{display:flex;gap:6px;align-items:center}
+.nkp1 .inp{flex:1;min-width:0}
+.nkp .two{margin:0}
+.nkpm summary{cursor:pointer;font-weight:800;color:var(--muted);font-size:.84rem;padding:2px 4px}
+.nkpm[open]{display:grid;gap:8px}
+.nkarbeit{text-align:center;padding:34px 10px}
+.nkarbeit .spin{margin:0 auto 14px}
+.nkarbeit p{font-weight:800;margin:0}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="nkDatei" accept="application/pdf,image/*" multiple hidden>
 <div id="modal" hidden><div class="scrim" data-a="modal-close"></div><div class="sheet" id="modalBox"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha256-WdOUh8NYmEO0EDItij1WLOAiq6HlzLFomO8/sqDaLs0=" crossorigin="anonymous"></script>
 <script>
@@ -680,7 +737,7 @@ body.scan-open #toast.on{transform:translate(-50%,0)}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.6.0";
+var APP_VERSION="1.7.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -713,6 +770,7 @@ var DOCTYPE={
   preisaenderung:{label:"Preisänderung",icon:"📈"},
   schreiben:{label:"Schreiben",icon:"✉️"},
   fahrzeugschein:{label:"Fahrzeugschein",icon:"🪪"},
+  nebenkosten:{label:"Nebenkostenabrechnung",icon:"🧾"},
   sonstiges:{label:"Dokument",icon:"📄"}
 };
 /* Welche Unterlagen gehören zu einem vollständigen Vertrag? (Dokumenten-Lücken) */
@@ -734,6 +792,244 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- Nebenkosten (1.7.0) Nachtrag ---- */
+  "Jahre einschätzen lassen":"Оценить годы",
+
+
+/* ---- Nebenkosten (1.7.0) ---- */
+  "Nebenkosten-Vorauszahlung":"Аванс за коммунальные услуги",
+  "Nebenkosten":"Коммунальные платежи",
+  "zuletzt {0}":"последний {0}",
+  "Jährliche Abrechnung auswerten":"Анализ ежегодного расчёта",
+  "Sieht nach einer Nebenkostenabrechnung aus":"Похоже на расчёт коммунальных платежей",
+  "Dann liest All-Home jede Position aus, vergleicht mit den Vorjahren und prüft Fristen und Heizkosten.":"Тогда All-Home считает каждую позицию, сравнит с прошлыми годами и проверит сроки и расходы на отопление.",
+  "Als Nebenkostenabrechnung auswerten":"Проанализировать как расчёт коммунальных платежей",
+  "Kommt zur Nebenkostenabrechnung {0}":"Будет добавлено к расчёту коммунальных платежей {0}",
+  "Wird als Nebenkostenabrechnung ausgelesen":"Будет считано как расчёт коммунальных платежей",
+  "Nebenkostenabrechnung":"Расчёт коммунальных платежей (Nebenkostenabrechnung)",
+  "Abrechnung zu spät – Nachzahlung meist nicht fällig":"Расчёт пришёл поздно — доплата обычно не положена",
+  "Sie kam am {0}, abrechnen musste der Vermieter bis {1} (§ 556 Abs. 3 BGB). Eine Nachforderung ist dann in der Regel ausgeschlossen, außer er hat die Verspätung nicht zu vertreten.":"Расчёт пришёл {0}, а арендодатель должен был выставить его до {1} (§ 556 Abs. 3 BGB). Требовать доплату он тогда, как правило, не может, если только задержка произошла не по его вине.",
+  "Abrechnung kam verspätet":"Расчёт пришёл с опозданием",
+  "Frist war der {0} – ein Guthaben steht dir trotzdem zu.":"Срок истёк {0} — переплата вам всё равно положена.",
+  "Zeitraum länger als 12 Monate":"Период длиннее 12 месяцев",
+  "{0} Tage abgerechnet – zulässig sind höchstens 12 Monate.":"Рассчитано дней: {0} — допустимо не более 12 месяцев.",
+  "Einwände bis {0} möglich":"Возражения возможны до {0}",
+  "Bis zum Ende des zwölften Monats nach Zugang kannst du der Abrechnung widersprechen und Belege einsehen.":"До конца двенадцатого месяца после получения вы можете оспорить расчёт и потребовать показать документы.",
+  "Zugangsdatum fehlt":"Не указана дата получения",
+  "Trag ein, wann die Abrechnung ankam – dann rechnet All-Home die Fristen.":"Укажите, когда пришёл расчёт, — тогда All-Home рассчитает сроки.",
+  "Wohnfläche geändert":"Жилая площадь изменилась",
+  "Vorher {0} m², jetzt {1} m² – das verschiebt alle flächenbezogenen Kosten.":"Было {0} м², теперь {1} м² — это меняет все расходы, распределяемые по площади.",
+  "Verteilerschlüssel geändert: {0}":"Изменён ключ распределения: {0}",
+  "Vorher „{0}“, jetzt „{1}“. Ein Wechsel ist nur in engen Grenzen erlaubt – lass dir den Grund nennen.":"Было «{0}», теперь «{1}». Менять ключ можно лишь в узких пределах — спросите о причине.",
+  "Lücke zur vorigen Abrechnung":"Разрыв с предыдущим расчётом",
+  "Die vorige endete am {0}, diese beginnt am {1}.":"Предыдущий закончился {0}, этот начинается {1}.",
+  "Zeiträume überschneiden sich":"Периоды пересекаются",
+  "Die vorige endete am {0}, diese beginnt schon am {1}.":"Предыдущий закончился {0}, а этот начинается уже {1}.",
+  "Rechnung geht nicht auf":"Расчёт не сходится",
+  "Kosten {0} − Vorauszahlungen {1} = {2}, auf der Abrechnung steht {3}. Vielleicht fehlt eine Position.":"Расходы {0} − авансы {1} = {2}, а в расчёте указано {3}. Возможно, не хватает позиции.",
+  "Nicht umlagefähige Kosten":"Расходы, которые нельзя перекладывать на арендатора",
+  "{0} – Verwaltung, Instandhaltung, Reparaturen, Rücklagen, Bankgebühren oder gemietete Rauchmelder dürfen Mietern nicht berechnet werden.":"{0} — управление, содержание, ремонт, резервный фонд, банковские сборы и аренда дымовых извещателей не могут выставляться арендаторам.",
+  "Kabel-TV seit 1.7.2024 nicht mehr umlagefähig":"Кабельное ТВ с 1.7.2024 больше не перекладывается на арендатора",
+  "Das Nebenkostenprivileg ist entfallen. Für die Zeit ab Juli 2024 darf der Vermieter Kabel- oder Antennenkosten nicht mehr berechnen.":"Льгота (Nebenkostenprivileg) отменена. За время с июля 2024 года арендодатель не вправе выставлять расходы на кабель или антенну.",
+  "Sonstige Betriebskosten":"Прочие эксплуатационные расходы",
+  "Nur zulässig, wenn jede Kostenart im Mietvertrag ausdrücklich vereinbart ist (z. B. Dachrinnenreinigung, Rauchmelder-Wartung).":"Допустимы, только если каждый вид расходов прямо указан в договоре аренды (например, чистка водостоков, обслуживание дымовых извещателей).",
+  "Verbrauchsanteil {0} %":"Доля по потреблению {0} %",
+  "Die Heizkostenverordnung verlangt, dass 50 bis 70 % nach Verbrauch abgerechnet werden.":"Постановление о расходах на отопление (HeizkostenV) требует распределять по потреблению от 50 до 70 %.",
+  "Heizkosten nicht nach Verbrauch abgerechnet":"Отопление рассчитано не по потреблению",
+  "Dann darfst du deinen Heizkostenanteil um 15 % kürzen (§ 12 HeizkostenV).":"Тогда вы вправе уменьшить свою долю расходов на отопление на 15 % (§ 12 HeizkostenV).",
+  "CO2-Kostenaufteilung fehlt":"Нет распределения расходов на CO2",
+  "Seit 2023 muss der Vermieter den CO2-Anteil nach dem Stufenmodell ausweisen. Fehlt er, darfst du die Heizkosten um 3 % kürzen (§ 7 Abs. 3 CO2KostAufG).":"С 2023 года арендодатель обязан указывать долю CO2 по ступенчатой модели. Если её нет, вы вправе уменьшить расходы на отопление на 3 % (§ 7 Abs. 3 CO2KostAufG).",
+  "CO2-Anteil passt nicht zur Stufe":"Доля CO2 не соответствует ступени",
+  "Bei {0} kg CO2 je m² trägst du laut Gesetz {1} %, berechnet wurden {2} %.":"При {0} кг CO2 на м² по закону вы несёте {1} %, а выставлено {2} %.",
+  "Monatliche Verbrauchsinfo fehlt":"Нет ежемесячной информации о потреблении",
+  "Bei fernablesbaren Zählern muss der Vermieter monatlich über den Verbrauch informieren. Sonst darfst du um 3 % kürzen (§ 12 HeizkostenV).":"При дистанционно считываемых счётчиках арендодатель обязан ежемесячно сообщать о потреблении. Иначе вы вправе уменьшить сумму на 3 % (§ 12 HeizkostenV).",
+  "{0} deutlich über dem Durchschnitt":"{0}: заметно выше среднего",
+  "{0} je m² und Monat – im Schnitt sind es {1} (Betriebskostenspiegel {2}).":"{0} за м² в месяц — в среднем {1} (Betriebskostenspiegel {2}).",
+  "Nebenkosten insgesamt sehr hoch":"Коммунальные платежи в целом очень высокие",
+  "{0} je m² und Monat – selbst mit allen Kostenarten liegt der Schnitt bei {1}.":"{0} за м² в месяц — даже со всеми видами расходов среднее значение {1}.",
+  "Wohnfläche fehlt":"Не указана жилая площадь",
+  "Mit der Wohnfläche vergleicht All-Home deine Kosten mit dem Betriebskostenspiegel.":"Зная жилую площадь, All-Home сравнит ваши расходы со средними значениями (Betriebskostenspiegel).",
+  "{0}: {1} gegenüber {2}":"{0}: {1} по сравнению с {2}",
+  "Seit 2025 gilt die neue Grundsteuer – höhere Bescheide sind möglich. Lass dir den Bescheid zeigen.":"С 2025 года действует новый земельный налог — возможны более высокие уведомления. Попросите показать уведомление.",
+  "Hochgerechnet auf 12 Monate {0} statt {1}. Belege einsehen und Grund erfragen.":"В пересчёте на 12 месяцев {0} вместо {1}. Проверьте документы и спросите о причине.",
+  "Vorauszahlung auf {0} anheben?":"Повысить аванс до {0}?",
+  "So deckt sie die Kosten dieses Zeitraums – statt {0} Nachzahlung im nächsten Jahr.":"Так он покроет расходы этого периода — вместо доплаты {0} в следующем году.",
+  "Vorauszahlung senken möglich":"Аванс можно снизить",
+  "{0} Guthaben – {1} im Monat würden die Kosten decken. Eine Senkung kannst du verlangen (§ 560 Abs. 4 BGB).":"Переплата {0} — {1} в месяц покрыли бы расходы. Вы можете потребовать снижения (§ 560 Abs. 4 BGB).",
+  "Steuer: bis {0} Ermäßigung":"Налог: вычет до {0}",
+  "20 % der Arbeitskosten aus Hausmeister, Reinigung, Garten, Winterdienst ({0}) und Wartung/Schornsteinfeger ({1}) zählen bei der Einkommensteuer (§ 35a EStG).":"20 % стоимости работ за дворника, уборку, сад, зимнюю уборку ({0}) и обслуживание/трубочиста ({1}) учитываются в подоходном налоге (§ 35a EStG).",
+  "Keine Auffälligkeiten gefunden":"Замечаний нет",
+  "Fristen, umlagefähige Posten, Heizkosten und Vergleichswerte sind unauffällig.":"Сроки, перекладываемые позиции, отопление и сравнительные значения в порядке.",
+  "Noch keine Abrechnung":"Расчётов пока нет",
+  "Lege jedes Jahr die Nebenkostenabrechnung ab – All-Home liest sie aus, vergleicht die Jahre und prüft Fristen, umlagefähige Posten und Heizkosten.":"Сохраняйте расчёт коммунальных платежей каждый год — All-Home считает его, сравнит годы и проверит сроки, перекладываемые позиции и отопление.",
+  "Kosten {0}":"Расходы {0}",
+  "ggü. Vorjahr":"к прошлому году",
+  "Teilzeitraum":"Неполный период",
+  "Je m² und Monat":"За м² в месяц",
+  "Schnitt {0}":"Среднее {0}",
+  "Guthaben":"Переплата",
+  "Nachzahlung":"Доплата",
+  "erledigt":"выполнено",
+  "offen":"открыто",
+  "Auffälligkeiten {0}":"Замечания {0}",
+  "alle {0} Hinweise":"все замечания ({0})",
+  "Entwicklung":"Динамика",
+  "Kosten je Kategorie":"Расходы по категориям",
+  "Abrechnungen":"Расчёты",
+  "Vergleichswerte: Betriebskostenspiegel des Deutschen Mieterbunds, Abrechnungsjahr {0}. Hinweise sind Anhaltspunkte, keine Rechtsberatung.":"Сравнительные значения: Betriebskostenspiegel Союза арендаторов Германии (Deutscher Mieterbund), расчётный год {0}. Подсказки служат ориентиром и не являются юридической консультацией.",
+  "Seite scannen":"Сканировать страницу",
+  "Abrechnung scannen":"Сканировать расчёт",
+  "Kostentreiber {0} gegenüber {1}":"Что подорожало: {0} по сравнению с {1}",
+  "Auf 12 Monate gerechnet.":"В пересчёте на 12 месяцев.",
+  "Kosten je Zeitraum":"Расходы за период",
+  "auf 12 Monate hochgerechnet":"в пересчёте на 12 месяцев",
+  "Schnitt":"Среднее",
+  "gestrichelt: Schnitt {0} (Mieterbund)":"пунктир: среднее {0} (Mieterbund)",
+  "Kategorie":"Категория",
+  "neu":"новое",
+  "Nebenkosten {0}":"Коммунальные платежи {0}",
+  "Vorauszahlungen {0}":"Авансы {0}",
+  "Bezahlt":"Оплачено",
+  "Erstattet":"Возвращено",
+  "rückgängig":"отменить",
+  "Als bezahlt markieren":"Отметить как оплаченное",
+  "Als erstattet markieren":"Отметить как возвращённое",
+  "Neue Vorauszahlung {0} im Monat":"Новый аванс {0} в месяц",
+  "Im Mietvertrag stehen noch {0}.":"В договоре аренды пока указано {0}.",
+  "Im Mietvertrag ist noch keine Vorauszahlung eingetragen.":"В договоре аренды аванс пока не указан.",
+  "In den Mietvertrag übernehmen":"Перенести в договор аренды",
+  "Prüfung":"Проверка",
+  "Positionen":"Позиции",
+  "Haus {0}":"Дом {0}",
+  "Noch keine Positionen – über „Bearbeiten“ eintragen oder die Abrechnung auslesen lassen.":"Позиций пока нет — внесите их через «Изменить» или дайте считать расчёт.",
+  "Heizung & Warmwasser":"Отопление и горячая вода",
+  "Heizkosten":"Расходы на отопление",
+  "Energie":"Энергия",
+  "Verbrauch":"Потребление",
+  "Warmwasser":"Горячая вода",
+  "Nach Verbrauch":"По потреблению",
+  "CO2-Aufteilung":"Распределение CO2",
+  "Stufe {0}":"Ступень {0}",
+  "dein Anteil {0} %":"ваша доля {0} %",
+  "Monatliche Verbrauchsinfo":"Ежемесячная информация о потреблении",
+  "erhalten":"получена",
+  "nicht erhalten":"не получена",
+  "Messdienst":"Служба учёта",
+  "Steuer (§ 35a EStG)":"Налог (§ 35a EStG)",
+  "Haushaltsnahe Dienstleistungen":"Бытовые услуги (haushaltsnahe Dienstleistungen)",
+  "Handwerkerleistungen":"Работы мастеров (Handwerkerleistungen)",
+  "Ermäßigung bis zu":"Вычет до",
+  "Nicht jede Position weist den Arbeitskostenanteil aus – dann ist hier der volle Betrag angesetzt. Den genauen Anteil nennt der Vermieter auf Nachfrage.":"Не в каждой позиции указана доля стоимости работ — тогда здесь учтена полная сумма. Точную долю арендодатель сообщит по запросу.",
+  "Zeitraum":"Период",
+  "Abrechnung vom":"Расчёт от",
+  "Erhalten am":"Получен",
+  "Einwände bis":"Возражения до",
+  "Abrechnungsfrist":"Срок расчёта",
+  "Wohnfläche":"Жилая площадь",
+  "Neue Vorauszahlung":"Новый аванс",
+  "Noch kein Dokument – etwa die Heizkostenabrechnung des Messdienstes dazulegen.":"Документов пока нет — добавьте, например, расчёт отопления от службы учёта.",
+  "Alle Dokumente neu auslesen":"Заново считать все документы",
+  "Abrechnung löschen":"Удалить расчёт",
+  "ohne Zuordnung":"без привязки",
+  "nicht absetzbar":"не вычитается",
+  "Haushaltsnahe Dienstleistung":"Бытовая услуга",
+  "Handwerkerleistung":"Работа мастера",
+  "ja":"да",
+  "nein":"нет",
+  "Abrechnung bearbeiten":"Изменить расчёт",
+  "Von der KI gelesen – bitte prüfen":"Считано ИИ — пожалуйста, проверьте",
+  "Gleich die Summen mit dem Papier vergleichen, dann speichern.":"Сравните суммы с бумажным расчётом, затем сохраните.",
+  "Zeitraum von":"Период с",
+  "bis":"по",
+  "Mietvertrag":"Договор аренды",
+  "Wohnfläche (m²)":"Жилая площадь (м²)",
+  "Ergebnis":"Итог",
+  "Vorauszahlungen im Zeitraum (€)":"Авансы за период (€)",
+  "Nachzahlung (+) / Guthaben (−) (€)":"Доплата (+) / переплата (−) (€)",
+  "Neue Vorauszahlung je Monat (€)":"Новый аванс в месяц (€)",
+  "Bezeichnung wie auf der Abrechnung":"Название как в расчёте",
+  "Position entfernen":"Удалить позицию",
+  "Dein Anteil €":"Ваша доля €",
+  "Hauskosten, Schlüssel, Steuer":"Расходы дома, ключ, налог",
+  "Hauskosten gesamt €":"Расходы всего дома €",
+  "Anteil wie gedruckt, z. B. 82,5 von 1.240 m²":"Доля как в расчёте, например 82,5 из 1.240 м²",
+  "davon Arbeitskosten €":"из них стоимость работ €",
+  "Position hinzufügen":"Добавить позицию",
+  "Heizkosten (€)":"Расходы на отопление (€)",
+  "aus den Positionen":"из позиций",
+  "Einheit":"Единица",
+  "Nach Verbrauch (%)":"По потреблению (%)",
+  "Warmwasser (m³)":"Горячая вода (м³)",
+  "Nach Verbrauch abgerechnet?":"Рассчитано по потреблению?",
+  "CO2-Aufteilung ausgewiesen?":"Распределение CO2 указано?",
+  "CO2 kg je m² und Jahr":"CO2 кг на м² в год",
+  "Dein CO2-Anteil (%)":"Ваша доля CO2 (%)",
+  "Monatliche Verbrauchsinfo erhalten?":"Ежемесячная информация о потреблении получена?",
+  "Zähler fernablesbar?":"Счётчики считываются дистанционно?",
+  "Bitte den Abrechnungszeitraum angeben (bis nach von).":"Укажите расчётный период (окончание после начала).",
+  "Für {0} gibt es schon eine Abrechnung. Als Korrektur übernehmen? Die bisherigen Werte werden ersetzt, ihre Dokumente bleiben erhalten.":"Для {0} расчёт уже есть. Принять как исправление? Прежние значения будут заменены, документы сохранятся.",
+  "Zwei Abrechnungen mit demselben Zeitraum – bitte zuerst die andere löschen.":"Два расчёта с одинаковым периодом — сначала удалите другой.",
+  "Es wurde nichts gespeichert – fehlende Berechtigung?":"Ничего не сохранено — нет прав?",
+  "Abrechnung {0} löschen? Die Dokumente bleiben erhalten.":"Удалить расчёт {0}? Документы сохранятся.",
+  "Es wurde nichts gelöscht – fehlende Berechtigung?":"Ничего не удалено — нет прав?",
+  "Abrechnung gelöscht":"Расчёт удалён",
+  "Dateien werden abgelegt …":"Файлы сохраняются …",
+  "All-Home liest die Abrechnung … (20–60 Sek.)":"All-Home считывает расчёт … (20–60 сек.)",
+  "Kein Dokument zum Auslesen gefunden.":"Не найден документ для считывания.",
+  "Zu viele oder zu große Dateien für einen Durchgang – bitte einzeln ablegen.":"Слишком много или слишком большие файлы для одного прохода — сохраните их по отдельности.",
+  "Das KI-Guthaben ist aufgebraucht – bitte die Werte von Hand eintragen.":"Лимит ИИ исчерпан — введите значения вручную.",
+  "Auslesen fehlgeschlagen":"Считать не удалось",
+  "KI-Einschätzung":"Оценка ИИ",
+  "Empfehlung":"Рекомендация",
+  "seitdem neue Daten":"с тех пор есть новые данные",
+  "Die KI liest alle Jahre zusammen und sagt in ein paar Sätzen, was auffällt und was du tun kannst. Kostet wenige Cent.":"ИИ просмотрит все годы вместе и в нескольких предложениях скажет, что бросается в глаза и что можно сделать. Стоит несколько центов.",
+  "Neu einschätzen":"Оценить заново",
+  "Die KI ordnet die Jahre ein …":"ИИ оценивает годы …",
+  "Einschätzung fehlgeschlagen":"Оценка не удалась",
+  "Position":"Позиция",
+  "Art nach § 35a":"Вид по § 35a",
+  "davon Arbeitskosten":"из них стоимость работ",
+  "Ermäßigung 20 %":"Вычет 20 %",
+  "Keine steuerlich absetzbaren Positionen erfasst.":"Нет позиций, вычитаемых из налога.",
+  "Ende der Einwendungsfrist":"Конец срока для возражений",
+  "Nächste Nebenkostenabrechnung":"Следующий расчёт коммунальных платежей",
+  "Muss spätestens kommen":"Должен прийти не позднее",
+  "Nebenkosten {0}: {1}":"Коммунальные платежи {0}: {1}",
+  "bis zu {0}":"до {0}",
+  "Nachzahlung {0} offen":"Доплата {0} не оплачена",
+  "vorher die Auffälligkeiten klären":"сначала выясните замечания",
+  "Einwände nur noch bis {0}":"Возражения только до {0}",
+  "Danach gilt die Abrechnung als anerkannt.":"После этого расчёт считается принятым.",
+  "Nebenkostenabrechnung überfällig":"Расчёт коммунальных платежей просрочен",
+  "Für den Zeitraum nach {0} hätte der Vermieter bis {1} abrechnen müssen. Eine Nachzahlung kann er dann meist nicht mehr verlangen.":"За период после {0} арендодатель должен был выставить расчёт до {1}. Доплату он тогда обычно уже не может требовать.",
+  "Neue Vorauszahlung {0}":"Новый аванс {0}",
+  "In den Mietvertrag übernehmen, damit die Haushaltskosten stimmen.":"Перенесите в договор аренды, чтобы расходы хозяйства были верными.",
+  "Jährliche Abrechnung ablegen – All-Home vergleicht die Jahre und prüft sie.":"Сохраняйте ежегодный расчёт — All-Home сравнит годы и проверит их.",
+  "{0} Abrechnung":"Расчётов: {0}",
+  "{0} Abrechnungen":"Расчётов: {0}",
+  "{0} Auffälligkeit":"Замечаний: {0}",
+  "{0} Auffälligkeiten":"Замечаний: {0}",
+  "Hauswart":"Дворник / завхоз",
+  "Gebäudereinigung":"Уборка здания",
+  "Müllbeseitigung":"Вывоз мусора",
+  "Gartenpflege":"Уход за садом",
+  "Aufzug":"Лифт",
+  "Allgemeinstrom":"Электричество в местах общего пользования",
+  "Straßenreinigung & Winterdienst":"Уборка улиц и зимняя уборка",
+  "Antenne, Kabel, Glasfaser":"Антенна, кабель, оптоволокно",
+  "Wäschepflege":"Прачечная",
+  "Nicht umlagefähig":"Не перекладывается на арендатора",
+  "Wohneinheiten":"Квартиры",
+  "Miteigentumsanteile":"Доли совместной собственности",
+  "Direkt zugeordnet":"Отнесено напрямую",
+  "Sonstiger Schlüssel":"Другой ключ",
+  "Öl":"Жидкое топливо",
+  "Wärmepumpe":"Тепловой насос",
+  "Pellets / Holz":"Пеллеты / дрова",
+  "Sonstige":"Прочее",
+  "Auffälligkeiten, Fristen, offene Nachzahlung.":"Замечания, сроки, неоплаченная доплата.",
+
 
 /* ---- Scanner (1.6.0) 2 ---- */
   "Anbieter und Vertragsart passen.":"Поставщик и вид договора совпадают.",
@@ -2075,7 +2371,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -2167,7 +2463,7 @@ function render(){
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   if(rt.name==="scan"){r.innerHTML=shell("","neu");scannerZeigen(rt.params);return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -2188,6 +2484,7 @@ function render(){
   else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
   else if(rt.name==="logos")     {inhalt=viewLogos();cur="mehr";}
   else if(rt.name==="kikosten")  {inhalt=viewKiKosten();cur="mehr";}
+  else if(rt.name==="nebenkosten"){inhalt=viewNebenkosten();cur=rt.params.von==="vertrag"?"vertraege":"mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
@@ -2261,19 +2558,21 @@ async function speichereSetup(arten,fertig){
    der kann je Scan einige Zehntausend Zeichen lang sein und wird nur gesucht. */
 var DOK_SPALTEN="id,household_id,user_id,contract_id,doc_type,filename,storage_path,mime_type,size_bytes,doc_date,extracted,"+
   "zusammenfassung,note,created_at,person_id,bereich,arzt,fachrichtung,med_typ,betrag,behandlungsdatum,content_hash,ki_pending,"+
-  "med_recherche,med_recherche_am,titel,ai_lang,i18n,weitere_seiten,seiten,ohne_ki";
+  "med_recherche,med_recherche_am,titel,ai_lang,i18n,weitere_seiten,seiten,ohne_ki,nk_id";
 async function ladeDaten(){
-  if(!HH){CONTRACTS=[];DOCS=[];PERSONS=[];return;}
+  if(!HH){CONTRACTS=[];DOCS=[];PERSONS=[];NK=[];return;}
   var antw=await Promise.all([
     sb.from("contracts").select("*").eq("household_id",HH.id).order("created_at",{ascending:false}),
     sb.from("documents").select(DOK_SPALTEN).eq("household_id",HH.id).order("created_at",{ascending:false}),
-    sb.from("persons").select("*").eq("household_id",HH.id).order("created_at",{ascending:true})
+    sb.from("persons").select("*").eq("household_id",HH.id).order("created_at",{ascending:true}),
+    sb.from("nk_abrechnungen").select("*").eq("household_id",HH.id).order("von",{ascending:true})
   ]);
   if(antw[0].error)throw antw[0].error;
   CONTRACTS=antw[0].data||[];
   if(antw[1].error)throw antw[1].error;
   DOCS=antw[1].data||[];
   PERSONS=(antw[2]&&!antw[2].error&&antw[2].data)?antw[2].data:[];
+  NK=(antw[3]&&!antw[3].error&&antw[3].data)?antw[3].data:[];
   loaded=true;
 }
 
@@ -2503,6 +2802,9 @@ function kostenPosten(){
   var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return k==="sonstiges"||!ARTEN[k]||!artAktiv(k);})
     .reduce(function(s,c){return s+monatskosten(c);},0);
   if(weitere>0)posten.push({k:"weitere",label:t("Weitere"),icon:"📄",m:weitere});
+  /* Nebenkosten-Vorauszahlung aus dem Mietvertrag – die „zweite Miete“ */
+  var nkm=nkVorauszahlungMonat();
+  if(nkm>0)posten.push({k:"nebenkosten",label:t("Nebenkosten-Vorauszahlung"),icon:"🧾",m:nkm});
   return posten.sort(function(a,b){return b.m-a.m;});
 }
 /* Die dringendste Frist einer Art */
@@ -2693,6 +2995,7 @@ function naheTermine(tage){
                    href:"#/vertrag?id="+c.id});
     }
   });
+  raus=raus.concat(nkTermine().filter(function(x){return x.days<=tage;}));
   raus.sort(function(x,y){return x.days-y.days;});
   return raus;
 }
@@ -2739,6 +3042,10 @@ function viewMehr(){
         '<span class="db"><span class="dn">'+t("Dokumente")+'</span>'+
         '<span class="dm"><span>'+tn(alleDokumente().length,"{0} Dokument","{0} Dokumente")+
           (dokumenteOhneVertrag().length?' · '+tf("{0} ohne Vertrag",dokumenteOhneVertrag().length):"")+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a>'+
+      '<a class="drow3" href="#/nebenkosten"><span class="di">'+ic("euro")+'</span>'+
+        '<span class="db"><span class="dn">'+t("Nebenkosten")+'</span>'+
+        '<span class="dm"><span>'+(NK.length?tn(NK.length,"{0} Abrechnung","{0} Abrechnungen")+' · '+tf("zuletzt {0}",nkLabel(nkNeueste())):t("Jährliche Abrechnung auswerten"))+'</span></span></span>'+
         '<span class="go">'+ic("right",18)+'</span></a>'+
       '<a class="drow3" href="#/einrichten"><span class="di">'+ic("tool")+'</span>'+
         '<span class="db"><span class="dn">'+t("Vertragsarten anpassen")+'</span>'+
@@ -2927,6 +3234,7 @@ function viewVertrag(id){
       (c.notizen?kv(t("Notizen"),esc(c.notizen)):"")+
     '</div></section>'+
     rechercheKarte(c)+
+    nkVertragKarte(c)+
     /* Dokumente */
     '<div class="sect">'+t("Dokumente")+'</div>'+
     '<section class="card">'+dokListe(c)+
@@ -3559,7 +3867,10 @@ function reviewKarte(){
     (aiVal(d,"zusammenfassung")?'<p style="margin:14px 0 0">'+esc(aiVal(d,"zusammenfassung"))+'</p>':"")+
     (Array.isArray(wichtig)&&wichtig.length
       ?'<ul class="hint" style="margin:10px 0 0;padding-left:20px">'+wichtig.map(function(w){return '<li>'+esc(w)+'</li>';}).join("")+'</ul>':"")+
-    (hinweise?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"");
+    (hinweise?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"")+
+    (nkVerdacht(d)?'<div class="sug info" style="margin-top:12px"><span class="si">🧾</span><div class="sb2"><div class="st">'+t("Sieht nach einer Nebenkostenabrechnung aus")+'</div>'+
+      '<div class="sx">'+t("Dann liest All-Home jede Position aus, vergleicht mit den Vorjahren und prüft Fristen und Heizkosten.")+'</div>'+
+      '<div class="sa"><button class="btn sm" data-a="nk-aus-dok" data-id="'+d.id+'">'+t("Als Nebenkostenabrechnung auswerten")+'</button></div></div></div>':"");
   /* Schon einem Vertrag zugeordnet (Scan am Vertrag oder eben gewählt) → abgleichen */
   if(c){
     if(!REVIEW_TROTZDEM&&!anbieterPasst(c,ext))
@@ -4390,7 +4701,7 @@ function medCsv(){
 }
 
 /* ================= Intelligente Funktionen =================
-   Sieben Gruppen, jede einzeln abschaltbar (PREFS.smart).
+   Acht Gruppen, jede einzeln abschaltbar (PREFS.smart).
    Ein Vorschlag erscheint nur, wenn er auch etwas zu sagen hat. */
 var SMART_GRUPPEN=[
   {k:"fristen",  label:"Kündigungsfristen",        text:"Warnt, bevor eine Frist abläuft."},
@@ -4399,7 +4710,8 @@ var SMART_GRUPPEN=[
   {k:"termine",  label:"Pflichttermine",           text:"HU/TÜV, Ausweise, Wartung."},
   {k:"kosten",   label:"Kosten & Wechsel",         text:"Größte Posten und ob ein Wechsel lohnt."},
   {k:"doppelt",  label:"Doppelt versichert",       text:"Zwei Verträge derselben Art."},
-  {k:"dokumente",label:"Dokumenten-Lücken",        text:"Fehlende Police, Rechnung, Mandat."}
+  {k:"dokumente",label:"Dokumenten-Lücken",        text:"Fehlende Police, Rechnung, Mandat."},
+  {k:"nebenkosten",label:"Nebenkosten",            text:"Auffälligkeiten, Fristen, offene Nachzahlung."}
 ];
 function smartAn(k){
   var s=PREFS.smart;
@@ -4565,6 +4877,7 @@ function vorschlaege(){
     }
   }
 
+  if(smartAn("nebenkosten"))v=v.concat(nkVorschlaege());
   return v.filter(function(x){return !istWeg(x.key);});
 }
 function vorschlagHtml(x){
@@ -5325,7 +5638,7 @@ async function logoLoeschen(id){
    lesen dürfen es nur Admins des Hauses (RLS über my_admin_household_ids). */
 var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
 var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
-  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
+  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
 var KI_MODELLNAME={"claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
 var KI_KOSTEN=null;   /* {hh, zeilen, fehler} */
 function kiEur(usd){
@@ -5967,17 +6280,18 @@ var SCAN_FILTER=[["auto","Auto"],["original","Original"],["grau","Graustufen"],[
 /* ---- Einstieg: Knöpfe setzen die Adresse, das Zeichnen öffnet die Ebene ---- */
 function scanStart(z){
   var q=[];
-  ["vertrag","art","med","person","doc"].forEach(function(k){if(z&&z[k])q.push(k+"="+encodeURIComponent(z[k]));});
+  ["vertrag","art","med","person","doc","nk"].forEach(function(k){if(z&&z[k])q.push(k+"="+encodeURIComponent(z[k]));});
   SCAN_INAPP=true;
   location.hash="#/scan"+(q.length?"?"+q.join("&"):"");
 }
 function scanZiel(p){
-  var z={vertrag:p.vertrag||null,art:p.art||null,med:p.med==="1",person:p.person||null,doc:p.doc||null};
+  var z={vertrag:p.vertrag||null,art:p.art||null,med:p.med==="1",person:p.person||null,doc:p.doc||null,nk:p.nk||null};
   if(z.vertrag&&!vertragById(z.vertrag))z.vertrag=null;
+  if(z.nk&&z.nk!=="neu"&&!nkById(z.nk))z.nk="neu";
   if(z.doc&&!DOCS.some(function(d){return d.id===z.doc;}))z.doc=null;
   return z;
 }
-function zielSchluessel(z){return [z.vertrag,z.art,z.med?1:0,z.person,z.doc].join("|");}
+function zielSchluessel(z){return [z.vertrag,z.art,z.med?1:0,z.person,z.doc,z.nk].join("|");}
 /* Vorgabe für die KI: Ausweise erst einmal nicht */
 function scanKiVorgabe(z){
   var c=z.vertrag?vertragById(z.vertrag):null,art=(c&&c.art)||z.art;
@@ -6588,7 +6902,8 @@ async function zuschnittAuto(){
 /* ================= Speichern ================= */
 function speichernHtml(){
   var n=SCAN.seiten.length,ad=anfuegenDok(),c=SCAN.ziel.vertrag?vertragById(SCAN.ziel.vertrag):null;
-  var wohin=ad?tf("Wird an „{0}“ angefügt",docTitel(ad)):(c?tf("Wird {0} zugeordnet",c.anbieter||artInfo(c.art).label):(SCAN.ziel.med?t("Landet im Bereich Gesundheit"):t("All-Home liest aus und schlägt die Zuordnung vor.")));
+  var nkZiel=SCAN.ziel.nk?(SCAN.ziel.nk==="neu"?null:nkById(SCAN.ziel.nk)):null;
+  var wohin=SCAN.ziel.nk?(nkZiel?tf("Kommt zur Nebenkostenabrechnung {0}",nkLabel(nkZiel)):t("Wird als Nebenkostenabrechnung ausgelesen")):ad?tf("Wird an „{0}“ angefügt",docTitel(ad)):(c?tf("Wird {0} zugeordnet",c.anbieter||artInfo(c.art).label):(SCAN.ziel.med?t("Landet im Bereich Gesundheit"):t("All-Home liest aus und schlägt die Zuordnung vor.")));
   return '<div class="sc-blatt"><div class="sc-blatt-in">'+
     '<div class="sc-kopf hell"><button class="ibtn" data-s="seiten" aria-label="'+esc(t("Zurück"))+'">'+ic("links")+'</button>'+
       '<span class="sc-titel">'+(ad?t("Seiten anfügen"):t("Scan speichern"))+'</span><span></span></div>'+
@@ -6683,11 +6998,28 @@ async function scanSpeichern(){
     var reihe={household_id:HH.id,filename:name,storage_path:pfade[0],weitere_seiten:pfade.slice(1),seiten:seiten.length,
       mime_type:mime,size_bytes:gesamt,doc_type:"sonstiges",content_hash:hash,contract_id:ziel.vertrag||null,ohne_ki:!opt.ki};
     if(ziel.med){reihe.bereich="medizin";reihe.person_id=opt.person||null;reihe.med_typ="sonstiges";reihe.fachrichtung="sonstiges";}
+    if(ziel.nk){
+      var mv=nkMieteVertrag(ziel.nk!=="neu"?nkById(ziel.nk):null);
+      reihe.doc_type="nebenkosten";reihe.nk_id=ziel.nk!=="neu"?ziel.nk:null;reihe.contract_id=ziel.vertrag||(mv?mv.id:null);reihe.ohne_ki=!opt.ki;
+      var nz=ziel.nk!=="neu"?nkById(ziel.nk):null;
+      reihe.titel=t("Nebenkostenabrechnung")+" "+(nz?nkLabel(nz):fmtDate(todayISO()));
+    }
     var ins=await sb.from("documents").insert(reihe).select("*").single();
     if(ins.error){await dateienWeg(pfade);throw new Error(netzFehler(ins.error));}
     var dok=ins.data;
     await entwurfLoeschen();
     var kiBilder=seiten.map(function(s){return s.ki;}).filter(Boolean);
+    /* Nebenkosten: statt der allgemeinen Auslesung die Abrechnung strukturiert lesen */
+    if(ziel.nk){
+      await ladeDaten();
+      var nkId=ziel.nk!=="neu"?ziel.nk:null;
+      SCAN_SPEICHERN=null;scannerAus();SCAN_INAPP=false;
+      if(opt.ki)volltextHolen(dok.id,kiBilder,"");
+      nkNach("#/nebenkosten"+(nkId?"?id="+nkId:""),function(){
+        if(opt.ki)nkAuslesen([dok.id],nkId,kiBilder);else nkFormular(nkId,null,[dok.id]);
+      });
+      return;
+    }
     if(opt.ki){
       arbeitText(t("All-Home liest das Dokument … (10–30 Sek.)"));
       var ergebnis=await kiAuslesen(dok,{bilder:kiBilder},ziel.med);
@@ -6996,6 +7328,817 @@ function scanKlick(ev){
   if(a==="entwurf-weg"){entwurfLoeschen();SCAN.entwurf=null;scanModus("kamera");return;}
 }
 
+/* ================= Nebenkostenabrechnung =================
+   Je Haus und Abrechnungszeitraum genau eine Abrechnung (butler.nk_abrechnungen).
+   Die KI liest aus; gerechnet, verglichen und geprüft wird hier – gleiche Eingaben,
+   gleiche Ergebnisse. Vergleichswerte: Betriebskostenspiegel des Deutschen Mieterbunds
+   (Euro je m² und Monat, Abrechnungsjahr 2024, veröffentlicht am 18.12.2025). */
+var NK=[];
+var NK_SPIEGEL={jahr:2024,gesamt:2.67,max:3.68};
+/* Kategorien nach § 2 BetrKV, zusammengefasst wie im Betriebskostenspiegel.
+   sp = Durchschnitt €/m²/Monat, p35a = übliche Einordnung für die Steuer */
+var NK_KAT={
+  heizung:          {l:"Heizung & Warmwasser",            icon:"🔥",sp:1.32},
+  wasser:           {l:"Wasser & Abwasser",               icon:"💧",sp:0.29},
+  grundsteuer:      {l:"Grundsteuer",                     icon:"🏛️",sp:0.18},
+  versicherung:     {l:"Versicherungen",                  icon:"🛡️",sp:0.31},
+  hauswart:         {l:"Hauswart",                        icon:"🧰",sp:0.21,p35a:"dienstleistung"},
+  gebaeudereinigung:{l:"Gebäudereinigung",                icon:"🧽",sp:0.21,p35a:"dienstleistung"},
+  muell:            {l:"Müllbeseitigung",                 icon:"🗑️",sp:0.16},
+  garten:           {l:"Gartenpflege",                    icon:"🌳",sp:0.15,p35a:"dienstleistung"},
+  aufzug:           {l:"Aufzug",                          icon:"🛗",sp:0.20,p35a:"handwerk"},
+  beleuchtung:      {l:"Allgemeinstrom",                  icon:"💡",sp:0.06},
+  strassenreinigung:{l:"Straßenreinigung & Winterdienst", icon:"🧹",sp:0.04,p35a:"dienstleistung"},
+  schornstein:      {l:"Schornsteinfeger",                icon:"🧑‍🏭",sp:0.04,p35a:"handwerk"},
+  antenne:          {l:"Antenne, Kabel, Glasfaser",       icon:"📡",sp:0.07},
+  waesche:          {l:"Wäschepflege",                    icon:"🧺",sp:null},
+  sonstige:         {l:"Sonstige Betriebskosten",         icon:"📄",sp:0.07},
+  nicht_umlagefaehig:{l:"Nicht umlagefähig",              icon:"⛔",sp:null}
+};
+var NK_SCHLUESSEL=[["","–"],["flaeche","Wohnfläche"],["personen","Personen"],["verbrauch","Verbrauch"],["einheiten","Wohneinheiten"],
+  ["miteigentum","Miteigentumsanteile"],["direkt","Direkt zugeordnet"],["sonstig","Sonstiger Schlüssel"]];
+var NK_ENERGIE=[["","–"],["gas","Gas"],["oel","Öl"],["fernwaerme","Fernwärme"],["waermepumpe","Wärmepumpe"],["pellets","Pellets / Holz"],["strom","Strom"],["sonstig","Sonstige"]];
+var NK_FOSSIL={gas:1,oel:1,fernwaerme:1};
+/* CO2KostAufG, Anlage: kg CO2 je m² und Jahr → Anteil des Mieters in % */
+var NK_CO2=[[12,100],[17,90],[22,80],[27,70],[32,60],[37,50],[42,40],[47,30],[52,20],[1e9,5]];
+var NK_FARBEN=["--nk1","--nk2","--nk3","--nk4","--nk5","--nk6","--nk7"];
+var NK_DATEI_ZIEL=null;   /* Abrechnung, an die gewählte Dateien kommen (null = neue) */
+/* Adresse wechseln und DANACH fn ausführen – der Adresswechsel schließt sonst ein eben geöffnetes Blatt */
+function nkNach(hash,fn){
+  if(location.hash===hash){render();fn();return;}
+  var h=function(){window.removeEventListener("hashchange",h);setTimeout(fn,0);};
+  window.addEventListener("hashchange",h);location.replace(hash);
+}
+
+/* ---------- Grundrechnung ---------- */
+function nkById(id){return NK.filter(function(n){return n.id===id;})[0]||null;}
+function nkSortiert(){return NK.slice().sort(function(a,b){return String(a.von).localeCompare(String(b.von));});}
+function nkTage(n){return Math.round((Date.parse(n.bis+"T00:00:00Z")-Date.parse(n.von+"T00:00:00Z"))/864e5)+1;}
+/* Länge in Kalendermonaten: 1.1.–31.12. sind genau 12, 1.4.–31.12. genau 9; Resttage anteilig */
+function nkMonate(n){
+  var a=String(n.von).split("-").map(Number),e=new Date(Date.parse(n.bis+"T00:00:00Z")+864e5);
+  var m=(e.getUTCFullYear()-a[0])*12+(e.getUTCMonth()+1-a[1])-(e.getUTCDate()<a[2]?1:0);
+  var anker=Date.parse(addMonthsISO(n.von,m)+"T00:00:00Z");
+  return m+Math.max(0,(e.getTime()-anker)/864e5)/30.436875;
+}
+function nkFaktor(n){var m=nkMonate(n);return m>0?12/m:1;}
+function nkVoll(n){return Math.abs(nkMonate(n)-12)<0.35;}
+/* „2025“ für ein Kalenderjahr, „2024/25“ für 12 Monate über den Jahreswechsel, sonst Monate */
+function nkLabel(n){
+  var v=String(n.von),b=String(n.bis);
+  if(v.slice(5)==="01-01"&&b.slice(5)==="12-31"&&v.slice(0,4)===b.slice(0,4))return v.slice(0,4);
+  if(nkVoll(n))return v.slice(0,4)+"/"+b.slice(2,4);
+  return v.slice(5,7)+"/"+v.slice(2,4)+"–"+b.slice(5,7)+"/"+b.slice(2,4);
+}
+function nkPos(n){return Array.isArray(n&&n.positionen)?n.positionen:[];}
+function nkBetrag(p){return numOrNull(p&&p.betrag)||0;}
+function nkKatVon(p){return NK_KAT[p&&p.kat]?p.kat:"sonstige";}
+function nkSumme(n){return nkPos(n).reduce(function(s,p){return s+nkBetrag(p);},0);}
+function nkKat(n){var o={};nkPos(n).forEach(function(p){var k=nkKatVon(p);o[k]=(o[k]||0)+nkBetrag(p);});return o;}
+function nkJeM2(betrag,n){var f=numOrNull(n.wohnflaeche);return f>0?betrag/f/nkMonate(n):null;}
+function nkVorgaenger(n){var l=nkSortiert(),i=l.map(function(x){return x.id;}).indexOf(n.id);return i>0?l[i-1]:null;}
+function nkNeueste(){var l=nkSortiert();return l.length?l[l.length-1]:null;}
+function nkHeiz(n){return (n&&n.heizung&&typeof n.heizung==="object")?n.heizung:{};}
+function nkHeizkosten(n){var k=numOrNull(nkHeiz(n).kosten);return k!=null?k:(nkKat(n).heizung||0);}
+/* Hauswart: ohne eigene Reinigung/Garten ist der Vergleichswert höher (0,37 statt 0,21) */
+function nkSpiegel(k,n){
+  var sp=NK_KAT[k]?NK_KAT[k].sp:null;
+  if(k==="hauswart"){var kk=nkKat(n);if(!kk.gebaeudereinigung&&!kk.garten)return 0.37;}
+  return sp;
+}
+function nkErgebnis(n){
+  var e=numOrNull(n.ergebnis);if(e!=null)return e;
+  var v=numOrNull(n.vorauszahlungen);return v!=null?Math.round((nkSumme(n)-v)*100)/100:null;
+}
+/* Vorschlag für die monatliche Vorauszahlung: Jahreskosten / 12, auf 5 € aufgerundet */
+function nkVorschlag(n){var m=nkSumme(n)*nkFaktor(n)/12;return m>0?Math.ceil(m/5)*5:null;}
+function monatsEnde(iso){var p=String(iso).split("-").map(Number);return isoAusUTC(new Date(Date.UTC(p[0],p[1],0)));}
+/* § 556 Abs. 3 BGB: Abrechnung binnen 12 Monaten nach Zeitraumende, Einwände bis Ende des 12. Monats nach Zugang */
+function nkFristAbrechnung(n){return addMonthsISO(n.bis,12);}
+function nkFristEinwand(n){return n.zugang_am?monatsEnde(addMonthsISO(n.zugang_am,12)):null;}
+function nkCo2Anteil(kg){for(var i=0;i<NK_CO2.length;i++)if(kg<NK_CO2[i][0])return NK_CO2[i][1];return 5;}
+function nkDelta(neu,alt){return (alt>0)?(neu-alt)/alt:null;}
+function prozent(x,d){return (x>0?"+":"")+num(x*100,d==null?0:d)+" %";}
+/* Mietvertrag des Hauses (für Zuordnung, Vorauszahlung und Vermieter) */
+function nkMieteVertrag(n){
+  if(n&&n.contract_id){var c=vertragById(n.contract_id);if(c)return c;}
+  var m=CONTRACTS.filter(function(c){return c.art==="miete";});
+  return m.filter(function(c){return c.status==="aktiv";})[0]||m[0]||null;
+}
+
+/* ================= Prüfungen =================
+   Jede liefert {art, titel, text, betrag?}. art: bad = vermutlich zu viel berechnet / Recht verletzt,
+   warn = prüfen, info = Hinweis, gut = alles in Ordnung. Keine Rechtsberatung – nur Anhaltspunkte. */
+function nkPruefen(n){
+  var h=[],vor=nkVorgaenger(n),summe=nkSumme(n),kat=nkKat(n),heiz=nkHeiz(n),heute=todayISO();
+  function dazu(art,titel,text,betrag){h.push({art:art,titel:titel,text:text,betrag:betrag==null?null:Math.round(betrag*100)/100});}
+  var erg=nkErgebnis(n);
+  /* ---- Fristen & Formales ---- */
+  var frist=nkFristAbrechnung(n);
+  if(n.zugang_am&&n.zugang_am>frist){
+    if(erg!=null&&erg>0)dazu("bad",t("Abrechnung zu spät – Nachzahlung meist nicht fällig"),
+      tf("Sie kam am {0}, abrechnen musste der Vermieter bis {1} (§ 556 Abs. 3 BGB). Eine Nachforderung ist dann in der Regel ausgeschlossen, außer er hat die Verspätung nicht zu vertreten.",fmtDate(n.zugang_am),fmtDate(frist)),erg);
+    else dazu("info",t("Abrechnung kam verspätet"),tf("Frist war der {0} – ein Guthaben steht dir trotzdem zu.",fmtDate(frist)));
+  }
+  if(nkMonate(n)>12.1)dazu("warn",t("Zeitraum länger als 12 Monate"),tf("{0} Tage abgerechnet – zulässig sind höchstens 12 Monate.",nkTage(n)));
+  var einwand=nkFristEinwand(n);
+  if(einwand&&einwand>=heute)dazu("info",tf("Einwände bis {0} möglich",fmtDate(einwand)),t("Bis zum Ende des zwölften Monats nach Zugang kannst du der Abrechnung widersprechen und Belege einsehen."));
+  if(!n.zugang_am)dazu("info",t("Zugangsdatum fehlt"),t("Trag ein, wann die Abrechnung ankam – dann rechnet All-Home die Fristen."));
+  if(vor){
+    var fa=numOrNull(vor.wohnflaeche),fn=numOrNull(n.wohnflaeche);
+    if(fa&&fn&&Math.abs(fa-fn)>0.05)dazu("warn",t("Wohnfläche geändert"),tf("Vorher {0} m², jetzt {1} m² – das verschiebt alle flächenbezogenen Kosten.",num(fa,2),num(fn,2)));
+    var sa={},sn={};
+    nkPos(vor).forEach(function(p){if(p.schluessel)sa[nkKatVon(p)]=p.schluessel;});
+    nkPos(n).forEach(function(p){if(p.schluessel)sn[nkKatVon(p)]=p.schluessel;});
+    Object.keys(sn).forEach(function(k){
+      if(sa[k]&&sa[k]!==sn[k])dazu("warn",tf("Verteilerschlüssel geändert: {0}",t(NK_KAT[k].l)),
+        tf("Vorher „{0}“, jetzt „{1}“. Ein Wechsel ist nur in engen Grenzen erlaubt – lass dir den Grund nennen.",t(schluesselName(sa[k])),t(schluesselName(sn[k]))));
+    });
+    var nachVor=addMonthsISO(vor.bis,0);
+    var tagNach=isoAusUTC(new Date(Date.parse(vor.bis+"T00:00:00Z")+864e5));
+    if(n.von>tagNach)dazu("info",t("Lücke zur vorigen Abrechnung"),tf("Die vorige endete am {0}, diese beginnt am {1}.",fmtDate(nachVor),fmtDate(n.von)));
+    else if(n.von<tagNach)dazu("warn",t("Zeiträume überschneiden sich"),tf("Die vorige endete am {0}, diese beginnt schon am {1}.",fmtDate(nachVor),fmtDate(n.von)));
+  }
+  var vz=numOrNull(n.vorauszahlungen),ergStand=numOrNull(n.ergebnis);
+  if(vz!=null&&ergStand!=null&&summe>0&&Math.abs(summe-vz-ergStand)>1)
+    dazu("warn",t("Rechnung geht nicht auf"),tf("Kosten {0} − Vorauszahlungen {1} = {2}, auf der Abrechnung steht {3}. Vielleicht fehlt eine Position.",eur(summe),eur(vz),eur(summe-vz),eur(ergStand)));
+  /* ---- Umlagefähigkeit ---- */
+  var nu=[],nuSumme=0;
+  nkPos(n).forEach(function(p){
+    var bez=String(p.bez||"");
+    var verdacht=nkKatVon(p)==="nicht_umlagefaehig"||(nkKatVon(p)!=="heizung"&&/verwalt|instandh|reparat|rücklage|ruecklage|kontof|bankgeb|porto|mahngeb|leerstand/i.test(bez));
+    if(/rauch/i.test(bez)&&/miete|leasing|mietgeb/i.test(bez))verdacht=true;    /* BGH VIII ZR 379/20: Miete für Rauchmelder nicht umlagefähig */
+    if(verdacht&&nkBetrag(p)>0){nu.push(bez||t(NK_KAT[nkKatVon(p)].l));nuSumme+=nkBetrag(p);}
+  });
+  if(nuSumme>0)dazu("bad",t("Nicht umlagefähige Kosten"),
+    tf("{0} – Verwaltung, Instandhaltung, Reparaturen, Rücklagen, Bankgebühren oder gemietete Rauchmelder dürfen Mietern nicht berechnet werden.",nu.join(", ")),nuSumme);
+  var kabel=0;
+  nkPos(n).forEach(function(p){
+    if(nkKatVon(p)!=="antenne"||/glasfaser/i.test(p.bez||""))return;
+    if(n.bis<"2024-07-01")return;
+    var ab=n.von>"2024-07-01"?n.von:"2024-07-01";
+    var anteil=(Date.parse(n.bis+"T00:00:00Z")-Date.parse(ab+"T00:00:00Z")+864e5)/(nkTage(n)*864e5);
+    kabel+=nkBetrag(p)*Math.max(0,Math.min(1,anteil));
+  });
+  if(kabel>=1)dazu("bad",t("Kabel-TV seit 1.7.2024 nicht mehr umlagefähig"),t("Das Nebenkostenprivileg ist entfallen. Für die Zeit ab Juli 2024 darf der Vermieter Kabel- oder Antennenkosten nicht mehr berechnen."),kabel);
+  if(kat.sonstige>0)dazu("info",t("Sonstige Betriebskosten"),t("Nur zulässig, wenn jede Kostenart im Mietvertrag ausdrücklich vereinbart ist (z. B. Dachrinnenreinigung, Rauchmelder-Wartung)."));
+  /* ---- Heizkosten (HeizkostenV, CO2KostAufG) ---- */
+  var hk=nkHeizkosten(n);
+  if(hk>0){
+    var va=numOrNull(heiz.verbrauchsanteil_pct);
+    if(va!=null&&(va<50||va>70))dazu("warn",tf("Verbrauchsanteil {0} %",num(va,0)),t("Die Heizkostenverordnung verlangt, dass 50 bis 70 % nach Verbrauch abgerechnet werden."));
+    if(heiz.verbrauchsabhaengig===false)dazu("bad",t("Heizkosten nicht nach Verbrauch abgerechnet"),t("Dann darfst du deinen Heizkostenanteil um 15 % kürzen (§ 12 HeizkostenV)."),hk*0.15);
+    var fossil=NK_FOSSIL[heiz.energietraeger]||!heiz.energietraeger;
+    if(heiz.co2_ausgewiesen===false&&n.bis>="2023-01-01"&&fossil)
+      dazu("bad",t("CO2-Kostenaufteilung fehlt"),t("Seit 2023 muss der Vermieter den CO2-Anteil nach dem Stufenmodell ausweisen. Fehlt er, darfst du die Heizkosten um 3 % kürzen (§ 7 Abs. 3 CO2KostAufG)."),hk*0.03);
+    var kg=numOrNull(heiz.co2_kg_m2),ma=numOrNull(heiz.co2_mieteranteil_pct);
+    if(kg!=null&&ma!=null&&Math.abs(nkCo2Anteil(kg)-ma)>0.5)
+      dazu("warn",t("CO2-Anteil passt nicht zur Stufe"),tf("Bei {0} kg CO2 je m² trägst du laut Gesetz {1} %, berechnet wurden {2} %.",num(kg,1),nkCo2Anteil(kg),num(ma,0)));
+    if(heiz.uvi===false&&heiz.fernablesbar===true&&n.bis>="2022-01-01")
+      dazu("bad",t("Monatliche Verbrauchsinfo fehlt"),t("Bei fernablesbaren Zählern muss der Vermieter monatlich über den Verbrauch informieren. Sonst darfst du um 3 % kürzen (§ 12 HeizkostenV)."),hk*0.03);
+  }
+  /* ---- Vergleich ---- */
+  var flaeche=numOrNull(n.wohnflaeche);
+  if(flaeche>0){
+    Object.keys(kat).forEach(function(k){
+      var sp=nkSpiegel(k,n),jm=nkJeM2(kat[k],n);
+      if(!sp||jm==null)return;
+      if(k==="antenne"&&kabel>=kat[k]-1)return;   /* ganz gestrichen – Vergleich sagt nichts mehr */
+      if(jm>sp*1.5&&kat[k]*nkFaktor(n)>=60)
+        dazu("warn",tf("{0} deutlich über dem Durchschnitt",t(NK_KAT[k].l)),tf("{0} je m² und Monat – im Schnitt sind es {1} (Betriebskostenspiegel {2}).",eur(jm),eur(sp),NK_SPIEGEL.jahr));
+    });
+    var ges=nkJeM2(summe,n);
+    if(ges!=null&&ges>NK_SPIEGEL.max)dazu("warn",t("Nebenkosten insgesamt sehr hoch"),tf("{0} je m² und Monat – selbst mit allen Kostenarten liegt der Schnitt bei {1}.",eur(ges),eur(NK_SPIEGEL.max)));
+  }else if(summe>0)dazu("info",t("Wohnfläche fehlt"),t("Mit der Wohnfläche vergleicht All-Home deine Kosten mit dem Betriebskostenspiegel."));
+  if(vor){
+    var ka=nkKat(vor),fv=nkFaktor(vor),fn2=nkFaktor(n);
+    Object.keys(kat).forEach(function(k){
+      var a=(ka[k]||0)*fv,b=kat[k]*fn2;
+      if(a>0&&b-a>=40&&(b-a)/a>=0.2)
+        dazu("warn",tf("{0}: {1} gegenüber {2}",t(NK_KAT[k].l),prozent((b-a)/a),nkLabel(vor)),
+          k==="grundsteuer"&&n.bis>="2025-01-01"
+            ?t("Seit 2025 gilt die neue Grundsteuer – höhere Bescheide sind möglich. Lass dir den Bescheid zeigen.")
+            :tf("Hochgerechnet auf 12 Monate {0} statt {1}. Belege einsehen und Grund erfragen.",eur(b),eur(a)));
+    });
+  }
+  if(erg!=null&&erg>0){
+    var vor2=nkVorschlag(n),neu=numOrNull(n.vorauszahlung_neu),jetzt=neu!=null?neu:(nkMieteVertrag(n)&&numOrNull((nkMieteVertrag(n).details||{}).nebenkosten));
+    if(vor2&&(jetzt==null||vor2>jetzt+4))dazu("info",tf("Vorauszahlung auf {0} anheben?",eur(vor2)),tf("So deckt sie die Kosten dieses Zeitraums – statt {0} Nachzahlung im nächsten Jahr.",eur(erg)));
+  }else if(erg!=null&&erg<-150){
+    var vor3=nkVorschlag(n);
+    if(vor3)dazu("info",t("Vorauszahlung senken möglich"),tf("{0} Guthaben – {1} im Monat würden die Kosten decken. Eine Senkung kannst du verlangen (§ 560 Abs. 4 BGB).",eur(-erg),eur(vor3)));
+  }
+  /* ---- Steuer (§ 35a EStG) ---- */
+  var st=nkSteuer(n);
+  if(st.dienst+st.handwerk>0)dazu("info",tf("Steuer: bis {0} Ermäßigung",eur(st.ermaessigung)),
+    tf("20 % der Arbeitskosten aus Hausmeister, Reinigung, Garten, Winterdienst ({0}) und Wartung/Schornsteinfeger ({1}) zählen bei der Einkommensteuer (§ 35a EStG).",eur(st.dienst),eur(st.handwerk)));
+  if(!h.some(function(x){return x.art==="bad"||x.art==="warn";}))dazu("gut",t("Keine Auffälligkeiten gefunden"),t("Fristen, umlagefähige Posten, Heizkosten und Vergleichswerte sind unauffällig."));
+  var reihe={bad:0,warn:1,info:2,gut:3};
+  return h.sort(function(a,b){return reihe[a.art]-reihe[b.art];});
+}
+function schluesselName(k){var s=NK_SCHLUESSEL.filter(function(x){return x[0]===k;})[0];return s?s[1]:String(k||"–");}
+/* § 35a: begünstigte Arbeitskosten – ausgewiesener Betrag, sonst die Position selbst (Obergrenze unbekannt) */
+function nkSteuer(n){
+  var d=0,hw=0,geschaetzt=false;
+  nkPos(n).forEach(function(p){
+    var art=p.p35a||null;if(!art)return;
+    var b=numOrNull(p.p35a_betrag);if(b==null){b=nkBetrag(p);geschaetzt=true;}
+    if(art==="dienstleistung")d+=b;else if(art==="handwerk")hw+=b;
+  });
+  return {dienst:d,handwerk:hw,ermaessigung:Math.min(d*0.2,4000)+Math.min(hw*0.2,1200),geschaetzt:geschaetzt};
+}
+function nkAuffaellig(n){return nkPruefen(n).filter(function(x){return x.art==="bad";});}
+
+/* ================= Übersicht ================= */
+function viewNebenkosten(){
+  var p=route().params;
+  if(p.id){var n=nkById(p.id);if(n)return nkDetail(n);}
+  var liste=nkSortiert(),c=nkMieteVertrag(null);
+  var kopf=zurueck(p.von==="vertrag"&&c?"#/vertrag?id="+c.id:"#/mehr",p.von==="vertrag"&&c?(c.anbieter||t("Miete")):t("Mehr"))+
+    seitenTitel(t("Nebenkosten"));
+  if(!liste.length)return kopf+'<section class="card"><div class="empty"><div class="ei">'+ic("euro",28)+'</div>'+
+    '<h3>'+t("Noch keine Abrechnung")+'</h3>'+
+    '<p>'+t("Lege jedes Jahr die Nebenkostenabrechnung ab – All-Home liest sie aus, vergleicht die Jahre und prüft Fristen, umlagefähige Posten und Heizkosten.")+'</p></div>'+
+    nkHinzuKnoepfe()+'</section>';
+  var neu=liste[liste.length-1],vor=nkVorgaenger(neu),summe=nkSumme(neu),erg=nkErgebnis(neu);
+  var d=vor?nkDelta(summe*nkFaktor(neu),nkSumme(vor)*nkFaktor(vor)):null,jm=nkJeM2(summe,neu);
+  var hinweise=nkPruefen(neu).filter(function(x){return x.art!=="gut";});
+  return kopf+
+    (HH?'<p class="hint" style="margin:-6px 0 14px">'+esc(HH.name||"")+(c?" · "+esc(c.anbieter||""):"")+'</p>':"")+
+    /* Kennzahlen des neuesten Zeitraums */
+    '<div class="kpis k3 nkkpi">'+
+      '<div class="kpi"><div class="kl">'+tf("Kosten {0}",nkLabel(neu))+'</div><div class="kv">'+eur0(summe)+'</div>'+
+        '<div class="ks">'+(d!=null?'<span class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+prozent(d)+'</span> '+t("ggü. Vorjahr"):(nkVoll(neu)?"":t("Teilzeitraum")))+'</div></div>'+
+      '<div class="kpi"><div class="kl">'+t("Je m² und Monat")+'</div><div class="kv">'+(jm!=null?eur(jm):"–")+'</div>'+
+        '<div class="ks">'+tf("Schnitt {0}",eur(NK_SPIEGEL.gesamt))+'</div></div>'+
+      '<div class="kpi"><div class="kl">'+(erg!=null&&erg<0?t("Guthaben"):t("Nachzahlung"))+'</div><div class="kv">'+(erg!=null?eur0(Math.abs(erg)):"–")+'</div>'+
+        '<div class="ks">'+(neu.erledigt?"✅ "+t("erledigt"):(erg!=null&&erg!==0?t("offen"):""))+'</div></div>'+
+    '</div>'+
+    /* Hinweise des neuesten Zeitraums */
+    (hinweise.length?'<div class="sect">'+tf("Auffälligkeiten {0}",nkLabel(neu))+'</div><div class="sugs">'+
+      hinweise.slice(0,4).map(nkHinweisHtml).join("")+'</div>'+
+      (hinweise.length>4?'<a class="lnk" href="#/nebenkosten?id='+neu.id+'" style="display:inline-block;margin-top:8px">'+tf("alle {0} Hinweise",hinweise.length)+'</a>':""):"")+
+    /* Entwicklung */
+    (liste.length>1||nkPos(neu).length?'<div class="sect">'+t("Entwicklung")+'</div>'+
+      '<section class="card">'+nkSaeulen(liste)+'</section>'+
+      (liste.some(function(n){return numOrNull(n.wohnflaeche)>0;})?'<section class="card" style="margin-top:12px">'+nkLinie(liste)+'</section>':"")+
+      '<div class="sect">'+t("Kosten je Kategorie")+'</div>'+
+      '<section class="card">'+nkTabelle(liste)+'</section>':"")+
+    (vor?nkTreiber(neu,vor):"")+
+    nkEinschaetzungKarte(liste)+
+    /* Alle Abrechnungen */
+    '<div class="sect">'+t("Abrechnungen")+'</div>'+
+    '<section class="card"><div class="dlist">'+liste.slice().reverse().map(function(n){
+      var e=nkErgebnis(n),auff=nkAuffaellig(n).length;
+      return '<a class="drow3" href="#/nebenkosten?id='+n.id+'">'+
+        '<span class="di">🧾</span><span class="db"><span class="dn">'+esc(nkLabel(n))+' · '+eur(nkSumme(n))+'</span>'+
+        '<span class="dm"><span>'+fmtDate(n.von)+'–'+fmtDate(n.bis)+'</span>'+
+          (e!=null?'<span>'+(e<0?t("Guthaben")+" "+eur(-e):t("Nachzahlung")+" "+eur(e))+'</span>':"")+
+          (auff?'<span class="pill warnp">'+tn(auff,"{0} Auffälligkeit","{0} Auffälligkeiten")+'</span>':"")+
+          (n.erledigt?'<span>✅</span>':"")+'</span></span>'+
+        '<span class="go">'+ic("right",16)+'</span></a>';
+    }).join("")+'</div>'+nkHinzuKnoepfe()+'</section>'+
+    '<div class="factions" style="margin-top:16px"><button class="btn ghost" data-a="nk-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button></div>'+
+    '<p class="hint" style="margin-top:14px">'+tf("Vergleichswerte: Betriebskostenspiegel des Deutschen Mieterbunds, Abrechnungsjahr {0}. Hinweise sind Anhaltspunkte, keine Rechtsberatung.",NK_SPIEGEL.jahr)+'</p>';
+}
+function nkHinzuKnoepfe(nkId){
+  var c=nkMieteVertrag(null);
+  return '<div class="factions" style="margin-top:14px">'+
+    '<button class="btn" data-a="scan" data-nk="'+(nkId||"neu")+'"'+(c?' data-vertrag="'+c.id+'"':"")+'>'+ic("camera")+' '+(nkId?t("Seite scannen"):t("Abrechnung scannen"))+'</button>'+
+    '<button class="btn ghost" data-a="nk-datei"'+(nkId?' data-id="'+nkId+'"':"")+'>'+ic("folder")+' '+t("Datei hochladen")+'</button>'+
+    (nkId?"":'<button class="btn ghost" data-a="nk-neu">'+ic("pencil")+' '+t("Von Hand eintragen")+'</button>')+
+  '</div>';
+}
+function nkHinweisHtml(x){
+  var art=x.art==="gut"?"good":x.art;
+  return '<div class="sug '+art+'"><span class="si">'+ic(x.art==="bad"?"alert":(x.art==="warn"?"alert":(x.art==="gut"?"check":"info")))+'</span>'+
+    '<div class="sb2"><div class="st">'+esc(x.titel)+(x.betrag?' <span class="nkbetrag">'+eur(x.betrag)+'</span>':"")+'</div><div class="sx">'+esc(x.text)+'</div></div></div>';
+}
+/* Größte Veränderungen gegenüber dem vorigen Zeitraum (auf 12 Monate gerechnet) */
+function nkTreiber(n,vor){
+  var a=nkKat(vor),b=nkKat(n),fa=nkFaktor(vor),fb=nkFaktor(n),keys={};
+  Object.keys(a).concat(Object.keys(b)).forEach(function(k){keys[k]=1;});
+  var l=Object.keys(keys).map(function(k){return {k:k,diff:(b[k]||0)*fb-(a[k]||0)*fa,alt:(a[k]||0)*fa};})
+    .filter(function(x){return Math.abs(x.diff)>=5;}).sort(function(x,y){return Math.abs(y.diff)-Math.abs(x.diff);}).slice(0,4);
+  if(!l.length)return "";
+  return '<div class="sect">'+tf("Kostentreiber {0} gegenüber {1}",nkLabel(n),nkLabel(vor))+'</div><section class="card"><div class="nktreib">'+
+    l.map(function(x){
+      return '<div class="nktr"><span>'+NK_KAT[x.k].icon+' '+esc(t(NK_KAT[x.k].l))+'</span>'+
+        '<span class="nkd '+(x.diff>0?"hoch":"runter")+'">'+(x.diff>0?"+":"−")+eur0(Math.abs(x.diff))+(x.alt>0?" ("+prozent(x.diff/x.alt)+")":"")+'</span></div>';
+    }).join("")+'</div><p class="hint" style="margin-top:8px">'+t("Auf 12 Monate gerechnet.")+'</p></section>';
+}
+
+/* ---------- Grafiken (eigenes SVG, Farben aus dem Design) ---------- */
+function nkGruppen(liste){
+  var tot={};
+  liste.forEach(function(n){var k=nkKat(n),f=nkFaktor(n);Object.keys(k).forEach(function(x){tot[x]=(tot[x]||0)+k[x]*f;});});
+  var reihe=Object.keys(tot).sort(function(a,b){return tot[b]-tot[a];});
+  var haupt=reihe.slice(0,6),farbe={},frei=NK_FARBEN.slice(2);
+  if(haupt.indexOf("heizung")>=0)farbe.heizung=NK_FARBEN[0];
+  if(haupt.indexOf("wasser")>=0)farbe.wasser=NK_FARBEN[1];
+  haupt.forEach(function(k){if(!farbe[k])farbe[k]=frei.shift()||"--muted-2";});
+  return {haupt:haupt,farbe:farbe,rest:reihe.length>6};
+}
+function nkSaeulen(liste){
+  var l=liste.slice(-6),g=nkGruppen(l),W=360,H=210,L=42,B=30,T=18,R=6;
+  var werte=l.map(function(n){var k=nkKat(n),f=nkFaktor(n),seg=g.haupt.map(function(x){return (k[x]||0)*f;});
+    var rest=Object.keys(k).filter(function(x){return g.haupt.indexOf(x)<0;}).reduce(function(s,x){return s+k[x]*f;},0);
+    seg.push(rest);return seg;});
+  var max=Math.max.apply(null,werte.map(function(s){return s.reduce(function(a,b){return a+b;},0);}).concat([1]));
+  var schritt=Math.pow(10,Math.floor(Math.log(max)/Math.LN10)),top=Math.ceil(max/schritt)*schritt;
+  if(top/schritt<3)schritt/=2;
+  var bw=Math.min(40,(W-L-R)/l.length*0.56),svg='';
+  for(var y=0;y<=top+0.001;y+=schritt){
+    var py=H-B-(y/top)*(H-B-T);
+    svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+py+'" y2="'+py+'" class="nkgrid"/><text x="'+(L-6)+'" y="'+(py+4)+'" class="nkax" text-anchor="end">'+esc(eur0(y))+'</text>';
+  }
+  l.forEach(function(n,i){
+    var cx=L+(i+0.5)*(W-L-R)/l.length,yy=H-B,summe=0;
+    werte[i].forEach(function(v,j){
+      if(v<=0)return;summe+=v;
+      var hgt=v/top*(H-B-T),farbe=j<g.haupt.length?g.farbe[g.haupt[j]]:"--muted-2";
+      svg+='<rect x="'+(cx-bw/2)+'" y="'+(yy-hgt)+'" width="'+bw+'" height="'+Math.max(0,hgt-1)+'" rx="3" style="fill:var('+farbe+')"/>';
+      yy-=hgt;
+    });
+    svg+='<text x="'+cx+'" y="'+(yy-5)+'" class="nkwert" text-anchor="middle">'+esc(eur0(summe))+(nkVoll(n)?"":"*")+'</text>'+
+      '<text x="'+cx+'" y="'+(H-B+18)+'" class="nkax" text-anchor="middle">'+esc(nkLabel(n))+'</text>';
+  });
+  var aria=l.map(function(n,i){return nkLabel(n)+": "+eur0(werte[i].reduce(function(a,b){return a+b;},0));}).join(", ");
+  return '<div class="nkchart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(t("Kosten je Zeitraum")+": "+aria)+'">'+svg+'</svg></div>'+
+    '<div class="nkleg">'+g.haupt.map(function(k){return '<span><i style="background:var('+g.farbe[k]+')"></i>'+esc(t(NK_KAT[k].l))+'</span>';}).join("")+
+      (g.rest?'<span><i style="background:var(--muted-2)"></i>'+t("Weitere")+'</span>':"")+'</div>'+
+    (l.some(function(n){return !nkVoll(n);})?'<p class="hint" style="margin-top:6px">* '+t("auf 12 Monate hochgerechnet")+'</p>':"");
+}
+function nkLinie(liste){
+  var l=liste.slice(-6).filter(function(n){return numOrNull(n.wohnflaeche)>0;});
+  if(!l.length)return "";
+  var W=360,H=160,L=34,B=26,T=18,R=44,pkt=l.map(function(n){return nkJeM2(nkSumme(n),n);});
+  /* Achse mit Luft nach oben, damit die Wertbeschriftung nicht an die oberste Linie stößt */
+  var roh=Math.max.apply(null,pkt.concat([NK_SPIEGEL.gesamt]))*1.18,schritt=roh<=2?0.5:(roh<=6?1:2);
+  var max=Math.ceil(roh/schritt)*schritt,min=0,EIN=16;
+  function py(v){return H-B-(v-min)/(max-min)*(H-B-T);}
+  function px(i){return l.length===1?(L+(W-L-R)/2):L+EIN+i*(W-L-R-2*EIN)/(l.length-1);}
+  var svg='',sy=py(NK_SPIEGEL.gesamt);
+  for(var v=0;v<=max+1e-9;v+=schritt)svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+py(v)+'" y2="'+py(v)+'" class="nkgrid"/><text x="'+(L-6)+'" y="'+(py(v)+4)+'" class="nkax" text-anchor="end">'+esc(num(v,v%1?1:0))+' €</text>';
+  svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+sy+'" y2="'+sy+'" class="nkspiegel"/><text x="'+(W-R+4)+'" y="'+(sy+4)+'" class="nkax">'+esc(t("Schnitt"))+'</text>';
+  if(l.length>1)svg+='<polyline class="nklinie" points="'+pkt.map(function(v,i){return px(i)+","+py(v);}).join(" ")+'"/>';
+  l.forEach(function(n,i){svg+='<circle cx="'+px(i)+'" cy="'+py(pkt[i])+'" r="4.5" class="nkpunkt"/>'+
+    '<text x="'+px(i)+'" y="'+(py(pkt[i])-10)+'" class="nkwert" text-anchor="middle">'+esc(num(pkt[i],2))+'</text>'+
+    '<text x="'+px(i)+'" y="'+(H-B+18)+'" class="nkax" text-anchor="middle">'+esc(nkLabel(n))+'</text>';});
+  return '<div class="nkkopf"><b>'+t("Je m² und Monat")+'</b><span class="hint" style="margin:0">'+tf("gestrichelt: Schnitt {0} (Mieterbund)",eur(NK_SPIEGEL.gesamt))+'</span></div>'+
+    '<div class="nkchart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(t("Je m² und Monat")+": "+l.map(function(n,i){return nkLabel(n)+" "+num(pkt[i],2)+" €";}).join(", "))+'">'+svg+'</svg></div>';
+}
+/* Kategorie × Zeitraum, letzte Spalte Veränderung (auf 12 Monate gerechnet) */
+function nkTabelle(liste){
+  var l=liste.slice(-4),keys={};
+  l.forEach(function(n){Object.keys(nkKat(n)).forEach(function(k){keys[k]=1;});});
+  var kat=Object.keys(NK_KAT).filter(function(k){return keys[k];});
+  var letzte=l[l.length-1],vor=l.length>1?l[l.length-2]:null;
+  function zelle(n,k){var v=nkKat(n)[k];return v?eur0(v):"–";}
+  return '<div class="nktab"><table class="nkt"><thead><tr><th>'+t("Kategorie")+'</th>'+l.map(function(n){return '<th>'+esc(nkLabel(n))+(nkVoll(n)?"":"*")+'</th>';}).join("")+
+    (vor?'<th>Δ</th>':"")+'</tr></thead><tbody>'+
+    kat.map(function(k){
+      var d=vor?nkDelta((nkKat(letzte)[k]||0)*nkFaktor(letzte),(nkKat(vor)[k]||0)*nkFaktor(vor)):null;
+      return '<tr><td>'+NK_KAT[k].icon+' '+esc(t(NK_KAT[k].l))+'</td>'+l.map(function(n){return '<td>'+zelle(n,k)+'</td>';}).join("")+
+        (vor?'<td class="nkd '+(d==null?"":(d>0.1?"hoch":(d<-0.05?"runter":"")))+'">'+(d==null?(nkKat(letzte)[k]?t("neu"):"–"):prozent(d))+'</td>':"")+'</tr>';
+    }).join("")+
+    '<tr class="nksum"><td>'+t("Gesamt")+'</td>'+l.map(function(n){return '<td>'+eur0(nkSumme(n))+'</td>';}).join("")+
+      (vor?(function(){var d=nkDelta(nkSumme(letzte)*nkFaktor(letzte),nkSumme(vor)*nkFaktor(vor));return '<td class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+(d==null?"–":prozent(d))+'</td>';})():"")+'</tr>'+
+    '</tbody></table></div>';
+}
+
+/* ================= Ein Zeitraum ================= */
+function nkDetail(n){
+  var summe=nkSumme(n),erg=nkErgebnis(n),kat=nkKat(n),vor=nkVorgaenger(n),heiz=nkHeiz(n),c=nkMieteVertrag(n);
+  var hinweise=nkPruefen(n),doks=DOCS.filter(function(d){return d.nk_id===n.id;}),st=nkSteuer(n);
+  var vzVertrag=c?numOrNull((c.details||{}).nebenkosten):null,vzNeu=numOrNull(n.vorauszahlung_neu);
+  var neueste=nkNeueste()&&nkNeueste().id===n.id;
+  var gruppen={};nkPos(n).forEach(function(p,i){var k=nkKatVon(p);(gruppen[k]=gruppen[k]||[]).push(p);});
+  return zurueck("#/nebenkosten",t("Nebenkosten"))+
+    '<div class="top" style="margin-bottom:10px"><div style="min-width:0"><div class="greet">'+fmtDate(n.von)+' – '+fmtDate(n.bis)+(c?" · "+esc(c.anbieter||""):"")+'</div>'+
+      '<div class="hh">'+tf("Nebenkosten {0}",nkLabel(n))+'</div></div></div>'+
+    '<div class="kpis nkkpi">'+
+      '<div class="kpi"><div class="kl">'+t("Kosten")+'</div><div class="kv">'+eur(summe)+'</div>'+
+        '<div class="ks">'+(nkJeM2(summe,n)!=null?eur(nkJeM2(summe,n))+" / m²·"+t("Monat"):"")+'</div></div>'+
+      '<div class="kpi"><div class="kl">'+(erg!=null&&erg<0?t("Guthaben"):t("Nachzahlung"))+'</div><div class="kv">'+(erg!=null?eur(Math.abs(erg)):"–")+'</div>'+
+        '<div class="ks">'+(n.vorauszahlungen!=null?tf("Vorauszahlungen {0}",eur(numOrNull(n.vorauszahlungen))):"")+'</div></div>'+
+    '</div>'+
+    (erg?'<div class="factions" style="margin:0 0 14px"><button class="btn '+(n.erledigt?"ghost":"")+'" data-a="nk-erledigt" data-id="'+n.id+'">'+
+      (n.erledigt?ic("check")+' '+(erg>0?t("Bezahlt"):t("Erstattet"))+" · "+t("rückgängig"):ic("check")+' '+(erg>0?t("Als bezahlt markieren"):t("Als erstattet markieren")))+'</button></div>':"")+
+    /* neue Vorauszahlung → Mietvertrag */
+    (neueste&&c&&vzNeu!=null&&(vzVertrag==null||Math.abs(vzVertrag-vzNeu)>0.004)?
+      '<div class="sug info" style="margin-bottom:14px"><span class="si">'+ic("link")+'</span><div class="sb2">'+
+        '<div class="st">'+tf("Neue Vorauszahlung {0} im Monat",eur(vzNeu))+'</div>'+
+        '<div class="sx">'+(vzVertrag!=null?tf("Im Mietvertrag stehen noch {0}.",eur(vzVertrag)):t("Im Mietvertrag ist noch keine Vorauszahlung eingetragen."))+'</div>'+
+        '<div class="sa"><button class="btn sm" data-a="nk-vz" data-id="'+n.id+'">'+t("In den Mietvertrag übernehmen")+'</button></div></div></div>':"")+
+    '<div class="sect">'+t("Prüfung")+'</div><div class="sugs">'+hinweise.map(nkHinweisHtml).join("")+'</div>'+
+    /* Positionen nach Kategorie */
+    '<div class="sect">'+t("Positionen")+'</div><section class="card">'+
+    (nkPos(n).length?Object.keys(NK_KAT).filter(function(k){return gruppen[k];}).map(function(k){
+      var sp=nkSpiegel(k,n),jm=nkJeM2(kat[k],n),va=vor?(nkKat(vor)[k]||0):null;
+      var d=va!=null&&va>0?nkDelta(kat[k]*nkFaktor(n),va*nkFaktor(vor)):null;
+      return '<div class="nkgr"><div class="nkgk"><span>'+NK_KAT[k].icon+' '+esc(t(NK_KAT[k].l))+'</span><b>'+eur(kat[k])+'</b></div>'+
+        '<div class="nkgm">'+(jm!=null?'<span>'+eur(jm)+' / m²</span>':"")+(sp&&jm!=null?'<span class="'+(jm>sp*1.5?"nkd hoch":"")+'">'+tf("Schnitt {0}",eur(sp))+'</span>':"")+
+          (d!=null?'<span class="nkd '+(d>0.1?"hoch":(d<-0.05?"runter":""))+'">'+prozent(d)+' '+t("ggü. Vorjahr")+'</span>':"")+'</div>'+
+        gruppen[k].map(function(p){
+          return '<div class="nkpos"><span class="nkpb">'+esc(p.bez||t(NK_KAT[k].l))+
+            (p.schluessel||p.anteil?'<span class="nkps">'+esc([p.schluessel?t(schluesselName(p.schluessel)):"",p.anteil||""].filter(Boolean).join(" · "))+
+              (numOrNull(p.haus)?" · "+tf("Haus {0}",eur0(numOrNull(p.haus))):"")+'</span>':"")+'</span>'+
+            (gruppen[k].length>1?'<span class="nkpw">'+eur(nkBetrag(p))+'</span>':"")+'</div>';
+        }).join("")+'</div>';
+    }).join("")+'<div class="nkgk nkges"><span>'+t("Gesamt")+'</span><b>'+eur(summe)+'</b></div>'
+      :'<p class="hint">'+t("Noch keine Positionen – über „Bearbeiten“ eintragen oder die Abrechnung auslesen lassen.")+'</p>')+
+    '</section>'+
+    /* Heizung */
+    (nkHeizkosten(n)>0||Object.keys(heiz).length?'<div class="sect">'+t("Heizung & Warmwasser")+'</div><section class="card"><div class="kvl">'+
+      kv(t("Heizkosten"),eur(nkHeizkosten(n)))+
+      (heiz.energietraeger?kv(t("Energie"),esc(t(energieName(heiz.energietraeger)))):"")+
+      (numOrNull(heiz.verbrauch)!=null?kv(t("Verbrauch"),esc(num(numOrNull(heiz.verbrauch),0)+" "+(heiz.einheit||""))):"")+
+      (numOrNull(heiz.warmwasser_m3)!=null?kv(t("Warmwasser"),esc(num(numOrNull(heiz.warmwasser_m3),1))+" m³"):"")+
+      (numOrNull(heiz.verbrauchsanteil_pct)!=null?kv(t("Nach Verbrauch"),esc(num(numOrNull(heiz.verbrauchsanteil_pct),0))+" %"):"")+
+      kv(t("CO2-Aufteilung"),heiz.co2_ausgewiesen===true?("✅ "+[numOrNull(heiz.co2_stufe)?tf("Stufe {0}",heiz.co2_stufe):"",numOrNull(heiz.co2_mieteranteil_pct)!=null?tf("dein Anteil {0} %",heiz.co2_mieteranteil_pct):"",numOrNull(heiz.co2_kosten)!=null?eur(numOrNull(heiz.co2_kosten)):""].filter(Boolean).join(" · ")):
+        (heiz.co2_ausgewiesen===false?"⚠️ "+t("fehlt"):t("unbekannt")))+
+      kv(t("Monatliche Verbrauchsinfo"),heiz.uvi===true?"✅ "+t("erhalten"):(heiz.uvi===false?"⚠️ "+t("nicht erhalten"):t("unbekannt")))+
+      (heiz.messdienst?kv(t("Messdienst"),esc(heiz.messdienst)):"")+
+    '</div></section>':"")+
+    /* Steuer */
+    (st.dienst+st.handwerk>0?'<div class="sect">'+t("Steuer (§ 35a EStG)")+'</div><section class="card"><div class="kvl">'+
+      kv(t("Haushaltsnahe Dienstleistungen"),eur(st.dienst))+kv(t("Handwerkerleistungen"),eur(st.handwerk))+
+      kv(t("Ermäßigung bis zu"),'<b>'+eur(st.ermaessigung)+'</b>')+'</div>'+
+      (st.geschaetzt?'<p class="hint">'+t("Nicht jede Position weist den Arbeitskostenanteil aus – dann ist hier der volle Betrag angesetzt. Den genauen Anteil nennt der Vermieter auf Nachfrage.")+'</p>':"")+'</section>':"")+
+    /* Angaben */
+    '<div class="sect">'+t("Angaben")+'</div><section class="card"><div class="kvl">'+
+      kv(t("Zeitraum"),fmtDate(n.von)+" – "+fmtDate(n.bis)+(nkVoll(n)?"":" ("+tn(Math.round(nkMonate(n)),"{0} Monat","{0} Monate")+")"))+
+      (n.erstellt_am?kv(t("Abrechnung vom"),fmtDate(n.erstellt_am)):"")+
+      kv(t("Erhalten am"),n.zugang_am?fmtDate(n.zugang_am):'<span class="mut">'+t("fehlt")+'</span>')+
+      (nkFristEinwand(n)?kv(t("Einwände bis"),fmtDate(nkFristEinwand(n))):"")+
+      kv(t("Abrechnungsfrist"),fmtDate(nkFristAbrechnung(n)))+
+      (numOrNull(n.wohnflaeche)?kv(t("Wohnfläche"),num(numOrNull(n.wohnflaeche),2)+" m²"):"")+
+      (numOrNull(n.personen)?kv(t("Personen"),num(numOrNull(n.personen),0)):"")+
+      (vzNeu!=null?kv(t("Neue Vorauszahlung"),eur(vzNeu)+" / "+t("Monat")):"")+
+      (n.notiz?kv(t("Notizen"),esc(n.notiz)):"")+
+    '</div></section>'+
+    /* Dokumente */
+    '<div class="sect">'+t("Dokumente")+'</div><section class="card">'+
+      (doks.length?'<div class="dlist">'+doks.map(function(d){
+        return '<button class="drow3" data-a="d-open" data-id="'+d.id+'"><span class="di">📄</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
+          '<span class="dm"><span>'+fmtDate(docDatum(d))+'</span>'+(d.seiten>1?'<span>'+tn(d.seiten,"{0} Seite","{0} Seiten")+'</span>':"")+'</span></span><span class="go">'+ic("right",16)+'</span></button>';
+      }).join("")+'</div>':'<p class="hint">'+t("Noch kein Dokument – etwa die Heizkostenabrechnung des Messdienstes dazulegen.")+'</p>')+
+      nkHinzuKnoepfe(n.id)+
+      (doks.length?'<div class="factions" style="margin-top:8px"><button class="btn ghost" data-a="nk-lesen" data-id="'+n.id+'">'+ic("sparkles")+' '+t("Alle Dokumente neu auslesen")+'</button></div>':"")+
+    '</section>'+
+    '<div class="factions" style="margin-top:20px">'+
+      '<button class="btn" data-a="nk-edit" data-id="'+n.id+'">'+ic("pencil")+' '+t("Bearbeiten")+'</button>'+
+      '<button class="btn ghost danger" data-a="nk-del" data-id="'+n.id+'">'+ic("trash")+' '+t("Abrechnung löschen")+'</button>'+
+    '</div>';
+}
+function energieName(k){var e=NK_ENERGIE.filter(function(x){return x[0]===k;})[0];return e?e[1]:String(k||"");}
+
+/* ================= Formular ================= */
+var NK_FORM=null;   /* {id, docIds, vorlage, positionen, ki} */
+function nkLeer(){var c=nkMieteVertrag(null),vor=nkNeueste();
+  var von=vor?isoAusUTC(new Date(Date.parse(vor.bis+"T00:00:00Z")+864e5)):(todayISO().slice(0,4)-1)+"-01-01";
+  return {contract_id:c?c.id:null,von:von,bis:addMonthsISO(von,12)<von?von:isoAusUTC(new Date(Date.parse(addMonthsISO(von,12)+"T00:00:00Z")-864e5)),
+    zugang_am:todayISO(),wohnflaeche:vor?vor.wohnflaeche:(c&&(c.details||{}).flaeche)||null,personen:vor?vor.personen:null,positionen:[],heizung:{}};}
+function nkFormular(id,vorlage,docIds){
+  var n=id?nkById(id):null;
+  var w=Object.assign({},n||nkLeer(),vorlage||{});
+  NK_FORM={id:id||null,docIds:(docIds||[]).slice(),ki:(vorlage&&vorlage.ki)||null,
+    positionen:JSON.parse(JSON.stringify(nkPos(w).length?nkPos(w):[{bez:"",kat:"grundsteuer",betrag:null}])),heizung:Object.assign({},w.heizung||{}),w:w};
+  nkFormZeichnen();
+}
+function nkFormZeichnen(){
+  var F=NK_FORM,w=F.w,h=F.heizung;
+  var miete=CONTRACTS.filter(function(c){return c.art==="miete"||c.art==="garage";});
+  var vOpts=[["",t("ohne Zuordnung")]].concat(miete.map(function(c){return [c.id,(c.anbieter||artInfo(c.art).label)+" · "+artInfo(c.art).label];}));
+  var katOpts=Object.keys(NK_KAT).map(function(k){return [k,NK_KAT[k].icon+" "+t(NK_KAT[k].l)];});
+  var schlOpts=NK_SCHLUESSEL.map(function(s){return [s[0],t(s[1])];});
+  var p35Opts=[["",t("nicht absetzbar")],["dienstleistung",t("Haushaltsnahe Dienstleistung")],["handwerk",t("Handwerkerleistung")]];
+  var jn=[["",t("unbekannt")],["ja",t("ja")],["nein",t("nein")]];
+  function jnWert(v){return v===true?"ja":(v===false?"nein":"");}
+  openModal('<h2 class="mhead">'+(F.id?ic("pencil")+' '+t("Abrechnung bearbeiten"):'🧾 '+t("Nebenkostenabrechnung"))+'</h2>'+
+    (F.ki?'<div class="sug info" style="margin-bottom:12px"><span class="si">'+ic("sparkles")+'</span><div class="sb2"><div class="st">'+t("Von der KI gelesen – bitte prüfen")+'</div>'+
+      '<div class="sx">'+esc(F.ki.hinweise||t("Gleich die Summen mit dem Papier vergleichen, dann speichern."))+'</div></div></div>':"")+
+    '<form id="nkForm" novalidate>'+
+      '<div class="two">'+fld(t("Zeitraum von"),inp("nk_von",w.von,"date"),true)+fld(t("bis"),inp("nk_bis",w.bis,"date"),true)+'</div>'+
+      '<div class="two">'+fld(t("Abrechnung vom"),inp("nk_erstellt",w.erstellt_am||"","date"))+fld(t("Erhalten am"),inp("nk_zugang",w.zugang_am||"","date"))+'</div>'+
+      (miete.length?fld(t("Mietvertrag"),sel("nk_vertrag",vOpts,w.contract_id||"")):"")+
+      '<div class="two">'+fld(t("Wohnfläche (m²)"),inp("nk_flaeche",w.wohnflaeche,"number"))+fld(t("Personen"),inp("nk_personen",w.personen,"number"))+'</div>'+
+      '<div class="mgrp">'+t("Ergebnis")+'</div>'+
+      '<div class="two">'+fld(t("Vorauszahlungen im Zeitraum (€)"),inp("nk_vz",w.vorauszahlungen,"number"))+fld(t("Nachzahlung (+) / Guthaben (−) (€)"),inp("nk_erg",w.ergebnis,"number"))+'</div>'+
+      fld(t("Neue Vorauszahlung je Monat (€)"),inp("nk_vzneu",w.vorauszahlung_neu,"number"))+
+      '<div class="mgrp">'+t("Positionen")+' <span class="mut" id="nkSumme">'+eur(F.positionen.reduce(function(s,p){return s+(numOrNull(p.betrag)||0);},0))+'</span></div>'+
+      '<div id="nkPosListe">'+F.positionen.map(function(p,i){
+        return '<div class="nkp" data-i="'+i+'">'+
+          '<div class="nkp1">'+inp("np_bez_"+i,p.bez||"","text",' placeholder="'+esc(t("Bezeichnung wie auf der Abrechnung"))+'"')+
+            '<button type="button" class="ibtn" data-a="nk-pos-weg" data-i="'+i+'" aria-label="'+esc(t("Position entfernen"))+'">'+ic("trash",18)+'</button></div>'+
+          '<div class="two">'+sel("np_kat_"+i,katOpts,NK_KAT[p.kat]?p.kat:"sonstige")+inp("np_betrag_"+i,p.betrag,"number",' placeholder="'+esc(t("Dein Anteil €"))+'"')+'</div>'+
+          '<details class="nkpm"'+(p.haus||p.schluessel||p.anteil||p.p35a?" open":"")+'><summary>'+t("Hauskosten, Schlüssel, Steuer")+'</summary>'+
+            '<div class="two">'+inp("np_haus_"+i,p.haus,"number",' placeholder="'+esc(t("Hauskosten gesamt €"))+'"')+sel("np_schl_"+i,schlOpts,p.schluessel||"")+'</div>'+
+            inp("np_anteil_"+i,p.anteil||"","text",' placeholder="'+esc(t("Anteil wie gedruckt, z. B. 82,5 von 1.240 m²"))+'"')+
+            '<div class="two">'+sel("np_p35_"+i,p35Opts,p.p35a||"")+inp("np_p35b_"+i,p.p35a_betrag,"number",' placeholder="'+esc(t("davon Arbeitskosten €"))+'"')+'</div>'+
+          '</details></div>';
+      }).join("")+'</div>'+
+      '<button type="button" class="btn ghost full" data-a="nk-pos-neu">'+ic("plus")+' '+t("Position hinzufügen")+'</button>'+
+      '<div class="mgrp">'+t("Heizung & Warmwasser")+'</div>'+
+      '<div class="two">'+fld(t("Energie"),sel("nh_energie",NK_ENERGIE.map(function(e){return [e[0],t(e[1])];}),h.energietraeger||""))+fld(t("Heizkosten (€)"),inp("nh_kosten",h.kosten,"number",' placeholder="'+esc(t("aus den Positionen"))+'"'))+'</div>'+
+      '<div class="two">'+fld(t("Verbrauch"),inp("nh_verbrauch",h.verbrauch,"number"))+fld(t("Einheit"),inp("nh_einheit",h.einheit||"","text",' placeholder="kWh"'))+'</div>'+
+      '<div class="two">'+fld(t("Nach Verbrauch (%)"),inp("nh_va",h.verbrauchsanteil_pct,"number",' placeholder="70"'))+fld(t("Warmwasser (m³)"),inp("nh_ww",h.warmwasser_m3,"number"))+'</div>'+
+      '<div class="two">'+fld(t("Nach Verbrauch abgerechnet?"),sel("nh_vabh",jn,jnWert(h.verbrauchsabhaengig)))+fld(t("CO2-Aufteilung ausgewiesen?"),sel("nh_co2",jn,jnWert(h.co2_ausgewiesen)))+'</div>'+
+      '<div class="two">'+fld(t("CO2 kg je m² und Jahr"),inp("nh_co2kg",h.co2_kg_m2,"number"))+fld(t("Dein CO2-Anteil (%)"),inp("nh_co2ma",h.co2_mieteranteil_pct,"number"))+'</div>'+
+      '<div class="two">'+fld(t("Monatliche Verbrauchsinfo erhalten?"),sel("nh_uvi",jn,jnWert(h.uvi)))+fld(t("Zähler fernablesbar?"),sel("nh_fern",jn,jnWert(h.fernablesbar)))+'</div>'+
+      fld(t("Notizen"),'<textarea class="inp" id="nk_notiz" rows="2">'+esc(w.notiz||"")+'</textarea>')+
+      '<div class="factions"><button class="btn lg" type="submit">'+ic("check")+' '+t("Speichern")+'</button>'+
+      '<button class="btn ghost" type="button" data-a="modal-close">'+t("Abbrechen")+'</button></div>'+
+    '</form>');
+}
+/* Formular in den Zustand lesen (vor dem Hinzufügen/Entfernen von Positionen und beim Speichern) */
+function nkFormLesen(){
+  var F=NK_FORM;if(!F)return null;
+  F.positionen=F.positionen.map(function(p,i){
+    if(!$("#np_bez_"+i))return p;
+    return {bez:val("np_bez_"+i),kat:val("np_kat_"+i)||"sonstige",betrag:valNum("np_betrag_"+i),haus:valNum("np_haus_"+i),
+      schluessel:val("np_schl_"+i)||null,anteil:val("np_anteil_"+i)||null,p35a:val("np_p35_"+i)||null,p35a_betrag:valNum("np_p35b_"+i)};
+  });
+  function jn(id){var v=val(id);return v==="ja"?true:(v==="nein"?false:null);}
+  F.heizung={energietraeger:val("nh_energie")||null,kosten:valNum("nh_kosten"),verbrauch:valNum("nh_verbrauch"),einheit:val("nh_einheit")||null,
+    verbrauchsanteil_pct:valNum("nh_va"),warmwasser_m3:valNum("nh_ww"),verbrauchsabhaengig:jn("nh_vabh"),co2_ausgewiesen:jn("nh_co2"),
+    co2_kg_m2:valNum("nh_co2kg"),co2_mieteranteil_pct:valNum("nh_co2ma"),uvi:jn("nh_uvi"),fernablesbar:jn("nh_fern"),
+    co2_stufe:F.heizung.co2_stufe||null,co2_kosten:F.heizung.co2_kosten==null?null:F.heizung.co2_kosten,messdienst:F.heizung.messdienst||null};
+  F.w=Object.assign({},F.w,{von:val("nk_von"),bis:val("nk_bis"),erstellt_am:val("nk_erstellt")||null,zugang_am:val("nk_zugang")||null,
+    contract_id:$("#nk_vertrag")?(val("nk_vertrag")||null):F.w.contract_id,wohnflaeche:valNum("nk_flaeche"),personen:valNum("nk_personen"),
+    vorauszahlungen:valNum("nk_vz"),ergebnis:valNum("nk_erg"),vorauszahlung_neu:valNum("nk_vzneu"),notiz:val("nk_notiz")||null});
+  return F;
+}
+function nkPosNeu(){var F=nkFormLesen();F.positionen.push({bez:"",kat:"sonstige",betrag:null});var y=$("#modalBox").scrollTop;nkFormZeichnen();$("#modalBox").scrollTop=y;
+  var e=$("#np_bez_"+(F.positionen.length-1));if(e)e.focus();}
+function nkPosWeg(i){var F=nkFormLesen();F.positionen.splice(i,1);var y=$("#modalBox").scrollTop;nkFormZeichnen();$("#modalBox").scrollTop=y;}
+var NK_BUSY=false;
+async function nkSpeichern(){
+  if(NK_BUSY||!HH)return;
+  var zahlen=["nk_flaeche","nk_personen","nk_vz","nk_erg","nk_vzneu","nh_kosten","nh_verbrauch","nh_va","nh_ww","nh_co2kg","nh_co2ma"];
+  NK_FORM.positionen.forEach(function(p,i){zahlen.push("np_betrag_"+i,"np_haus_"+i,"np_p35b_"+i);});
+  if(zahlFehlt(zahlen)){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
+  var F=nkFormLesen(),w=F.w;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(w.von||"")||!/^\d{4}-\d{2}-\d{2}$/.test(w.bis||"")||w.bis<w.von){
+    var e=$(!w.von?"#nk_von":"#nk_bis");if(e){e.classList.add("bad");e.focus();}
+    toast(t("Bitte den Abrechnungszeitraum angeben (bis nach von)."),true);return;}
+  var reihe={household_id:HH.id,contract_id:w.contract_id||null,von:w.von,bis:w.bis,erstellt_am:w.erstellt_am,zugang_am:w.zugang_am,
+    wohnflaeche:w.wohnflaeche,personen:w.personen,vorauszahlungen:w.vorauszahlungen,vorauszahlung_neu:w.vorauszahlung_neu,ergebnis:w.ergebnis,
+    positionen:F.positionen.filter(function(p){return p.bez||p.betrag!=null;}),heizung:F.heizung,notiz:w.notiz};
+  if(F.ki)reihe.ki=F.ki;
+  /* Gleicher Zeitraum schon da → Korrektur ersetzt die Werte, Dokumente bleiben */
+  var ziel=F.id,gleich=NK.filter(function(x){return x.von===w.von&&x.bis===w.bis&&x.id!==F.id;})[0];
+  if(gleich){
+    if(F.id){toast(t("Zwei Abrechnungen mit demselben Zeitraum – bitte zuerst die andere löschen."),true);return;}
+    if(!confirm(tf("Für {0} gibt es schon eine Abrechnung. Als Korrektur übernehmen? Die bisherigen Werte werden ersetzt, ihre Dokumente bleiben erhalten.",nkLabel(gleich))))return;
+    ziel=gleich.id;reihe.erledigt=false;
+  }
+  NK_BUSY=true;
+  try{
+    var r=ziel?await sb.from("nk_abrechnungen").update(reihe).eq("id",ziel).select("id")
+              :await sb.from("nk_abrechnungen").insert(reihe).select("id");
+    if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts gespeichert – fehlende Berechtigung?"));
+    var id=r.data[0].id;
+    if(F.docIds.length){
+      var dr=await sb.from("documents").update({nk_id:id,contract_id:reihe.contract_id,doc_type:"nebenkosten"}).in("id",F.docIds).select("id");
+      if(dr.error)throw dr.error;
+    }
+    NK_FORM=null;closeModal(true);await ladeDaten();
+    go("#/nebenkosten?id="+id);toast(t("Gespeichert")+" ✅");
+  }catch(x){toast(t("Speichern fehlgeschlagen")+": "+errMsg(x),true);}
+  finally{NK_BUSY=false;}
+}
+async function nkLoeschen(id){
+  var n=nkById(id);if(!n)return;
+  if(!confirm(tf("Abrechnung {0} löschen? Die Dokumente bleiben erhalten.",nkLabel(n))))return;
+  try{
+    var r=await sb.from("nk_abrechnungen").delete().eq("id",id).select("id");
+    if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts gelöscht – fehlende Berechtigung?"));
+    await ladeDaten();go("#/nebenkosten");toast(t("Abrechnung gelöscht"));
+  }catch(x){toast(t("Löschen fehlgeschlagen")+": "+errMsg(x),true);}
+}
+async function nkErledigt(id){
+  var n=nkById(id);if(!n)return;
+  try{var r=await sb.from("nk_abrechnungen").update({erledigt:!n.erledigt}).eq("id",id).select("id");
+    if(r.error)throw r.error;await ladeDaten();render();}
+  catch(x){toast(t("Speichern fehlgeschlagen")+": "+errMsg(x),true);}
+}
+/* Neue Vorauszahlung in den Mietvertrag (Feld „Nebenkosten (€/Monat)“) */
+async function nkVzUebernehmen(id){
+  var n=nkById(id),c=n&&nkMieteVertrag(n);if(!c||n.vorauszahlung_neu==null)return;
+  var det=Object.assign({},c.details||{});det.nebenkosten=numOrNull(n.vorauszahlung_neu);
+  try{var r=await sb.from("contracts").update({details:det}).eq("id",c.id).select("id");
+    if(r.error)throw r.error;if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts geändert – fehlende Berechtigung?"));
+    await ladeDaten();render();toast(t("Übernommen")+" ✅");}
+  catch(x){toast(t("Speichern fehlgeschlagen")+": "+errMsg(x),true);}
+}
+
+/* ================= Auslesen ================= */
+/* Dateien wählen (PDF/Fotos): ablegen, dann gemeinsam auslesen */
+async function nkDateienHochladen(dateien,nkId){
+  dateien=Array.prototype.slice.call(dateien||[]);if(!dateien.length||!HH)return;
+  var c=nkMieteVertrag(nkId?nkById(nkId):null),ids=[];
+  nkArbeit(t("Dateien werden abgelegt …"));
+  try{
+    for(var i=0;i<dateien.length;i++){
+      var f=dateien[i],pdf=f.type==="application/pdf"||/\.pdf$/i.test(f.name||"");
+      if(!pdf&&!/^image\//.test(f.type))throw new Error(t("Format nicht unterstützt (nur PDF oder Foto)."));
+      if(pdf&&f.size>12*1024*1024)throw new Error(t("PDF größer als 12 MB"));
+      var blob=pdf?f:await bildKlein(f),mime=pdf?"application/pdf":"image/jpeg",name=(f.name||"nebenkosten").replace(/\.[^.]+$/,"")+(pdf?".pdf":".jpg");
+      var bytes=new Uint8Array(await blob.arrayBuffer()),pfad=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_"+pfadName(name);
+      var up=await hochladenMitWiederholung(pfad,bytes,mime);if(up.error)throw new Error(netzFehler(up.error));
+      var ins=await sb.from("documents").insert({household_id:HH.id,filename:name,storage_path:pfad,mime_type:mime,size_bytes:bytes.length,
+        doc_type:"nebenkosten",content_hash:await inhaltHash(bytes),contract_id:c?c.id:null,nk_id:nkId||null}).select("id").single();
+      if(ins.error){await dateienWeg([pfad]);throw new Error(netzFehler(ins.error));}
+      ids.push(ins.data.id);
+    }
+    await ladeDaten();
+  }catch(x){closeModal(true);toast(errMsg(x),true);if(ids.length)await ladeDaten();return;}
+  await nkAuslesen(ids,nkId||null,null);
+}
+function nkArbeit(txt){openModal('<div class="nkarbeit"><span class="spin"></span><p id="nkArbeitTxt">'+esc(txt)+'</p></div>');}
+/* Ein oder mehrere Dokumente (bei einer bestehenden Abrechnung: alle ihre Dokumente) gemeinsam lesen */
+async function nkAuslesen(docIds,nkId,bilderVorab){
+  var ids=docIds.slice();
+  if(nkId)DOCS.forEach(function(d){if(d.nk_id===nkId&&ids.indexOf(d.id)<0)ids.push(d.id);});
+  nkArbeit(t("All-Home liest die Abrechnung … (20–60 Sek.)"));
+  try{
+    var dateien=[],summe=0;
+    if(bilderVorab&&bilderVorab.length&&ids.length===1)dateien=bilderVorab.map(function(b){return {data:bytesBase64(b),mime:"image/jpeg"};});
+    else for(var i=0;i<ids.length;i++){
+      var d=DOCS.filter(function(x){return x.id===ids[i];})[0];if(!d)continue;
+      if((d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||"")){
+        (await bilderDesDokuments(d)).forEach(function(b){dateien.push({data:bytesBase64(b),mime:"image/jpeg"});});
+      }else{
+        var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+        if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+        dateien.push({data:bytesBase64(new Uint8Array(await dl.data.arrayBuffer())),mime:"application/pdf"});
+      }
+    }
+    dateien.forEach(function(x){summe+=x.data.length;});
+    if(!dateien.length)throw new Error(t("Kein Dokument zum Auslesen gefunden."));
+    if(dateien.length>20||summe>19000000)throw new Error(t("Zu viele oder zu große Dateien für einen Durchgang – bitte einzeln ablegen."));
+    var b=await edgeRuf(EDGE_EXTRACT,{modus:"nk",dateien:dateien,model:kiStufe(),lang:curLang});
+    if(!b.abrechnung)throw new Error(t("Nichts erkannt."));
+    closeModal(true);
+    nkFormular(nkId,nkAusKi(b.abrechnung,b.modell),ids);
+  }catch(x){
+    closeModal(true);
+    if(x&&x.code==="ki_guthaben")toast(t("Das KI-Guthaben ist aufgebraucht – bitte die Werte von Hand eintragen."),true);
+    else toast(t("Auslesen fehlgeschlagen")+": "+errMsg(x),true);
+    nkFormular(nkId,null,ids);
+  }
+}
+/* KI-Antwort → Formularwerte (nur gültige Codes, Zahlen als Zahl) */
+function nkAusKi(a,modell){
+  function z(v){return numOrNull(v);}
+  function d(v){return /^\d{4}-\d{2}-\d{2}$/.test(String(v||""))?String(v):null;}
+  function jn(v){return v===true?true:(v===false?false:null);}
+  var h=a.heizung||{};
+  var schl={};NK_SCHLUESSEL.forEach(function(s){if(s[0])schl[s[0]]=1;});
+  var v={positionen:(Array.isArray(a.positionen)?a.positionen:[]).map(function(p){
+      return {bez:String(p.bezeichnung||"").slice(0,120),kat:NK_KAT[p.kategorie]?p.kategorie:"sonstige",betrag:z(p.betrag),haus:z(p.hauskosten),
+        schluessel:schl[p.schluessel]?p.schluessel:null,anteil:p.anteilText?String(p.anteilText).slice(0,80):null,
+        p35a:(p.p35a==="dienstleistung"||p.p35a==="handwerk")?p.p35a:null,p35a_betrag:z(p.p35aBetrag)};
+    }).filter(function(p){return p.bez||p.betrag!=null;}),
+    heizung:{energietraeger:NK_ENERGIE.some(function(e){return e[0]&&e[0]===h.energietraeger;})?h.energietraeger:null,kosten:z(h.kosten),
+      verbrauch:z(h.verbrauch),einheit:h.verbrauchEinheit||null,verbrauchsanteil_pct:z(h.verbrauchsanteilProzent),warmwasser_m3:z(h.warmwasserM3),
+      verbrauchsabhaengig:jn(h.verbrauchsabhaengig),co2_ausgewiesen:jn(h.co2Ausgewiesen),co2_kg_m2:z(h.co2KgProM2),co2_stufe:z(h.co2Stufe),
+      co2_mieteranteil_pct:z(h.co2MieteranteilProzent),co2_kosten:z(h.co2KostenMieter),uvi:jn(h.verbrauchsinfoErhalten),fernablesbar:jn(h.fernablesbar),
+      messdienst:h.messdienst?String(h.messdienst).slice(0,60):null},
+    ki:{modell:modell||null,am:new Date().toISOString(),hinweise:a.hinweise||"",vermieter:a.vermieter||null}};
+  if(d(a.zeitraumVon))v.von=d(a.zeitraumVon);
+  if(d(a.zeitraumBis))v.bis=d(a.zeitraumBis);
+  if(d(a.erstelltAm))v.erstellt_am=d(a.erstelltAm);
+  ["wohnflaeche","personen","vorauszahlungen","ergebnis"].forEach(function(k){if(z(a[k])!=null)v[k]=z(a[k]);});
+  if(z(a.vorauszahlungNeu)!=null)v.vorauszahlung_neu=z(a.vorauszahlungNeu);
+  return v;
+}
+/* Sieht ein gewöhnlich hochgeladenes Dokument nach Nebenkostenabrechnung aus? */
+function nkVerdacht(d){
+  var ext=(d&&d.extracted)||{},txt=[d&&d.titel,ext.titel,ext.zusammenfassung].filter(Boolean).join(" ");
+  return !d.nk_id&&/nebenkost|betriebskost|heizkostenabrechnung|heiz-? und warmwasserkost/i.test(txt);
+}
+
+/* ================= KI-Einschätzung über alle Jahre ================= */
+function nkStand(liste){return liste.map(function(n){return n.id+":"+(n.updated_at||"");}).join("|");}
+function nkEinschaetzungKarte(liste){
+  var e=SETUP&&SETUP.nk_einschaetzung,inh=e&&e.inhalt,alt=e&&e.stand!==nkStand(liste);
+  var art={gut:["good","check"],auffaellig:["warn","alert"],handeln:["bad","alert"]};
+  return '<div class="sect">'+t("KI-Einschätzung")+'</div><section class="card">'+
+    (inh?'<p style="margin:0 0 12px">'+esc(inh.kurz||"")+'</p>'+
+      (Array.isArray(inh.punkte)?'<div class="sugs">'+inh.punkte.slice(0,7).map(function(p){var a=art[p.art]||["info","info"];
+        return '<div class="sug '+a[0]+'"><span class="si">'+ic(a[1])+'</span><div class="sb2"><div class="st">'+esc(p.titel||"")+'</div><div class="sx">'+esc(p.text||"")+'</div></div></div>';}).join("")+'</div>':"")+
+      (inh.empfehlung?'<p style="margin:12px 0 0"><b>'+t("Empfehlung")+':</b> '+esc(inh.empfehlung)+'</p>':"")+
+      '<p class="hint" style="margin-top:10px">'+tf("Stand {0}",fmtDate(String(e.am||"").slice(0,10)))+(alt?" · "+t("seitdem neue Daten"):"")+'</p>'
+     :'<p class="hint" style="margin:0">'+t("Die KI liest alle Jahre zusammen und sagt in ein paar Sätzen, was auffällt und was du tun kannst. Kostet wenige Cent.")+'</p>')+
+    '<div class="factions" style="margin-top:12px"><button class="btn'+(inh&&!alt?" ghost":"")+'" data-a="nk-ki">'+ic("sparkles")+' '+(inh?t("Neu einschätzen"):t("Jahre einschätzen lassen"))+'</button></div>'+
+  '</section>';
+}
+async function nkEinschaetzen(){
+  var liste=nkSortiert();if(!liste.length||!HH)return;
+  var daten={spiegel_gesamt:NK_SPIEGEL.gesamt,spiegel_jahr:NK_SPIEGEL.jahr,zeitraeume:liste.map(function(n){
+    var k=nkKat(n),kat={};
+    Object.keys(k).forEach(function(x){kat[x]={betrag:Math.round(k[x]*100)/100,je_m2_monat:nkJeM2(k[x],n)==null?null:Math.round(nkJeM2(k[x],n)*100)/100,spiegel:nkSpiegel(x,n)};});
+    return {zeitraum:nkLabel(n),von:n.von,bis:n.bis,monate:Math.round(nkMonate(n)*10)/10,wohnflaeche:numOrNull(n.wohnflaeche),personen:numOrNull(n.personen),
+      kosten:Math.round(nkSumme(n)*100)/100,je_m2_monat:nkJeM2(nkSumme(n),n)==null?null:Math.round(nkJeM2(nkSumme(n),n)*100)/100,
+      vorauszahlungen:numOrNull(n.vorauszahlungen),ergebnis:nkErgebnis(n),kategorien:kat,heizung:n.heizung||{},
+      hinweise:nkPruefen(n).filter(function(x){return x.art!=="gut";}).map(function(x){return x.titel+(x.betrag?" ("+x.betrag+" EUR)":"");})};
+  })};
+  nkArbeit(t("Die KI ordnet die Jahre ein …"));
+  try{
+    var b=await edgeRuf(EDGE_EXTRACT,{modus:"nk-bewertung",textContent:JSON.stringify(daten),model:kiStufe(),lang:curLang});
+    if(!b.einschaetzung)throw new Error(t("Nichts erkannt."));
+    var wert={inhalt:b.einschaetzung,am:new Date().toISOString(),stand:nkStand(liste),lang:curLang,modell:b.modell||null};
+    var r=await sb.from("household_setup").update({nk_einschaetzung:wert}).eq("household_id",HH.id).select("household_id");
+    if(r.error)throw r.error;
+    if(!r.data||!r.data.length){
+      var r2=await sb.from("household_setup").upsert({household_id:HH.id,arten:aktiveArten(),eingerichtet:!!(SETUP&&SETUP.eingerichtet),nk_einschaetzung:wert}).select("*").single();
+      if(r2.error)throw r2.error;
+    }
+    SETUP=Object.assign({},SETUP||{},{nk_einschaetzung:wert});
+    closeModal(true);render();
+  }catch(x){closeModal(true);
+    if(x&&x.code==="ki_guthaben")toast(t("Das KI-Guthaben ist aufgebraucht – bitte später erneut."),true);
+    else toast(t("Einschätzung fehlgeschlagen")+": "+errMsg(x),true);}
+}
+
+/* ================= Steuerübersicht (CSV) ================= */
+function nkCsv(){
+  function z(v){var s=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+  function geld(v){return v==null?"":Number(v).toFixed(2).replace(".",",");}
+  var zeilen=[[t("Zeitraum"),t("Position"),t("Kategorie"),t("Art nach § 35a"),t("Betrag"),t("davon Arbeitskosten"),t("Ermäßigung 20 %")]];
+  nkSortiert().forEach(function(n){
+    nkPos(n).forEach(function(p){
+      if(!p.p35a)return;
+      var a=numOrNull(p.p35a_betrag);
+      zeilen.push([nkLabel(n),p.bez||"",t(NK_KAT[nkKatVon(p)].l),p.p35a==="handwerk"?t("Handwerkerleistung"):t("Haushaltsnahe Dienstleistung"),
+        geld(nkBetrag(p)),geld(a),geld((a!=null?a:nkBetrag(p))*0.2)]);
+    });
+  });
+  if(zeilen.length<2){toast(t("Keine steuerlich absetzbaren Positionen erfasst."),true);return;}
+  var csv="﻿"+zeilen.map(function(r){return r.map(z).join(";");}).join("\r\n");
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download="nebenkosten-steuer.csv";document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);
+}
+
+/* ================= Einbindung: Termine, Vorschläge, Kosten ================= */
+function nkTermine(){
+  var raus=[],neu=nkNeueste(),heute=todayISO();if(!neu)return raus;
+  var e=nkFristEinwand(neu);
+  if(e&&e>=heute)raus.push({days:daysUntil(e),level:ampel(daysUntil(e)),icon:"🧾",titel:tf("Nebenkosten {0}",nkLabel(neu)),
+    text:t("Ende der Einwendungsfrist")+" · "+fmtDate(e),href:"#/nebenkosten?id="+neu.id});
+  /* nächste Abrechnung: Zeitraum endet 12 Monate nach dem letzten, der Vermieter hat 12 Monate Zeit */
+  var naechstesEnde=addMonthsISO(neu.bis,12),spaetestens=addMonthsISO(naechstesEnde,12);
+  if(naechstesEnde<heute)raus.push({days:daysUntil(spaetestens),level:daysUntil(spaetestens)<0?"red":"gray",icon:"🧾",
+    titel:t("Nächste Nebenkostenabrechnung"),text:t("Muss spätestens kommen")+" · "+fmtDate(spaetestens),href:"#/nebenkosten"});
+  return raus;
+}
+function nkVorschlaege(){
+  var v=[],neu=nkNeueste(),heute=todayISO();if(!neu)return v;
+  var bad=nkAuffaellig(neu),erg=nkErgebnis(neu);
+  if(bad.length){
+    var sum=bad.reduce(function(s,x){return s+(x.betrag||0);},0);
+    v.push({key:"nk:"+neu.id+":"+bad.length,art:"bad",icon:"alert",titel:tf("Nebenkosten {0}: {1}",nkLabel(neu),tn(bad.length,"{0} Auffälligkeit","{0} Auffälligkeiten")),
+      text:bad.map(function(x){return x.titel;}).join(" · ")+(sum>0?" · "+tf("bis zu {0}",eur(sum)):""),knopf:t("Ansehen"),href:"#/nebenkosten?id="+neu.id});
+  }
+  if(erg!=null&&erg>0&&!neu.erledigt)v.push({key:"nkzahl:"+neu.id,art:"warn",icon:"euro",titel:tf("Nachzahlung {0} offen",eur(erg)),
+    text:tf("Nebenkosten {0}",nkLabel(neu))+(bad.length?" · "+t("vorher die Auffälligkeiten klären"):""),knopf:t("Ansehen"),href:"#/nebenkosten?id="+neu.id});
+  var e=nkFristEinwand(neu);
+  if(e&&e>=heute&&daysUntil(e)<=30&&bad.length)v.push({key:"nkeinwand:"+neu.id,art:"warn",icon:"clock",titel:tf("Einwände nur noch bis {0}",fmtDate(e)),
+    text:t("Danach gilt die Abrechnung als anerkannt."),knopf:t("Ansehen"),href:"#/nebenkosten?id="+neu.id});
+  var spaet=addMonthsISO(addMonthsISO(neu.bis,12),12);
+  if(spaet<heute&&!NK.some(function(n){return n.von>neu.bis;}))v.push({key:"nkfehlt:"+neu.bis,art:"info",icon:"clock",
+    titel:t("Nebenkostenabrechnung überfällig"),text:tf("Für den Zeitraum nach {0} hätte der Vermieter bis {1} abrechnen müssen. Eine Nachzahlung kann er dann meist nicht mehr verlangen.",fmtDate(neu.bis),fmtDate(spaet)),
+    knopf:t("Ansehen"),href:"#/nebenkosten"});
+  var c=nkMieteVertrag(neu),vz=numOrNull(neu.vorauszahlung_neu);
+  if(c&&vz!=null&&numOrNull((c.details||{}).nebenkosten)!==vz)v.push({key:"nkvz:"+neu.id+":"+vz,art:"info",icon:"link",
+    titel:tf("Neue Vorauszahlung {0}",eur(vz)),text:t("In den Mietvertrag übernehmen, damit die Haushaltskosten stimmen."),knopf:t("Übernehmen"),aktion:"nk-vz",id:neu.id});
+  return v;
+}
+/* Vorauszahlung aus den Mietverträgen (Feld „Nebenkosten (€/Monat)“) */
+function nkVorauszahlungMonat(){
+  return CONTRACTS.filter(function(c){return (c.art==="miete"||c.art==="garage")&&c.status==="aktiv";})
+    .reduce(function(s,c){return s+(numOrNull((c.details||{}).nebenkosten)||0);},0);
+}
+/* Kurzkarte am Mietvertrag */
+function nkVertragKarte(c){
+  if(c.art!=="miete"&&!NK.some(function(n){return n.contract_id===c.id;}))return "";
+  var neu=nkNeueste();
+  return '<div class="sect">'+t("Nebenkosten")+'</div><section class="card">'+
+    (neu?'<a class="drow3" href="#/nebenkosten?von=vertrag"><span class="di">🧾</span><span class="db"><span class="dn">'+tf("Nebenkosten {0}",nkLabel(neu))+' · '+eur(nkSumme(neu))+'</span>'+
+      '<span class="dm"><span>'+tn(NK.length,"{0} Abrechnung","{0} Abrechnungen")+'</span>'+
+      (nkErgebnis(neu)!=null?'<span>'+(nkErgebnis(neu)<0?t("Guthaben")+" "+eur(-nkErgebnis(neu)):t("Nachzahlung")+" "+eur(nkErgebnis(neu)))+'</span>':"")+
+      (nkAuffaellig(neu).length?'<span class="pill warnp">'+tn(nkAuffaellig(neu).length,"{0} Auffälligkeit","{0} Auffälligkeiten")+'</span>':"")+'</span></span>'+
+      '<span class="go">'+ic("right",16)+'</span></a>'
+     :'<p class="hint" style="margin:0 0 4px">'+t("Jährliche Abrechnung ablegen – All-Home vergleicht die Jahre und prüft sie.")+'</p>'+nkHinzuKnoepfe())+
+  '</section>';
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 document.addEventListener("click",function(ev){
@@ -7061,7 +8204,7 @@ document.addEventListener("click",function(ev){
   if(a==="ics"){icsExport(id);return;}
 
   /* --- Scannen und Hochladen --- */
-  if(a==="scan"){closeModal(true);scanStart({vertrag:b.dataset.vertrag||null,art:b.dataset.art||null,med:b.dataset.med||null,person:b.dataset.person||null,doc:b.dataset.doc||null});return;}
+  if(a==="scan"){closeModal(true);scanStart({vertrag:b.dataset.vertrag||null,art:b.dataset.art||null,med:b.dataset.med||null,person:b.dataset.person||null,doc:b.dataset.doc||null,nk:b.dataset.nk||null});return;}
   if(a==="pick-file"){var fp=$("#fPick");if(fp)fp.click();return;}
   if(a==="imp-mehr"){IMPORT.ergebnisse=[];REVIEW=null;render();return;}
 
@@ -7105,6 +8248,20 @@ document.addEventListener("click",function(ev){
   if(a==="weg"){wegklicken(b.dataset.key);return;}
   if(a==="smart"){smartSchalten(b.dataset.k,b.dataset.v==="1");return;}
   if(a==="recherche"){rechercheVertrag(id);return;}
+
+  /* --- Nebenkosten --- */
+  if(a==="nk-neu"){nkFormular(null,null,[]);return;}
+  if(a==="nk-edit"){nkFormular(id,null,[]);return;}
+  if(a==="nk-del"){nkLoeschen(id);return;}
+  if(a==="nk-erledigt"){nkErledigt(id);return;}
+  if(a==="nk-vz"){nkVzUebernehmen(id);return;}
+  if(a==="nk-ki"){nkEinschaetzen();return;}
+  if(a==="nk-csv"){nkCsv();return;}
+  if(a==="nk-pos-neu"){nkPosNeu();return;}
+  if(a==="nk-pos-weg"){nkPosWeg(Number(b.dataset.i));return;}
+  if(a==="nk-datei"){NK_DATEI_ZIEL=id||null;var nd=$("#nkDatei");if(nd)nd.click();return;}
+  if(a==="nk-lesen"){nkAuslesen([],id,null);return;}
+  if(a==="nk-aus-dok"){var nkDok=id;REVIEW=null;nkNach("#/nebenkosten",function(){nkAuslesen([nkDok],null,null);});return;}
 });
 
 /* Formulare */
@@ -7122,6 +8279,7 @@ document.addEventListener("submit",function(ev){
   if(f.dataset.form==="logo"){ev.preventDefault();logoSpeichern();return;}
   if(f.dataset.form==="beitreten"){ev.preventDefault();beitreten();return;}
   if(f.dataset.form==="haus-loeschen"){ev.preventDefault();hausLoeschen(f.dataset.id);return;}
+  if(f.id==="nkForm"){ev.preventDefault();nkSpeichern();return;}
   if(f.id==="medForm"){ev.preventDefault();medSpeichern(f.dataset.id);return;}
   if(f.id==="persForm"){
     ev.preventDefault();
@@ -7141,6 +8299,7 @@ document.addEventListener("input",function(ev){
 });
 document.addEventListener("change",function(ev){
   var el=ev.target;if(!el)return;
+  if(el.id==="nkDatei"){var nkFs=Array.prototype.slice.call(el.files||[]),nkZ=NK_DATEI_ZIEL;NK_DATEI_ZIEL=null;el.value="";if(nkFs.length)nkDateienHochladen(nkFs,nkZ);return;}
   if(el.id==="pdfAn"){var pf=el.files&&el.files[0];el.value="";if(pf)pdfAnhaengen(el.dataset.id,pf);return;}
   if(el.id==="fPick"){
     var p=route().params;
