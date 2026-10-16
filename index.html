@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-uczW8R2vN6UCpKlenQw8e37qpNaS/TKJi1R555R4p0I='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-gkldMDcIdElkce8qPJ8nOmDTv/61GfeYIwlaC6QiBJM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -756,7 +756,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.8.2";
+var APP_VERSION="1.8.3";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -8888,6 +8888,8 @@ async function starteSitzung(){
   if(!location.hash)location.hash="#/start";
   render();
 }
+/* Service Worker = Offline-Rückfall; nur über https, lokal würden zwischengespeicherte Stände das Testen stören */
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
 boot();
 })();
 </script>
