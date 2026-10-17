@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-gkldMDcIdElkce8qPJ8nOmDTv/61GfeYIwlaC6QiBJM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-SJ7id7yHmuvzUUHo60e/81b+SUwGg4RAYWgDHyLJlsY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -756,7 +756,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.8.3";
+var APP_VERSION="1.8.4";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -811,6 +811,17 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.8.4: Personen-Bestätigung ---- */
+  "Patient: {0}":"Пациент: {0}",
+  "Wird angelegt …":"Создание …",
+
+
+/* ---- 1.8.4: Personen nicht doppelt ---- */
+  "„{0}“ zuordnen":"Назначить «{0}»",
+  "„{0}“ gibt es schon.":"«{0}» уже есть.",
+  "„{0}“ zugeordnet ✅":"«{0}» назначен ✅",
+
 
 /* ---- Gesamtprüfung (1.8.2) d ---- */
   "Dich selbst nimmst du über „Haus verlassen“ heraus.":"Себя вы удаляете через «Покинуть дом».",
@@ -2691,6 +2702,8 @@ async function ladeDaten(){
   DOCS=antw[1].data||[];
   PERSONS=(antw[2]&&!antw[2].error&&antw[2].data)?antw[2].data:[];
   NK=(antw[3]&&!antw[3].error&&antw[3].data)?antw[3].data:[];
+  /* Die Bestätigungskarte hält eine Kopie des Dokuments – mit auffrischen, sonst zeigt sie den alten Stand */
+  if(REVIEW){var frisch=DOCS.filter(function(x){return x.id===REVIEW.id;})[0];if(frisch)REVIEW=frisch;}
   loaded=true;
 }
 
@@ -4704,7 +4717,10 @@ function medReviewKarte(d){
     (vorschlag&&!d.person_id?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("user")+'</span><div class="sb2">'+
       '<div class="st">'+tf("Patient laut Dokument: {0}",esc(vorschlag))+'</div>'+
       '<div class="sa"><button class="btn" data-a="med-person-neu" data-id="'+d.id+'" data-name="'+esc(vorschlag)+'">'+
-        tf("„{0}“ als Person anlegen",esc(vorschlag))+'</button></div></div></div>':"")+
+        tf(personMitNamen(vorschlag)?"„{0}“ zuordnen":"„{0}“ als Person anlegen",esc(vorschlag))+'</button></div></div></div>':"")+
+    /* Bestätigung nach dem Zuordnen – statt des Knopfs */
+    (d.person_id&&personById(d.person_id)?'<div class="sug good" style="margin-top:12px"><span class="si">'+ic("user")+'</span><div class="sb2">'+
+      '<div class="st">'+tf("Patient: {0}",esc(personById(d.person_id).name))+' ✅</div></div></div>':"")+
     '<div class="factions" style="margin-top:16px">'+
       '<button class="btn" data-a="med-edit" data-id="'+d.id+'">'+ic("pencil")+' '+t("Prüfen / anpassen")+'</button>'+
       '<button class="btn ghost" data-a="rv-med-ok" data-id="'+d.id+'">'+ic("check")+' '+t("So ablegen")+'</button>'+
@@ -4777,16 +4793,35 @@ function personenVerwalten(){
       '<button class="btn ghost" type="button" data-a="modal-close">'+t("Schließen")+'</button></div>'+
     '</form>');
 }
+/* Vergleichsform eines Namens: „Kajs, Stanislav“, „Herr Stanislav Kajs“ und „stanislav kajs“ sind dieselbe Person */
+function personSchluessel(name){
+  var s=String(name||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss");
+  if(s.normalize)s=s.normalize("NFD").replace(/[̀-ͯ]/g,"");
+  return s.replace(/[^a-z0-9а-яё]+/g," ").split(" ").filter(function(w){return w&&!/^(herr|frau|dr|prof|med|dipl)$/.test(w);}).sort().join(" ");
+}
+function personMitNamen(name){
+  var k=personSchluessel(name);if(!k)return null;
+  return PERSONS.filter(function(p){return personSchluessel(p.name)===k;})[0]||null;
+}
+var PERS_BUSY=false;
 async function personAnlegen(name,docId){
-  name=(name||"").trim();if(!name)return null;
+  name=(name||"").trim();if(!name||PERS_BUSY)return null;
+  /* Gleicher Name schon da: beim Dokument zuordnen statt doppelt anlegen */
+  var p=personMitNamen(name);
+  if(p&&!docId){toast(tf("„{0}“ gibt es schon.",name),true);return null;}
+  PERS_BUSY=true;
   try{
-    var r=await sb.from("persons").insert({household_id:HH.id,name:name}).select("*").single();
-    if(r.error)throw r.error;
-    if(docId)await sb.from("documents").update({person_id:r.data.id}).eq("id",docId);
+    if(!p){
+      var r=await sb.from("persons").insert({household_id:HH.id,name:name}).select("*").single();
+      if(r.error)throw r.error;
+      p=r.data;
+      toast(tf("Person „{0}“ angelegt ✅",name));
+    }else toast(tf("„{0}“ zugeordnet ✅",p.name));
+    if(docId){var u=await sb.from("documents").update({person_id:p.id}).eq("id",docId);if(u.error)throw u.error;}
     await ladeDaten();
-    toast(tf("Person „{0}“ angelegt ✅",name));
-    return r.data;
+    return p;
   }catch(e){toast(t("Anlegen fehlgeschlagen")+": "+errMsg(e),true);return null;}
+  finally{PERS_BUSY=false;}
 }
 async function personLoeschen(id){
   var p=personById(id);if(!p)return;
@@ -5775,27 +5810,35 @@ var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
 var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
   "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
 var KI_MODELLNAME={"claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
-var KI_KOSTEN=null;   /* {hh, zeilen, fehler} */
+var KI_KOSTEN=null;   /* {hh, zeilen, fehler, am, laedt} */
 function kiEur(usd){
   var e=(Number(usd)||0)*USD_EUR;
   return e<1?"≈ "+num(e*100,e*100<10?1:0)+" ct":"≈ "+eur(e);
 }
 function kiModell(id){var m=String(id||"");for(var k in KI_MODELLNAME)if(m.indexOf(k)===0)return KI_MODELLNAME[k];return m||"–";}
 function datumZeit(iso){var d=new Date(iso);return isNaN(d)?"–":fmtDate(iso)+", "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+/* Jeder Seitenwechsel macht die Liste alt – beim nächsten Öffnen kommt sie frisch */
+window.addEventListener("hashchange",function(){if(KI_KOSTEN)KI_KOSTEN.am=0;});
+function neuesteZuerst(a,b){return (Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0);}
 async function ladeKiKosten(){
-  var hh=HH?HH.id:null;KI_KOSTEN={hh:hh,zeilen:null,fehler:null};
+  var hh=HH?HH.id:null;
+  /* Beim erneuten Öffnen bleibt die bisherige Liste stehen, bis die frische da ist */
+  if(!KI_KOSTEN||KI_KOSTEN.hh!==hh)KI_KOSTEN={hh:hh,zeilen:null,fehler:null};
+  var k=KI_KOSTEN;k.laedt=true;
   try{
     var r=await sbPub.from("ai_calls").select("created_at,user_id,user_email,mode,level,model,input_tokens,output_tokens,cost_usd,ok")
       .eq("household_id",hh).order("created_at",{ascending:false}).limit(500);
     if(r.error)throw r.error;
-    KI_KOSTEN.zeilen=r.data||[];
-  }catch(e){KI_KOSTEN.fehler=errMsg(e);KI_KOSTEN.zeilen=[];}
+    k.zeilen=(r.data||[]).slice().sort(neuesteZuerst);k.fehler=null;
+  }catch(e){k.fehler=errMsg(e);if(!k.zeilen)k.zeilen=[];}
+  k.am=Date.now();k.laedt=false;
   if(route().name==="kikosten")render();
 }
 function viewKiKosten(){
   var kopf=zurueck("#/mehr",t("Mehr"))+seitenTitel(t("KI-Kosten"));
   if(!HH||!ichAdmin(HH.id))return kopf+'<section class="card"><p class="hint">'+t("Nur für Admins des Hauses.")+'</p></section>';
-  if(!KI_KOSTEN||KI_KOSTEN.hh!==HH.id){ladeKiKosten();return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';}
+  /* Neu laden, sobald die Liste älter als 10 s ist – sonst fehlen Auswertungen, die seit dem letzten Öffnen dazukamen */
+  if(!KI_KOSTEN||KI_KOSTEN.hh!==HH.id||(!KI_KOSTEN.laedt&&Date.now()-(KI_KOSTEN.am||0)>10000))ladeKiKosten();
   if(!KI_KOSTEN.zeilen)return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';
   var z=KI_KOSTEN.zeilen,monat=todayISO().slice(0,7);
   var summe=function(l){return l.reduce(function(s,r){return s+(Number(r.cost_usd)||0);},0);};
@@ -8684,7 +8727,11 @@ document.addEventListener("click",function(ev){
   if(a==="med-explain"){medErklaeren(id);return;}
   if(a==="med-tovertrag"){medZuVertrag(id);return;}
   if(a==="med-csv"){medCsv();return;}
-  if(a==="med-person-neu"){personAnlegen(b.dataset.name,id).then(function(){render();});return;}
+  if(a==="med-person-neu"){
+    if(b.disabled)return;
+    b.disabled=true;b.textContent=t("Wird angelegt …");   /* sofort sichtbar, ein zweiter Klick zählt nicht */
+    personAnlegen(b.dataset.name,id).then(function(){render();});return;
+  }
   if(a==="pers-verw"){personenVerwalten();return;}
   if(a==="pers-del"){personLoeschen(id);return;}
 
