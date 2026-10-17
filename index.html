@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-SJ7id7yHmuvzUUHo60e/81b+SUwGg4RAYWgDHyLJlsY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-C3Qp3LbA7nI0Eib8uB54pSzRcZ0nsb7vMnIqjl9KDDY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -562,6 +562,11 @@ ul.hint li+li,ol.hint li+li{margin-top:4px}
 .setupcat:not(.on) .ck{visibility:hidden}
 /* Pflicht-Sternchen lesbar */
 .fld .pfl,.pfl-leg .pfl{color:var(--warn)}
+
+/* ================= 1.8.5: Knopf arbeitet ================= */
+.laeuft{opacity:.6;cursor:progress;pointer-events:none}
+.btn.laeuft::after{content:"";display:inline-block;width:14px;height:14px;margin-left:8px;vertical-align:-2px;
+  border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -756,7 +761,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.8.4";
+var APP_VERSION="1.8.5";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -811,6 +816,37 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.8.5: Nebenkosten-Prüfung ---- */
+  "Wohnfläche prüfen":"Проверьте жилую площадь",
+  "{0} m² sind für eine Wohnung ungewöhnlich – steht hier vielleicht die Fläche des ganzen Hauses?":"{0} м² — необычно для квартиры. Возможно, указана площадь всего дома?",
+  "Personenzahl prüfen":"Проверьте число жильцов",
+  "{0} Personen sind für eine Wohnung ungewöhnlich – steht hier vielleicht die Zahl des ganzen Hauses?":"{0} чел. — необычно для квартиры. Возможно, указано число жильцов всего дома?",
+  "Zeitraum endet in der Zukunft":"Период заканчивается в будущем",
+  "Eingetragen ist der {0} – bitte die Daten prüfen.":"Указано {0} — проверьте даты.",
+  "Erhalten vor Ende des Zeitraums?":"Получено до окончания периода?",
+  "Als Zugang steht der {0}, der Zeitraum endet aber erst am {1}.":"Дата получения {0}, но период заканчивается только {1}.",
+  "Datum prüfen":"Проверьте дату",
+  "Die Abrechnung ist vom {0}, erhalten am {1} – das passt nicht zusammen.":"Расчёт датирован {0}, получен {1} — это не сходится.",
+  "Anteil größer als die Hauskosten":"Доля больше расходов всего дома",
+  "Bei {0} ist dein Anteil höher als die Kosten des ganzen Hauses – vermutlich ein Lese- oder Rechenfehler.":"По позиции {0} ваша доля больше расходов всего дома — вероятно, ошибка чтения или расчёта.",
+  "Arbeitskosten größer als die Position":"Расходы на работы больше суммы позиции",
+  "Bei {0} sind die Arbeitskosten (§ 35a) höher als der Betrag selbst.":"По позиции {0} расходы на работы (§ 35a) больше самой суммы.",
+  "Heizkosten weichen ab":"Расходы на отопление не совпадают",
+  "Im Heizungsteil stehen {0}, die Heizungs-Positionen ergeben {1}. Eines davon stimmt nicht – bitte mit dem Papier vergleichen.":"В разделе отопления указано {0}, позиции отопления дают {1}. Что-то из этого неверно — сверьте с бумагой.",
+  "Das Nebenkostenprivileg ist entfallen. Gebühren für den TV-Empfang (Kabelanschluss, Sammelvertrag) darf der Vermieter für die Zeit ab Juli 2024 nicht mehr berechnen – nur noch Betriebsstrom und Wartung der Anlage.":"Привилегия на включение в коммунальные платежи отменена (Nebenkostenprivileg). Плату за приём ТВ (кабельное подключение, коллективный договор) арендодатель не вправе начислять с июля 2024 — только электроэнергию и обслуживание установки.",
+  "Antennenkosten prüfen":"Проверьте расходы на антенну",
+  "Seit Juli 2024 sind nur noch Betriebsstrom und Wartung der Antennenanlage umlagefähig, keine Gebühren für den TV-Empfang. Lass dir aufschlüsseln, was hier enthalten ist.":"С июля 2024 переносить на жильцов можно только электроэнергию и обслуживание антенны, но не плату за приём ТВ. Попросите расшифровку этой суммы.",
+  "Glasfaser-Entgelt über 60 € im Jahr":"Плата за оптоволокно больше 60 € в год",
+  "Für die Bereitstellung eines Glasfasernetzes dürfen höchstens 60 € je Wohnung und Jahr umgelegt werden – hier sind es {0} (auf 12 Monate gerechnet).":"За предоставление оптоволоконной сети можно переносить не более 60 € на квартиру в год — здесь {0} (в пересчёте на 12 месяцев).",
+  "Vorjahr nur Teilzeitraum":"Прошлый период неполный",
+
+
+/* ---- 1.8.5: Knöpfe ---- */
+  "Wieder offen":"Снова открыто",
+  "Als bezahlt markiert":"Отмечено как оплаченное",
+  "Einschätzung erstellt ✅":"Оценка готова ✅",
+
 
 /* ---- 1.8.4: Personen-Bestätigung ---- */
   "Patient: {0}":"Пациент: {0}",
@@ -7868,6 +7904,10 @@ function nkMonate(n){
 }
 function nkFaktor(n){var m=nkMonate(n);return m>0?12/m:1;}
 function nkVoll(n){return Math.abs(nkMonate(n)-12)<0.35;}
+/* Zwei Zeiträume nur vergleichen, wenn beide fast ein Jahr umfassen – sonst verzerren Winter- oder Sommermonate die Hochrechnung */
+function nkVergleichbar(a,b){return !!(a&&b)&&nkMonate(a)>=11&&nkMonate(b)>=11;}
+/* Je Kategorie: Heizung hängt an der Jahreszeit (beide fast ein Jahr), alles andere lässt sich ab 3 Monaten hochrechnen */
+function nkVergleichbarKat(k,a,b){return k==="heizung"?nkVergleichbar(a,b):(!!(a&&b)&&nkMonate(a)>=3&&nkMonate(b)>=3);}
 /* „2025“ für ein Kalenderjahr, „2024/25“ für 12 Monate über den Jahreswechsel, sonst Monate */
 function nkLabel(n){
   var v=String(n.von),b=String(n.bis);
@@ -7947,6 +7987,20 @@ function nkPruefen(n){
   var vz=numOrNull(n.vorauszahlungen),ergStand=numOrNull(n.ergebnis);
   if(vz!=null&&ergStand!=null&&summe>0&&Math.abs(summe-vz-ergStand)>1)
     dazu("warn",t("Rechnung geht nicht auf"),tf("Kosten {0} − Vorauszahlungen {1} = {2}, auf der Abrechnung steht {3}. Vielleicht fehlt eine Position.",eur(summe),eur(vz),eur(summe-vz),eur(ergStand)));
+  /* ---- Plausibilität: typische Lese- und Tippfehler ---- */
+  var fl=numOrNull(n.wohnflaeche),pe=numOrNull(n.personen);
+  if(fl!=null&&(fl<10||fl>400))dazu("warn",t("Wohnfläche prüfen"),tf("{0} m² sind für eine Wohnung ungewöhnlich – steht hier vielleicht die Fläche des ganzen Hauses?",num(fl,2)));
+  if(pe!=null&&(pe<0||pe>12))dazu("warn",t("Personenzahl prüfen"),tf("{0} Personen sind für eine Wohnung ungewöhnlich – steht hier vielleicht die Zahl des ganzen Hauses?",num(pe,1)));
+  if(n.bis>heute)dazu("warn",t("Zeitraum endet in der Zukunft"),tf("Eingetragen ist der {0} – bitte die Daten prüfen.",fmtDate(n.bis)));
+  if(n.zugang_am&&n.zugang_am<n.bis)dazu("warn",t("Erhalten vor Ende des Zeitraums?"),tf("Als Zugang steht der {0}, der Zeitraum endet aber erst am {1}.",fmtDate(n.zugang_am),fmtDate(n.bis)));
+  if(n.erstellt_am&&n.zugang_am&&n.erstellt_am>n.zugang_am)dazu("warn",t("Datum prüfen"),tf("Die Abrechnung ist vom {0}, erhalten am {1} – das passt nicht zusammen.",fmtDate(n.erstellt_am),fmtDate(n.zugang_am)));
+  var zuGross=nkPos(n).filter(function(p){var hs=numOrNull(p.haus);return hs!=null&&hs>0&&nkBetrag(p)>hs+0.5;});
+  if(zuGross.length)dazu("warn",t("Anteil größer als die Hauskosten"),tf("Bei {0} ist dein Anteil höher als die Kosten des ganzen Hauses – vermutlich ein Lese- oder Rechenfehler.",zuGross.map(function(p){return p.bez||t(NK_KAT[nkKatVon(p)].l);}).join(", ")));
+  var arbZuGross=nkPos(n).filter(function(p){var b=numOrNull(p.p35a_betrag);return b!=null&&b>nkBetrag(p)+0.5;});
+  if(arbZuGross.length)dazu("warn",t("Arbeitskosten größer als die Position"),tf("Bei {0} sind die Arbeitskosten (§ 35a) höher als der Betrag selbst.",arbZuGross.map(function(p){return p.bez||t(NK_KAT[nkKatVon(p)].l);}).join(", ")));
+  var hkAng=numOrNull(heiz.kosten),hkPos=kat.heizung||0;
+  if(hkAng!=null&&hkAng>0&&hkPos>0&&Math.abs(hkAng-hkPos)>Math.max(1,hkPos*0.01))
+    dazu("warn",t("Heizkosten weichen ab"),tf("Im Heizungsteil stehen {0}, die Heizungs-Positionen ergeben {1}. Eines davon stimmt nicht – bitte mit dem Papier vergleichen.",eur(hkAng),eur(hkPos)));
   /* ---- Umlagefähigkeit ---- */
   var nu=[],nuSumme=0;
   nkPos(n).forEach(function(p){
@@ -7957,15 +8011,23 @@ function nkPruefen(n){
   });
   if(nuSumme>0)dazu("bad",t("Nicht umlagefähige Kosten"),
     tf("{0} – Verwaltung, Instandhaltung, Reparaturen, Rücklagen, Bankgebühren oder gemietete Rauchmelder dürfen Mietern nicht berechnet werden.",nu.join(", ")),nuSumme);
-  var kabel=0;
+  /* § 2 Nr. 15 BetrKV: seit 1.7.2024 keine Gebühren für den TV-Empfang mehr – Betriebsstrom und Wartung der Anlage schon.
+     Glasfaser-Bereitstellungsentgelt höchstens 60 € je Wohnung und Jahr */
+  var kabel=0,kabelUnklar=0,glas=0;
   nkPos(n).forEach(function(p){
-    if(nkKatVon(p)!=="antenne"||/glasfaser/i.test(p.bez||""))return;
+    if(nkKatVon(p)!=="antenne")return;
+    var bez=String(p.bez||"");
+    if(/glasfaser/i.test(bez)){glas+=nkBetrag(p);return;}
+    if(/strom|wartung|prüf|pruef|inspektion|einstell/i.test(bez))return;
     if(n.bis<"2024-07-01")return;
     var ab=n.von>"2024-07-01"?n.von:"2024-07-01";
     var anteil=(Date.parse(n.bis+"T00:00:00Z")-Date.parse(ab+"T00:00:00Z")+864e5)/(nkTage(n)*864e5);
-    kabel+=nkBetrag(p)*Math.max(0,Math.min(1,anteil));
+    var teil=nkBetrag(p)*Math.max(0,Math.min(1,anteil));
+    if(/kabel|tv|fernseh|grundgeb|sammel|nutzungsentgelt|urheber|vodafone|pyur|columbus|unitymedia|primacom|netcologne/i.test(bez))kabel+=teil;else kabelUnklar+=teil;
   });
-  if(kabel>=1)dazu("bad",t("Kabel-TV seit 1.7.2024 nicht mehr umlagefähig"),t("Das Nebenkostenprivileg ist entfallen. Für die Zeit ab Juli 2024 darf der Vermieter Kabel- oder Antennenkosten nicht mehr berechnen."),kabel);
+  if(kabel>=1)dazu("bad",t("Kabel-TV seit 1.7.2024 nicht mehr umlagefähig"),t("Das Nebenkostenprivileg ist entfallen. Gebühren für den TV-Empfang (Kabelanschluss, Sammelvertrag) darf der Vermieter für die Zeit ab Juli 2024 nicht mehr berechnen – nur noch Betriebsstrom und Wartung der Anlage."),kabel);
+  if(kabelUnklar>=1)dazu("warn",t("Antennenkosten prüfen"),t("Seit Juli 2024 sind nur noch Betriebsstrom und Wartung der Antennenanlage umlagefähig, keine Gebühren für den TV-Empfang. Lass dir aufschlüsseln, was hier enthalten ist."),kabelUnklar);
+  if(glas*nkFaktor(n)>60.5)dazu("warn",t("Glasfaser-Entgelt über 60 € im Jahr"),tf("Für die Bereitstellung eines Glasfasernetzes dürfen höchstens 60 € je Wohnung und Jahr umgelegt werden – hier sind es {0} (auf 12 Monate gerechnet).",eur(glas*nkFaktor(n))),glas*nkFaktor(n)-60);
   if(kat.sonstige>0)dazu("info",t("Sonstige Betriebskosten"),t("Nur zulässig, wenn jede Kostenart im Mietvertrag ausdrücklich vereinbart ist (z. B. Dachrinnenreinigung, Rauchmelder-Wartung)."));
   /* ---- Heizkosten (HeizkostenV, CO2KostAufG) ---- */
   var hk=nkHeizkosten(n);
@@ -7974,7 +8036,7 @@ function nkPruefen(n){
     if(va!=null&&(va<50||va>70))dazu("warn",tf("Verbrauchsanteil {0} %",num(va,0)),t("Die Heizkostenverordnung verlangt, dass 50 bis 70 % nach Verbrauch abgerechnet werden."));
     if(heiz.verbrauchsabhaengig===false)dazu("bad",t("Heizkosten nicht nach Verbrauch abgerechnet"),t("Dann darfst du deinen Heizkostenanteil um 15 % kürzen (§ 12 HeizkostenV)."),hk*0.15);
     var fossil=NK_FOSSIL[heiz.energietraeger]||!heiz.energietraeger;
-    if(heiz.co2_ausgewiesen===false&&n.bis>="2023-01-01"&&fossil)
+    if(heiz.co2_ausgewiesen===false&&n.von>="2023-01-01"&&fossil)   /* § 11 Abs. 2 CO2KostAufG: Zeiträume ab 1.1.2023 */
       dazu("bad",t("CO2-Kostenaufteilung fehlt"),t("Seit 2023 muss der Vermieter den CO2-Anteil nach dem Stufenmodell ausweisen. Fehlt er, darfst du die Heizkosten um 3 % kürzen (§ 7 Abs. 3 CO2KostAufG)."),hk*0.03);
     var kg=numOrNull(heiz.co2_kg_m2),ma=numOrNull(heiz.co2_mieteranteil_pct);
     if(kg!=null&&ma!=null&&Math.abs(nkCo2Anteil(kg)-ma)>0.5)
@@ -7988,7 +8050,7 @@ function nkPruefen(n){
     Object.keys(kat).forEach(function(k){
       var sp=nkSpiegel(k,n),jm=nkJeM2(kat[k],n);
       if(!sp||jm==null)return;
-      if(k==="antenne"&&kabel>=kat[k]-1)return;   /* ganz gestrichen – Vergleich sagt nichts mehr */
+      if(k==="antenne"&&kabel+kabelUnklar>=kat[k]-1)return;   /* ganz gestrichen – Vergleich sagt nichts mehr */
       if(jm>sp*1.5&&kat[k]*nkFaktor(n)>=60)
         dazu("warn",tf("{0} deutlich über dem Durchschnitt",t(NK_KAT[k].l)),tf("{0} je m² und Monat – im Schnitt sind es {1} (Betriebskostenspiegel {2}).",eur(jm),eur(sp),NK_SPIEGEL.jahr));
     });
@@ -7998,6 +8060,7 @@ function nkPruefen(n){
   if(vor){
     var ka=nkKat(vor),fv=nkFaktor(vor),fn2=nkFaktor(n);
     Object.keys(kat).forEach(function(k){
+      if(!nkVergleichbarKat(k,vor,n))return;
       var a=(ka[k]||0)*fv,b=kat[k]*fn2;
       if(a>0&&b-a>=40&&(b-a)/a>=0.2)
         dazu("warn",tf("{0}: {1} gegenüber {2}",t(NK_KAT[k].l),prozent((b-a)/a),nkLabel(vor)),
@@ -8046,14 +8109,14 @@ function viewNebenkosten(){
     '<p>'+t("Lege jedes Jahr die Nebenkostenabrechnung ab – All-Home liest sie aus, vergleicht die Jahre und prüft Fristen, umlagefähige Posten und Heizkosten.")+'</p></div>'+
     nkHinzuKnoepfe()+'</section>';
   var neu=liste[liste.length-1],vor=nkVorgaenger(neu),summe=nkSumme(neu),erg=nkErgebnis(neu);
-  var d=vor?nkDelta(summe*nkFaktor(neu),nkSumme(vor)*nkFaktor(vor)):null,jm=nkJeM2(summe,neu);
+  var d=nkVergleichbar(neu,vor)?nkDelta(summe*nkFaktor(neu),nkSumme(vor)*nkFaktor(vor)):null,jm=nkJeM2(summe,neu);
   var hinweise=nkPruefen(neu).filter(function(x){return x.art!=="gut";});
   return kopf+
     (HH?'<p class="hint" style="margin:-6px 0 14px">'+esc(HH.name||"")+(c?" · "+esc(c.anbieter||""):"")+'</p>':"")+
     /* Kennzahlen des neuesten Zeitraums */
     '<div class="kpis k3 nkkpi">'+
       '<div class="kpi"><div class="kl">'+tf("Kosten {0}",nkLabel(neu))+'</div><div class="kv">'+eur0(summe)+'</div>'+
-        '<div class="ks">'+(d!=null?'<span class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+prozent(d)+'</span> '+t("ggü. Vorjahr"):(nkVoll(neu)?"":t("Teilzeitraum")))+'</div></div>'+
+        '<div class="ks">'+(d!=null?'<span class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+prozent(d)+'</span> '+t("ggü. Vorjahr"):(nkVoll(neu)?(vor?t("Vorjahr nur Teilzeitraum"):""):t("Teilzeitraum")))+'</div></div>'+
       '<div class="kpi"><div class="kl">'+t("Je m² und Monat")+'</div><div class="kv">'+(jm!=null?eur(jm):"–")+'</div>'+
         '<div class="ks">'+tf("Schnitt {0}",eur(NK_SPIEGEL.gesamt))+'</div></div>'+
       '<div class="kpi"><div class="kl">'+(erg!=null&&erg<0?t("Guthaben"):t("Nachzahlung"))+'</div><div class="kv">'+(erg!=null?eur0(Math.abs(erg)):"–")+'</div>'+
@@ -8103,7 +8166,7 @@ function nkHinweisHtml(x){
 function nkTreiber(n,vor){
   var a=nkKat(vor),b=nkKat(n),fa=nkFaktor(vor),fb=nkFaktor(n),keys={};
   Object.keys(a).concat(Object.keys(b)).forEach(function(k){keys[k]=1;});
-  var l=Object.keys(keys).map(function(k){return {k:k,diff:(b[k]||0)*fb-(a[k]||0)*fa,alt:(a[k]||0)*fa};})
+  var l=Object.keys(keys).filter(function(k){return nkVergleichbarKat(k,vor,n);}).map(function(k){return {k:k,diff:(b[k]||0)*fb-(a[k]||0)*fa,alt:(a[k]||0)*fa};})
     .filter(function(x){return Math.abs(x.diff)>=5;}).sort(function(x,y){return Math.abs(y.diff)-Math.abs(x.diff);}).slice(0,4);
   if(!l.length)return "";
   return '<div class="sect">'+tf("Kostentreiber {0} gegenüber {1}",nkLabel(n),nkLabel(vor))+'</div><section class="card"><div class="nktreib">'+
@@ -8183,12 +8246,12 @@ function nkTabelle(liste){
   return '<div class="nktab"><table class="nkt"><thead><tr><th>'+t("Kategorie")+'</th>'+l.map(function(n){return '<th>'+esc(nkLabel(n))+(nkVoll(n)?"":"*")+'</th>';}).join("")+
     (vor?'<th>Δ</th>':"")+'</tr></thead><tbody>'+
     kat.map(function(k){
-      var d=vor?nkDelta((nkKat(letzte)[k]||0)*nkFaktor(letzte),(nkKat(vor)[k]||0)*nkFaktor(vor)):null;
+      var vg=vor&&nkVergleichbarKat(k,letzte,vor),d=vg?nkDelta((nkKat(letzte)[k]||0)*nkFaktor(letzte),(nkKat(vor)[k]||0)*nkFaktor(vor)):null;
       return '<tr><td>'+NK_KAT[k].icon+' '+esc(t(NK_KAT[k].l))+'</td>'+l.map(function(n){return '<td>'+zelle(n,k)+'</td>';}).join("")+
-        (vor?'<td class="nkd '+(d==null?"":(d>0.1?"hoch":(d<-0.05?"runter":"")))+'">'+(d==null?(nkKat(letzte)[k]?t("neu"):"–"):prozent(d))+'</td>':"")+'</tr>';
+        (vor?'<td class="nkd '+(d==null?"":(d>0.1?"hoch":(d<-0.05?"runter":"")))+'">'+(d==null?(vg&&nkKat(letzte)[k]?t("neu"):"–"):prozent(d))+'</td>':"")+'</tr>';
     }).join("")+
     '<tr class="nksum"><td>'+t("Gesamt")+'</td>'+l.map(function(n){return '<td>'+eur0(nkSumme(n))+'</td>';}).join("")+
-      (vor?(function(){var d=nkDelta(nkSumme(letzte)*nkFaktor(letzte),nkSumme(vor)*nkFaktor(vor));return '<td class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+(d==null?"–":prozent(d))+'</td>';})():"")+'</tr>'+
+      (vor?(function(){var d=nkVergleichbar(letzte,vor)?nkDelta(nkSumme(letzte)*nkFaktor(letzte),nkSumme(vor)*nkFaktor(vor)):null;return '<td class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+(d==null?"–":prozent(d))+'</td>';})():"")+'</tr>'+
     '</tbody></table></div>';
 }
 
@@ -8221,7 +8284,7 @@ function nkDetail(n){
     '<div class="sect">'+t("Positionen")+'</div><section class="card">'+
     (nkPos(n).length?Object.keys(NK_KAT).filter(function(k){return gruppen[k];}).map(function(k){
       var sp=nkSpiegel(k,n),jm=nkJeM2(kat[k],n),va=vor?(nkKat(vor)[k]||0):null;
-      var d=va!=null&&va>0?nkDelta(kat[k]*nkFaktor(n),va*nkFaktor(vor)):null;
+      var d=va!=null&&va>0&&nkVergleichbarKat(k,n,vor)?nkDelta(kat[k]*nkFaktor(n),va*nkFaktor(vor)):null;
       return '<div class="nkgr"><div class="nkgk"><span>'+NK_KAT[k].icon+' '+esc(t(NK_KAT[k].l))+'</span><b>'+eur(kat[k])+'</b></div>'+
         '<div class="nkgm">'+(jm!=null?'<span>'+eur(jm)+' / m²</span>':"")+(sp&&jm!=null?'<span class="'+(jm>sp*1.5?"nkd hoch":"")+'">'+tf("Schnitt {0}",eur(sp))+'</span>':"")+
           (d!=null?'<span class="nkd '+(d>0.1?"hoch":(d<-0.05?"runter":""))+'">'+prozent(d)+' '+t("ggü. Vorjahr")+'</span>':"")+'</div>'+
@@ -8241,7 +8304,7 @@ function nkDetail(n){
       (numOrNull(heiz.verbrauch)!=null?kv(t("Verbrauch"),esc(num(numOrNull(heiz.verbrauch),0)+" "+(heiz.einheit||""))):"")+
       (numOrNull(heiz.warmwasser_m3)!=null?kv(t("Warmwasser"),esc(num(numOrNull(heiz.warmwasser_m3),1))+" m³"):"")+
       (numOrNull(heiz.verbrauchsanteil_pct)!=null?kv(t("Nach Verbrauch"),esc(num(numOrNull(heiz.verbrauchsanteil_pct),0))+" %"):"")+
-      kv(t("CO2-Aufteilung"),heiz.co2_ausgewiesen===true?("✅ "+[numOrNull(heiz.co2_stufe)?tf("Stufe {0}",heiz.co2_stufe):"",numOrNull(heiz.co2_mieteranteil_pct)!=null?tf("dein Anteil {0} %",heiz.co2_mieteranteil_pct):"",numOrNull(heiz.co2_kosten)!=null?eur(numOrNull(heiz.co2_kosten)):""].filter(Boolean).join(" · ")):
+      kv(t("CO2-Aufteilung"),heiz.co2_ausgewiesen===true?("✅ "+[numOrNull(heiz.co2_stufe)?tf("Stufe {0}",num(numOrNull(heiz.co2_stufe),0)):"",numOrNull(heiz.co2_mieteranteil_pct)!=null?tf("dein Anteil {0} %",num(numOrNull(heiz.co2_mieteranteil_pct),0)):"",numOrNull(heiz.co2_kosten)!=null?eur(numOrNull(heiz.co2_kosten)):""].filter(Boolean).join(" · ")):
         (heiz.co2_ausgewiesen===false?"⚠️ "+t("fehlt"):t("unbekannt")))+
       kv(t("Monatliche Verbrauchsinfo"),heiz.uvi===true?"✅ "+t("erhalten"):(heiz.uvi===false?"⚠️ "+t("nicht erhalten"):t("unbekannt")))+
       (heiz.messdienst?kv(t("Messdienst"),esc(heiz.messdienst)):"")+
@@ -8410,7 +8473,8 @@ async function nkLoeschen(id){
 async function nkErledigt(id){
   var n=nkById(id);if(!n)return;
   try{var r=await sb.from("nk_abrechnungen").update({erledigt:!n.erledigt}).eq("id",id).select("id");
-    if(r.error)throw r.error;await ladeDaten();render();}
+    if(r.error)throw r.error;await ladeDaten();render();
+    toast(n.erledigt?t("Wieder offen"):t("Als bezahlt markiert")+" ✅");}
   catch(x){toast(t("Speichern fehlgeschlagen")+": "+errMsg(x),true);}
 }
 /* Neue Vorauszahlung in den Mietvertrag (Feld „Nebenkosten (€/Monat)“) */
@@ -8492,11 +8556,11 @@ function nkAusKi(a,modell){
         p35a:(p.p35a==="dienstleistung"||p.p35a==="handwerk")?p.p35a:null,p35a_betrag:z(p.p35aBetrag)};
     }).filter(function(p){return p.bez||p.betrag!=null;}),
     heizung:{energietraeger:NK_ENERGIE.some(function(e){return e[0]&&e[0]===h.energietraeger;})?h.energietraeger:null,kosten:z(h.kosten),
-      verbrauch:z(h.verbrauch),einheit:h.verbrauchEinheit||null,verbrauchsanteil_pct:z(h.verbrauchsanteilProzent),warmwasser_m3:z(h.warmwasserM3),
+      verbrauch:z(h.verbrauch),einheit:h.verbrauchEinheit?String(h.verbrauchEinheit).slice(0,20):null,verbrauchsanteil_pct:z(h.verbrauchsanteilProzent),warmwasser_m3:z(h.warmwasserM3),
       verbrauchsabhaengig:jn(h.verbrauchsabhaengig),co2_ausgewiesen:jn(h.co2Ausgewiesen),co2_kg_m2:z(h.co2KgProM2),co2_stufe:z(h.co2Stufe),
       co2_mieteranteil_pct:z(h.co2MieteranteilProzent),co2_kosten:z(h.co2KostenMieter),uvi:jn(h.verbrauchsinfoErhalten),fernablesbar:jn(h.fernablesbar),
       messdienst:h.messdienst?String(h.messdienst).slice(0,60):null},
-    ki:{modell:modell||null,am:new Date().toISOString(),hinweise:a.hinweise||"",vermieter:a.vermieter||null}};
+    ki:{modell:modell||null,am:new Date().toISOString(),hinweise:a.hinweise?String(a.hinweise).slice(0,400):"",vermieter:a.vermieter?String(a.vermieter).slice(0,120):null}};
   if(d(a.zeitraumVon))v.von=d(a.zeitraumVon);
   if(d(a.zeitraumBis))v.bis=d(a.zeitraumBis);
   if(d(a.erstelltAm))v.erstellt_am=d(a.erstelltAm);
@@ -8547,15 +8611,17 @@ async function nkEinschaetzen(){
       if(r2.error)throw r2.error;
     }
     SETUP=Object.assign({},SETUP||{},{nk_einschaetzung:wert});
-    closeModal(true);render();
+    closeModal(true);render();toast(t("Einschätzung erstellt ✅"));
   }catch(x){closeModal(true);
     if(x&&x.code==="ki_guthaben")toast(t("Das KI-Guthaben ist aufgebraucht – bitte später erneut."),true);
     else toast(t("Einschätzung fehlgeschlagen")+": "+errMsg(x),true);}
 }
 
 /* ================= Steuerübersicht (CSV) ================= */
+/* Eine CSV-Zelle: Text, der mit = + - @ beginnt, würde Excel als Formel ausführen → mit ' entschärfen (reine Zahlen bleiben) */
+function nkCsvZelle(v){var s=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d+([.,]\d+)?$/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
 function nkCsv(){
-  function z(v){var s=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+  var z=nkCsvZelle;
   function geld(v){return v==null?"":Number(v).toFixed(2).replace(".",",");}
   var zeilen=[[t("Zeitraum"),t("Position"),t("Kategorie"),t("Art nach § 35a"),t("Betrag"),t("davon Arbeitskosten"),t("Ermäßigung 20 %")]];
   nkSortiert().forEach(function(n){
@@ -8628,48 +8694,58 @@ function nkVertragKarte(c){
 
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
+/* Knopf mit Hintergrund-Arbeit: sofort gedimmt mit Kreisel, weitere Klicks zählen nicht, bis sie fertig ist */
+function laeuft(el,p){
+  if(!el||!el.setAttribute||!p||typeof p.then!=="function")return;
+  var knoepfe=el.tagName==="FORM"?Array.prototype.slice.call(el.querySelectorAll('button[type="submit"]')):[el];
+  el.setAttribute("aria-busy","true");
+  knoepfe.forEach(function(k){k.classList.add("laeuft");});
+  var fertig=function(){el.removeAttribute("aria-busy");knoepfe.forEach(function(k){k.classList.remove("laeuft");});};
+  p.then(fertig,fertig);
+}
 document.addEventListener("click",function(ev){
   var b=ev.target.closest("[data-a]");
   if(!b)return;
+  if(b.getAttribute&&b.getAttribute("aria-busy")==="true")return;
   var a=b.dataset.a,id=b.dataset.id;
 
   /* --- Rahmen --- */
   if(a==="theme"){applyTheme(!isDark());render();return;}
   if(a==="theme-set"){applyTheme(b.dataset.d==="1");render();return;}
-  if(a==="lang"){setzeSprache(b.dataset.l);return;}
+  if(a==="lang"){laeuft(b,setzeSprache(b.dataset.l));return;}
   if(a==="modal-close"){closeModal();return;}
-  if(a==="logout"){doLogout();return;}
-  if(a==="suche"){sucheOeffnen();return;}
+  if(a==="logout"){laeuft(b,doLogout());return;}
+  if(a==="suche"){laeuft(b,sucheOeffnen());return;}
   if(a==="noop"){return;}
   if(a==="neu-laden"){LADEFEHLER=null;SETUP_FEHLER=null;starteSitzung();return;}
 
   /* --- Anmeldung --- */
-  if(a==="signup"){doSignup();return;}
-  if(a==="forgot"){doForgot();return;}
+  if(a==="signup"){laeuft(b,doSignup());return;}
+  if(a==="forgot"){laeuft(b,doForgot());return;}
 
   /* --- Haushalt --- */
-  if(a==="hh-switch"){haushaltWaehlen();return;}
-  if(a==="hh-pick"){haushaltSetzen(b.dataset.id);return;}
-  if(a==="ki-set"){setzeKiStufe(b.dataset.v);return;}
-  if(a==="ki-blatt"){kiStufeBlatt();return;}
-  if(a==="alltrack-blatt"){alltrackBlatt();return;}
-  if(a==="alltrack-set"){setzeAlltrack(b.dataset.v);return;}
-  if(a==="logo-neu"){logoFormular(null,b.dataset.name||"");return;}
-  if(a==="logo-edit"){logoFormular(id);return;}
-  if(a==="logo-holen"){logoHolen();return;}
+  if(a==="hh-switch"){laeuft(b,haushaltWaehlen());return;}
+  if(a==="hh-pick"){laeuft(b,haushaltSetzen(b.dataset.id));return;}
+  if(a==="ki-set"){laeuft(b,setzeKiStufe(b.dataset.v));return;}
+  if(a==="ki-blatt"){laeuft(b,kiStufeBlatt());return;}
+  if(a==="alltrack-blatt"){laeuft(b,alltrackBlatt());return;}
+  if(a==="alltrack-set"){laeuft(b,setzeAlltrack(b.dataset.v));return;}
+  if(a==="logo-neu"){laeuft(b,logoFormular(null,b.dataset.name||""));return;}
+  if(a==="logo-edit"){laeuft(b,logoFormular(id));return;}
+  if(a==="logo-holen"){laeuft(b,logoHolen());return;}
   if(a==="logo-datei"){var lf=$("#l_file");if(lf)lf.click();return;}
-  if(a==="logo-del"){logoLoeschen(id);return;}
-  if(a==="hh-neu"){hausFormular(null);return;}
-  if(a==="hh-edit"){hausFormular(id);return;}
-  if(a==="hh-join"){beitretenFormular();return;}
-  if(a==="hh-invite"){einladen(id);return;}
-  if(a==="hh-copy"){kopieren(b.dataset.text);return;}
-  if(a==="hh-share"){teilen(b.dataset.text);return;}
-  if(a==="hh-leave"){hausVerlassen(id);return;}
-  if(a==="hh-del"){loeschenFormular(id);return;}
-  if(a==="mg-menu"){mitgliedMenue(id,b.dataset.uid);return;}
-  if(a==="mg-admin"){mitgliedAdmin(id,b.dataset.uid,b.dataset.v==="1");return;}
-  if(a==="mg-remove"){mitgliedEntfernen(id,b.dataset.uid);return;}
+  if(a==="logo-del"){laeuft(b,logoLoeschen(id));return;}
+  if(a==="hh-neu"){laeuft(b,hausFormular(null));return;}
+  if(a==="hh-edit"){laeuft(b,hausFormular(id));return;}
+  if(a==="hh-join"){laeuft(b,beitretenFormular());return;}
+  if(a==="hh-invite"){laeuft(b,einladen(id));return;}
+  if(a==="hh-copy"){laeuft(b,kopieren(b.dataset.text));return;}
+  if(a==="hh-share"){laeuft(b,teilen(b.dataset.text));return;}
+  if(a==="hh-leave"){laeuft(b,hausVerlassen(id));return;}
+  if(a==="hh-del"){laeuft(b,loeschenFormular(id));return;}
+  if(a==="mg-menu"){laeuft(b,mitgliedMenue(id,b.dataset.uid));return;}
+  if(a==="mg-admin"){laeuft(b,mitgliedAdmin(id,b.dataset.uid,b.dataset.v==="1"));return;}
+  if(a==="mg-remove"){laeuft(b,mitgliedEntfernen(id,b.dataset.uid));return;}
 
   /* --- Einrichtung --- */
   if(a==="art-toggle"){
@@ -8679,16 +8755,16 @@ document.addEventListener("click",function(ev){
     if(i>=0)setupWahl.splice(i,1);else setupWahl.push(k);
     render();return;
   }
-  if(a==="setup-save"){setupSpeichern();return;}
+  if(a==="setup-save"){laeuft(b,setupSpeichern());return;}
 
   /* --- Verträge --- */
-  if(a==="v-neu"){oeffneForm(b.dataset.k,null,null);return;}
+  if(a==="v-neu"){laeuft(b,oeffneForm(b.dataset.k,null,null));return;}
   if(a==="v-edit"){var c=vertragById(id);if(c)oeffneForm(c.art||"sonstiges",id,null);return;}
-  if(a==="v-del"){loescheVertrag(id);return;}
-  if(a==="v-kuendigen"){kuendigenBlatt(id);return;}
+  if(a==="v-del"){laeuft(b,loescheVertrag(id));return;}
+  if(a==="v-kuendigen"){laeuft(b,kuendigenBlatt(id));return;}
   if(a==="v-kuend-ok"){var zum=val("k_zum");closeModal(true);setzeStatus(id,"gekuendigt",zum);return;}
-  if(a==="v-aktiv"){setzeStatus(id,"aktiv");return;}
-  if(a==="ics"){icsExport(id);return;}
+  if(a==="v-aktiv"){laeuft(b,setzeStatus(id,"aktiv"));return;}
+  if(a==="ics"){laeuft(b,icsExport(id));return;}
 
   /* --- Scannen und Hochladen --- */
   if(a==="scan"){closeModal(true);scanStart({vertrag:b.dataset.vertrag||null,art:b.dataset.art||null,med:b.dataset.med||null,person:b.dataset.person||null,doc:b.dataset.doc||null,nk:b.dataset.nk||null});return;}
@@ -8696,62 +8772,62 @@ document.addEventListener("click",function(ev){
   if(a==="imp-mehr"){IMPORT.ergebnisse=[];REVIEW=null;render();return;}
 
   /* --- Bestätigung nach dem Einlesen --- */
-  if(a==="rv-link"){reviewZuordnen(id);return;}
-  if(a==="rv-neu"){reviewNeuerVertrag(b.dataset.k);return;}
+  if(a==="rv-link"){laeuft(b,reviewZuordnen(id));return;}
+  if(a==="rv-neu"){laeuft(b,reviewNeuerVertrag(b.dataset.k));return;}
   if(a==="rv-archiv"){REVIEW=null;go("#/vertraege");return;}
   if(a==="rv-anders"){if(REVIEW)dokumentZuordnen(REVIEW.id);return;}
   if(a==="rv-trotzdem"){REVIEW_TROTZDEM=true;REVIEW_WAHL=null;render();return;}
   if(a==="ab-zeile"){if(REVIEW_WAHL){var kz=b.dataset.k;REVIEW_WAHL[kz]=!REVIEW_WAHL[kz];render();}return;}
-  if(a==="rv-uebernehmen"){abgleichUebernehmen();return;}
-  if(a==="rv-fertig"){abgleichFertig();return;}
+  if(a==="rv-uebernehmen"){laeuft(b,abgleichUebernehmen());return;}
+  if(a==="rv-fertig"){laeuft(b,abgleichFertig());return;}
   if(a==="rv-med-ok"){REVIEW=null;go("#/gesundheit");return;}
 
   /* --- Dokumente --- */
-  if(a==="d-open"){dokumentOeffnen(id);return;}
-  if(a==="d-view"){dokumentAnzeigen(id);return;}
-  if(a==="d-del"){dokumentLoeschen(id);return;}
-  if(a==="d-del-wahl"){dokumenteAuswahlLoeschen();return;}
-  if(a==="ab-wahl"){ablageWahl(id);return;}
-  if(a==="ab-alle"){ablageAlle();return;}
-  if(a==="d-link"){dokumentZuordnen(id);return;}
-  if(a==="d-link-pick"){dokumentVerknuepfen(id,b.dataset.cid);return;}
-  if(a==="d-reanalyze"){analyseNachholen(id);return;}
-  if(a==="d-seiten"){seitenHinzufuegen(id);return;}
+  if(a==="d-open"){laeuft(b,dokumentOeffnen(id));return;}
+  if(a==="d-view"){laeuft(b,dokumentAnzeigen(id));return;}
+  if(a==="d-del"){laeuft(b,dokumentLoeschen(id));return;}
+  if(a==="d-del-wahl"){laeuft(b,dokumenteAuswahlLoeschen());return;}
+  if(a==="ab-wahl"){laeuft(b,ablageWahl(id));return;}
+  if(a==="ab-alle"){laeuft(b,ablageAlle());return;}
+  if(a==="d-link"){laeuft(b,dokumentZuordnen(id));return;}
+  if(a==="d-link-pick"){laeuft(b,dokumentVerknuepfen(id,b.dataset.cid));return;}
+  if(a==="d-reanalyze"){laeuft(b,analyseNachholen(id));return;}
+  if(a==="d-seiten"){laeuft(b,seitenHinzufuegen(id));return;}
   if(a==="d-pdf-an"){var pa=$("#pdfAn");if(pa)pa.click();return;}
-  if(a==="bb"){bbBlaettern(Number(b.dataset.r)||0);return;}
+  if(a==="bb"){laeuft(b,bbBlaettern(Number(b.dataset.r)||0));return;}
   if(a==="bb-tab"){if(BB&&BB.urls[BB.i])window.open(BB.urls[BB.i],"_blank","noopener");return;}
 
   /* --- Gesundheit --- */
   if(a==="med-open"){go("#/gesundheit?doc="+id);return;}
-  if(a==="med-edit"){medFormular(id);return;}
-  if(a==="med-explain"){medErklaeren(id);return;}
-  if(a==="med-tovertrag"){medZuVertrag(id);return;}
-  if(a==="med-csv"){medCsv();return;}
+  if(a==="med-edit"){laeuft(b,medFormular(id));return;}
+  if(a==="med-explain"){laeuft(b,medErklaeren(id));return;}
+  if(a==="med-tovertrag"){laeuft(b,medZuVertrag(id));return;}
+  if(a==="med-csv"){laeuft(b,medCsv());return;}
   if(a==="med-person-neu"){
     if(b.disabled)return;
     b.disabled=true;b.textContent=t("Wird angelegt …");   /* sofort sichtbar, ein zweiter Klick zählt nicht */
     personAnlegen(b.dataset.name,id).then(function(){render();});return;
   }
-  if(a==="pers-verw"){personenVerwalten();return;}
-  if(a==="pers-del"){personLoeschen(id);return;}
+  if(a==="pers-verw"){laeuft(b,personenVerwalten());return;}
+  if(a==="pers-del"){laeuft(b,personLoeschen(id));return;}
 
   /* --- Intelligente Funktionen --- */
-  if(a==="weg"){wegklicken(b.dataset.key);return;}
-  if(a==="smart"){smartSchalten(b.dataset.k,b.dataset.v==="1");return;}
-  if(a==="recherche"){rechercheVertrag(id);return;}
+  if(a==="weg"){laeuft(b,wegklicken(b.dataset.key));return;}
+  if(a==="smart"){laeuft(b,smartSchalten(b.dataset.k,b.dataset.v==="1"));return;}
+  if(a==="recherche"){laeuft(b,rechercheVertrag(id));return;}
 
   /* --- Nebenkosten --- */
-  if(a==="nk-neu"){nkFormular(null,null,[]);return;}
-  if(a==="nk-edit"){nkFormular(id,null,[]);return;}
-  if(a==="nk-del"){nkLoeschen(id);return;}
-  if(a==="nk-erledigt"){nkErledigt(id);return;}
-  if(a==="nk-vz"){nkVzUebernehmen(id);return;}
-  if(a==="nk-ki"){nkEinschaetzen();return;}
-  if(a==="nk-csv"){nkCsv();return;}
-  if(a==="nk-pos-neu"){nkPosNeu();return;}
-  if(a==="nk-pos-weg"){nkPosWeg(Number(b.dataset.i));return;}
+  if(a==="nk-neu"){laeuft(b,nkFormular(null,null,[]));return;}
+  if(a==="nk-edit"){laeuft(b,nkFormular(id,null,[]));return;}
+  if(a==="nk-del"){laeuft(b,nkLoeschen(id));return;}
+  if(a==="nk-erledigt"){laeuft(b,nkErledigt(id));return;}
+  if(a==="nk-vz"){laeuft(b,nkVzUebernehmen(id));return;}
+  if(a==="nk-ki"){laeuft(b,nkEinschaetzen());return;}
+  if(a==="nk-csv"){laeuft(b,nkCsv());return;}
+  if(a==="nk-pos-neu"){laeuft(b,nkPosNeu());return;}
+  if(a==="nk-pos-weg"){laeuft(b,nkPosWeg(Number(b.dataset.i)));return;}
   if(a==="nk-datei"){NK_DATEI_ZIEL=id||null;var nd=$("#nkDatei");if(nd)nd.click();return;}
-  if(a==="nk-lesen"){nkAuslesen([],id,null);return;}
+  if(a==="nk-lesen"){laeuft(b,nkAuslesen([],id,null));return;}
   if(a==="nk-aus-dok"){var nkDok=id;REVIEW=null;nkNach("#/nebenkosten",function(){nkAuslesen([nkDok],null,null);});return;}
 });
 
@@ -8759,23 +8835,24 @@ document.addEventListener("click",function(ev){
 document.addEventListener("submit",function(ev){
   var f=ev.target;
   if(!f)return;
+  if(f.getAttribute&&f.getAttribute("aria-busy")==="true"){ev.preventDefault();return;}
   if(f.id==="authForm"){
     ev.preventDefault();
     var btn=f.querySelector('button[type="submit"]');
-    if(btn&&btn.dataset.mode==="setpass")doSetPass();else doLogin();
+    laeuft(f,btn&&btn.dataset.mode==="setpass"?doSetPass():doLogin());
     return;
   }
-  if(f.id==="vForm"){ev.preventDefault();speichereVertrag();return;}
-  if(f.dataset.form==="haus"){ev.preventDefault();hausSpeichern(f.dataset.id||null);return;}
-  if(f.dataset.form==="logo"){ev.preventDefault();logoSpeichern();return;}
-  if(f.dataset.form==="beitreten"){ev.preventDefault();beitreten();return;}
-  if(f.dataset.form==="haus-loeschen"){ev.preventDefault();hausLoeschen(f.dataset.id);return;}
-  if(f.id==="nkForm"){ev.preventDefault();nkSpeichern();return;}
-  if(f.id==="medForm"){ev.preventDefault();medSpeichern(f.dataset.id);return;}
+  if(f.id==="vForm"){ev.preventDefault();laeuft(f,speichereVertrag());return;}
+  if(f.dataset.form==="haus"){ev.preventDefault();laeuft(f,hausSpeichern(f.dataset.id||null));return;}
+  if(f.dataset.form==="logo"){ev.preventDefault();laeuft(f,logoSpeichern());return;}
+  if(f.dataset.form==="beitreten"){ev.preventDefault();laeuft(f,beitreten());return;}
+  if(f.dataset.form==="haus-loeschen"){ev.preventDefault();laeuft(f,hausLoeschen(f.dataset.id));return;}
+  if(f.id==="nkForm"){ev.preventDefault();laeuft(f,nkSpeichern());return;}
+  if(f.id==="medForm"){ev.preventDefault();laeuft(f,medSpeichern(f.dataset.id));return;}
   if(f.id==="persForm"){
     ev.preventDefault();
     var n=val("p_name");
-    if(n)personAnlegen(n).then(function(){closeModal(true);personenVerwalten();});
+    if(n)laeuft(f,personAnlegen(n).then(function(r){if(r){closeModal(true);personenVerwalten();}}));
     return;
   }
 });
