@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-C3Qp3LbA7nI0Eib8uB54pSzRcZ0nsb7vMnIqjl9KDDY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-YRJctsyaKmjepMKMbZoX8CWWI736ruOaBc9x3ipxaXQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -567,6 +567,16 @@ ul.hint li+li,ol.hint li+li{margin-top:4px}
 .laeuft{opacity:.6;cursor:progress;pointer-events:none}
 .btn.laeuft::after{content:"";display:inline-block;width:14px;height:14px;margin-left:8px;vertical-align:-2px;
   border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}
+
+/* ================= 1.9.0: Registrierungen ================= */
+.regz{display:flex;flex-direction:column;gap:10px;padding:14px 4px;border-bottom:1px solid var(--line)}
+.regz:last-child{border-bottom:0}
+.regz .db{display:flex;flex-direction:column;gap:3px;min-width:0}
+.regz .dn{font-weight:800;overflow-wrap:anywhere}
+.regz .dm{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:13px;font-weight:600}
+.regz .dm span{overflow-wrap:anywhere}
+.regz .factions{margin:0}
+.authc .kvl .kw{overflow-wrap:anywhere}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -761,7 +771,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.8.5";
+var APP_VERSION="1.9.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -816,6 +826,34 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.9.0: Freigabe ---- */
+  "Registrierungen":"Регистрации",
+  "Nur für den Superadmin.":"Только для суперадминистратора.",
+  "Wartet auf Freigabe":"Ожидают подтверждения",
+  "E-Mail noch nicht bestätigt":"E-mail ещё не подтверждён",
+  "Freigeben":"Подтвердить",
+  "Ablehnen":"Отклонить",
+  "Niemand wartet auf Freigabe.":"Никто не ожидает подтверждения.",
+  "Freigegebene Konten":"Подтверждённые аккаунты",
+  "Superadmin":"Суперадмин",
+  "nie angemeldet":"ни разу не входил(а)",
+  "Passwort-Link senden":"Отправить ссылку для пароля",
+  "Neue Konten sehen nichts, bis du sie freigibst. Sobald jemand seine E-Mail-Adresse bestätigt hat, bekommst du eine Mail mit Freigeben und Ablehnen.":"Новые аккаунты ничего не видят, пока вы их не подтвердите. Как только кто-то подтвердит свой e-mail, вы получите письмо с кнопками «Подтвердить» и «Отклонить».",
+  "{0} ist freigegeben ✅":"{0}: аккаунт подтверждён ✅",
+  "Freigeben fehlgeschlagen":"Не удалось подтвердить",
+  "Registrierung von {0} ablehnen? Das Konto wird gelöscht.":"Отклонить регистрацию {0}? Аккаунт будет удалён.",
+  "Registrierung abgelehnt, Konto gelöscht":"Регистрация отклонена, аккаунт удалён",
+  "Ablehnen fehlgeschlagen":"Не удалось отклонить",
+  "Link zum Zurücksetzen des Passworts an {0} schicken?":"Отправить ссылку для сброса пароля на {0}?",
+  "Link an {0} geschickt ✅":"Ссылка отправлена на {0} ✅",
+  "Senden fehlgeschlagen":"Не удалось отправить",
+  "{0} Registrierung wartet auf Freigabe":"{0} регистрация ожидает подтверждения",
+  "{0} Registrierungen warten auf Freigabe":"{0} регистрации ожидают подтверждения",
+  "{0} wartet auf Freigabe":"{0} ожидает подтверждения",
+  "{0} warten auf Freigabe":"{0} ожидают подтверждения",
+  "Konten freigeben oder ablehnen":"Подтверждать или отклонять аккаунты",
+
 
 /* ---- 1.8.5: Nebenkosten-Prüfung ---- */
   "Wohnfläche prüfen":"Проверьте жилую площадь",
@@ -2536,7 +2574,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -2619,8 +2657,12 @@ function closeModal(still){
 /* ================= Zeichnen ================= */
 function render(){
   var r=$("#root");if(!r)return;
+  /* Freigabe-Link aus der Mail: geht auch ohne Anmeldung */
+  if(route().name==="freigabe"){r.innerHTML=freigabeSeiteHtml();return;}
   if(booting){r.innerHTML=ladeHtml();return;}
   if(!me){r.innerHTML=authHtml();return;}
+  /* Konto noch nicht freigegeben: nur die Warteseite */
+  if(FREIGABE==="offen"){r.innerHTML=wartenHtml();return;}
   var rt=route();
   /* Scanner: eigene Ebene über der App; die Adresse hält ihn offen */
   if(rt.name!=="scan"&&SCAN&&!SCAN_SPEICHERN)scannerAus();   /* beim Speichern bleibt er offen, bis alles oben ist */
@@ -2628,7 +2670,7 @@ function render(){
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   if(rt.name==="scan"){r.innerHTML=shell("","neu");scannerZeigen(rt.params);return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -2649,6 +2691,7 @@ function render(){
   else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
   else if(rt.name==="logos")     {inhalt=viewLogos();cur="mehr";}
   else if(rt.name==="kikosten")  {inhalt=viewKiKosten();cur="mehr";}
+  else if(rt.name==="registrierungen"){inhalt=viewRegistrierungen();cur="mehr";}
   else if(rt.name==="nebenkosten"){inhalt=viewNebenkosten();cur=rt.params.von==="vertrag"?"vertraege":"mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
@@ -2877,6 +2920,7 @@ async function ladeAlles(){
 var AUTH_MODE="login";
 function authHtml(){
   var reset=AUTH_MODE==="reset";
+  if(AUTH_MODE==="signup")return signupHtml();
   return '<div class="auth"><form class="authc" id="authForm" novalidate><img class="logo" src="icon.svg?v=2" alt="">'+
     '<h1>'+(reset?"Neues Passwort":"All-Home")+'</h1>'+
     '<p>'+(reset?"Vergib jetzt ein neues Passwort.":"Alle Verträge deines Haushalts an einem Ort.")+'</p>'+
@@ -2887,6 +2931,19 @@ function authHtml(){
        '<label class="fld"><span>Passwort</span><input class="inp" id="a_pass" type="password" autocomplete="current-password"></label>'+
        '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="login">Anmelden</button>'+
        '<div class="arow"><button type="button" class="lnk" data-a="signup">Neues Konto</button><button type="button" class="lnk" data-a="forgot">Passwort vergessen?</button></div>')+
+  '</form></div>';
+}
+/* Neues Konto: Vor- und Nachname gehen an den Administrator, der das Konto freigibt */
+function signupHtml(){
+  return '<div class="auth"><form class="authc" id="authForm" novalidate><img class="logo" src="icon.svg?v=2" alt="">'+
+    '<h1>Neues Konto</h1>'+
+    '<p>Nach der Bestätigung deiner E-Mail-Adresse gibt der Administrator dein Konto frei.</p>'+
+    '<div class="two"><label class="fld"><span>Vorname</span><input class="inp" id="a_vorname" type="text" autocomplete="given-name" maxlength="80"></label>'+
+    '<label class="fld"><span>Nachname</span><input class="inp" id="a_nachname" type="text" autocomplete="family-name" maxlength="80"></label></div>'+
+    '<label class="fld"><span>E-Mail</span><input class="inp" id="a_mail" type="email" autocomplete="username" inputmode="email"></label>'+
+    '<label class="fld"><span>Passwort</span><input class="inp" id="a_pass" type="password" autocomplete="new-password" minlength="8"></label>'+
+    '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="signup">Konto anlegen</button>'+
+    '<div class="arow"><button type="button" class="lnk" data-a="auth-login">Ich habe schon ein Konto</button></div>'+
   '</form></div>';
 }
 function authMsg(txt,kind){var m=$("#amsg");if(m){m.textContent=txt||"";m.className="amsg"+(kind?" "+kind:"");}}
@@ -2910,13 +2967,18 @@ async function doLogin(){
 }
 async function doSignup(){
   var mail=($("#a_mail").value||"").trim(),pass=$("#a_pass").value||"";
+  var vn=(($("#a_vorname")||{}).value||"").trim(),nn=(($("#a_nachname")||{}).value||"").trim();
+  if(!vn||!nn){authMsg("Bitte Vor- und Nachname eingeben.","err");return;}
   if(!mail||!pass){authMsg("Bitte E-Mail und Passwort eingeben.","err");return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){authMsg("Bitte eine gültige E-Mail-Adresse eingeben.","err");return;}
   if(pass.length<8){authMsg("Das Passwort muss mindestens 8 Zeichen haben.","err");return;}
   authMsg("Konto wird erstellt …");
   try{
-    var r=await sb.auth.signUp({email:mail,password:pass,options:{emailRedirectTo:location.origin+location.pathname}});
+    var r=await sb.auth.signUp({email:mail,password:pass,options:{emailRedirectTo:location.origin+location.pathname,data:{vorname:vn.slice(0,80),nachname:nn.slice(0,80),app:"all-home"}}});
     if(r.error){authMsg(loginFehler(r.error),"err");return;}
-    authMsg(r.data&&r.data.session?"Konto erstellt – du wirst angemeldet …":"Fast fertig! Wir haben dir eine Bestätigungs-E-Mail geschickt. Bitte klicke den Link darin an.","ok");
+    if(r.data&&r.data.session){authMsg("Konto erstellt – du wirst angemeldet …","ok");return;}
+    AUTH_MODE="login";render();var am=$("#a_mail");if(am)am.value=mail;
+    authMsg("Fast fertig! Bitte bestätige deine E-Mail-Adresse über den Link in unserer Mail an "+mail+". Danach gibt der Administrator dein Konto frei.","ok");
   }catch(e){authMsg(loginFehler(e),"err");}
 }
 async function doForgot(){
@@ -2926,7 +2988,8 @@ async function doForgot(){
   try{
     var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname});
     if(r.error){authMsg(loginFehler(r.error),"err");return;}
-    authMsg("Wir haben dir eine E-Mail zum Zurücksetzen geschickt.","ok");
+    /* Der Server sagt aus Datenschutzgründen nicht, ob es die Adresse gibt – darum ehrlich formulieren */
+    authMsg("Falls es ein Konto mit "+mail+" gibt, ist jetzt eine E-Mail zum Zurücksetzen unterwegs. Nichts angekommen? Schreibweise und Spam-Ordner prüfen.","ok");
   }catch(e){authMsg(loginFehler(e),"err");}
 }
 async function doSetPass(){
@@ -2945,6 +3008,7 @@ async function doLogout(){
   await entwurfLoeschen();
   try{await sb.auth.signOut();}catch(e){}
   me=null;HH=null;SETUP=null;CONTRACTS=[];DOCS=[];PERSONS=[];ENERGIE={};
+  FREIGABE=null;IST_SUPERADMIN=false;REG=null;AUTH_MODE="login";
   curLang="de";applyLangAttr();   /* Anmelde-Bildschirm ist immer deutsch */
   authMsg("");render();
 }
@@ -3233,7 +3297,11 @@ function viewMehr(){
       '<span class="db"><span class="dn">'+t("KI-Stufe")+'</span>'+
       '<span class="dm"><span>'+t(KI_STUFEN[kiStufe()].name)+' · '+esc(KI_STUFEN[kiStufe()].model)+'</span></span></span>'+
       '<span class="go">'+ic("right",18)+'</span></button></section>'+
-    (IST_APP_ADMIN||(HH&&ichAdmin(HH.id))?'<div class="mgrp">'+t("Verwaltung")+'</div><section class="card">'+
+    (IST_SUPERADMIN||IST_APP_ADMIN||(HH&&ichAdmin(HH.id))?'<div class="mgrp">'+t("Verwaltung")+'</div><section class="card">'+
+      (IST_SUPERADMIN?'<a class="drow3" href="#/registrierungen"><span class="di">'+ic("users")+'</span>'+
+        '<span class="db"><span class="dn">'+t("Registrierungen")+'</span>'+
+        '<span class="dm"><span>'+(regOffen().length?tn(regOffen().length,"{0} wartet auf Freigabe","{0} warten auf Freigabe"):t("Konten freigeben oder ablehnen"))+'</span></span></span>'+
+        (regOffen().length?'<span class="pill warnp">'+regOffen().length+'</span>':"")+'<span class="go">'+ic("right",18)+'</span></a>':"")+
       (HH&&ichAdmin(HH.id)?'<a class="drow3" href="#/kikosten"><span class="di">'+ic("euro")+'</span>'+
         '<span class="db"><span class="dn">'+t("KI-Kosten")+'</span>'+
         '<span class="dm"><span>'+t("Wer, wann, wie viel")+'</span></span></span>'+
@@ -5084,6 +5152,7 @@ function vorschlaege(){
   }
 
   if(smartAn("nebenkosten"))v=v.concat(nkVorschlaege());
+  v=regVorschlaege().concat(v);   /* Superadmin: wartende Registrierungen ganz vorn – nicht abschaltbar */
   return v.filter(function(x){return !istWeg(x.key);});
 }
 function vorschlagHtml(x){
@@ -8692,6 +8761,152 @@ function nkVertragKarte(c){
   '</section>';
 }
 
+/* ================= Freigabe neuer Konten =================
+   Neue Konten starten „offen“: Die Datenbank zeigt ihnen nichts, bis der Superadmin sie freigibt –
+   per Link aus der Benachrichtigungs-Mail (#/freigabe?t=…&a=…, geht auch ohne Anmeldung, der Link
+   trägt ein Einmal-Token) oder unter Mehr › Registrierungen. Diese Seiten bleiben deutsch wie die Anmeldung. */
+var FREIGABE=null;          /* "freigegeben" | "offen" | null (noch unbekannt) */
+var IST_SUPERADMIN=false;
+var REG=null;               /* Liste für den Superadmin: {zeilen, fehler, am, laedt} */
+var FG=null;                /* Freigabe-Seite: {token, aktion, daten, fehler, ergebnis, laedt} */
+var EDGE_FREIGABE="allhome-freigabe";
+
+/* Eigener Status + Superadmin? Bei einem Technikfehler nicht aussperren – die Datenbank schützt ohnehin. */
+async function ladeFreigabe(){
+  FREIGABE=null;IST_SUPERADMIN=false;if(!me)return;
+  try{var r=await sbPub.rpc("meine_freigabe");FREIGABE=(r&&!r.error&&r.data)?r.data:"freigegeben";}catch(e){FREIGABE="freigegeben";}
+  if(FREIGABE!=="freigegeben")return;
+  try{var s=await sbPub.rpc("ist_superadmin");IST_SUPERADMIN=!!(s&&!s.error&&s.data===true);}catch(e){}
+  if(IST_SUPERADMIN)ladeRegistrierungen();
+}
+function wartenHtml(){
+  return '<div class="auth"><div class="authc"><img class="logo" src="icon.svg?v=2" alt="">'+
+    '<h1>Fast geschafft</h1>'+
+    '<p>Dein Konto <b>'+esc((me&&me.email)||"")+'</b> wartet auf die Freigabe durch den Administrator. Sobald es freigegeben ist, kannst du All-Home und AllTrack nutzen.</p>'+
+    '<div class="amsg" id="amsg"></div>'+
+    '<button class="btn lg full" type="button" data-a="freigabe-pruefen">Erneut prüfen</button>'+
+    '<div class="arow"><button type="button" class="lnk" data-a="logout">Abmelden</button></div>'+
+  '</div></div>';
+}
+async function freigabePruefen(){
+  await ladeFreigabe();
+  if(FREIGABE==="offen"){authMsg("Noch nicht freigegeben – bitte später noch einmal.","err");return;}
+  await starteSitzung();
+}
+
+/* ---------- Freigabe-Seite aus der Mail ---------- */
+async function freigabeRuf(body){
+  var r=await sb.functions.invoke(EDGE_FREIGABE,{body:body});
+  if(r.error){
+    var msg=null;
+    try{if(r.error.context&&typeof r.error.context.json==="function"){var jb=await r.error.context.json();msg=jb&&jb.error;}}catch(e){}
+    throw new Error(msg||errMsg(r.error));
+  }
+  var b=r.data||{};
+  if(b.error)throw new Error(b.error);
+  return b;
+}
+async function freigabeInfo(){
+  try{var b=await freigabeRuf({modus:"info",token:FG.token});FG.daten=b.registrierung||null;if(!FG.daten)FG.fehler="Der Link ist ungültig.";}
+  catch(e){FG.fehler=errMsg(e);}
+  FG.laedt=false;if(route().name==="freigabe")render();
+}
+function fgName(d){return [d&&d.vorname,d&&d.nachname].filter(Boolean).join(" ")||"(ohne Namen)";}
+function freigabeSeiteHtml(){
+  var p=route().params;
+  if(!FG||FG.token!==(p.t||"")){FG={token:p.t||"",aktion:p.a==="ablehnen"?"ablehnen":"freigeben",laedt:true};freigabeInfo();}
+  var kopf='<div class="auth"><div class="authc"><img class="logo" src="icon.svg?v=2" alt=""><h1>Registrierung</h1>';
+  var fuss='<div class="arow"><a class="lnk" href="#/start">Zu All-Home</a></div></div></div>';
+  if(FG.laedt)return kopf+'<div class="abrbusy"><span class="spin"></span></div>'+fuss;
+  if(FG.ergebnis){
+    var e=FG.ergebnis;
+    return kopf+'<p>'+(e.aktion==="freigeben"
+      ?'✅ <b>'+esc(fgName(e))+'</b> ist freigegeben und kann All-Home und AllTrack jetzt nutzen.'
+      :'Die Registrierung von <b>'+esc(fgName(e))+'</b> ('+esc(e.email||"")+') ist abgelehnt, das Konto gelöscht.')+'</p>'+fuss;
+  }
+  if(FG.fehler)return kopf+'<p>'+esc(FG.fehler)+'</p><p class="hint">Offene Registrierungen findest du in All-Home unter Mehr › Registrierungen.</p>'+fuss;
+  var d=FG.daten,ab=FG.aktion==="ablehnen";
+  return kopf+'<p>'+(ab?"Diese Registrierung ablehnen?":"Diese Registrierung freigeben?")+'</p>'+
+    '<div class="kvl" style="text-align:left;margin:4px 0 18px">'+
+      kv("Vorname",esc(d.vorname||"–"))+kv("Nachname",esc(d.nachname||"–"))+kv("E-Mail",esc(d.email||""))+
+      kv("Registriert",esc(fmtDate(String(d.angelegt_am||"").slice(0,10))))+kv("Über",esc(d.app==="alltrack"?"AllTrack":(d.app==="all-home"?"All-Home":"–")))+
+    '</div>'+
+    '<div class="amsg" id="amsg"></div>'+
+    '<button class="btn lg full'+(ab?" danger":"")+'" type="button" data-a="'+(ab?"fg-nein":"fg-ja")+'">'+(ab?"Ablehnen und Konto löschen":"Freigeben")+'</button>'+
+    '<button class="btn full ghost" type="button" style="margin-top:10px" data-a="'+(ab?"fg-ja":"fg-nein")+'">'+(ab?"Doch freigeben":"Stattdessen ablehnen")+'</button>'+
+    fuss;
+}
+async function freigabeEntscheiden(aktion){
+  if(!FG||!FG.daten)return;
+  if(aktion==="ablehnen"&&!confirm("Registrierung von "+fgName(FG.daten)+" ablehnen? Das Konto wird gelöscht."))return;
+  try{
+    var b=await freigabeRuf({modus:"entscheiden",token:FG.token,aktion:aktion});
+    FG.ergebnis=b.ergebnis;REG=null;render();
+  }catch(e){authMsg(errMsg(e),"err");}
+}
+
+/* ---------- Superadmin: Mehr › Registrierungen ---------- */
+async function ladeRegistrierungen(){
+  REG=REG||{zeilen:null,fehler:null};REG.laedt=true;
+  try{var r=await sbPub.rpc("registrierungen_liste");if(r.error)throw r.error;REG.zeilen=r.data||[];REG.fehler=null;}
+  catch(e){REG.fehler=errMsg(e);if(!REG.zeilen)REG.zeilen=[];}
+  REG.am=Date.now();REG.laedt=false;
+  if(["registrierungen","mehr","start","vorschlaege"].indexOf(route().name)>=0)render();
+}
+window.addEventListener("hashchange",function(){if(REG)REG.am=0;});
+function regOffen(){return ((REG&&REG.zeilen)||[]).filter(function(z){return z.status!=="freigegeben";});}
+function regName(z){return [z.vorname,z.nachname].filter(Boolean).join(" ");}
+function viewRegistrierungen(){
+  var kopf=zurueck("#/mehr",t("Mehr"))+seitenTitel(t("Registrierungen"));
+  if(!IST_SUPERADMIN)return kopf+'<section class="card"><p class="hint">'+t("Nur für den Superadmin.")+'</p></section>';
+  if(!REG||(!REG.laedt&&Date.now()-(REG.am||0)>10000))ladeRegistrierungen();
+  if(!REG.zeilen)return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';
+  var offen=regOffen(),frei=REG.zeilen.filter(function(z){return z.status==="freigegeben";});
+  return kopf+(REG.fehler?fehlerKarte(REG.fehler):"")+
+    '<div class="sect">'+t("Wartet auf Freigabe")+'</div>'+
+    (offen.length?'<section class="card"><div class="dlist">'+offen.map(function(z){
+      return '<div class="regz"><div class="db"><span class="dn">'+esc(regName(z)||z.email)+'</span>'+
+        '<span class="dm"><span>'+esc(z.email)+'</span><span>'+fmtDate(String(z.angelegt_am||"").slice(0,10))+'</span>'+
+          (z.email_bestaetigt?"":'<span class="pill">'+t("E-Mail noch nicht bestätigt")+'</span>')+'</span></div>'+
+        '<div class="factions"><button class="btn sm" data-a="reg-ja" data-id="'+z.user_id+'">'+ic("check")+' '+t("Freigeben")+'</button>'+
+        '<button class="btn sm ghost danger" data-a="reg-nein" data-id="'+z.user_id+'">'+t("Ablehnen")+'</button></div></div>';
+    }).join("")+'</div></section>'
+     :'<section class="card"><p class="hint" style="margin:0">'+t("Niemand wartet auf Freigabe.")+'</p></section>')+
+    '<div class="sect">'+t("Freigegebene Konten")+'</div><section class="card"><div class="dlist">'+frei.map(function(z){
+      return '<div class="regz"><div class="db"><span class="dn">'+esc(regName(z)||z.email)+(z.superadmin?' <span class="pill">'+t("Superadmin")+'</span>':"")+'</span>'+
+        '<span class="dm"><span>'+esc(z.email)+'</span><span>'+(z.zuletzt_angemeldet?tf("zuletzt {0}",fmtDate(String(z.zuletzt_angemeldet).slice(0,10))):t("nie angemeldet"))+'</span></span></div>'+
+        '<div class="factions"><button class="btn sm ghost" data-a="reg-pw" data-mail="'+esc(z.email)+'">'+ic("link")+' '+t("Passwort-Link senden")+'</button></div></div>';
+    }).join("")+'</div></section>'+
+    '<p class="hint" style="margin-top:14px">'+t("Neue Konten sehen nichts, bis du sie freigibst. Sobald jemand seine E-Mail-Adresse bestätigt hat, bekommst du eine Mail mit Freigeben und Ablehnen.")+'</p>';
+}
+function regZeile(id){return ((REG&&REG.zeilen)||[]).filter(function(z){return z.user_id===id;})[0]||null;}
+async function regFreigeben(id){
+  try{var r=await sbPub.rpc("registrierung_freigeben",{p_user:id});if(r.error)throw r.error;
+    var z=regZeile(id);await ladeRegistrierungen();toast(tf("{0} ist freigegeben ✅",regName(z||{})||(z&&z.email)||""));}
+  catch(e){toast(t("Freigeben fehlgeschlagen")+": "+errMsg(e),true);}
+}
+async function regAblehnen(id){
+  var z=regZeile(id);if(!z)return;
+  if(!confirm(tf("Registrierung von {0} ablehnen? Das Konto wird gelöscht.",regName(z)||z.email)))return;
+  try{var r=await sbPub.rpc("registrierung_ablehnen",{p_user:id});if(r.error)throw r.error;
+    await ladeRegistrierungen();toast(t("Registrierung abgelehnt, Konto gelöscht"));}
+  catch(e){toast(t("Ablehnen fehlgeschlagen")+": "+errMsg(e),true);}
+}
+/* Passwort vergessen für jemanden: der Link geht an die hinterlegte Adresse – keine Tippfehler möglich */
+async function regPasswort(mail){
+  if(!mail||!confirm(tf("Link zum Zurücksetzen des Passworts an {0} schicken?",mail)))return;
+  try{var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;
+    toast(tf("Link an {0} geschickt ✅",mail));}
+  catch(e){toast(t("Senden fehlgeschlagen")+": "+loginFehler(e),true);}
+}
+function regVorschlaege(){
+  if(!IST_SUPERADMIN)return [];
+  var offen=regOffen().filter(function(z){return z.email_bestaetigt;});if(!offen.length)return [];
+  return [{key:"reg:"+offen.map(function(z){return z.user_id;}).join(","),art:"warn",icon:"user",
+    titel:tn(offen.length,"{0} Registrierung wartet auf Freigabe","{0} Registrierungen warten auf Freigabe"),
+    text:offen.map(function(z){return regName(z)||z.email;}).join(" · "),knopf:t("Ansehen"),href:"#/registrierungen"}];
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 /* Knopf mit Hintergrund-Arbeit: sofort gedimmt mit Kreisel, weitere Klicks zählen nicht, bis sie fertig ist */
@@ -8720,7 +8935,14 @@ document.addEventListener("click",function(ev){
   if(a==="neu-laden"){LADEFEHLER=null;SETUP_FEHLER=null;starteSitzung();return;}
 
   /* --- Anmeldung --- */
-  if(a==="signup"){laeuft(b,doSignup());return;}
+  if(a==="signup"){AUTH_MODE="signup";var sm=$("#a_mail"),smw=sm?sm.value:"";render();var sm2=$("#a_mail");if(sm2)sm2.value=smw;var vn=$("#a_vorname");if(vn)vn.focus();return;}
+  if(a==="auth-login"){AUTH_MODE="login";render();return;}
+  if(a==="freigabe-pruefen"){laeuft(b,freigabePruefen());return;}
+  if(a==="fg-ja"){laeuft(b,freigabeEntscheiden("freigeben"));return;}
+  if(a==="fg-nein"){laeuft(b,freigabeEntscheiden("ablehnen"));return;}
+  if(a==="reg-ja"){laeuft(b,regFreigeben(id));return;}
+  if(a==="reg-nein"){laeuft(b,regAblehnen(id));return;}
+  if(a==="reg-pw"){laeuft(b,regPasswort(b.dataset.mail));return;}
   if(a==="forgot"){laeuft(b,doForgot());return;}
 
   /* --- Haushalt --- */
@@ -8839,7 +9061,8 @@ document.addEventListener("submit",function(ev){
   if(f.id==="authForm"){
     ev.preventDefault();
     var btn=f.querySelector('button[type="submit"]');
-    laeuft(f,btn&&btn.dataset.mode==="setpass"?doSetPass():doLogin());
+    var am=btn&&btn.dataset.mode;
+    laeuft(f,am==="setpass"?doSetPass():(am==="signup"?doSignup():doLogin()));
     return;
   }
   if(f.id==="vForm"){ev.preventDefault();laeuft(f,speichereVertrag());return;}
@@ -9006,6 +9229,8 @@ async function boot(){
 }
 async function starteSitzung(){
   booting=true;render();
+  await ladeFreigabe();
+  if(FREIGABE==="offen"){booting=false;render();return;}
   try{await ladeAlles();}
   catch(e){LADEFEHLER=errMsg(e);}
   booting=false;
