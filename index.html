@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-4YO4R9y7gJgqoHSlJb7xItqcIX4rqxFHOwbA4qKz1vM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-msay67vScowG2wchS2MlakSWieupfhaMDdLok4kz++o='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -773,6 +773,49 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
 .nkarbeit{text-align:center;padding:34px 10px}
 .nkarbeit .spin{margin:0 auto 14px}
 .nkarbeit p{font-weight:800;margin:0}
+
+/* ---- Heatmap (1.9.8) ---- */
+.nkmopt{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.nkmseg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.nkmseg button{min-height:34px;padding:0 11px;font-weight:800;font-size:.8rem;color:var(--muted)}
+.nkmseg button+button{border-left:1.5px solid var(--line)}
+.nkmseg button.on{background:var(--ink);color:var(--ink-fg)}
+.nkm th[scope=row]{font-weight:800;color:var(--text);font-size:.84rem}
+.nkm .nkm-auf{display:flex;align-items:center;gap:6px;width:100%;min-height:34px;text-align:left;font-weight:800}
+.nkm .nkm-pf{flex:none;width:12px;color:var(--muted)}
+.nkm .nkm-p th[scope=row]{padding-left:24px;font-weight:700;font-size:.8rem}
+.nkm .nkm-p .nkm-pn{vertical-align:middle}
+.nkm td.nkm-z{padding:0}
+.nkm .nkm-z button{display:block;width:100%;min-height:34px;padding:7px 6px;text-align:right;font:inherit;font-weight:700;color:inherit}
+.nkm .nkm-k .nkm-z button{font-weight:900}
+.nkm .nkm-k th,.nkm .nkm-k td{border-top:1px solid var(--line-2)}
+.nkmspark{width:56px;height:18px;display:block;margin-left:auto}
+.nkmspark polyline{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.nkm-bar{display:inline-block;width:30px;height:6px;border-radius:3px;background:var(--line);margin-right:6px;vertical-align:middle;overflow:hidden}
+.nkm-bar i{display:block;height:100%;background:var(--nk7)}
+.nkm tr.nkm-akt td{text-align:left;white-space:normal;padding:8px 6px 12px 24px;background:var(--surface)}
+.nkm tr.nkm-akt .sug{margin:0 0 8px}
+.nkm tr.nkm-akt .factions{margin:0}
+.nkm .nkm-tr{display:inline-flex;align-items:center;gap:3px;min-height:32px;font-size:.74rem;font-weight:800;color:var(--muted);margin-right:6px;vertical-align:middle}
+.nkm tfoot th{font-weight:800;color:var(--muted);font-size:.78rem}
+.nkm tfoot .nksum th,.nkm tfoot .nksum td{font-weight:900;color:var(--text)}
+.nkm tfoot td{color:var(--text)}
+.nkm-leg{margin:8px 0 0}
+.nkm thead th:first-child,.nkm tbody th[scope=row],.nkm tfoot th[scope=row]{box-shadow:1px 0 0 var(--line)}
+.nktab.nkmbox{direction:ltr}
+.nkm tr.nkm-akt td{position:static}
+.nkm .nkm-akt-in{position:sticky;left:6px;max-width:calc(var(--nkm-w,100%) - 36px)}
+.nkmopt{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.nkmopt::-webkit-scrollbar{display:none}
+.nkmseg{flex:none}
+.nkm .nkm-cb{width:32px;height:32px;display:inline-grid;place-items:center;vertical-align:middle;margin:0 2px 0 -6px}
+.nkm .nkm-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--line-2);display:grid;place-items:center;background:var(--surface)}
+.nkm .nkm-cb.an .nkm-box{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}
+.nkm td.nkm-s{min-width:64px}
+.nkm td.nkm-d{min-width:58px}
+.nkm td.nkm-a{min-width:76px}
+.nkm tr.nkm-f td,.nkm tr.nkm-f th{border-bottom:1px solid var(--line)}
+.nkm .nkm-vs .sa{gap:8px}
 </style>
 </head>
 <body>
@@ -791,7 +834,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.7";
+var APP_VERSION="1.9.8";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -846,6 +889,44 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.9.8 Heatmap ---- */
+  "Trennen":"Разделить",
+  "{0} Jahr":"{0} год",
+  "{0} Jahre":"Лет: {0}",
+  "Anzahl Jahre":"Количество лет",
+  "Δ Vorjahr":"Δ к прошлому году",
+  "Höhe":"Сумма",
+  "Farbe":"Цвет",
+  "€ / Jahr":"€ / год",
+  "€ / m²":"€ / м²",
+  "Werte":"Значения",
+  "Anstieg":"Рост",
+  "Sortierung":"Сортировка",
+  "Vermutlich dieselbe Position":"Вероятно, та же позиция",
+  "Zusammenfassen":"Объединить",
+  "Nein":"Нет",
+  "Positionen zusammenfassen":"Объединить позиции",
+  "Verlauf":"Динамика",
+  "Vorjahr":"прошлый год",
+  "Δ seit {0}":"Δ с {0}",
+  "Anteil":"Доля",
+  "Vorauszahlungen":"Авансовые платежи",
+  "Nachzahlung / Guthaben":"Доплата / переплата",
+  "€ je m² · Monat (Schnitt {0})":"€ за м² · месяц (в среднем {0})",
+  "Rot: teurer als im Vorjahr · Grün: günstiger":"Красный: дороже, чем в прошлом году · Зелёный: дешевле",
+  "Je kräftiger, desto teurer":"Чем насыщеннее, тем дороже",
+  "€ je m² und Monat":"€ за м² в месяц",
+  "€ im Jahr":"€ в год",
+  "neu in diesem Jahr":"новое в этом году",
+  "nicht vergleichbar (Teilzeitraum)":"несопоставимо (неполный период)",
+  "Auf 12 Monate":"За 12 месяцев",
+  "Gegenüber Vorjahr":"По сравнению с прошлым годом",
+  "Wie auf der Abrechnung":"Как в расчёте",
+  "Abrechnung {0} öffnen":"Открыть расчёт {0}",
+  "Zusammengefasst als „{0}“":"Объединено как «{0}»",
+  "Getrennt":"Разделено",
+
 
 /* ---- 1.9.7 Umzug ---- */
   "„{0}“ gibt es im Ziel schon als eigenen Vertrag – bitte prüfen.":"«{0}» уже есть в целевом хозяйстве отдельным договором — проверьте, пожалуйста.",
@@ -2892,6 +2973,7 @@ function render(){
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
+  if(rt.name==="nebenkosten"&&typeof nkmNachZeichnen==="function")nkmNachZeichnen();
 }
 /* Fehler, der stehen bleibt – anders als eine Kurzmeldung, die man verpasst */
 function fehlerKarte(txt){
@@ -8937,7 +9019,7 @@ function viewNebenkosten(){
       '<section class="card">'+nkSaeulen(liste)+'</section>'+
       (liste.some(function(n){return numOrNull(n.wohnflaeche)>0;})?'<section class="card" style="margin-top:12px">'+nkLinie(liste)+'</section>':"")+
       '<div class="sect">'+t("Kosten je Kategorie")+'</div>'+
-      '<section class="card">'+nkTabelle(liste)+'</section>':"")+
+      '<section class="card">'+nkMatrixHtml(liste)+'</section>':"")+
     (vor?nkTreiber(neu,vor):"")+
     nkEinschaetzungKarte(liste)+
     /* Alle Abrechnungen */
@@ -9041,24 +9123,6 @@ function nkLinie(liste){
     '<text x="'+px(i)+'" y="'+(H-B+18)+'" class="nkax" text-anchor="middle">'+esc(nkLabel(n))+'</text>';});
   return '<div class="nkkopf"><b>'+t("Je m² und Monat")+'</b><span class="hint" style="margin:0">'+tf("gestrichelt: Schnitt {0} (Mieterbund)",eur(NK_SPIEGEL.gesamt))+'</span></div>'+
     '<div class="nkchart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(t("Je m² und Monat")+": "+l.map(function(n,i){return nkLabel(n)+" "+num(pkt[i],2)+" €";}).join(", "))+'">'+svg+'</svg></div>';
-}
-/* Kategorie × Zeitraum, letzte Spalte Veränderung (auf 12 Monate gerechnet) */
-function nkTabelle(liste){
-  var l=liste.slice(-4),keys={};
-  l.forEach(function(n){Object.keys(nkKat(n)).forEach(function(k){keys[k]=1;});});
-  var kat=Object.keys(NK_KAT).filter(function(k){return keys[k];});
-  var letzte=l[l.length-1],vor=l.length>1?l[l.length-2]:null;
-  function zelle(n,k){var v=nkKat(n)[k];return v?eur0(v):"–";}
-  return '<div class="nktab"><table class="nkt"><thead><tr><th>'+t("Kategorie")+'</th>'+l.map(function(n){return '<th>'+esc(nkLabel(n))+(nkVoll(n)?"":"*")+'</th>';}).join("")+
-    (vor?'<th>Δ</th>':"")+'</tr></thead><tbody>'+
-    kat.map(function(k){
-      var vg=vor&&nkVergleichbarKat(k,letzte,vor),d=vg?nkDelta((nkKat(letzte)[k]||0)*nkFaktor(letzte),(nkKat(vor)[k]||0)*nkFaktor(vor)):null;
-      return '<tr><td>'+NK_KAT[k].icon+' '+esc(t(NK_KAT[k].l))+'</td>'+l.map(function(n){return '<td>'+zelle(n,k)+'</td>';}).join("")+
-        (vor?'<td class="nkd '+(d==null?"":(d>0.1?"hoch":(d<-0.05?"runter":"")))+'">'+(d==null?(vg&&nkKat(letzte)[k]?t("neu"):"–"):prozent(d))+'</td>':"")+'</tr>';
-    }).join("")+
-    '<tr class="nksum"><td>'+t("Gesamt")+'</td>'+l.map(function(n){return '<td>'+eur0(nkSumme(n))+'</td>';}).join("")+
-      (vor?(function(){var d=nkVergleichbar(letzte,vor)?nkDelta(nkSumme(letzte)*nkFaktor(letzte),nkSumme(vor)*nkFaktor(vor)):null;return '<td class="nkd '+(d>0.005?"hoch":(d<-0.005?"runter":""))+'">'+(d==null?"–":prozent(d))+'</td>';})():"")+'</tr>'+
-    '</tbody></table></div>';
 }
 
 /* ================= Ein Zeitraum ================= */
@@ -9754,6 +9818,313 @@ function nkVertragKarte(c){
      :'<p class="hint" style="margin:0 0 4px">'+t("Jährliche Abrechnung ablegen – All-Home vergleicht die Jahre und prüft sie.")+'</p>'+nkHinzuKnoepfe())+
   '</section>';
 }
+
+/* ================= Nebenkosten-Heatmap: Kategorien × Jahre, aufklappbare Positionen, Zellen-Detail =================
+   Abgestimmt mit dem User (18.10.2026): ersetzt „Kosten je Kategorie“; neueste 3/4/5 Zeiträume; Farbe = Veränderung
+   zum Vorjahr (rot teurer, grün günstiger) oder Höhe; Werte € im Jahr (Teilzeitraum hochgerechnet, *) oder € je m² und
+   Monat; je Zeile Verlaufslinie, Δ Vorjahr, Δ Zeitraum, Anteil; sortierbar; Positionen automatisch über die Jahre
+   zusammengeführt (Schreibweise egal, gleiche Bezeichnung im Jahr addiert) und von Hand zusammenfassbar
+   (household_setup.nk_gruppen), dazu Vorschläge für Positionen, die nie im selben Jahr vorkommen. */
+var NKM={anzahl:5,farbe:"delta",wert:"jahr",sort:"betrag",offen:{},wahl:null,vorschlaege:[],matrix:null};
+(function(){try{var s=JSON.parse(localStorage.getItem("ah_nkm")||"{}");
+  if([3,4,5].indexOf(s.anzahl)>=0)NKM.anzahl=s.anzahl;
+  if(s.farbe==="delta"||s.farbe==="hoehe")NKM.farbe=s.farbe;
+  if(s.wert==="jahr"||s.wert==="m2")NKM.wert=s.wert;
+  if(s.sort==="betrag"||s.sort==="anstieg")NKM.sort=s.sort;}catch(e){}})();
+function nkmMerken(){try{localStorage.setItem("ah_nkm",JSON.stringify({anzahl:NKM.anzahl,farbe:NKM.farbe,wert:NKM.wert,sort:NKM.sort}));}catch(e){}}
+/* ---------- Zusammenfassungen ---------- */
+function nkGruppenDaten(){var g=SETUP&&SETUP.nk_gruppen;return (g&&typeof g==="object")?{g:Object.assign({},g.g||{}),nein:(g.nein||[]).slice()}:{g:{},nein:[]};}
+function nkPosSchluessel(k,bez){return k+"|"+artText(bez).trim();}
+function nkZeilenSchluessel(k,bez,gr){var s=nkPosSchluessel(k,bez),n=gr.g[s];return n?k+"|g:"+artText(n).trim():s;}
+/* Angezeigter Name: Gruppenname bzw. die neueste gedruckte Bezeichnung */
+function nkmName(P,gr){
+  if(P.gruppe){var q=Object.keys(P.quellen)[0];return gr.g[q]||P.letzter||"";}
+  return P.letzter||"";
+}
+/* ---------- Die Matrix (rein rechnerisch, prüfbar) ----------
+   alle: Abrechnungen aufsteigend; liefert sichtbare Spalten + den Zeitraum davor (für Δ der ersten Spalte) */
+function nkMatrix(alle,gr,anzahl){
+  var sp=alle.slice(-anzahl),vor=alle.length>sp.length?alle[alle.length-sp.length-1]:null;
+  var spX=(vor?[vor]:[]).concat(sp),o=vor?1:0,kats={};
+  function leer(){return spX.map(function(){return null;});}
+  spX.forEach(function(n,i){
+    nkPos(n).forEach(function(p){
+      var k=nkKatVon(p),b=nkBetrag(p),bez=p.bez||t(NK_KAT[k].l),key=nkZeilenSchluessel(k,bez,gr);
+      var K=kats[k]||(kats[k]={key:"k:"+k,k:k,ebene:"kat",roh:leer(),pos:{}});
+      K.roh[i]=(K.roh[i]||0)+b;
+      var P=K.pos[key]||(K.pos[key]={key:key,k:k,ebene:"pos",gruppe:key.indexOf("|g:")>0,roh:leer(),teile:spX.map(function(){return [];}),quellen:{},letzter:null});
+      P.roh[i]=(P.roh[i]||0)+b;P.teile[i].push(p);P.quellen[nkPosSchluessel(k,bez)]=bez;if(i>=o)P.letzter=bez;
+    });
+  });
+  var liste=Object.keys(NK_KAT).filter(function(k){return kats[k]&&kats[k].roh.slice(o).some(function(v){return v!=null;});}).map(function(k){
+    var K=kats[k];
+    K.positionen=Object.keys(K.pos).map(function(x){return K.pos[x];}).filter(function(P){return P.roh.slice(o).some(function(v){return v!=null;});});
+    K.positionen.forEach(function(P){if(!P.letzter)P.letzter=Object.keys(P.quellen).map(function(q){return P.quellen[q];})[0];P.name=nkmName(P,gr);});
+    K.name=t(NK_KAT[k].l);
+    return K;
+  });
+  return {spalten:spX,o:o,kats:liste};
+}
+/* Auf 12 Monate gerechnet (Vergleichsgröße) bzw. Anzeige-Wert je Modus */
+function nkmJahr(roh,n){return roh==null?null:roh*nkFaktor(n);}
+function nkmAnzeige(roh,n,wert){if(roh==null)return null;return wert==="m2"?nkJeM2(roh,n):roh*nkFaktor(n);}
+/* Veränderung einer Zeile in Spalte i gegenüber i-1 (nur vergleichbare Zeiträume, Heizung beide fast ein Jahr) */
+function nkmDelta(Z,M,i){
+  if(i<1)return {d:null};
+  var a=Z.roh[i-1],b=Z.roh[i],na=M.spalten[i-1],nb=M.spalten[i];
+  if(b!=null&&a==null)return {d:null,neu:true};
+  if(a==null||b==null)return {d:null};
+  if(!nkVergleichbarKat(Z.k,na,nb))return {d:null,teil:true};
+  return {d:nkDelta(nkmJahr(b,nb),nkmJahr(a,na)),diff:nkmJahr(b,nb)-nkmJahr(a,na)};
+}
+/* Δ über den sichtbaren Zeitraum: erste sichtbare Spalte mit Wert → letzte */
+function nkmDeltaZeitraum(Z,M){
+  var l=M.spalten.length-1,i0=-1;
+  for(var i=M.o;i<l;i++){if(Z.roh[i]!=null){i0=i;break;}}
+  if(i0<0||Z.roh[l]==null)return {d:null};
+  if(!nkVergleichbarKat(Z.k,M.spalten[i0],M.spalten[l]))return {d:null};
+  return {d:nkDelta(nkmJahr(Z.roh[l],M.spalten[l]),nkmJahr(Z.roh[i0],M.spalten[i0])),seit:nkLabel(M.spalten[i0])};
+}
+function nkmGesamtJahr(M,i){var n=M.spalten[i];return nkSumme(n)*nkFaktor(n);}
+function nkmAnteil(Z,M){var l=M.spalten.length-1,g=nkmGesamtJahr(M,l),v=nkmJahr(Z.roh[l],M.spalten[l]);return (g>0&&v!=null)?v/g:null;}
+function nkmSortieren(zeilen,M){
+  var l=M.spalten.length-1;
+  return zeilen.slice().sort(function(a,b){
+    if(NKM.sort==="anstieg"){var da=nkmDeltaZeitraum(a,M).d,db=nkmDeltaZeitraum(b,M).d;
+      if(da==null&&db==null)return 0;if(da==null)return 1;if(db==null)return -1;return db-da;}
+    return (nkmJahr(b.roh[l],M.spalten[l])||0)-(nkmJahr(a.roh[l],M.spalten[l])||0);
+  });
+}
+/* ---------- Vorschläge: Positionen einer Kategorie, die nie im selben Jahr vorkommen ---------- */
+function nkmVorschlaegeFuer(K,M,gr){
+  var zeilen=K.positionen,jahre={},aus=[];
+  zeilen.forEach(function(P){jahre[P.key]=[];for(var i=M.o;i<M.spalten.length;i++)if(P.roh[i]!=null)jahre[P.key].push(i);});
+  function getrennt(a,b){return !jahre[a].some(function(i){return jahre[b].indexOf(i)>=0;});}
+  var kandidaten=zeilen.map(function(A){
+    var mit=zeilen.filter(function(B){return B.key!==A.key&&getrennt(A.key,B.key);});
+    return mit.length?[A].concat(mit):null;
+  }).filter(Boolean).sort(function(x,y){return y.length-x.length;});
+  kandidaten.forEach(function(s){
+    var keys=s.map(function(P){return P.key;}).sort(),sig=K.k+":"+keys.join("+");
+    /* abgelehnt: dieser Vorschlag und jede Teilmenge davon */
+    if(gr.nein.some(function(nsig){var i=nsig.indexOf(":");if(nsig.slice(0,i)!==K.k)return false;var nk=nsig.slice(i+1).split("+");return keys.every(function(x){return nk.indexOf(x)>=0;});}))return;
+    if(aus.some(function(v){return keys.every(function(x){return v.keys.indexOf(x)>=0;});}))return;
+    aus.push({k:K.k,keys:keys,sig:sig,zeilen:s});
+  });
+  return aus.slice(0,2);
+}
+/* ---------- Darstellung ---------- */
+function nkmFarbe(Z,M,i,max){
+  if(NKM.farbe==="hoehe"){
+    var v=nkmJahr(Z.roh[i],M.spalten[i]);if(v==null||!(max>0))return "";
+    return "background:color-mix(in srgb,var(--nk7) "+Math.round(6+34*Math.min(1,v/max))+"%,transparent)";
+  }
+  var r=nkmDelta(Z,M,i);if(r.d==null||Math.abs(r.d)<0.02)return "";
+  var st=Math.round(10+32*Math.min(1,Math.abs(r.d)/0.5));
+  return "background:color-mix(in srgb,var("+(r.d>0?"--neg":"--pos")+") "+st+"%,transparent)";
+}
+function nkmZahl(v){if(v==null)return "–";return NKM.wert==="m2"?num(v,2):eur0(v);}
+function nkmSpark(Z,M){
+  var pkt=[];for(var i=M.o;i<M.spalten.length;i++){var v=nkmJahr(Z.roh[i],M.spalten[i]);pkt.push(v);}
+  var da=pkt.filter(function(v){return v!=null;});if(da.length<2)return "";
+  var mn=Math.min.apply(null,da),mx=Math.max.apply(null,da),W=56,H=18,sp=mx-mn||1;
+  var linien=[],akt=[];
+  pkt.forEach(function(v,j){
+    if(v==null){if(akt.length>1)linien.push(akt);akt=[];return;}
+    akt.push((pkt.length===1?W/2:j*W/(pkt.length-1)).toFixed(1)+","+(H-2-(v-mn)/sp*(H-4)).toFixed(1));
+  });
+  if(akt.length>1)linien.push(akt);
+  return '<svg class="nkmspark" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+linien.map(function(l){return '<polyline points="'+l.join(" ")+'"/>';}).join("")+'</svg>';
+}
+function nkmProzent(d){return d==null?"–":prozent(d);}
+function nkmDeltaZelle(r){return '<td class="nkm-d nkd '+(r.d==null?"":(r.d>0.02?"hoch":(r.d<-0.02?"runter":"")))+'">'+(r.d==null?(r.neu?t("neu"):"–"):prozent(r.d))+'</td>';}
+function nkmZeile(Z,M,max,zus){
+  var l=M.spalten.length-1,anteil=nkmAnteil(Z,M),ist=Z.ebene==="kat",K=ist?Z:null,offen=ist&&NKM.offen[Z.k];
+  var wahl=!ist&&NKM.wahl&&NKM.wahl.k===Z.k,an=wahl&&NKM.wahl.keys[Z.key];
+  var kopf=ist
+    ?'<button class="nkm-auf" data-a="nkm-kat" data-k="'+Z.k+'" aria-expanded="'+(offen?"true":"false")+'"><span class="nkm-pf">'+(offen?"▾":"▸")+'</span>'+NK_KAT[Z.k].icon+' '+esc(Z.name)+'</button>'
+    :(wahl?(Z.gruppe?'<button class="nkm-tr" data-a="nkm-trennen" data-r="'+esc(Z.key)+'">'+ic("x",14)+' '+t("Trennen")+'</button>':'<button class="nkm-cb'+(an?" an":"")+'" data-a="nkm-wahl" data-r="'+esc(Z.key)+'" role="checkbox" aria-checked="'+(an?"true":"false")+'" aria-label="'+esc(Z.name)+'"><span class="nkm-box">'+(an?ic("check",14):"")+'</span></button>'):"")+
+      '<span class="nkm-pn">'+(Z.gruppe?"🔗 ":"")+esc(Z.name)+'</span>';
+  var zellen="";
+  for(var i=M.o;i<=l;i++){
+    var n=M.spalten[i],v=nkmAnzeige(Z.roh[i],n,NKM.wert);
+    zellen+='<td class="nkm-z" style="'+nkmFarbe(Z,M,i,max)+'">'+(Z.roh[i]==null?'<span class="mut">–</span>':
+      '<button data-a="nkm-zelle" data-r="'+esc(Z.key)+'" data-i="'+i+'">'+nkmZahl(v)+'</button>')+'</td>';
+  }
+  return '<tr class="'+(ist?"nkm-k":"nkm-p")+'"><th scope="row">'+kopf+'</th>'+zellen+
+    '<td class="nkm-s">'+nkmSpark(Z,M)+'</td>'+nkmDeltaZelle(nkmDelta(Z,M,l))+nkmDeltaZelle(nkmDeltaZeitraum(Z,M))+
+    '<td class="nkm-a">'+(anteil==null?"–":'<span class="nkm-bar"><i style="width:'+Math.round(Math.min(1,anteil)*100)+'%"></i></span>'+num(anteil*100,0)+' %')+'</td></tr>'+(zus||"");
+}
+function nkmOptionen(verfuegbar){
+  function seg(o,werte,label){
+    return '<div class="nkmseg" role="group" aria-label="'+esc(label)+'">'+werte.map(function(w){
+      return '<button class="'+(NKM[o]===w[0]?"on":"")+'" data-a="nkm-opt" data-o="'+o+'" data-v="'+w[0]+'" aria-pressed="'+(NKM[o]===w[0]?"true":"false")+'">'+w[1]+'</button>';
+    }).join("")+'</div>';
+  }
+  var jahre=[3,4,5].filter(function(z){return z<=Math.max(3,verfuegbar);}).map(function(z){return [z,tn(z,"{0} Jahr","{0} Jahre")];});
+  return '<div class="nkmopt">'+
+    (verfuegbar>3?seg("anzahl",jahre,t("Anzahl Jahre")):"")+
+    seg("farbe",[["delta",t("Δ Vorjahr")],["hoehe",t("Höhe")]],t("Farbe"))+
+    seg("wert",[["jahr",t("€ / Jahr")],["m2",t("€ / m²")]],t("Werte"))+
+    seg("sort",[["betrag",t("Betrag")],["anstieg",t("Anstieg")]],t("Sortierung"))+
+  '</div>';
+}
+function nkMatrixHtml(alle){
+  var gr=nkGruppenDaten(),M=nkMatrix(alle,gr,Math.min(NKM.anzahl,alle.length));NKM.matrix=M;NKM.vorschlaege=[];
+  var l=M.spalten.length-1,spalten=M.spalten.slice(M.o);
+  if(!M.kats.length)return '<p class="hint">'+t("Noch keine Positionen – über „Bearbeiten“ eintragen oder die Abrechnung auslesen lassen.")+'</p>';
+  /* Höhe: Kategorien und Positionen je für sich skaliert */
+  var maxK=0,maxP=0;
+  M.kats.forEach(function(K){for(var i=M.o;i<=l;i++){maxK=Math.max(maxK,nkmJahr(K.roh[i],M.spalten[i])||0);
+    K.positionen.forEach(function(P){maxP=Math.max(maxP,nkmJahr(P.roh[i],M.spalten[i])||0);});}});
+  var breite=spalten.length+5;
+  var koerper=nkmSortieren(M.kats,M).map(function(K){
+    var zus="";
+    if(NKM.offen[K.k]){
+      var vs=NKM.wahl&&NKM.wahl.k===K.k?[]:nkmVorschlaegeFuer(K,M,gr);
+      zus=nkmSortieren(K.positionen,M).map(function(P){return nkmZeile(P,M,maxP);}).join("")+
+        '<tr class="nkm-akt"><td colspan="'+breite+'"><div class="nkm-akt-in">'+
+        vs.map(function(v){
+          NKM.vorschlaege.push(v);var idx=NKM.vorschlaege.length-1;
+          return '<div class="sug info nkm-vs"><span class="si">'+ic("link")+'</span><div class="sb2">'+
+            '<div class="st">'+t("Vermutlich dieselbe Position")+'</div>'+
+            '<div class="sx">'+esc(v.zeilen.map(function(P){return "„"+P.name+"“";}).join(" · "))+'</div>'+
+            '<div class="sa"><button class="btn sm" data-a="nkm-vorschlag" data-i="'+idx+'">'+t("Zusammenfassen")+'</button>'+
+            '<button class="btn sm ghost" data-a="nkm-nein" data-i="'+idx+'">'+t("Nein")+'</button></div></div></div>';
+        }).join("")+
+        (NKM.wahl&&NKM.wahl.k===K.k
+          ?'<div class="factions"><button class="btn sm" data-a="nkm-zus"'+(Object.keys(NKM.wahl.keys).length>1?"":" disabled")+'>'+ic("link")+' '+
+            tn(Object.keys(NKM.wahl.keys).length,"{0} zusammenfassen","{0} zusammenfassen")+'</button>'+
+            '<button class="btn sm ghost" data-a="nkm-wahl-ende">'+t("Fertig")+'</button></div>'
+          :(K.positionen.length>1?'<div class="factions"><button class="btn sm ghost" data-a="nkm-wahl-start" data-k="'+K.k+'">'+ic("link")+' '+t("Positionen zusammenfassen")+'</button></div>':""))+
+        '</div></td></tr>';
+    }
+    return nkmZeile(K,M,maxK,zus);
+  }).join("");
+  function fuss(label,werte,klasse){
+    return '<tr class="nkm-f '+(klasse||"")+'"><th scope="row">'+label+'</th>'+werte.map(function(w){return '<td>'+w+'</td>';}).join("")+'<td colspan="4"></td></tr>';
+  }
+  var teil=spalten.some(function(n){return !nkVoll(n);});
+  var gesamt=spalten.map(function(n){return nkmZahl(NKM.wert==="m2"?nkJeM2(nkSumme(n),n):nkSumme(n)*nkFaktor(n));});
+  var vz=spalten.map(function(n){var v=numOrNull(n.vorauszahlungen);return v==null?"–":eur0(v);});
+  var erg=spalten.map(function(n){var e=nkErgebnis(n);return e==null?"–":'<span class="nkd '+(e>0?"hoch":(e<0?"runter":""))+'">'+(e>0?"+":(e<0?"−":""))+eur0(Math.abs(e))+'</span>';});
+  var m2=spalten.map(function(n){var v=nkJeM2(nkSumme(n),n);return v==null?"–":'<span class="'+(v>NK_SPIEGEL.gesamt*1.15?"nkd hoch":"")+'">'+num(v,2)+'</span>';});
+  return nkmOptionen(alle.length)+
+    '<div class="nktab nkmbox"><table class="nkt nkm"><thead><tr><th>'+t("Kategorie")+'</th>'+spalten.map(function(n,j){return '<th'+(j===spalten.length-1?' data-j="neu"':"")+'>'+esc(nkLabel(n))+(nkVoll(n)?"":"*")+'</th>';}).join("")+
+      '<th>'+t("Verlauf")+'</th><th>Δ '+t("Vorjahr")+'</th><th>'+esc(tf("Δ seit {0}",nkLabel(spalten[0])))+'</th><th>'+t("Anteil")+'</th></tr></thead>'+
+    '<tbody>'+koerper+'</tbody><tfoot>'+
+      fuss(t("Gesamt")+(teil?"*":""),gesamt,"nksum")+
+      fuss(t("Vorauszahlungen"),vz)+
+      fuss(t("Nachzahlung / Guthaben"),erg)+
+      fuss(tf("€ je m² · Monat (Schnitt {0})",num(NK_SPIEGEL.gesamt,2)),m2)+
+    '</tfoot></table></div>'+
+    '<p class="hint nkm-leg">'+(NKM.farbe==="delta"?t("Rot: teurer als im Vorjahr · Grün: günstiger"):t("Je kräftiger, desto teurer"))+
+      (NKM.wert==="m2"?" · "+t("€ je m² und Monat"):" · "+t("€ im Jahr"))+(teil?" · * "+t("auf 12 Monate hochgerechnet"):"")+'</p>';
+}
+/* ---------- Zellen-Detail ---------- */
+function nkmZeileFinden(key){
+  var M=NKM.matrix;if(!M)return null;
+  for(var a=0;a<M.kats.length;a++){var K=M.kats[a];if(K.key===key)return K;
+    for(var b=0;b<K.positionen.length;b++)if(K.positionen[b].key===key)return K.positionen[b];}
+  return null;
+}
+function nkmHinweise(n,Z,M,i){
+  var namen=[t(NK_KAT[Z.k].l)];
+  if(Z.ebene==="pos")Z.teile[i].forEach(function(p){if(p.bez)namen.push(p.bez);});
+  else Z.positionen.forEach(function(P){P.teile[i].forEach(function(p){if(p.bez)namen.push(p.bez);});});
+  namen=namen.filter(function(x){return String(x).length>=5;}).map(function(x){return String(x).toLowerCase();});
+  return nkPruefen(n).filter(function(h){
+    if(h.art==="gut")return false;var s=(String(h.titel||"")+" "+String(h.text||"")).toLowerCase();
+    return namen.some(function(x){return s.indexOf(x)>=0;});
+  });
+}
+function nkmZelle(key,i){
+  var M=NKM.matrix,Z=nkmZeileFinden(key);if(!Z||!M||Z.roh[i]==null)return;
+  var n=M.spalten[i],roh=Z.roh[i],r=nkmDelta(Z,M,i),jm=nkJeM2(roh,n),sp=nkSpiegel(Z.k,n);
+  var teile=Z.ebene==="pos"?Z.teile[i]:[].concat.apply([],Z.positionen.map(function(P){return P.teile[i];}));
+  var vj=r.d!=null?((r.diff>0?"+":"−")+eur0(Math.abs(r.diff))+" ("+prozent(r.d)+")"):(r.neu?t("neu in diesem Jahr"):(r.teil?t("nicht vergleichbar (Teilzeitraum)"):"–"));
+  var hw=nkmHinweise(n,Z,M,i);
+  openModal('<h2 class="mhead">'+NK_KAT[Z.k].icon+' '+esc(Z.ebene==="kat"?Z.name:Z.name)+' · '+esc(nkLabel(n))+'</h2>'+
+    '<section class="card"><div class="kvl">'+
+      kv(t("Betrag"),eur(roh))+
+      (!nkVoll(n)?kv(t("Auf 12 Monate"),eur(roh*nkFaktor(n))):"")+
+      kv(t("Gegenüber Vorjahr"),'<span class="nkd '+(r.d==null?"":(r.d>0.02?"hoch":(r.d<-0.02?"runter":"")))+'">'+esc(vj)+'</span>')+
+      (jm!=null?kv(t("Je m² und Monat"),eur(jm)+(sp?' · '+tf("Schnitt {0}",eur(sp))+(Z.ebene==="pos"?" ("+esc(t(NK_KAT[Z.k].l))+")":""):"")):"")+
+    '</div></section>'+
+    '<div class="sect">'+t("Wie auf der Abrechnung")+'</div><section class="card"><div class="dlist">'+teile.map(function(p){
+      var info=[p.schluessel?t(schluesselName(p.schluessel)):"",p.anteil||"",numOrNull(p.haus)?tf("Haus {0}",eur0(numOrNull(p.haus))):""].filter(Boolean);
+      return '<div class="drow3"><span class="db"><span class="dn">'+esc(p.bez||t(NK_KAT[nkKatVon(p)].l))+'</span>'+(info.length?'<span class="dm">'+info.map(function(x){return '<span>'+esc(x)+'</span>';}).join("")+'</span>':"")+'</span>'+
+        '<span class="nkpw"><b>'+eur(nkBetrag(p))+'</b></span></div>';
+    }).join("")+'</div></section>'+
+    (hw.length?'<div class="sect">'+t("Prüfung")+'</div><div class="sugs">'+hw.map(nkHinweisHtml).join("")+'</div>':"")+
+    '<div class="factions" style="margin-top:14px"><a class="btn" href="#/nebenkosten?id='+esc(n.id)+'">'+ic("right")+' '+tf("Abrechnung {0} öffnen",esc(nkLabel(n)))+'</a>'+
+    '<button class="btn ghost" data-a="modal-close">'+t("Schließen")+'</button></div>');
+}
+/* ---------- Zusammenfassen / Trennen / Vorschläge ---------- */
+async function nkmGruppenSpeichern(gr,meldung){
+  var wert={g:gr.g,nein:gr.nein};
+  try{
+    var r=await sb.from("household_setup").update({nk_gruppen:wert}).eq("household_id",HH.id).select("household_id");
+    if(r.error)throw r.error;
+    if(!r.data||!r.data.length){
+      var r2=await sb.from("household_setup").upsert({household_id:HH.id,arten:aktiveArten(),eingerichtet:!!(SETUP&&SETUP.eingerichtet),nk_gruppen:wert}).select("*").single();
+      if(r2.error)throw r2.error;
+    }
+    SETUP=Object.assign({},SETUP||{},{nk_gruppen:wert});
+    render();if(meldung)toast(meldung);
+  }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+}
+/* Alle Quell-Schlüssel der gewählten Zeilen bekommen den Gruppennamen */
+function nkmGruppeSetzen(gr,zeilen,name){
+  zeilen.forEach(function(P){Object.keys(P.quellen).forEach(function(q){gr.g[q]=name;});});
+  return gr;
+}
+function nkmStandardName(zeilen){
+  var M=NKM.matrix,best=null,bi=-1;
+  zeilen.forEach(function(P){for(var i=M.spalten.length-1;i>=0;i--){if(P.teile[i]&&P.teile[i].length){if(i>bi){bi=i;best=P.teile[i][0].bez;}break;}}});
+  return String(best||zeilen[0].name||"").replace(/\s*\([^)]*\)\s*$/,"").trim().slice(0,80);
+}
+function nkmZusammenfassenBlatt(){
+  var w=NKM.wahl;if(!w)return;
+  var zeilen=Object.keys(w.keys).map(nkmZeileFinden).filter(Boolean);if(zeilen.length<2)return;
+  openModal('<h2 class="mhead">'+ic("link")+' '+t("Positionen zusammenfassen")+'</h2>'+
+    '<p class="hint" style="margin:0 4px 12px">'+esc(zeilen.map(function(P){return "„"+P.name+"“";}).join(" · "))+'</p>'+
+    fld(t("Name"),inp("nkm_name",nkmStandardName(zeilen),"text",' maxlength="80"'))+
+    '<div class="factions"><button class="btn" data-a="nkm-zus-ok">'+ic("check")+' '+t("Zusammenfassen")+'</button>'+
+    '<button class="btn ghost" data-a="modal-close">'+t("Abbrechen")+'</button></div>');
+}
+async function nkmZusammenfassen(){
+  var w=NKM.wahl,name=String(val("nkm_name")||"").trim().slice(0,80);
+  if(!w||!name){toast(t("Bitte einen Namen eingeben."),true);return;}
+  var zeilen=Object.keys(w.keys).map(nkmZeileFinden).filter(Boolean);
+  NKM.wahl=null;closeModal(true);
+  await nkmGruppenSpeichern(nkmGruppeSetzen(nkGruppenDaten(),zeilen,name),tf("Zusammengefasst als „{0}“",name)+" ✅");
+}
+async function nkmTrennen(key){
+  var Z=nkmZeileFinden(key);if(!Z||!Z.gruppe)return;
+  var gr=nkGruppenDaten();Object.keys(Z.quellen).forEach(function(q){delete gr.g[q];});
+  await nkmGruppenSpeichern(gr,t("Getrennt")+" ✅");
+}
+async function nkmVorschlagAnnehmen(i){
+  var v=NKM.vorschlaege[i];if(!v)return;
+  var name=nkmStandardName(v.zeilen);
+  await nkmGruppenSpeichern(nkmGruppeSetzen(nkGruppenDaten(),v.zeilen,name),tf("Zusammengefasst als „{0}“",name)+" ✅");
+}
+async function nkmVorschlagAblehnen(i){
+  var v=NKM.vorschlaege[i];if(!v)return;
+  var gr=nkGruppenDaten();if(gr.nein.indexOf(v.sig)<0)gr.nein.push(v.sig);
+  await nkmGruppenSpeichern(gr,null);
+}
+/* Nach dem Zeichnen: Sichtbreite für die Aktionszeilen setzen und so scrollen, dass die neuesten Jahre zu sehen sind
+   (beim Umschalten bleibt die Position, die man gerade hatte) */
+function nkmNachZeichnen(){
+  var box=document.querySelector(".nkmbox");if(!box)return;
+  box.style.setProperty("--nkm-w",box.clientWidth+"px");
+  if(NKM.scrollX!=null){box.scrollLeft=NKM.scrollX;NKM.scrollX=null;return;}
+  var th=box.querySelector('th[data-j="neu"]');if(!th)return;
+  box.scrollLeft=Math.max(0,th.offsetLeft+th.offsetWidth+8-box.clientWidth);
+}
+function nkmNeuZeichnen(){var y=window.scrollY,box=document.querySelector(".nkmbox");NKM.scrollX=box?box.scrollLeft:null;render();window.scrollTo(0,y);}
 
 /* ================= Freigabe neuer Konten =================
    Neue Konten starten „offen“: Die Datenbank zeigt ihnen nichts, bis der Superadmin sie freigibt –
@@ -10465,6 +10836,17 @@ document.addEventListener("click",function(ev){
   if(a==="uz-vertrag"){umzugMit({v:[id]});UMZUG.ansicht="vertraege";go("#/umzug");return;}
   if(a==="uz-doks"){umzugMit({d:Object.keys(ABLAGE_WAHL)});UMZUG.ansicht="dokumente";go("#/umzug");return;}
   if(a==="v-ergaenzen"){laeuft(b,vertragAusDokumenten(id));return;}
+  if(a==="nkm-opt"){var nkmO=b.dataset.o,nkmV=b.dataset.v;NKM[nkmO]=nkmO==="anzahl"?Number(nkmV):nkmV;nkmMerken();nkmNeuZeichnen();return;}
+  if(a==="nkm-kat"){var nkmK=b.dataset.k;if(NKM.offen[nkmK])delete NKM.offen[nkmK];else NKM.offen[nkmK]=1;if(NKM.wahl&&NKM.wahl.k===nkmK&&!NKM.offen[nkmK])NKM.wahl=null;nkmNeuZeichnen();return;}
+  if(a==="nkm-zelle"){nkmZelle(b.dataset.r,Number(b.dataset.i));return;}
+  if(a==="nkm-wahl-start"){NKM.wahl={k:b.dataset.k,keys:{}};NKM.offen[b.dataset.k]=1;nkmNeuZeichnen();return;}
+  if(a==="nkm-wahl"){var nkmR=b.dataset.r;if(NKM.wahl){if(NKM.wahl.keys[nkmR])delete NKM.wahl.keys[nkmR];else NKM.wahl.keys[nkmR]=1;}nkmNeuZeichnen();return;}
+  if(a==="nkm-wahl-ende"){NKM.wahl=null;nkmNeuZeichnen();return;}
+  if(a==="nkm-zus"){nkmZusammenfassenBlatt();return;}
+  if(a==="nkm-zus-ok"){laeuft(b,nkmZusammenfassen());return;}
+  if(a==="nkm-trennen"){laeuft(b,nkmTrennen(b.dataset.r));return;}
+  if(a==="nkm-vorschlag"){laeuft(b,nkmVorschlagAnnehmen(Number(b.dataset.i)));return;}
+  if(a==="nkm-nein"){laeuft(b,nkmVorschlagAblehnen(Number(b.dataset.i)));return;}
   if(a==="nk-alle"){laeuft(b,nkAlleErfassen());return;}
   if(a==="nk-modus"){nkModus(b.dataset.k);return;}
   if(a==="nk-erfassen"){nkBerichtErfassen(Number(b.dataset.i));return;}
