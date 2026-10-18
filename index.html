@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-l6m7O45ffOVQXpJktZsKVB+iAk6PXaVZfFvIXoSoBVc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-UZz6+pzRB2UlrzSwC/T1488g+og0Nen8Gxr0jjeGVa4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -552,6 +552,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 /* Trefferflächen mindestens 40 px hoch – Lage und Aussehen bleiben */
 .back{padding:9px 0;margin:-7px 0}
 main>a.lnk,.arow .lnk{display:inline-block;padding:9px 0;margin:-9px 0}
+.drow3>.lnk{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 4px 0 8px;margin:-10px 0}
 .sug .dis{padding:12px;margin:-12px -12px -8px 0}
 .drow3.wahl .wbox{position:relative}
 .drow3.wahl .wbox::after{content:"";position:absolute;inset:-8px}
@@ -777,7 +778,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.3";
+var APP_VERSION="1.9.4";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -832,6 +833,47 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.9.4 Nebenkosten automatisch ---- */
+  "keine Positionen erkannt":"позиции не распознаны",
+  "Zugeordnet: Nebenkosten {0}":"Отнесено: коммунальные платежи {0}",
+  "Automatisch erfassen":"Внести автоматически",
+  "Alle {0} automatisch erfassen":"Внести все ({0}) автоматически",
+  "{0} Nebenkostenabrechnung noch nicht erfasst":"{0} расчёт коммунальных платежей ещё не внесён",
+  "{0} Nebenkostenabrechnungen noch nicht erfasst":"Расчётов коммунальных платежей ещё не внесено: {0}",
+  "All-Home liest sie aus und ordnet sie dem Zeitraum zu.":"All-Home считает их и отнесёт к нужному периоду.",
+  "Erfassen":"Внести",
+
+
+/* ---- 1.9.4 Nebenkosten-Upload ---- */
+  "„{0}“: nur PDF oder Foto.":"«{0}»: только PDF или фото.",
+  "„{0}“ ist größer als 12 MB.":"«{0}» больше 12 МБ.",
+  "Zusammen zu groß für einen Durchgang (höchstens etwa 14 MB) – bitte aufteilen.":"Вместе слишком большие для одного прохода (не более ок. 14 МБ) — разделите, пожалуйста.",
+  "doppelt ausgewählt":"выбран дважды",
+  "schon in dieser Abrechnung":"уже в этом расчёте",
+  "schon in Abrechnung {0}":"уже в расчёте {0}",
+  "schon vorhanden":"уже есть",
+  "{0} Datei":"{0} файл",
+  "{0} Dateien":"Файлов: {0}",
+  "Eine Abrechnung":"Один расчёт",
+  "Teile derselben Abrechnung, z. B. Heizkosten und Anlagen":"Части одного расчёта, напр. отопление и приложения",
+  "Mehrere Jahre":"Несколько лет",
+  "Jede Datei einzeln lesen und dem Zeitraum zuordnen":"Считать каждый файл отдельно и отнести к периоду",
+  "Dateien werden vorbereitet …":"Файлы подготавливаются …",
+  "Übersprungen: {0}":"Пропущено: {0}",
+  "Datei {0} von {1} wird gelesen …":"Считывается файл {0} из {1} …",
+  "{0}: {1} Dateien werden gemeinsam gelesen …":"{0}: файлы ({1}) считываются вместе …",
+  "gemeinsam nicht lesbar – bitte prüfen":"вместе не считались — проверьте, пожалуйста",
+  "Abrechnungen werden angelegt …":"Расчёты создаются …",
+  "an die vorhandene Abrechnung angehängt – Werte unverändert":"добавлено к имеющемуся расчёту — значения не изменены",
+  "Zeitraum nicht erkannt":"Период не распознан",
+  "Nebenkosten eingelesen":"Коммунальные расчёты считаны",
+  "öffnen":"открыть",
+  "erfassen":"внести",
+  "Noch nicht erfasst":"Ещё не внесено",
+  "Höchstens {0} Dateien je Abrechnung.":"Не более {0} файлов на расчёт.",
+  "Höchstens {0} Dateien auf einmal.":"Не более {0} файлов за раз.",
+
 
 /* ---- 1.9.2b ---- */
   "Neuer Vertrag: {0}":"Новый договор: {0}",
@@ -3961,13 +4003,14 @@ async function dateienVerarbeiten(files,ziel){
     try{await einesVerarbeiten(files[i],ziel);}
     catch(e){IMPORT.ergebnisse.push({name:files[i].name||t("Datei"),icon:"⚠️",text:errMsg(e)});}
   }
-  IMPORT.laeuft=false;versteckeArbeit();
   await ladeDaten();
-  /* Genau ein Dokument → direkt zur Bestätigung, sonst Sammelbericht */
-  if(IMPORT.ergebnisse.length===1&&IMPORT.ergebnisse[0].docId){
-    REVIEW=DOCS.filter(function(d){return d.id===IMPORT.ergebnisse[0].docId;})[0]||null;
-    IMPORT.ergebnisse=[];
-  }
+  /* Nebenkostenabrechnungen gleich dem passenden Zeitraum zuordnen (oder ihn anlegen) */
+  await nkNachUpload(IMPORT.ergebnisse.map(function(r){return r.docId;}).filter(Boolean),zeigeArbeit);
+  IMPORT.laeuft=false;versteckeArbeit();
+  /* Genau ein Dokument → direkt zur Bestätigung (Nebenkosten: zur Abrechnung), sonst Sammelbericht */
+  var einz=IMPORT.ergebnisse.length===1&&IMPORT.ergebnisse[0].docId?DOCS.filter(function(d){return d.id===IMPORT.ergebnisse[0].docId;})[0]||null:null;
+  if(einz&&einz.nk_id){IMPORT.ergebnisse=[];nkZugeordnetMelden(einz.nk_id);go("#/nebenkosten?id="+einz.nk_id);return;}
+  if(einz){REVIEW=einz;IMPORT.ergebnisse=[];}
   render();
 }
 async function einesVerarbeiten(file,ziel){
@@ -4231,7 +4274,7 @@ function dokTaugtFuerVertrag(d,art){
 function zuordnungsVorschlaege(docs){
   var gruppen=[];
   (docs||[]).forEach(function(d){
-    if(!d||hatVertrag(d)||d.nk_id||istMed(d)||d.ki_pending||!d.extracted)return;
+    if(!d||hatVertrag(d)||d.nk_id||nkSicher(d)||istMed(d)||d.ki_pending||!d.extracted)return;   /* Nebenkosten gehören in die Abrechnung, nicht in einen Vertrag */
     var art=artFuerDok(d);
     var g=gruppen.filter(function(x){return x.art===art&&x.docs.some(function(y){return gleicherVorgang(y.extracted||{},d.extracted);});})[0];
     if(g)g.docs.push(d);else gruppen.push({art:art,docs:[d]});
@@ -4467,10 +4510,10 @@ function importBericht(){
       '<div class="st">'+t("KI-Guthaben aufgebraucht")+'</div>'+
       '<div class="sx">'+t("Die Dokumente sind gespeichert, die Analyse lässt sich später nachholen.")+'</div></div></div>':"")+
     '<div class="dlist">'+IMPORT.ergebnisse.map(function(r){
-      var dz=r.docId?DOCS.filter(function(x){return x.id===r.docId;})[0]:null,cz=dz&&hatVertrag(dz)?vertragById(dz.contract_id):null;
-      return '<div class="drow3"><span class="di">'+(cz?"🔗":r.icon)+'</span>'+
+      var dz=r.docId?DOCS.filter(function(x){return x.id===r.docId;})[0]:null,nz=dz&&dz.nk_id?nkById(dz.nk_id):null,cz=!nz&&dz&&hatVertrag(dz)?vertragById(dz.contract_id):null;
+      return '<div class="drow3"><span class="di">'+(nz?"🧾":(cz?"🔗":r.icon))+'</span>'+
         '<span class="db"><span class="dn">'+esc(r.name)+'</span>'+
-        '<span class="dm"><span>'+(cz?"→ "+esc(cz.anbieter||artInfo(cz.art||"sonstiges").label):esc(r.text))+'</span></span></span>'+
+        '<span class="dm"><span>'+(nz?"→ "+esc(tf("Nebenkosten {0}",nkLabel(nz))):(cz?"→ "+esc(cz.anbieter||artInfo(cz.art||"sonstiges").label):esc(r.text)))+'</span></span></span>'+
         (r.docId?'<button class="lnk" data-a="d-open" data-id="'+r.docId+'">'+t("ansehen")+'</button>':"")+'</div>';
     }).join("")+'</div>'+
     vorschlagListe(IMPORT.ergebnisse.map(function(r){return r.docId?DOCS.filter(function(x){return x.id===r.docId;})[0]:null;}),"margin-top:14px")+
@@ -7821,6 +7864,12 @@ async function scanSpeichern(){
       if(ergebnis==="ok")volltextHolen(dok.id,seiten.map(function(x){return x.jpeg;}),"",1);
     }
     await ladeDaten();
+    /* Nebenkostenabrechnung im normalen Scan → gleich dem Zeitraum zuordnen */
+    if(opt.ki&&!ziel.med){
+      await nkNachUpload([dok.id],arbeitText);
+      var sd=DOCS.filter(function(x){return x.id===dok.id;})[0];
+      if(sd&&sd.nk_id){SCAN_SPEICHERN=null;scannerAus();SCAN_INAPP=false;nkZugeordnetMelden(sd.nk_id);location.replace("#/nebenkosten?id="+sd.nk_id);return;}
+    }
     scanFertig(dok.id,opt.ki,ziel);
   }catch(e){
     scanFehlerZeigen(errMsg(e));
@@ -8403,12 +8452,13 @@ function viewNebenkosten(){
   if(!liste.length)return kopf+'<section class="card"><div class="empty"><div class="ei">'+ic("euro",28)+'</div>'+
     '<h3>'+t("Noch keine Abrechnung")+'</h3>'+
     '<p>'+t("Lege jedes Jahr die Nebenkostenabrechnung ab – All-Home liest sie aus, vergleicht die Jahre und prüft Fristen, umlagefähige Posten und Heizkosten.")+'</p></div>'+
-    nkHinzuKnoepfe()+'</section>';
+    nkHinzuKnoepfe()+'</section>'+nkOffenKarte();
   var neu=liste[liste.length-1],vor=nkVorgaenger(neu),summe=nkSumme(neu),erg=nkErgebnis(neu);
   var d=nkVergleichbar(neu,vor)?nkDelta(summe*nkFaktor(neu),nkSumme(vor)*nkFaktor(vor)):null,jm=nkJeM2(summe,neu);
   var hinweise=nkPruefen(neu).filter(function(x){return x.art!=="gut";});
   return kopf+
     (HH?'<p class="hint" style="margin:-6px 0 14px">'+esc(HH.name||"")+(c?" · "+esc(c.anbieter||""):"")+'</p>':"")+
+    nkOffenKarte()+
     /* Kennzahlen des neuesten Zeitraums */
     '<div class="kpis k3 nkkpi">'+
       '<div class="kpi"><div class="kl">'+tf("Kosten {0}",nkLabel(neu))+'</div><div class="kv">'+eur0(summe)+'</div>'+
@@ -8729,10 +8779,7 @@ async function nkSpeichern(){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(w.von||"")||!/^\d{4}-\d{2}-\d{2}$/.test(w.bis||"")||w.bis<w.von){
     var e=$(!w.von?"#nk_von":"#nk_bis");if(e){e.classList.add("bad");e.focus();}
     toast(t("Bitte den Abrechnungszeitraum angeben (bis nach von)."),true);return;}
-  var reihe={household_id:HH.id,contract_id:w.contract_id||null,von:w.von,bis:w.bis,erstellt_am:w.erstellt_am,zugang_am:w.zugang_am,
-    wohnflaeche:w.wohnflaeche,personen:w.personen,vorauszahlungen:w.vorauszahlungen,vorauszahlung_neu:w.vorauszahlung_neu,ergebnis:w.ergebnis,
-    positionen:F.positionen.filter(function(p){return p.bez||p.betrag!=null;}),heizung:F.heizung,notiz:w.notiz};
-  if(F.ki)reihe.ki=F.ki;
+  var reihe=nkZeile(w,F.positionen,F.heizung,F.ki);
   /* Gleicher Zeitraum schon da → Korrektur ersetzt die Werte, Dokumente bleiben */
   var ziel=F.id,gleich=NK.filter(function(x){return x.von===w.von&&x.bis===w.bis&&x.id!==F.id;})[0];
   if(gleich){
@@ -8784,52 +8831,137 @@ async function nkVzUebernehmen(id){
 }
 
 /* ================= Auslesen ================= */
-/* Dateien wählen (PDF/Fotos): ablegen, dann gemeinsam auslesen */
-async function nkDateienHochladen(dateien,nkId){
+/* Grenzen der KI je Durchgang (wie butler-extract: 20 Dateien bzw. Seiten, 20 Mio. Base64-Zeichen ≈ 14 MB) */
+var NK_MAX_TEILE=20,NK_MAX_B64=19000000;
+var NK_WAHL=null;      /* gewählte Dateien, bis feststeht: eine Abrechnung oder mehrere Jahre */
+var NK_BERICHT=null;   /* Ergebnis „mehrere Jahre“: {zeilen:[{icon,name,text,nk?,doc?,vorschlag?}]} */
+var NK_LAEUFT=false;
+function nkB64(n){return Math.ceil((Number(n)||0)/3)*4;}
+function nkIstPdf(f){return !!f&&(f.type==="application/pdf"||/\.pdf$/i.test(f.name||""));}
+/* So viele Teile schickt ein abgelegtes Dokument an die KI (Scan-Seiten einzeln, PDF als Ganzes) */
+function nkTeile(d){return 1+((d&&d.weitere_seiten)||[]).length;}
+/* Was sich ohne Lesen prüfen lässt – vor dem ersten Hochladen. gesamt: alles geht in EINEN KI-Durchgang */
+function nkVorpruefung(dateien,alt,gesamt){
+  alt=alt||[];
+  for(var i=0;i<dateien.length;i++){var f=dateien[i];
+    if(!nkIstPdf(f)&&!/^image\//.test(f.type||""))return tf("„{0}“: nur PDF oder Foto.",f.name||t("Datei"));
+    if(nkIstPdf(f)&&f.size>12*1024*1024)return tf("„{0}“ ist größer als 12 MB.",f.name||t("Datei"));
+  }
+  var teile=dateien.length+alt.reduce(function(s,d){return s+nkTeile(d);},0);
+  if(teile>NK_MAX_TEILE)return tf(gesamt?"Höchstens {0} Dateien je Abrechnung.":"Höchstens {0} Dateien auf einmal.",NK_MAX_TEILE);
+  if(gesamt){
+    var b64=dateien.filter(nkIstPdf).reduce(function(s,f){return s+nkB64(f.size);},0)+alt.reduce(function(s,d){return s+nkB64(d.size_bytes);},0);
+    if(b64>NK_MAX_B64)return t("Zusammen zu groß für einen Durchgang (höchstens etwa 14 MB) – bitte aufteilen.");
+  }
+  return null;
+}
+/* Datei vorbereiten: Fotos verkleinern, Prüfsumme über den Inhalt */
+async function nkVorbereiten(f){
+  var pdf=nkIstPdf(f),blob=pdf?f:await bildKlein(f);
+  var bytes=new Uint8Array(await blob.arrayBuffer());
+  return {name:(f.name||"nebenkosten").replace(/\.[^.]+$/,"")+(pdf?".pdf":".jpg"),mime:pdf?"application/pdf":"image/jpeg",bytes:bytes,hash:await inhaltHash(bytes)};
+}
+/* Dubletten über die Prüfsumme: doppelt in der Auswahl oder schon in einer Abrechnung → überspringen;
+   schon abgelegt, aber noch ohne Abrechnung → dieses Dokument verwenden statt neu hochladen */
+function nkDublettenPruefung(hash,gesehen,nkId){
+  if(!hash)return null;
+  if(gesehen[hash])return {weg:t("doppelt ausgewählt")};
+  gesehen[hash]=1;
+  var d=DOCS.filter(function(x){return x.content_hash===hash;})[0];if(!d)return null;
+  if(d.nk_id){var n=nkById(d.nk_id);
+    return {weg:d.nk_id===nkId?t("schon in dieser Abrechnung"):(n?tf("schon in Abrechnung {0}",nkLabel(n)):t("schon vorhanden")),nk:n?n.id:null};}
+  return {doc:d};
+}
+async function nkAblegen(v,nkId,c){
+  var pfad=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_"+pfadName(v.name);
+  var up=await hochladenMitWiederholung(pfad,v.bytes,v.mime);if(up.error)throw new Error(netzFehler(up.error));
+  var ins=await sb.from("documents").insert({household_id:HH.id,filename:v.name,storage_path:pfad,mime_type:v.mime,size_bytes:v.bytes.length,
+    doc_type:"nebenkosten",content_hash:v.hash,contract_id:c?c.id:null,nk_id:nkId||null}).select("id").single();
+  if(ins.error){await dateienWeg([pfad]);throw new Error(netzFehler(ins.error));}
+  return ins.data.id;
+}
+/* Dateien gewählt: an eine bestehende Abrechnung oder nur eine Datei → direkt; mehrere für eine neue → fragen */
+function nkDateienHochladen(dateien,nkId){
   dateien=Array.prototype.slice.call(dateien||[]);if(!dateien.length||!HH)return;
-  var c=nkMieteVertrag(nkId?nkById(nkId):null),ids=[];
-  nkArbeit(t("Dateien werden abgelegt …"));
+  if(NK_LAEUFT){toast(t("Es läuft bereits ein Import."),true);return;}
+  if(nkId||dateien.length===1){nkEineAbrechnung(dateien,nkId);return;}
+  var fehler=nkVorpruefung(dateien,[],false);
+  if(fehler){toast(fehler,true);return;}
+  NK_WAHL=dateien;
+  function wahl(k,icon,titel,unter){
+    return '<button class="setupcat" data-a="nk-modus" data-k="'+k+'"><span>'+icon+'</span><span>'+titel+'<br><span class="mut" style="font-size:.82rem">'+unter+'</span></span></button>';
+  }
+  openModal('<h2 class="mhead">'+tn(dateien.length,"{0} Datei","{0} Dateien")+'</h2><div class="mlist">'+
+    wahl("eine","🧾",t("Eine Abrechnung"),t("Teile derselben Abrechnung, z. B. Heizkosten und Anlagen"))+
+    wahl("jahre","📚",t("Mehrere Jahre"),t("Jede Datei einzeln lesen und dem Zeitraum zuordnen"))+'</div>'+
+    '<div class="factions"><button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button></div>');
+}
+function nkModus(k){
+  var d=NK_WAHL;NK_WAHL=null;if(!d)return;
+  closeModal(true);
+  if(k==="jahre")nkMehrereJahre(d);else nkEineAbrechnung(d,null);
+}
+/* Alle Dateien gehören zu EINER Abrechnung: Grenzen prüfen, Dubletten auslassen, ablegen, gemeinsam lesen */
+async function nkEineAbrechnung(dateien,nkId){
+  var c=nkMieteVertrag(nkId?nkById(nkId):null),alt=nkId?DOCS.filter(function(d){return d.nk_id===nkId;}):[];
+  var fehler=nkVorpruefung(dateien,alt,true);
+  if(fehler){toast(fehler,true);return;}
+  NK_LAEUFT=true;
+  var ids=[],weg=[],bereit=[],gesehen={},neu=0;
   try{
+    nkArbeit(t("Dateien werden vorbereitet …"));
     for(var i=0;i<dateien.length;i++){
-      var f=dateien[i],pdf=f.type==="application/pdf"||/\.pdf$/i.test(f.name||"");
-      if(!pdf&&!/^image\//.test(f.type))throw new Error(t("Format nicht unterstützt (nur PDF oder Foto)."));
-      if(pdf&&f.size>12*1024*1024)throw new Error(t("PDF größer als 12 MB"));
-      var blob=pdf?f:await bildKlein(f),mime=pdf?"application/pdf":"image/jpeg",name=(f.name||"nebenkosten").replace(/\.[^.]+$/,"")+(pdf?".pdf":".jpg");
-      var bytes=new Uint8Array(await blob.arrayBuffer()),pfad=HH.id+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"_"+pfadName(name);
-      var up=await hochladenMitWiederholung(pfad,bytes,mime);if(up.error)throw new Error(netzFehler(up.error));
-      var ins=await sb.from("documents").insert({household_id:HH.id,filename:name,storage_path:pfad,mime_type:mime,size_bytes:bytes.length,
-        doc_type:"nebenkosten",content_hash:await inhaltHash(bytes),contract_id:c?c.id:null,nk_id:nkId||null}).select("id").single();
-      if(ins.error){await dateienWeg([pfad]);throw new Error(netzFehler(ins.error));}
-      ids.push(ins.data.id);
+      var v=await nkVorbereiten(dateien[i]),dup=nkDublettenPruefung(v.hash,gesehen,nkId);
+      if(dup&&dup.weg){weg.push("„"+v.name+"“ "+dup.weg);continue;}
+      if(dup&&dup.doc){ids.push(dup.doc.id);continue;}
+      bereit.push(v);
     }
-    await ladeDaten();
-  }catch(x){closeModal(true);toast(errMsg(x),true);if(ids.length)await ladeDaten();return;}
+    /* Fotos sind erst nach dem Verkleinern genau bekannt – deshalb jetzt noch einmal, aber vor dem Hochladen */
+    var schon=DOCS.filter(function(d){return ids.indexOf(d.id)>=0;}).concat(alt);
+    var b64=bereit.reduce(function(s,v){return s+nkB64(v.bytes.length);},0)+schon.reduce(function(s,d){return s+nkB64(d.size_bytes);},0);
+    if(b64>NK_MAX_B64)throw new Error(t("Zusammen zu groß für einen Durchgang (höchstens etwa 14 MB) – bitte aufteilen."));
+    if(bereit.length)nkArbeitText(t("Dateien werden abgelegt …"));
+    for(var j=0;j<bereit.length;j++){ids.push(await nkAblegen(bereit[j],nkId,c));neu++;}
+    if(neu)await ladeDaten();
+  }catch(x){closeModal(true);toast(errMsg(x),true);if(neu)await ladeDaten();NK_LAEUFT=false;return;}
+  NK_LAEUFT=false;
+  if(!ids.length){closeModal(true);toast(weg.join(" · "));return;}
+  if(weg.length)toast(tf("Übersprungen: {0}",weg.join(" · ")));
   await nkAuslesen(ids,nkId||null,null);
 }
 function nkArbeit(txt){openModal('<div class="nkarbeit"><span class="spin"></span><p id="nkArbeitTxt">'+esc(txt)+'</p></div>');}
+function nkArbeitText(txt){var e=$("#nkArbeitTxt");if(e)e.textContent=txt;else nkArbeit(txt);}
+/* Dokumente als KI-Nutzlast (Scan-Seiten als Bilder, PDFs als Ganzes) */
+async function nkNutzlast(ids){
+  var dateien=[];
+  for(var i=0;i<ids.length;i++){
+    var d=DOCS.filter(function(x){return x.id===ids[i];})[0];if(!d)continue;
+    if((d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||"")){
+      (await bilderDesDokuments(d)).forEach(function(b){dateien.push({data:bytesBase64(b),mime:"image/jpeg"});});
+    }else{
+      var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+      if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+      dateien.push({data:bytesBase64(new Uint8Array(await dl.data.arrayBuffer())),mime:"application/pdf"});
+    }
+  }
+  return dateien;
+}
+async function nkKiLesen(dateien){
+  var summe=0;dateien.forEach(function(x){summe+=x.data.length;});
+  if(!dateien.length)throw new Error(t("Kein Dokument zum Auslesen gefunden."));
+  if(dateien.length>NK_MAX_TEILE||summe>NK_MAX_B64)throw new Error(t("Zu viele oder zu große Dateien für einen Durchgang – bitte einzeln ablegen."));
+  var b=await edgeRuf(EDGE_EXTRACT,{modus:"nk",dateien:dateien,model:kiStufe(),lang:curLang});
+  if(!b.abrechnung)throw new Error(t("Nichts erkannt."));
+  return b;
+}
 /* Ein oder mehrere Dokumente (bei einer bestehenden Abrechnung: alle ihre Dokumente) gemeinsam lesen */
 async function nkAuslesen(docIds,nkId,bilderVorab){
   var ids=docIds.slice();
   if(nkId)DOCS.forEach(function(d){if(d.nk_id===nkId&&ids.indexOf(d.id)<0)ids.push(d.id);});
   nkArbeit(t("All-Home liest die Abrechnung … (20–60 Sek.)"));
   try{
-    var dateien=[],summe=0;
-    if(bilderVorab&&bilderVorab.length&&ids.length===1)dateien=bilderVorab.map(function(b){return {data:bytesBase64(b),mime:"image/jpeg"};});
-    else for(var i=0;i<ids.length;i++){
-      var d=DOCS.filter(function(x){return x.id===ids[i];})[0];if(!d)continue;
-      if((d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||"")){
-        (await bilderDesDokuments(d)).forEach(function(b){dateien.push({data:bytesBase64(b),mime:"image/jpeg"});});
-      }else{
-        var dl=await sb.storage.from(BUCKET).download(d.storage_path);
-        if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
-        dateien.push({data:bytesBase64(new Uint8Array(await dl.data.arrayBuffer())),mime:"application/pdf"});
-      }
-    }
-    dateien.forEach(function(x){summe+=x.data.length;});
-    if(!dateien.length)throw new Error(t("Kein Dokument zum Auslesen gefunden."));
-    if(dateien.length>20||summe>19000000)throw new Error(t("Zu viele oder zu große Dateien für einen Durchgang – bitte einzeln ablegen."));
-    var b=await edgeRuf(EDGE_EXTRACT,{modus:"nk",dateien:dateien,model:kiStufe(),lang:curLang});
-    if(!b.abrechnung)throw new Error(t("Nichts erkannt."));
+    var dateien=(bilderVorab&&bilderVorab.length&&ids.length===1)?bilderVorab.map(function(b){return {data:bytesBase64(b),mime:"image/jpeg"};}):await nkNutzlast(ids);
+    var b=await nkKiLesen(dateien);
     closeModal(true);
     nkFormular(nkId,nkAusKi(b.abrechnung,b.modell),ids);
   }catch(x){
@@ -8838,6 +8970,164 @@ async function nkAuslesen(docIds,nkId,bilderVorab){
     else toast(t("Auslesen fehlgeschlagen")+": "+errMsg(x),true);
     nkFormular(nkId,null,ids);
   }
+}
+
+/* ---------- Mehrere Jahre auf einmal ----------
+   Jede Datei einzeln lesen, nach Zeitraum bündeln, je Zeitraum eine Abrechnung. Mehrere Dateien desselben
+   Zeitraums (Abrechnung + Heizkostenblatt) liest die KI danach gemeinsam, damit nichts doppelt zählt.
+   Gibt es den Zeitraum schon, kommen die Dateien dazu – die erfassten Werte bleiben, wie sie sind. */
+function nkGruppieren(posten){
+  var nach={},gruppen=[],offen=[];
+  posten.forEach(function(p){
+    var v=p.vorschlag;
+    if(!v||!v.von||!v.bis||v.bis<v.von||!nkPos(v).length){offen.push(p);return;}   /* ohne Positionen ist es keine Abrechnung */
+    var k=v.von+"|"+v.bis;
+    if(!nach[k]){nach[k]={von:v.von,bis:v.bis,posten:[]};gruppen.push(nach[k]);}
+    nach[k].posten.push(p);
+  });
+  gruppen.sort(function(a,b){return a.von<b.von?-1:(a.von>b.von?1:0);});
+  return {gruppen:gruppen,offen:offen};
+}
+/* Aus mehreren Einzel-Lesungen die vollständigste (meiste Positionen) */
+function nkBesterVorschlag(posten){
+  return posten.map(function(p){return p.vorschlag;}).filter(Boolean)
+    .reduce(function(a,b){return !a||nkPos(b).length>nkPos(a).length?b:a;},null);
+}
+/* Datenbankzeile einer Abrechnung aus Formular- oder KI-Werten */
+function nkZeile(w,positionen,heizung,ki){
+  function z(v){return v==null||v===""?null:v;}
+  var reihe={household_id:HH.id,contract_id:z(w.contract_id),von:w.von,bis:w.bis,erstellt_am:z(w.erstellt_am),zugang_am:z(w.zugang_am),
+    wohnflaeche:z(w.wohnflaeche),personen:z(w.personen),vorauszahlungen:z(w.vorauszahlungen),vorauszahlung_neu:z(w.vorauszahlung_neu),ergebnis:z(w.ergebnis),
+    positionen:(positionen||[]).filter(function(p){return p.bez||p.betrag!=null;}),heizung:heizung||{},notiz:z(w.notiz)};
+  if(ki)reihe.ki=ki;
+  return reihe;
+}
+function nkErgebnisText(erg){return erg==null?"":(erg<0?t("Guthaben")+" "+eur(-erg):t("Nachzahlung")+" "+eur(erg));}
+async function nkMehrereJahre(dateien){
+  if(!HH||NK_LAEUFT)return;
+  NK_LAEUFT=true;
+  var c=nkMieteVertrag(null),gesehen={},posten=[],kopf=[],fuss=[],kiAus=null,n=dateien.length;
+  try{
+    nkArbeit(tf("Datei {0} von {1} wird gelesen …",1,n));
+    for(var i=0;i<n;i++){
+      nkArbeitText(tf("Datei {0} von {1} wird gelesen …",i+1,n));
+      var f=dateien[i],name=f.name||t("Datei");
+      try{
+        var v=await nkVorbereiten(f);name=v.name;
+        var dup=nkDublettenPruefung(v.hash,gesehen,null);
+        if(dup&&dup.weg){fuss.push({icon:"⏭️",name:name,text:dup.weg,nk:dup.nk||null});continue;}
+        var p={id:dup&&dup.doc?dup.doc.id:await nkAblegen(v,null,c),name:name};
+        if(kiAus)p.fehler=kiAus;
+        else try{var b=await nkKiLesen([{data:bytesBase64(v.bytes),mime:v.mime}]);p.vorschlag=nkAusKi(b.abrechnung,b.modell);}
+        catch(x){
+          p.fehler=x&&x.code==="ki_guthaben"?t("KI-Guthaben aufgebraucht"):errMsg(x);
+          if(x&&(x.code==="ki_guthaben"||x.code==="limit"||x.code==="budget"))kiAus=p.fehler;
+        }
+        posten.push(p);
+      }catch(x){fuss.push({icon:"⚠️",name:name,text:errMsg(x)});}
+    }
+    kopf=(await nkBuendeln(posten,kiAus,nkArbeitText)).zeilen;
+  }catch(x){fuss.push({icon:"⚠️",name:t("Datei"),text:errMsg(x)});}
+  finally{NK_LAEUFT=false;}
+  NK_BERICHT={zeilen:kopf.concat(fuss)};
+  closeModal(true);
+  nkNach("#/nebenkosten",nkBerichtZeigen);
+}
+/* Gelesene Dokumente ({id,name,vorschlag|fehler}) nach Zeitraum bündeln und speichern: vorhandener Zeitraum → Dokumente dazu,
+   neuer → Abrechnung anlegen (mehrere Dateien eines Zeitraums vorher gemeinsam lesen). melde(text): Fortschritt */
+async function nkBuendeln(posten,kiAus,melde){
+  var c=nkMieteVertrag(null),kopf=[];
+  await ladeDaten();
+  var g=nkGruppieren(posten);
+  for(var k=0;k<g.gruppen.length;k++){
+    var gr=g.gruppen[k],ids=gr.posten.map(function(p){return p.id;}),label=nkLabel(gr),notiz="";
+    var vorschlag=nkBesterVorschlag(gr.posten),da=NK.filter(function(x){return x.von===gr.von&&x.bis===gr.bis;})[0];
+    if(!da&&ids.length>1&&!kiAus){
+      melde(tf("{0}: {1} Dateien werden gemeinsam gelesen …",label,ids.length));
+      try{var gb=await nkKiLesen(await nkNutzlast(ids));vorschlag=Object.assign(nkAusKi(gb.abrechnung,gb.modell),{von:gr.von,bis:gr.bis});}
+      catch(x){notiz=t("gemeinsam nicht lesbar – bitte prüfen");}
+    }
+    melde(t("Abrechnungen werden angelegt …"));
+    try{
+      var ziel=da?da.id:null;
+      if(!da){
+        var w=Object.assign({},nkLeer(),vorschlag,{von:gr.von,bis:gr.bis,zugang_am:null});
+        var r=await sb.from("nk_abrechnungen").insert(nkZeile(w,nkPos(w),w.heizung,vorschlag.ki)).select("id");
+        if(r.error)throw r.error;
+        if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts gespeichert – fehlende Berechtigung?"));
+        ziel=r.data[0].id;
+      }
+      var dr=await sb.from("documents").update({nk_id:ziel,contract_id:da?da.contract_id:(c?c.id:null),doc_type:"nebenkosten"}).in("id",ids).select("id");
+      if(dr.error)throw dr.error;
+      kopf.push({icon:da?"📎":"✅",name:tf("Nebenkosten {0}",label),nk:ziel,
+        text:da?t("an die vorhandene Abrechnung angehängt – Werte unverändert")
+          :[eur(nkSumme(vorschlag)),nkErgebnisText(numOrNull(vorschlag.ergebnis)),ids.length>1?tn(ids.length,"{0} Datei","{0} Dateien"):"",notiz].filter(Boolean).join(" · ")});
+    }catch(x){kopf.push({icon:"⚠️",name:tf("Nebenkosten {0}",label),text:t("Speichern fehlgeschlagen")+": "+errMsg(x)});}
+  }
+  g.offen.forEach(function(p){kopf.push({icon:"⚠️",name:p.name,text:p.fehler||(p.vorschlag&&p.vorschlag.von?t("keine Positionen erkannt"):t("Zeitraum nicht erkannt")),doc:p.id,vorschlag:p.vorschlag||null});});
+  await ladeDaten();
+  return {zeilen:kopf};
+}
+/* Schon abgelegte Dokumente als Nebenkosten erfassen: je Dokument lesen, dann bündeln */
+async function nkDokumenteErfassen(ids,melde){
+  var posten=[],kiAus=null;
+  for(var i=0;i<ids.length;i++){
+    var d=DOCS.filter(function(x){return x.id===ids[i];})[0];if(!d)continue;
+    melde(ids.length>1?tf("Datei {0} von {1} wird gelesen …",i+1,ids.length):t("All-Home liest die Abrechnung … (20–60 Sek.)"));
+    var p={id:d.id,name:docTitel(d)};
+    if(kiAus)p.fehler=kiAus;
+    else try{var b=await nkKiLesen(await nkNutzlast([d.id]));p.vorschlag=nkAusKi(b.abrechnung,b.modell);}
+    catch(x){
+      p.fehler=x&&x.code==="ki_guthaben"?t("KI-Guthaben aufgebraucht"):errMsg(x);
+      if(x&&(x.code==="ki_guthaben"||x.code==="limit"||x.code==="budget"))kiAus=p.fehler;
+    }
+    posten.push(p);
+  }
+  return nkBuendeln(posten,kiAus,melde);
+}
+/* Nach dem normalen Hochladen oder Scannen: eindeutige Nebenkostenabrechnungen gleich dem Zeitraum zuordnen */
+async function nkNachUpload(ids,melde){
+  var liste=(ids||[]).filter(function(id){var d=DOCS.filter(function(x){return x.id===id;})[0];return d&&nkSicher(d);});
+  if(!liste.length)return;
+  try{await nkDokumenteErfassen(liste,melde);}catch(e){try{await ladeDaten();}catch(_e){}}
+}
+function nkZugeordnetMelden(nkId){var n=nkById(nkId);toast(tf("Zugeordnet: Nebenkosten {0}",n?nkLabel(n):"")+" ✅");}
+/* „Noch nicht erfasst“ in einem Rutsch */
+async function nkAlleErfassen(){
+  var ids=nkOhneAbrechnung().map(function(d){return d.id;});
+  if(!ids.length||NK_LAEUFT)return;
+  NK_LAEUFT=true;nkArbeit(t("Dateien werden vorbereitet …"));
+  var r;
+  try{r=await nkDokumenteErfassen(ids,nkArbeitText);}
+  catch(x){r={zeilen:[{icon:"⚠️",name:t("Datei"),text:errMsg(x)}]};}
+  finally{NK_LAEUFT=false;}
+  NK_BERICHT={zeilen:r.zeilen};closeModal(true);
+  nkNach("#/nebenkosten",nkBerichtZeigen);
+}
+function nkBerichtZeigen(){
+  var B=NK_BERICHT;if(!B)return;
+  openModal('<h2 class="mhead">'+t("Nebenkosten eingelesen")+'</h2><div class="dlist">'+B.zeilen.map(function(z,i){
+    return '<div class="drow3"><span class="di">'+z.icon+'</span><span class="db"><span class="dn">'+esc(z.name)+'</span>'+
+      '<span class="dm"><span>'+esc(z.text)+'</span></span></span>'+
+      (z.nk?'<a class="lnk" href="#/nebenkosten?id='+esc(z.nk)+'">'+t("öffnen")+'</a>':
+        (z.doc?'<button class="lnk" data-a="'+(z.vorschlag?"nk-erfassen":"nk-aus-dok")+'" data-id="'+esc(z.doc)+'" data-i="'+i+'">'+t("erfassen")+'</button>':""))+'</div>';
+  }).join("")+'</div>'+
+  '<div class="factions"><button class="btn full" data-a="nk-bericht-fertig">'+t("Fertig")+'</button></div>');
+}
+function nkBerichtErfassen(i){
+  var z=NK_BERICHT&&NK_BERICHT.zeilen[i];if(!z||!z.doc)return;
+  nkFormular(null,z.vorschlag||null,[z.doc]);
+}
+/* Nebenkostenabrechnungen ohne Abrechnung (normal hochgeladen, abgebrochen, Zeitraum nicht erkannt, KI-Guthaben leer) */
+function nkOhneAbrechnung(){return DOCS.filter(nkSicher);}
+function nkOffenKarte(){
+  var l=nkOhneAbrechnung();if(!l.length)return "";
+  return '<div class="sect">'+t("Noch nicht erfasst")+'</div><section class="card"><div class="dlist">'+l.map(function(d){
+    return '<div class="drow3"><span class="di">📄</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
+      '<span class="dm"><span>'+fmtDate(docDatum(d))+'</span></span></span>'+
+      '<button class="lnk" data-a="nk-aus-dok" data-id="'+d.id+'">'+t("erfassen")+'</button></div>';
+  }).join("")+'</div>'+
+    '<div class="factions" style="margin-top:12px"><button class="btn" data-a="nk-alle">'+ic("sparkles")+' '+tn(l.length,"Automatisch erfassen","Alle {0} automatisch erfassen")+'</button></div></section>';
 }
 /* KI-Antwort → Formularwerte (nur gültige Codes, Zahlen als Zahl) */
 function nkAusKi(a,modell){
@@ -8864,17 +9154,24 @@ function nkAusKi(a,modell){
   if(z(a.vorauszahlungNeu)!=null)v.vorauszahlung_neu=z(a.vorauszahlungNeu);
   return v;
 }
-/* Sieht ein gewöhnlich hochgeladenes Dokument nach Nebenkostenabrechnung aus? */
 /* Sieht das Dokument nach einer Nebenkostenabrechnung aus? Titel dürfen das Wort einfach nennen,
-   die Zusammenfassung nur mit „Abrechnung“ – sonst wäre jeder Mietvertrag mit „Nebenkostenvorauszahlung“ verdächtig. */
-function nkVerdacht(d){
-  if(!d||d.nk_id)return false;
+   die Zusammenfassung nur mit „Abrechnung“ – sonst wäre jeder Mietvertrag mit „Nebenkostenvorauszahlung“ verdächtig.
+   Die Art „Miete“ schließt nichts aus – die KI ordnet auch Nebenkostenabrechnungen der Miete zu. */
+var NK_ABRECHNUNG=/nebenkostenabrechnung|betriebskostenabrechnung|heizkostenabrechnung|(neben|betriebs|heiz)kosten (jahres)?abrechnung|abrechnung (der |ueber die )?(neben|betriebs|heiz)kosten/;
+/* Eindeutig: Titel oder Produkt nennen die Abrechnung (oder schon als Nebenkosten abgelegt) – nur dann ordnet All-Home selbst zu */
+function nkSicher(d){
+  if(!d||d.nk_id||istMed(d))return false;
   var ext=d.extracted||{};
-  if(ext.docType==="vertrag"||ext.art==="miete")return false;
-  var titel=artText([d.titel,ext.titel,ext.produkt].filter(Boolean).join(" ")),lang=artText(ext.zusammenfassung);
-  var abrechnung=/nebenkostenabrechnung|betriebskostenabrechnung|heizkostenabrechnung|(neben|betriebs|heiz)kosten (jahres)?abrechnung|abrechnung (der |ueber die )?(neben|betriebs|heiz)kosten/;
-  if(abrechnung.test(titel)||abrechnung.test(lang))return true;
-  return /nebenkost|betriebskost|heizkost/.test(titel)&&!/mietvertrag|vorauszahlung|mieterhoehung/.test(titel);
+  if(ext.docType==="vertrag")return false;
+  if(d.doc_type==="nebenkosten")return true;
+  var titel=artText([d.titel,ext.titel,ext.produkt].filter(Boolean).join(" "));
+  return NK_ABRECHNUNG.test(titel)||(/nebenkost|betriebskost|heizkost/.test(titel)&&!/mietvertrag|vorauszahlung|mieterhoehung/.test(titel));
+}
+function nkVerdacht(d){
+  if(!d||d.nk_id||istMed(d))return false;
+  var ext=d.extracted||{};
+  if(ext.docType==="vertrag")return false;
+  return nkSicher(d)||NK_ABRECHNUNG.test(artText(ext.zusammenfassung));
 }
 
 /* ================= KI-Einschätzung über alle Jahre ================= */
@@ -8955,7 +9252,10 @@ function nkTermine(){
   return raus;
 }
 function nkVorschlaege(){
-  var v=[],neu=nkNeueste(),heute=todayISO();if(!neu)return v;
+  var v=[],neu=nkNeueste(),heute=todayISO(),offen=nkOhneAbrechnung();
+  if(offen.length)v.push({key:"nkoffen:"+offen.length,art:"info",icon:"euro",titel:tn(offen.length,"{0} Nebenkostenabrechnung noch nicht erfasst","{0} Nebenkostenabrechnungen noch nicht erfasst"),
+    text:t("All-Home liest sie aus und ordnet sie dem Zeitraum zu."),knopf:t("Erfassen"),aktion:"nk-alle"});
+  if(!neu)return v;
   var bad=nkAuffaellig(neu),erg=nkErgebnis(neu);
   if(bad.length){
     var sum=bad.reduce(function(s,x){return s+(x.betrag||0);},0);
@@ -9287,6 +9587,10 @@ document.addEventListener("click",function(ev){
   if(a==="nk-pos-weg"){laeuft(b,nkPosWeg(Number(b.dataset.i)));return;}
   if(a==="nk-datei"){NK_DATEI_ZIEL=id||null;var nd=$("#nkDatei");if(nd)nd.click();return;}
   if(a==="nk-lesen"){laeuft(b,nkAuslesen([],id,null));return;}
+  if(a==="nk-alle"){laeuft(b,nkAlleErfassen());return;}
+  if(a==="nk-modus"){nkModus(b.dataset.k);return;}
+  if(a==="nk-erfassen"){nkBerichtErfassen(Number(b.dataset.i));return;}
+  if(a==="nk-bericht-fertig"){NK_BERICHT=null;closeModal(true);render();return;}
   if(a==="nk-aus-dok"){var nkDok=id;REVIEW=null;nkNach("#/nebenkosten",function(){nkAuslesen([nkDok],null,null);});return;}
 });
 
