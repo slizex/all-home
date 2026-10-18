@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-+0ZzKllvMmM63ceqxXTAW7O83CDB+Hme0vETEiR4RBc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-4YO4R9y7gJgqoHSlJb7xItqcIX4rqxFHOwbA4qKz1vM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -523,6 +523,14 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 /* Gesundheit: Fach, Person, Jahr in einer Zeile; nur die Ereignisauswahl über die ganze Breite */
 .filt.medfilt .sel{flex:1 1 0;min-width:0}
 .filt.medfilt .sel.voll{flex-basis:100%}
+.drow3.wahl.mit .wbox{opacity:.5}
+/* Umzug: Auswahl ist kein Löschen – neutral statt rot */
+#uzliste .drow3.wahl.an{background:var(--surface-2)}
+#uzliste .drow3.wahl.an .wbox{background:var(--ink);border-color:var(--ink)}
+.langrow.uztabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.uztabs .lb{min-width:0;padding:10px 6px;font-size:.88rem}
+@media(min-width:560px){.langrow.uztabs{grid-template-columns:repeat(4,1fr)}}
+.factions.uzaktion{margin:0 0 14px}
 .filt.dsrow{flex-wrap:nowrap;align-items:center}
 .filt.dsrow .inp{flex:1 1 auto;min-width:0}
 .filt.dsrow .btn{flex:none}/* Pflichtfelder: dezentes Sternchen, Legende am Formularende */
@@ -560,7 +568,7 @@ main>a.lnk,.arow .lnk{display:inline-block;padding:9px 0;margin:-9px 0}
 .drow3>.lnk{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 4px 0 8px;margin:-10px 0}
 .sug .dis{padding:12px;margin:-12px -12px -8px 0}
 .drow3.wahl .wbox{position:relative}
-.drow3.wahl .wbox::after{content:"";position:absolute;inset:-8px}
+.drow3.wahl .wbox::after{content:"";position:absolute;inset:-9px}
 /* Listen mit Hinweis-Farbe: untereinander (.hint ist sonst eine Flex-Zeile – die Punkte liefen ineinander) */
 ul.hint,ol.hint{display:block}
 ul.hint li+li,ol.hint li+li{margin-top:4px}
@@ -783,7 +791,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.6";
+var APP_VERSION="1.9.7";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -838,6 +846,69 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.9.7 Umzug ---- */
+  "„{0}“ gibt es im Ziel schon als eigenen Vertrag – bitte prüfen.":"«{0}» уже есть в целевом хозяйстве отдельным договором — проверьте, пожалуйста.",
+  "Nebenkosten {0}: Summen weichen ab ({1} hier, {2} im Ziel) – die Werte im Ziel bleiben.":"Коммунальные платежи {0}: суммы расходятся ({1} здесь, {2} в цели) — значения в цели сохраняются.",
+  "{0} von {1} wird verschoben …":"Перемещается {0} из {1} …",
+  "im Ziel angelegt":"создан(а) в цели",
+  "verschoben":"перемещено",
+  "mit dem gleichen Vertrag im Ziel zusammengeführt":"объединено с таким же договором в цели",
+  "an die vorhandene Abrechnung im Ziel angehängt – Werte unverändert":"добавлено к имеющемуся расчёту в цели — значения не изменены",
+  "lag schon im Ziel – zusammengeführt":"уже было в цели — объединено",
+  "verschoben → {0}":"перемещено → {0}",
+  "verschoben · ohne Vertrag":"перемещено · без договора",
+  "mit den Verträgen bzw. Abrechnungen umgezogen":"перемещены вместе с договорами или расчётами",
+  "Vertragsarten im Ziel angehakt":"Виды договоров отмечены в цели",
+  "Hinweis":"Примечание",
+  "Nur Admins eines Haushalts können daraus verschieben.":"Перемещать из хозяйства могут только его администраторы.",
+  "Im Ziel-Haushalt fehlt die Berechtigung.":"Нет прав в целевом хозяйстве.",
+  "{0} von {1} wird zurückgeschoben …":"Возвращается {0} из {1} …",
+  "Bitte zuerst das Ziel wählen.":"Сначала выберите цель.",
+  "Bitte etwas auswählen.":"Выберите что-нибудь.",
+  "Ziel wird geprüft …":"Проверяется цель …",
+  "Ziel konnte nicht geladen werden":"Не удалось загрузить цель",
+  "{0} wird mit dem gleichen Vertrag im Ziel zusammengeführt":"{0} будет объединён с таким же договором в цели",
+  "{0} werden mit den gleichen Verträgen im Ziel zusammengeführt":"Будут объединены с такими же договорами в цели: {0}",
+  "{0} Arztdokument":"{0} медицинский документ",
+  "{0} Arztdokumente":"Медицинских документов: {0}",
+  "{0} Nebenkostenabrechnung":"{0} расчёт коммунальных платежей",
+  "{0} Nebenkostenabrechnungen":"Расчётов коммунальных платежей: {0}",
+  "{0} kommt an die vorhandene Abrechnung":"{0} будет добавлен к имеющемуся расчёту",
+  "{0} kommen an vorhandene Abrechnungen":"Будут добавлены к имеющимся расчётам: {0}",
+  "{0} Datei liegt schon im Ziel":"{0} файл уже есть в цели",
+  "{0} Dateien liegen schon im Ziel":"Файлов уже в цели: {0}",
+  "werden zusammengeführt":"будут объединены",
+  "{0} Person wird im Ziel angelegt":"{0} человек будет создан в цели",
+  "{0} Personen werden im Ziel angelegt":"Людей будет создано в цели: {0}",
+  "Nach „{0}“ verschieben?":"Переместить в «{0}»?",
+  "Jetzt verschieben":"Переместить",
+  "Wird verschoben …":"Перемещается …",
+  "Umzug":"Перемещение",
+  "Nach „{0}“ verschoben":"Перемещено в «{0}»",
+  "Zu „{0}“ wechseln":"Перейти в «{0}»",
+  "Rückgängig":"Отменить",
+  "Wird zurückgeschoben …":"Возвращается …",
+  "{0} Eintrag konnte nicht zurückgeschoben werden.":"{0} запись не удалось вернуть.",
+  "{0} Einträge konnten nicht zurückgeschoben werden.":"Не удалось вернуть записей: {0}.",
+  "Zurückgeschoben ✅":"Возвращено ✅",
+  "kommt mit":"переносится вместе",
+  "ohne Vertrag":"без договора",
+  "Hier gibt es nichts zu verschieben.":"Здесь нечего перемещать.",
+  "In anderen Haushalt verschieben":"Переместить в другое хозяйство",
+  "Dafür brauchst du einen zweiten Haushalt.":"Для этого нужно второе хозяйство.",
+  "Nur Admins von „{0}“ können daraus verschieben.":"Перемещать из «{0}» могут только его администраторы.",
+  "Aus „{0}“":"Из «{0}»",
+  "Ziel-Haushalt":"Целевое хозяйство",
+  "Ziel wählen …":"Выберите цель …",
+  "{0} Eintrag verschieben":"Переместить {0} запись",
+  "{0} Einträge verschieben":"Переместить записи: {0}",
+  "Einträge antippen":"Отметьте записи",
+  "Kommt mit dem Mietvertrag mit.":"Переносится вместе с договором аренды.",
+  "Kommt mit dem Vertrag bzw. der Abrechnung mit.":"Переносится вместе с договором или расчётом.",
+  "Verträge, Dokumente, Nebenkosten":"Договоры, документы, коммунальные платежи",
+  "In anderen Haushalt":"В другое хозяйство",
+
 
 /* ---- 1.9.6 Fach ---- */
   "Fach":"Специальность",
@@ -2698,7 +2769,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -2794,7 +2865,7 @@ function render(){
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   if(rt.name==="scan"){r.innerHTML=shell("","neu");scannerZeigen(rt.params);return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen","umzug"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -2817,6 +2888,7 @@ function render(){
   else if(rt.name==="kikosten")  {inhalt=viewKiKosten();cur="mehr";}
   else if(rt.name==="registrierungen"){inhalt=viewRegistrierungen();cur="mehr";}
   else if(rt.name==="nebenkosten"){inhalt=viewNebenkosten();cur=rt.params.von==="vertrag"?"vertraege":"mehr";}
+  else if(rt.name==="umzug")     {inhalt=viewUmzug();cur="mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
   r.innerHTML=shell(inhalt,cur);
@@ -3418,6 +3490,10 @@ function viewMehr(){
         '<span class="db"><span class="dn">'+t("Nebenkosten")+'</span>'+
         '<span class="dm"><span>'+(NK.length?tn(NK.length,"{0} Abrechnung","{0} Abrechnungen")+' · '+tf("zuletzt {0}",nkLabel(nkNeueste())):t("Jährliche Abrechnung auswerten"))+'</span></span></span>'+
         '<span class="go">'+ic("right",18)+'</span></a>'+
+      (HOUSEHOLDS.length>1?'<a class="drow3" href="#/umzug"><span class="di">'+ic("house")+'</span>'+
+        '<span class="db"><span class="dn">'+t("In anderen Haushalt verschieben")+'</span>'+
+        '<span class="dm"><span>'+t("Verträge, Dokumente, Nebenkosten")+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a>':"")+
       '<a class="drow3" href="#/einrichten"><span class="di">'+ic("tool")+'</span>'+
         '<span class="db"><span class="dn">'+t("Vertragsarten anpassen")+'</span>'+
         '<span class="dm">'+tf("{0} von {1} angehakt",aktiveArten().length,Object.keys(ARTEN).length-1)+'</span></span>'+
@@ -3627,6 +3703,7 @@ function viewVertrag(id){
       (c.status==="aktiv"
         ?'<button class="btn ghost" data-a="v-kuendigen" data-id="'+c.id+'">✂️ '+t("Als gekündigt markieren")+'</button>'
         :'<button class="btn ghost" data-a="v-aktiv" data-id="'+c.id+'">↩️ '+t("Wieder als aktiv markieren")+'</button>')+
+      (HOUSEHOLDS.length>1&&HH&&ichAdmin(HH.id)?'<button class="btn ghost" data-a="uz-vertrag" data-id="'+c.id+'">'+ic("house")+' '+t("In anderen Haushalt")+'</button>':"")+
       '<button class="btn ghost danger" data-a="v-del" data-id="'+c.id+'">'+ic("trash")+' '+t("Löschen")+'</button>'+
     '</div>';
 }
@@ -4842,6 +4919,7 @@ function viewDokumente(){
         (wahl?'<div class="factions">'+
           '<button class="btn danger" data-a="d-del-wahl"'+(n?"":" disabled")+'>'+ic("trash")+' '+
             (n?tn(n,"{0} Dokument löschen","{0} Dokumente löschen"):t("Dokumente zum Löschen antippen"))+'</button>'+
+          (n&&HOUSEHOLDS.length>1&&HH&&ichAdmin(HH.id)?'<button class="btn ghost" data-a="uz-doks">'+ic("house")+' '+t("In anderen Haushalt")+'</button>':"")+
           '<button class="btn ghost" data-a="ab-alle">'+(alle?t("Auswahl aufheben"):t("Alle auswählen"))+'</button>'+
         '</div>':"")
       :'<section class="card"><div class="empty"><div class="ei">'+ic("check",28)+'</div><h3>'+t("Alles zugeordnet")+'</h3></div></section>');
@@ -9822,6 +9900,410 @@ function regVorschlaege(){
     text:offen.map(function(z){return regName(z)||z.email;}).join(" · "),knopf:t("Ansehen"),href:"#/registrierungen"}];
 }
 
+/* ================= Umzug: Verträge, Dokumente, Arztdokumente, Nebenkosten in einen anderen Haushalt =================
+   Regeln (mit dem User abgestimmt, 18.10.2026):
+   - Ein Vertrag nimmt alle seine Dokumente mit, ein Vertrag mit Nebenkostenabrechnungen (Miete) auch diese samt Dokumenten.
+   - Ein einzelnes Dokument eines bleibenden Vertrags: im Ziel dem Vertrag mit gleicher Vertrags- bzw. Kundennummer
+     (+ gleiche Art) zuordnen, sonst „ohne Vertrag“. Eine einzelne Abrechnung hängt sich an den Mietvertrag des Ziels.
+   - Personen: gleichnamige im Ziel verwenden, sonst dort anlegen.
+   - Dubletten im Ziel: gleiche Datei → zusammenführen (Zielkopie bleibt), gleiche Vertragsnummer bzw. Kundennummer + Art →
+     Verträge zusammenführen (leere Felder des Ziels füllen), gleicher Abrechnungszeitraum → Dokumente an die Ziel-Abrechnung.
+   - Nur Admins des Quell-Haushalts (Datenbank-Trigger butler.umzug_nur_admin), Ziel: Mitglied (RLS).
+   - Dateien ziehen mit: kopieren → umtragen (Pfad + Haushalt in einem Schritt, Prüfregel pfade_im_haus) → alte löschen. */
+var UMZUG={hh:null,ziel:null,wahl:{v:{},d:{},n:{}},ansicht:"vertraege",q:"",bericht:null,laeuft:false,plan:null,zielDaten:null};
+function umzugZiele(){return HOUSEHOLDS.filter(function(h){return !HH||h.id!==HH.id;});}
+function umzugBereit(){
+  if(!HH)return;
+  if(UMZUG.hh!==HH.id){UMZUG.hh=HH.id;UMZUG.wahl={v:{},d:{},n:{}};UMZUG.ziel=null;UMZUG.q="";}
+  var z=umzugZiele();
+  if(UMZUG.ziel&&!z.some(function(h){return h.id===UMZUG.ziel;}))UMZUG.ziel=null;
+  if(!UMZUG.ziel&&z.length===1)UMZUG.ziel=z[0].id;
+}
+function umzugMit(wahl){umzugBereit();UMZUG.wahl={v:{},d:{},n:{}};Object.keys(wahl).forEach(function(k){(wahl[k]||[]).forEach(function(id){UMZUG.wahl[k][id]=1;});});}
+/* Auswahl samt allem, was automatisch mitkommt */
+function umzugErweitern(wahl,quelle){
+  var v={},n={},d={},grund={};
+  Object.keys(wahl.v||{}).forEach(function(id){if(quelle.contracts.some(function(c){return c.id===id;}))v[id]=1;});
+  quelle.nk.forEach(function(x){if(x.contract_id&&v[x.contract_id]){n[x.id]=1;grund["n"+x.id]="vertrag";}});
+  Object.keys(wahl.n||{}).forEach(function(id){if(quelle.nk.some(function(x){return x.id===id;}))n[id]=1;});
+  quelle.docs.forEach(function(x){
+    if(x.contract_id&&v[x.contract_id]){d[x.id]=1;grund["d"+x.id]="vertrag";}
+    else if(x.nk_id&&n[x.nk_id]){d[x.id]=1;grund["d"+x.id]="nk";}
+  });
+  Object.keys(wahl.d||{}).forEach(function(id){if(quelle.docs.some(function(x){return x.id===id;}))d[id]=1;});
+  return {v:Object.keys(v),n:Object.keys(n),d:Object.keys(d),grund:grund};
+}
+function umzugQuelle(){return {contracts:CONTRACTS,docs:DOCS,nk:NK,persons:PERSONS};}
+/* Ist dieser Vertrag im Ziel eindeutig derselbe? Vertragsnummer gleich, oder Kundennummer gleich bei gleicher Art
+   (eine Kundennummer gilt bei manchen Anbietern für mehrere Verträge, z. B. Mobilfunk und Internet) */
+function umzugGleicherVertrag(c,liste){
+  var tr=liste.filter(function(z){
+    return nummerGleich(c.vertragsnummer,z.vertragsnummer)||(nummerGleich(c.kundennummer,z.kundennummer)&&(c.art||"sonstiges")===(z.art||"sonstiges"));
+  });
+  return tr.length===1?tr[0]:null;
+}
+function umzugMieteImZiel(liste){
+  var m=liste.filter(function(c){return c.art==="miete";});
+  return m.filter(function(c){return c.status==="aktiv";})[0]||m[0]||null;
+}
+/* Der Plan: was passiert mit jedem Eintrag? Rein rechnerisch, ohne Datenbank (prüfbar) */
+function umzugPlan(wahl,quelle,ziel){
+  var e=umzugErweitern(wahl,quelle),plan={ziel:ziel.id,vertraege:[],nk:[],dokumente:[],personen:{},arten:[],hinweise:[]};
+  function byId(l,id){return l.filter(function(x){return x.id===id;})[0]||null;}
+  var cZiel={},nZiel={};
+  e.v.forEach(function(id){
+    var c=byId(quelle.contracts,id),gl=umzugGleicherVertrag(c,ziel.contracts);
+    plan.vertraege.push({c:c,aktion:gl?"zusammen":"verschieben",ziel:gl});
+    cZiel[id]=gl?gl.id:id;
+    if(!gl){
+      if(plan.arten.indexOf(c.art||"sonstiges")<0)plan.arten.push(c.art||"sonstiges");
+      if(ziel.contracts.some(function(z){return (z.art||"sonstiges")===(c.art||"sonstiges")&&anbieterGleich(z.anbieter,c.anbieter)===true;}))
+        plan.hinweise.push(tf("„{0}“ gibt es im Ziel schon als eigenen Vertrag – bitte prüfen.",c.anbieter||artInfo(c.art).label));
+    }
+  });
+  var mieteZiel=umzugMieteImZiel(ziel.contracts);
+  e.n.forEach(function(id){
+    var x=byId(quelle.nk,id),gl=ziel.nk.filter(function(z){return z.von===x.von&&z.bis===x.bis;})[0]||null;
+    var vertrag=x.contract_id&&cZiel[x.contract_id]?cZiel[x.contract_id]:(mieteZiel?mieteZiel.id:null);
+    plan.nk.push({n:x,aktion:gl?"zusammen":"verschieben",ziel:gl,vertrag:vertrag});
+    nZiel[id]=gl?gl.id:id;
+    if(gl&&Math.abs(nkSumme(gl)-nkSumme(x))>1)plan.hinweise.push(tf("Nebenkosten {0}: Summen weichen ab ({1} hier, {2} im Ziel) – die Werte im Ziel bleiben.",nkLabel(x),eur(nkSumme(x)),eur(nkSumme(gl))));
+  });
+  e.d.forEach(function(id){
+    var x=byId(quelle.docs,id),dub=x.content_hash?ziel.docs.filter(function(z){return z.content_hash===x.content_hash;})[0]||null:null;
+    var vertrag=null,nk=null;
+    if(x.contract_id&&cZiel[x.contract_id])vertrag=cZiel[x.contract_id];
+    else if(x.contract_id){var qc=byId(quelle.contracts,x.contract_id),zc=qc?umzugGleicherVertrag(qc,ziel.contracts):null;vertrag=zc?zc.id:null;}
+    if(x.nk_id&&nZiel[x.nk_id])nk=nZiel[x.nk_id];
+    plan.dokumente.push({d:x,aktion:dub?"zusammen":"verschieben",ziel:dub,vertrag:vertrag,nk:nk,mit:e.grund["d"+id]||null});
+  });
+  /* Personen der Einträge, die wirklich umziehen */
+  plan.vertraege.concat(plan.dokumente).forEach(function(p){
+    var o=p.c||p.d;if(p.aktion!=="verschieben"||!o.person_id)return;
+    var pq=byId(quelle.persons,o.person_id);if(!pq)return;
+    var pz=(ziel.persons||[]).filter(function(z){return personSchluessel(z.name)===personSchluessel(pq.name);})[0]||null;
+    plan.personen[o.person_id]={name:pq.name,ziel:pz?pz.id:null};
+  });
+  return plan;
+}
+function umzugZahlen(plan){
+  function z(l,a,f){return l.filter(function(p){return (!a||p.aktion===a)&&(!f||f(p));}).length;}
+  return {v:plan.vertraege.length,vZus:z(plan.vertraege,"zusammen"),n:plan.nk.length,nZus:z(plan.nk,"zusammen"),
+    d:z(plan.dokumente,null,function(p){return !istMed(p.d);}),med:z(plan.dokumente,null,function(p){return istMed(p.d);}),
+    dZus:z(plan.dokumente,"zusammen"),pNeu:Object.keys(plan.personen).filter(function(k){return !plan.personen[k].ziel;}).length};
+}
+/* Daten des Ziels (Mitglied → lesbar) */
+async function umzugZielLaden(hid){
+  var r=await Promise.all([
+    sb.from("contracts").select("*").eq("household_id",hid),
+    sb.from("documents").select("id,household_id,contract_id,nk_id,person_id,content_hash,storage_path,weitere_seiten,bereich,titel,filename").eq("household_id",hid),
+    sb.from("nk_abrechnungen").select("*").eq("household_id",hid),
+    sb.from("persons").select("*").eq("household_id",hid),
+    sb.from("household_setup").select("*").eq("household_id",hid).maybeSingle()
+  ]);
+  for(var i=0;i<4;i++)if(r[i].error)throw r[i].error;
+  return {id:hid,contracts:r[0].data||[],docs:r[1].data||[],nk:r[2].data||[],persons:r[3].data||[],setup:(r[4]&&!r[4].error&&r[4].data)||null};
+}
+function umzugPfad(pfad,hid){var s=String(pfad||""),i=s.indexOf("/");return hid+"/"+(i>=0?s.slice(i+1):s);}
+/* Datei(en) eines Dokuments in den Zielordner kopieren; liefert die neuen Pfade (bei Fehler wird aufgeräumt) */
+async function umzugDateienKopieren(pfade,hid){
+  var neu=[];
+  try{
+    for(var i=0;i<pfade.length;i++){
+      var ziel=umzugPfad(pfade[i],hid),r=await sb.storage.from(BUCKET).copy(pfade[i],ziel);
+      if(r.error&&/exist|duplicate|409/i.test(errMsg(r.error))){ziel=hid+"/u"+Date.now()+"_"+Math.random().toString(36).slice(2,6)+"_"+String(pfade[i]).split("/").pop();r=await sb.storage.from(BUCKET).copy(pfade[i],ziel);}
+      if(r.error)throw new Error(netzFehler(r.error));
+      neu.push(ziel);
+    }
+  }catch(e){await dateienWeg(neu);throw e;}
+  return neu;
+}
+/* Leere Felder des Zielvertrags aus dem verschobenen füllen */
+function umzugVertragFuellen(q,z){
+  var upd={};
+  ["produkt","kundennummer","vertragsnummer","vertragsstart","mindestlaufzeit_monate","kuendigungsfrist_monate","verlaengerung_monate","notizen"].forEach(function(k){
+    if(leerWert(z[k])&&!leerWert(q[k]))upd[k]=q[k];
+  });
+  if(z.kosten==null&&q.kosten!=null){upd.kosten=q.kosten;upd.kosten_intervall=q.kosten_intervall;}
+  var dq=q.details||{},dz=Object.assign({},z.details||{}),neu=false;
+  Object.keys(dq).forEach(function(k){if(leerWert(dz[k])&&!leerWert(dq[k])){dz[k]=dq[k];neu=true;}});
+  if(neu)upd.details=dz;
+  return upd;
+}
+/* ---------- Ausführen ---------- */
+async function umzugAusfuehren(plan,zd,melde){
+  var Q=HH.id,Z=zd.id,log=[],zeilen=[],pmap={},schritt=0,gesamt=plan.vertraege.length+plan.nk.length+plan.dokumente.length;
+  function weiter(){schritt++;melde(tf("{0} von {1} wird verschoben …",Math.min(schritt,gesamt),gesamt));}
+  /* 1. Personen im Ziel finden oder anlegen */
+  var pids=Object.keys(plan.personen);
+  for(var i=0;i<pids.length;i++){
+    var pp=plan.personen[pids[i]];
+    if(pp.ziel){pmap[pids[i]]=pp.ziel;continue;}
+    var pr=await sb.from("persons").insert({household_id:Z,name:pp.name}).select("id").single();
+    if(!pr.error&&pr.data){pmap[pids[i]]=pr.data.id;zeilen.push({icon:"👤",name:pp.name,text:t("im Ziel angelegt")});}
+  }
+  /* 2. Verträge */
+  var cOk={};
+  for(var a=0;a<plan.vertraege.length;a++){
+    var pv=plan.vertraege[a],c=pv.c;weiter();
+    try{
+      if(pv.aktion==="verschieben"){
+        var r1=await sb.from("contracts").update({household_id:Z,person_id:c.person_id?(pmap[c.person_id]||null):null}).eq("id",c.id).select("id");
+        if(r1.error)throw r1.error;if(!r1.data||!r1.data.length)throw new Error(t("Es wurde nichts geändert – fehlende Berechtigung?"));
+        log.push({typ:"v",id:c.id,person:c.person_id||null});cOk[c.id]=c.id;
+        zeilen.push({icon:"✅",name:c.anbieter||artInfo(c.art).label,text:artInfo(c.art).label+" · "+t("verschoben")});
+      }else{
+        var upd=umzugVertragFuellen(c,pv.ziel);
+        if(Object.keys(upd).length){var r2=await sb.from("contracts").update(upd).eq("id",pv.ziel.id).select("id");if(r2.error)throw r2.error;}
+        cOk[c.id]=pv.ziel.id;
+        zeilen.push({icon:"🔗",name:c.anbieter||artInfo(c.art).label,text:t("mit dem gleichen Vertrag im Ziel zusammengeführt")});
+      }
+    }catch(x){zeilen.push({icon:"⚠️",name:c.anbieter||artInfo(c.art).label,text:umzugFehler(x)});}
+  }
+  /* 3. Nebenkostenabrechnungen */
+  var nOk={};
+  for(var b=0;b<plan.nk.length;b++){
+    var pn=plan.nk[b],n=pn.n;weiter();
+    var vz=n.contract_id&&cOk[n.contract_id]?cOk[n.contract_id]:(n.contract_id&&plan.vertraege.some(function(p){return p.c.id===n.contract_id;})?null:pn.vertrag);
+    try{
+      if(pn.aktion==="verschieben"){
+        var r3=await sb.from("nk_abrechnungen").update({household_id:Z,contract_id:vz}).eq("id",n.id).select("id");
+        if(r3.error)throw r3.error;if(!r3.data||!r3.data.length)throw new Error(t("Es wurde nichts geändert – fehlende Berechtigung?"));
+        log.push({typ:"n",id:n.id,contract:n.contract_id||null});nOk[n.id]=n.id;
+        zeilen.push({icon:"✅",name:tf("Nebenkosten {0}",nkLabel(n)),text:t("verschoben")});
+      }else{
+        nOk[n.id]=pn.ziel.id;
+        zeilen.push({icon:"🔗",name:tf("Nebenkosten {0}",nkLabel(n)),text:t("an die vorhandene Abrechnung im Ziel angehängt – Werte unverändert")});
+      }
+    }catch(x){zeilen.push({icon:"⚠️",name:tf("Nebenkosten {0}",nkLabel(n)),text:umzugFehler(x)});}
+  }
+  /* 4. Dokumente: Datei kopieren → umtragen → alte Datei löschen; Zusammenführen: Quell-Kopie entfernen */
+  var mitDok=0;
+  for(var k=0;k<plan.dokumente.length;k++){
+    var pd=plan.dokumente[k],d=pd.d;weiter();
+    var vertrag=d.contract_id&&cOk.hasOwnProperty(d.contract_id)?cOk[d.contract_id]:(plan.vertraege.some(function(p){return p.c.id===d.contract_id;})?null:pd.vertrag);
+    var nk=d.nk_id&&nOk.hasOwnProperty(d.nk_id)?nOk[d.nk_id]:null;
+    var pfade=[d.storage_path].concat(d.weitere_seiten||[]).filter(Boolean);
+    try{
+      if(pd.aktion==="zusammen"){
+        var adopt={};
+        if(!pd.ziel.contract_id&&vertrag)adopt.contract_id=vertrag;
+        if(!pd.ziel.nk_id&&nk)adopt.nk_id=nk;
+        if(Object.keys(adopt).length){var r4=await sb.from("documents").update(adopt).eq("id",pd.ziel.id);if(r4.error)throw r4.error;}
+        var r5=await sb.from("documents").delete().eq("id",d.id).select("id");if(r5.error)throw r5.error;
+        await dateienWeg(pfade);
+        zeilen.push({icon:"🔗",name:docTitel(d),text:t("lag schon im Ziel – zusammengeführt")});
+      }else{
+        var neu=await umzugDateienKopieren(pfade,Z);
+        var r6=await sb.from("documents").update({household_id:Z,storage_path:neu[0],weitere_seiten:neu.slice(1),contract_id:vertrag,nk_id:nk,
+          person_id:d.person_id?(pmap[d.person_id]||null):null}).eq("id",d.id).select("id");
+        if(r6.error||!r6.data||!r6.data.length){await dateienWeg(neu);throw r6.error||new Error(t("Es wurde nichts geändert – fehlende Berechtigung?"));}
+        await dateienWeg(pfade);
+        log.push({typ:"d",id:d.id,alt:{storage_path:d.storage_path,weitere_seiten:d.weitere_seiten||[],contract_id:d.contract_id||null,nk_id:d.nk_id||null,person_id:d.person_id||null},neu:neu});
+        if(pd.mit)mitDok++;
+        if(!pd.mit)zeilen.push({icon:"✅",name:docTitel(d),text:vertrag?tf("verschoben → {0}",umzugVertragName(vertrag,plan,zd)):t("verschoben · ohne Vertrag")});
+      }
+    }catch(x){
+      zeilen.push({icon:"⚠️",name:docTitel(d),text:umzugFehler(x)});
+      /* Bleibt das Dokument zurück, darf es nicht an einem Vertrag/einer Abrechnung im anderen Haushalt hängen */
+      var los={};if(d.contract_id&&cOk[d.contract_id])los.contract_id=null;if(d.nk_id&&nOk[d.nk_id])los.nk_id=null;
+      if(Object.keys(los).length){try{await sb.from("documents").update(los).eq("id",d.id);}catch(_e){}}
+    }
+  }
+  if(mitDok)zeilen.push({icon:"📄",name:tn(mitDok,"{0} Dokument","{0} Dokumente"),text:t("mit den Verträgen bzw. Abrechnungen umgezogen")});
+  /* 5. Zusammengeführte Quell-Verträge/-Abrechnungen entfernen */
+  var weg=plan.vertraege.filter(function(p){return p.aktion==="zusammen"&&cOk[p.c.id];}).map(function(p){return p.c.id;});
+  if(weg.length){try{await sb.from("contracts").delete().in("id",weg);}catch(e){}}
+  var wegN=plan.nk.filter(function(p){return p.aktion==="zusammen"&&nOk[p.n.id];}).map(function(p){return p.n.id;});
+  if(wegN.length){try{await sb.from("nk_abrechnungen").delete().in("id",wegN);}catch(e){}}
+  /* 6. Vertragsarten im Ziel anhaken, sonst wären die Verträge dort unsichtbar */
+  var arten=(zd.setup&&Array.isArray(zd.setup.arten))?zd.setup.arten.slice():[],fehlt=plan.arten.filter(function(a){return a!=="sonstiges"&&arten.indexOf(a)<0;});
+  if(fehlt.length){
+    try{await sb.from("household_setup").upsert({household_id:Z,arten:arten.concat(fehlt),eingerichtet:zd.setup?!!zd.setup.eingerichtet:false,updated_at:new Date().toISOString()});
+      zeilen.push({icon:"🧩",name:t("Vertragsarten im Ziel angehakt"),text:fehlt.map(function(a){return artInfo(a).label;}).join(", ")});}catch(e){}
+  }
+  plan.hinweise.forEach(function(h){zeilen.push({icon:"ℹ️",name:t("Hinweis"),text:h});});
+  return {zeilen:zeilen,log:log,ziel:Z,quelle:Q};
+}
+function umzugVertragName(id,plan,zd){
+  var c=plan.vertraege.filter(function(p){return p.c.id===id;})[0];if(c)return c.c.anbieter||artInfo(c.c.art).label;
+  var z=zd.contracts.filter(function(x){return x.id===id;})[0];return z?(z.anbieter||artInfo(z.art).label):"";
+}
+function umzugFehler(x){
+  var m=errMsg(x);
+  if(/nur_admin_verschiebt/.test(m))return t("Nur Admins eines Haushalts können daraus verschieben.");
+  if(/row-level security|row level security/i.test(m))return t("Im Ziel-Haushalt fehlt die Berechtigung.");
+  return m;
+}
+/* ---------- Rückgängig: genau die verschobenen Einträge zurück (Zusammengeführtes bleibt) ---------- */
+async function umzugZurueck(b,melde){
+  var Q=b.quelle,Z=b.ziel,fehler=0,n=0,gesamt=b.log.length;
+  function weiter(){n++;melde(tf("{0} von {1} wird zurückgeschoben …",Math.min(n,gesamt),gesamt));}
+  var v=b.log.filter(function(l){return l.typ==="v";}),nk=b.log.filter(function(l){return l.typ==="n";}),dk=b.log.filter(function(l){return l.typ==="d";});
+  for(var i=0;i<v.length;i++){weiter();try{var r=await sb.from("contracts").update({household_id:Q,person_id:v[i].person}).eq("id",v[i].id).select("id");if(r.error||!r.data||!r.data.length)fehler++;}catch(e){fehler++;}}
+  for(var j=0;j<nk.length;j++){weiter();try{var r2=await sb.from("nk_abrechnungen").update({household_id:Q,contract_id:nk[j].contract}).eq("id",nk[j].id).select("id");if(r2.error||!r2.data||!r2.data.length)fehler++;}catch(e){fehler++;}}
+  for(var k=0;k<dk.length;k++){
+    weiter();var l=dk[k];
+    try{
+      var alt=[l.alt.storage_path].concat(l.alt.weitere_seiten||[]),kopiert=[];
+      for(var p=0;p<l.neu.length;p++){var c=await sb.storage.from(BUCKET).copy(l.neu[p],alt[p]);if(c.error)throw c.error;kopiert.push(alt[p]);}
+      var r3=await sb.from("documents").update({household_id:Q,storage_path:alt[0],weitere_seiten:alt.slice(1),contract_id:l.alt.contract_id,nk_id:l.alt.nk_id,person_id:l.alt.person_id}).eq("id",l.id).select("id");
+      if(r3.error||!r3.data||!r3.data.length){await dateienWeg(kopiert);throw r3.error||new Error("–");}
+      await dateienWeg(l.neu);
+    }catch(e){fehler++;}
+  }
+  return fehler;
+}
+/* ---------- Ablauf ---------- */
+async function umzugPruefen(){
+  umzugBereit();
+  if(!UMZUG.ziel){toast(t("Bitte zuerst das Ziel wählen."),true);return;}
+  if(!ichAdmin(HH.id)){toast(t("Nur Admins eines Haushalts können daraus verschieben."),true);return;}
+  var e=umzugErweitern(UMZUG.wahl,umzugQuelle());
+  if(!e.v.length&&!e.n.length&&!e.d.length){toast(t("Bitte etwas auswählen."),true);return;}
+  nkArbeit(t("Ziel wird geprüft …"));
+  try{
+    var zd=await umzugZielLaden(UMZUG.ziel),plan=umzugPlan(UMZUG.wahl,umzugQuelle(),zd);
+    UMZUG.plan=plan;UMZUG.zielDaten=zd;
+    umzugBestaetigung(plan,zd);
+  }catch(x){closeModal(true);toast(t("Ziel konnte nicht geladen werden")+": "+errMsg(x),true);}
+}
+function umzugZielName(id){var h=hausById(id);return h?(h.name||t("Haushalt")):"";}
+function umzugBestaetigung(plan,zd){
+  var z=umzugZahlen(plan),zeilen=[];
+  if(z.v)zeilen.push(["📑",tn(z.v,"{0} Vertrag","{0} Verträge"),z.vZus?tn(z.vZus,"{0} wird mit dem gleichen Vertrag im Ziel zusammengeführt","{0} werden mit den gleichen Verträgen im Ziel zusammengeführt"):""]);
+  if(z.d)zeilen.push(["📄",tn(z.d,"{0} Dokument","{0} Dokumente"),""]);
+  if(z.med)zeilen.push(["🩺",tn(z.med,"{0} Arztdokument","{0} Arztdokumente"),""]);
+  if(z.n)zeilen.push(["🧾",tn(z.n,"{0} Nebenkostenabrechnung","{0} Nebenkostenabrechnungen"),z.nZus?tn(z.nZus,"{0} kommt an die vorhandene Abrechnung","{0} kommen an vorhandene Abrechnungen"):""]);
+  if(z.dZus)zeilen.push(["🔗",tn(z.dZus,"{0} Datei liegt schon im Ziel","{0} Dateien liegen schon im Ziel"),t("werden zusammengeführt")]);
+  if(z.pNeu)zeilen.push(["👤",tn(z.pNeu,"{0} Person wird im Ziel angelegt","{0} Personen werden im Ziel angelegt"),""]);
+  openModal('<h2 class="mhead">'+esc(tf("Nach „{0}“ verschieben?",umzugZielName(zd.id)))+'</h2>'+
+    '<div class="dlist">'+zeilen.map(function(r){
+      return '<div class="drow3"><span class="di">'+r[0]+'</span><span class="db"><span class="dn">'+esc(r[1])+'</span>'+(r[2]?'<span class="dm"><span>'+esc(r[2])+'</span></span>':"")+'</span></div>';
+    }).join("")+'</div>'+
+    (plan.hinweise.length?'<div class="sug warn" style="margin-top:12px"><span class="si">'+ic("alert")+'</span><div class="sb2"><div class="sx">'+plan.hinweise.map(esc).join("<br>")+'</div></div></div>':"")+
+    '<div class="factions"><button class="btn full" data-a="uz-los">'+ic("check")+' '+t("Jetzt verschieben")+'</button>'+
+    '<button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button></div>');
+}
+async function umzugLos(){
+  if(UMZUG.laeuft||!UMZUG.plan)return;
+  UMZUG.laeuft=true;var plan=UMZUG.plan,zd=UMZUG.zielDaten,b=null;
+  nkArbeit(t("Wird verschoben …"));
+  try{b=await umzugAusfuehren(plan,zd,nkArbeitText);}
+  catch(x){b={zeilen:[{icon:"⚠️",name:t("Umzug"),text:errMsg(x)}],log:[],ziel:zd.id,quelle:HH.id};}
+  finally{UMZUG.laeuft=false;}
+  UMZUG.wahl={v:{},d:{},n:{}};UMZUG.plan=null;UMZUG.bericht=b;
+  try{await ladeDaten();}catch(e){}
+  closeModal(true);render();umzugBerichtZeigen();
+}
+function umzugBerichtZeigen(){
+  var b=UMZUG.bericht;if(!b)return;
+  var zurueck=b.log.length&&ichAdmin(b.ziel)&&HH&&HH.id===b.quelle;
+  openModal('<h2 class="mhead">'+esc(tf("Nach „{0}“ verschoben",umzugZielName(b.ziel)))+'</h2><div class="dlist">'+b.zeilen.map(function(z){
+    return '<div class="drow3"><span class="di">'+z.icon+'</span><span class="db"><span class="dn">'+esc(z.name)+'</span><span class="dm"><span>'+esc(z.text)+'</span></span></span></div>';
+  }).join("")+'</div>'+
+  '<div class="factions">'+
+    '<button class="btn full" data-a="uz-wechseln" data-id="'+esc(b.ziel)+'">'+ic("house")+' '+esc(tf("Zu „{0}“ wechseln",umzugZielName(b.ziel)))+'</button>'+
+    (zurueck?'<button class="btn ghost full" data-a="uz-zurueck">'+ic("refresh")+' '+t("Rückgängig")+'</button>':"")+
+    '<button class="btn ghost full" data-a="uz-fertig">'+t("Fertig")+'</button></div>');
+}
+async function umzugRueckgaengig(){
+  var b=UMZUG.bericht;if(!b||UMZUG.laeuft)return;
+  UMZUG.laeuft=true;nkArbeit(t("Wird zurückgeschoben …"));
+  var fehler=0;
+  try{fehler=await umzugZurueck(b,nkArbeitText);}catch(e){fehler=1;}
+  finally{UMZUG.laeuft=false;}
+  UMZUG.bericht=null;
+  try{await ladeDaten();}catch(e){}
+  closeModal(true);render();
+  toast(fehler?tn(fehler,"{0} Eintrag konnte nicht zurückgeschoben werden.","{0} Einträge konnten nicht zurückgeschoben werden."):t("Zurückgeschoben ✅"),!!fehler);
+}
+/* ---------- Ansicht ---------- */
+function umzugImplizit(kind,id,e){return !UMZUG.wahl[kind][id]&&e[kind].indexOf(id)>=0;}
+function umzugZeile(kind,id,icon,name,meta,such,e){
+  var an=!!UMZUG.wahl[kind][id],mit=umzugImplizit(kind,id,e);
+  return '<div class="drow3 wahl'+(an||mit?" an":"")+(mit?" mit":"")+'" data-such="'+esc(artText(such))+'">'+
+    '<button class="wbox" data-a="uz-wahl" data-k="'+kind+'" data-id="'+esc(id)+'" role="checkbox" aria-checked="'+(an||mit)+'" aria-label="'+esc(t("Auswählen"))+'">'+(an||mit?ic("check",16):"")+'</button>'+
+    '<button class="wtxt" data-a="uz-wahl" data-k="'+kind+'" data-id="'+esc(id)+'"><span class="dn">'+icon+' '+esc(name)+'</span>'+
+      '<span class="dm">'+meta.filter(Boolean).map(function(m){return '<span>'+esc(m)+'</span>';}).join("")+(mit?'<span class="pill">'+t("kommt mit")+'</span>':"")+'</span></button></div>';
+}
+function umzugListe(e){
+  var a=UMZUG.ansicht,zeilen=[];
+  if(a==="vertraege"){
+    CONTRACTS.slice().sort(function(x,y){return String(x.anbieter||"").localeCompare(String(y.anbieter||""));}).forEach(function(c){
+      var ai=artInfo(c.art||"sonstiges"),nd=DOCS.filter(function(d){return d.contract_id===c.id;}).length,nn=NK.filter(function(n){return n.contract_id===c.id;}).length;
+      zeilen.push(umzugZeile("v",c.id,ai.icon,c.anbieter||ai.label,[ai.label,nd?tn(nd,"{0} Dokument","{0} Dokumente"):"",nn?tn(nn,"{0} Abrechnung","{0} Abrechnungen"):""],[c.anbieter,ai.label,c.produkt,c.kundennummer,c.vertragsnummer].join(" "),e));
+    });
+  }else if(a==="dokumente"||a==="gesundheit"){
+    DOCS.filter(function(d){return a==="gesundheit"?istMed(d):!istMed(d);}).slice().sort(function(x,y){return String(docDatum(y)).localeCompare(String(docDatum(x)));}).forEach(function(d){
+      var c=hatVertrag(d)?vertragById(d.contract_id):null,ty=istMed(d)?medTypInfo(d.med_typ):dtInfo(d.doc_type);
+      zeilen.push(umzugZeile("d",d.id,ty.icon,docTitel(d),[fmtDate(istMed(d)?medDatum(d):docDatum(d)),istMed(d)?(d.arzt||""):(c?(c.anbieter||artInfo(c.art).label):t("ohne Vertrag"))],[docTitel(d),d.filename,d.arzt,c?c.anbieter:""].join(" "),e));
+    });
+  }else{
+    nkSortiert().slice().reverse().forEach(function(n){
+      var nd=DOCS.filter(function(d){return d.nk_id===n.id;}).length;
+      zeilen.push(umzugZeile("n",n.id,"🧾",tf("Nebenkosten {0}",nkLabel(n)),[fmtDate(n.von)+"–"+fmtDate(n.bis),eur(nkSumme(n)),nd?tn(nd,"{0} Dokument","{0} Dokumente"):""],"nebenkosten "+nkLabel(n),e));
+    });
+  }
+  return zeilen.length?'<section class="card"><div class="dlist" id="uzliste">'+zeilen.join("")+'</div><p class="hint" id="uzleer" hidden>'+t("Nichts gefunden.")+'</p></section>'
+    :'<section class="card"><p class="hint">'+t("Hier gibt es nichts zu verschieben.")+'</p></section>';
+}
+function viewUmzug(){
+  var kopf=zurueck("#/mehr",t("Mehr"))+seitenTitel(t("In anderen Haushalt verschieben"));
+  umzugBereit();
+  var ziele=umzugZiele();
+  if(!ziele.length)return kopf+'<section class="card"><p class="hint">'+t("Dafür brauchst du einen zweiten Haushalt.")+'</p>'+
+    '<div class="factions"><a class="btn" href="#/haushalte">'+ic("users")+' '+t("Häuser & Mitglieder")+'</a></div></section>';
+  if(!ichAdmin(HH.id))return kopf+'<section class="card"><p class="hint">'+esc(tf("Nur Admins von „{0}“ können daraus verschieben.",HH.name||t("Haushalt")))+'</p></section>';
+  var e=umzugErweitern(UMZUG.wahl,umzugQuelle()),summe=e.v.length+e.n.length+e.d.length;
+  var tabs=[["vertraege",t("Verträge"),"v"],["dokumente",t("Dokumente"),"d"],["gesundheit",t("Gesundheit"),"d"],["nebenkosten",t("Nebenkosten"),"n"]];
+  function zahl(k,a){
+    if(k==="v")return e.v.length;if(k==="n")return e.n.length;
+    return e.d.filter(function(id){var d=DOCS.filter(function(x){return x.id===id;})[0];return d&&(a==="gesundheit"?istMed(d):!istMed(d));}).length;
+  }
+  return kopf+
+    '<p class="hint" style="margin:-6px 0 14px">'+esc(tf("Aus „{0}“",HH.name||t("Haushalt")))+'</p>'+
+    '<div class="filt"><select class="sel" id="uzZiel" aria-label="'+esc(t("Ziel-Haushalt"))+'">'+
+      (ziele.length>1?'<option value="">'+t("Ziel wählen …")+'</option>':"")+
+      ziele.map(function(h){return '<option value="'+esc(h.id)+'"'+(UMZUG.ziel===h.id?" selected":"")+'>→ '+esc(h.name||t("Haushalt"))+'</option>';}).join("")+
+    '</select></div>'+
+    '<div class="langrow dokf uztabs">'+tabs.map(function(tb){
+      var nz=zahl(tb[2],tb[0]);
+      return '<button class="lb'+(UMZUG.ansicht===tb[0]?" on":"")+'" data-a="uz-ansicht" data-k="'+tb[0]+'">'+tb[1]+(nz?' <span class="pill">'+nz+'</span>':"")+'</button>';
+    }).join("")+'</div>'+
+    '<div class="filt dsrow"><input class="inp" id="uzsuche" type="search" value="'+esc(UMZUG.q)+'" placeholder="'+esc(t("Suchen"))+'" aria-label="'+esc(t("Suchen"))+'" autocomplete="off">'+
+      '<button class="btn ghost sm" data-a="uz-alle">'+t("Alle")+'</button></div>'+
+    '<div class="factions uzaktion">'+
+      '<button class="btn" data-a="uz-pruefen"'+(summe&&UMZUG.ziel?"":" disabled")+'>'+ic("check")+' '+
+        (summe?tn(summe,"{0} Eintrag verschieben","{0} Einträge verschieben"):t("Einträge antippen"))+'</button>'+
+      (summe?'<button class="btn ghost" data-a="uz-leeren">'+t("Auswahl aufheben")+'</button>':"")+
+    '</div>'+
+    umzugListe(e);
+}
+/* Suche ohne neu zu zeichnen */
+function umzugFilter(q){
+  UMZUG.q=String(q||"");var w=artText(UMZUG.q).trim().split(" ").filter(Boolean),treffer=0;
+  document.querySelectorAll("#uzliste>[data-such]").forEach(function(z){
+    var s=String(z.getAttribute("data-such")),ja=w.every(function(x){return s.indexOf(x)>=0;});z.hidden=!ja;if(ja)treffer++;
+  });
+  var l=$("#uzleer");if(l)l.hidden=!!treffer;
+}
+function umzugWahl(kind,id){
+  var e=umzugErweitern(UMZUG.wahl,umzugQuelle());
+  if(umzugImplizit(kind,id,e)){toast(kind==="n"?t("Kommt mit dem Mietvertrag mit."):t("Kommt mit dem Vertrag bzw. der Abrechnung mit."));return;}
+  if(UMZUG.wahl[kind][id])delete UMZUG.wahl[kind][id];else UMZUG.wahl[kind][id]=1;
+  umzugNeuZeichnen();
+}
+/* „Alle“ meint alle, die gerade zu sehen sind (Reiter + Suche); sind alle schon gewählt, hebt es auf */
+function umzugAlle(){
+  var kind=UMZUG.ansicht==="vertraege"?"v":(UMZUG.ansicht==="nebenkosten"?"n":"d"),ids=[];
+  document.querySelectorAll("#uzliste>[data-such]").forEach(function(z){if(!z.hidden){var b=z.querySelector("[data-id]");if(b)ids.push(b.getAttribute("data-id"));}});
+  var alle=ids.length&&ids.every(function(id){return UMZUG.wahl[kind][id];});
+  ids.forEach(function(id){if(alle)delete UMZUG.wahl[kind][id];else UMZUG.wahl[kind][id]=1;});
+  umzugNeuZeichnen();
+}
+function umzugNeuZeichnen(){var y=window.scrollY;render();if(UMZUG.q)umzugFilter(UMZUG.q);window.scrollTo(0,y);}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 /* Knopf mit Hintergrund-Arbeit: sofort gedimmt mit Kreisel, weitere Klicks zählen nicht, bis sie fertig ist */
@@ -9971,6 +10453,17 @@ document.addEventListener("click",function(ev){
   if(a==="nk-pos-weg"){laeuft(b,nkPosWeg(Number(b.dataset.i)));return;}
   if(a==="nk-datei"){NK_DATEI_ZIEL=id||null;var nd=$("#nkDatei");if(nd)nd.click();return;}
   if(a==="nk-lesen"){laeuft(b,nkAuslesen([],id,null));return;}
+  if(a==="uz-wahl"){umzugWahl(b.dataset.k,id);return;}
+  if(a==="uz-ansicht"){UMZUG.ansicht=b.dataset.k||"vertraege";UMZUG.q="";render();return;}
+  if(a==="uz-alle"){umzugAlle();return;}
+  if(a==="uz-leeren"){UMZUG.wahl={v:{},d:{},n:{}};umzugNeuZeichnen();return;}
+  if(a==="uz-pruefen"){laeuft(b,umzugPruefen());return;}
+  if(a==="uz-los"){laeuft(b,umzugLos());return;}
+  if(a==="uz-zurueck"){laeuft(b,umzugRueckgaengig());return;}
+  if(a==="uz-fertig"){UMZUG.bericht=null;closeModal(true);render();return;}
+  if(a==="uz-wechseln"){UMZUG.bericht=null;laeuft(b,haushaltSetzen(id));return;}
+  if(a==="uz-vertrag"){umzugMit({v:[id]});UMZUG.ansicht="vertraege";go("#/umzug");return;}
+  if(a==="uz-doks"){umzugMit({d:Object.keys(ABLAGE_WAHL)});UMZUG.ansicht="dokumente";go("#/umzug");return;}
   if(a==="v-ergaenzen"){laeuft(b,vertragAusDokumenten(id));return;}
   if(a==="nk-alle"){laeuft(b,nkAlleErfassen());return;}
   if(a==="nk-modus"){nkModus(b.dataset.k);return;}
@@ -10012,6 +10505,7 @@ document.addEventListener("input",function(ev){
   if(tid==="lsuche")logoFilter(ev.target.value);
   if(tid==="dsuche")dokFilter(ev.target.value);
   if(tid==="msuche")medSuche(ev.target.value);
+  if(tid==="uzsuche")umzugFilter(ev.target.value);
   if(tid==="l_muster"){var lt=$("#l_treffer");if(lt)lt.innerHTML=logoTreffer(ev.target.value);}
   if(ev.target&&ev.target.classList&&ev.target.classList.contains("bad"))ev.target.classList.remove("bad");
 });
@@ -10028,6 +10522,7 @@ document.addEventListener("change",function(ev){
   if(el.id==="l_file"){logoDatei(el.files&&el.files[0]);el.value="";return;}
   if(el.id==="mfFach"){medFilter.fach=el.value;render();return;}
   if(el.id==="mfEreignis"){medFilter.ereignis=el.value;render();return;}
+  if(el.id==="uzZiel"){UMZUG.ziel=el.value||null;render();return;}
   if(el.id==="mfPerson"){medFilter.person=el.value;render();return;}
   if(el.id==="mfJahr"){medFilter.jahr=el.value;render();return;}
   if(/^f_/.test(el.id||""))formVorschau();

@@ -1,5 +1,5 @@
 /* All-Home Service Worker — network-first (immer frisch, offline Fallback) */
-var CACHE = "allhome-shell-v24";
+var CACHE = "allhome-shell-v25";
 /* Gleiche Domain wie AllTrack: der Cache-Speicher ist geteilt, aufgeräumt wird nur der eigene */
 var PREFIX = "allhome-shell-";
 
