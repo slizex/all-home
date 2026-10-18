@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-UZz6+pzRB2UlrzSwC/T1488g+og0Nen8Gxr0jjeGVa4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-BDpdYYHe/MA965bHRtZpUpxUD9qtK2cUUOGfcTU1o6Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -778,7 +778,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.4";
+var APP_VERSION="1.9.5";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -833,6 +833,18 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.9.5 Vertrag aus Dokumenten ---- */
+  "Ergänzt: {0}":"Дополнено: {0}",
+  "Dokument zugeordnet":"Документ привязан",
+  "{0} Dokumente zugeordnet":"Документов привязано: {0}",
+  "{0} · ergänzt: {1}":"{0} · дополнено: {1}",
+  "Nichts zu ergänzen":"Нечего дополнять",
+  "Analyse nachgeholt":"Анализ выполнен",
+  "seit {0}":"с {0}",
+  "{0} Angabe aus den Dokumenten":"{0} сведение из документов",
+  "{0} Angaben aus den Dokumenten":"Сведений из документов: {0}",
+
 
 /* ---- 1.9.4 Nebenkosten automatisch ---- */
   "keine Positionen erkannt":"позиции не распознаны",
@@ -2863,15 +2875,29 @@ async function ladeEnergie(){
   ENERGIE={};
   if(!HH)return;
   try{
-    var r=await sbPub.from("tariffs").select("*").eq("household_id",HH.id)
-            .order("gueltig_ab",{ascending:false});
-    if(!r||r.error)return;
-    (r.data||[]).forEach(function(tar){
-      var cat=tar.category;
-      if(!cat)return;
-      if(!ENERGIE[cat])ENERGIE[cat]=tar;   /* absteigend sortiert → der erste ist der jüngste */
-    });
+    var r=await Promise.all([sbPub.from("tariffs").select("*").eq("household_id",HH.id),
+      sbPub.from("abschlag_changes").select("*").eq("household_id",HH.id)]);
+    if(!r[0]||r[0].error)return;
+    ENERGIE=energieAuswerten(r[0].data||[],(r[1]&&!r[1].error&&r[1].data)||[],todayISO());
   }catch(e){}
+}
+/* Wie AllTrack: Es gilt der jüngste Tarif mit „gültig ab“ bis heute (am selben Tag der zuletzt angelegte).
+   Der Abschlag ist der jüngste Eintrag aus Tarifen und Abschlagsänderungen bis heute – am selben Tag gewinnt die Änderung.
+   Gilt noch kein Tarif, zeigt All-Home den nächsten. */
+function energieAuswerten(tarife,aenderungen,heute){
+  var aus={},nach={};
+  (tarife||[]).forEach(function(x){if(x&&x.category)(nach[x.category]=nach[x.category]||[]).push(x);});
+  Object.keys(nach).forEach(function(cat){
+    var ts=nach[cat].slice().sort(function(a,b){var x=String(a.gueltig_ab||""),y=String(b.gueltig_ab||"");
+      return x===y?(String(a.erstellt_am||"")<String(b.erstellt_am||"")?1:-1):(x<y?1:-1);});
+    var tar=ts.filter(function(x){return String(x.gueltig_ab||"")<=heute;})[0]||ts[ts.length-1];
+    var ev=ts.map(function(x){return {d:String(x.gueltig_ab||""),b:x.abschlag,r:0,o:String(x.erstellt_am||"")};})
+      .concat((aenderungen||[]).filter(function(a){return a&&a.category===cat;}).map(function(a){return {d:String(a.gueltig_ab||""),b:a.betrag,r:1,o:String(a.erstellt_am||"")};}))
+      .filter(function(e){return e.d<=heute&&e.b!=null;})
+      .sort(function(a,b){if(a.d!==b.d)return a.d<b.d?1:-1;if(a.r!==b.r)return a.r<b.r?1:-1;return a.o<b.o?1:-1;});
+    aus[cat]=Object.assign({},tar,{abschlag:ev.length?ev[0].b:tar.abschlag,abschlag_ab:ev.length?ev[0].d:(tar.gueltig_ab||null)});
+  });
+  return aus;
 }
 function energieInfo(art){
   var r=ENERGIE[art];
@@ -2885,7 +2911,8 @@ function energieInfo(art){
     vertragsstart:r.vertragsstart||null,
     laufzeit:r.laufzeit||null,
     kuendigungsfrist:r.kuendigungsfrist||null,
-    ab:r.gueltig_ab||null
+    ab:r.gueltig_ab||null,
+    abschlagAb:r.abschlag_ab||null
   };
 }
 /* ---- Ist die AllTrack-Verbindung für dieses Haus an? ----
@@ -3442,7 +3469,7 @@ function viewArt(k){
         '</div></div>'+
         (e?'<div class="kvl">'+
           kv(t("Anbieter"),esc(e.anbieter||"–"))+
-          (e.abschlag!=null?kv(t("Abschlag"),eur(e.abschlag)+" / "+t("Monat")):"")+
+          (e.abschlag!=null?kv(t("Abschlag"),eur(e.abschlag)+" / "+t("Monat")+(e.abschlagAb&&e.abschlagAb!==e.ab?" · "+tf("seit {0}",fmtDate(e.abschlagAb)):"")):"")+
           (e.arbeitspreisCt!=null?kv(t("Arbeitspreis"),num(e.arbeitspreisCt,3)+" ct"):"")+
           (e.grundpreisMon!=null?kv(t("Grundpreis"),eur(e.grundpreisMon)+" / "+t("Monat")):"")+
           (e.kundennummer?kv(t("Kundennummer"),esc(e.kundennummer)):"")+
@@ -3500,9 +3527,10 @@ function viewVertrag(id){
   var zusatz=artFelder(a.key).map(function(fd){
     var v=det[fd.k];
     if(v==null||v==="")return "";
-    return kv(fd.l,fd.t==="date"?fmtDate(v):(fd.t==="eur"?eur(v):esc(String(v))));
+    return kv(fd.l,fd.t==="date"?fmtDate(v):(fd.t==="eur"?eur(v):(fd.t==="num"&&numOrNull(v)!=null?num(numOrNull(v),3):esc(String(v)))));
   }).join("");
   var doks=DOCS.filter(function(d){return d.contract_id===c.id;});
+  var plan=ergaenzungPlan(c,doks.map(function(d){return d.id;}));
   return zurueck("#/vertraege",t("Verträge"))+
     '<div class="top vkopf" style="margin-bottom:12px"><div class="vk">'+anbieterKachel(c.anbieter,a.icon,"hhi",28)+'<div style="min-width:0">'+
       '<div class="greet">'+esc(a.label)+'</div>'+
@@ -3522,6 +3550,10 @@ function viewVertrag(id){
     '</section>')+
     /* Angaben */
     '<div class="sect">'+t("Angaben")+'</div>'+
+    (plan.zeilen.length?'<div class="sug info"><span class="si">'+ic("doc")+'</span><div class="sb2">'+
+      '<div class="st">'+tn(plan.zeilen.length,"{0} Angabe aus den Dokumenten","{0} Angaben aus den Dokumenten")+'</div>'+
+      '<div class="sx">'+esc(plan.zeilen.map(function(z){return z.label+": "+z.neu;}).join(" · "))+'</div>'+
+      '<div class="sa"><button class="btn sm" data-a="v-ergaenzen" data-id="'+c.id+'">'+t("Ergänzen")+'</button></div></div></div>':"")+
     '<section class="card"><div class="kvl">'+
       (c.kosten!=null?kv(t(artProfil(a.key).kl).replace(/\s*\(€\)$/,""),eur(c.kosten)+" / "+ivLabel(c.kosten_intervall)+(mk&&c.kosten_intervall!=="monatlich"?" ("+eur(mk)+" / "+t("Monat")+")":"")):"")+
       (c.kundennummer?kv(t("Kundennummer"),esc(c.kundennummer)):"")+
@@ -4006,6 +4038,11 @@ async function dateienVerarbeiten(files,ziel){
   await ladeDaten();
   /* Nebenkostenabrechnungen gleich dem passenden Zeitraum zuordnen (oder ihn anlegen) */
   await nkNachUpload(IMPORT.ergebnisse.map(function(r){return r.docId;}).filter(Boolean),zeigeArbeit);
+  /* Am Vertrag hochgeladen: leere Vertragsfelder gleich aus dem Dokument füllen */
+  if(ziel&&ziel.vertrag){
+    var ergU=await vertragErgaenzen(ziel.vertrag,IMPORT.ergebnisse.map(function(r){return r.docId;}).filter(Boolean));
+    if(ergU.length){await ladeDaten();toast(tf("Ergänzt: {0}",ergU.join(", "))+" ✅");}
+  }
   IMPORT.laeuft=false;versteckeArbeit();
   /* Genau ein Dokument → direkt zur Bestätigung (Nebenkosten: zur Abrechnung), sonst Sammelbericht */
   var einz=IMPORT.ergebnisse.length===1&&IMPORT.ergebnisse[0].docId?DOCS.filter(function(d){return d.id===IMPORT.ergebnisse[0].docId;})[0]||null:null;
@@ -4314,8 +4351,9 @@ async function vorschlagZuordnen(ids,cid){
   try{
     for(var i=0;i<g.docs.length;i++){var r=await sb.from("documents").update({contract_id:cid}).eq("id",g.docs[i].id);if(r.error)throw r.error;}
     await ladeDaten();
+    var ergV=await vertragErgaenzen(cid,g.docs.map(function(d){return d.id;}));if(ergV.length)await ladeDaten();
     REVIEW=DOCS.filter(function(d){return d.id===g.docs[0].id;})[0]||null;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;
-    toast(tn(g.docs.length,"Dokument zugeordnet ✅","{0} Dokumente zugeordnet ✅"));
+    toast(ergaenztText(ergV,tn(g.docs.length,"Dokument zugeordnet","{0} Dokumente zugeordnet")));
     if(REVIEW){go("#/neu");window.scrollTo(0,0);}else render();
   }catch(e){toast(t("Zuordnen fehlgeschlagen")+": "+errMsg(e),true);await ladeDaten();render();}
 }
@@ -4417,6 +4455,7 @@ function feldText(f,v){
   if(leerWert(v))return "";
   if(f.t==="date")return fmtDate(v);
   if(f.t==="eur")return eur(numOrNull(v));
+  if(f.t==="num"&&numOrNull(v)!=null)return num(numOrNull(v),3);
   return String(v);
 }
 function abgleichZeilen(c,ext){
@@ -4433,7 +4472,11 @@ function abgleichZeilen(c,ext){
   if(!artInfo(art).kein_anbieter&&ext.anbieter&&leerWert(c.anbieter))zeile("anbieter",t(ap.al),c.anbieter,ext.anbieter,null,null,{anbieter:String(ext.anbieter).trim()});
   if(grundfeld(art,"produkt"))zeile("produkt",t("Tarif / Produkt"),c.produkt,ext.produkt,null,null,{produkt:ext.produkt});
   if(grundfeld(art,"kundennummer"))zeile("kundennummer",t("Kundennummer"),c.kundennummer,ext.kundennummer,null,null,{kundennummer:ext.kundennummer});
-  if(grundfeld(art,"vertragsnummer"))zeile("vertragsnummer",t(ap.vn),c.vertragsnummer,ext.vertragsnummer,null,null,{vertragsnummer:ext.vertragsnummer});
+  if(grundfeld(art,"vertragsnummer")){
+    zeile("vertragsnummer",t(ap.vn),c.vertragsnummer,ext.vertragsnummer,null,null,{vertragsnummer:ext.vertragsnummer});
+    /* Vor butler-extract v22 stand bei Rechnungen oft die Rechnungsnummer hier – dann nicht vorab anhaken */
+    var lz=z[z.length-1];if(lz&&lz.k==="vertragsnummer"&&ext.docType==="rechnung"&&!("rechnungsnummer" in ext))lz.an=false;
+  }
   if(grundfeld(art,"beginn")&&/^\d{4}-\d{2}-\d{2}$/.test(String(ext.vertragsstart||"")))
     zeile("beginn",t("Vertragsbeginn"),c.vertragsstart,ext.vertragsstart,leerWert(c.vertragsstart)?"":fmtDate(c.vertragsstart),fmtDate(ext.vertragsstart),{vertragsstart:ext.vertragsstart});
   var ml=monate(ext.mindestlaufzeitMonate),kf=monate(ext.kuendigungsfristMonate),vl=monate(ext.verlaengerungMonate);
@@ -4458,9 +4501,16 @@ function abgleichZeilen(c,ext){
   });
   return z;
 }
+function abgleichAktuell(d,c,ext){
+  if(!d||!c||!/^(preisaenderung|vertrag|police)$/.test((ext&&ext.docType)||""))return false;
+  var dd=docDatum(d)||"";
+  /* nur Dokumente, die Konditionen festlegen – eine spätere Rechnung ändert keinen Preis */
+  return !DOCS.some(function(x){return x.id!==d.id&&x.contract_id===c.id&&/^(preisaenderung|vertrag|police)$/.test((x.extracted&&x.extracted.docType)||"")&&(docDatum(x)||"")>dd;});
+}
 function abgleichKarte(c,ext){
   var zeilen=abgleichZeilen(c,ext),name=esc(c.anbieter||artInfo(c.art).label);
-  if(REVIEW_WAHL==null){REVIEW_WAHL={};zeilen.forEach(function(z){REVIEW_WAHL[z.k]=z.an;});}
+  /* Ist das Dokument die neueste Preisänderung/Police/Vertragsfassung, gilt sie: Abweichungen vorab anhaken (bestätigt wird trotzdem) */
+  if(REVIEW_WAHL==null){var akt=abgleichAktuell(REVIEW,c,ext);REVIEW_WAHL={};zeilen.forEach(function(z){REVIEW_WAHL[z.k]=z.an||(akt&&z.k!=="anbieter");});}
   if(!zeilen.length)return '<div class="sect">'+tf("Abgleich mit „{0}“",name)+'</div><section class="card">'+
     '<div class="sug good"><span class="si">'+ic("check")+'</span><div class="sb2"><div class="st">'+t("Alles stimmt mit dem Vertrag überein.")+'</div></div></div>'+
     '<div class="factions"><button class="btn" data-a="rv-fertig">'+t("Zum Vertrag")+'</button></div></section>';
@@ -4498,6 +4548,40 @@ async function abgleichUebernehmen(){
     if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts geändert – fehlende Berechtigung?"));
     await ladeDaten();toast(t("Übernommen")+" ✅");abgleichFertig();
   }catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+}
+/* Was die zugeordneten Dokumente zu LEEREN Feldern des Vertrags beitragen – neueste Angabe zuerst, nie überschreiben.
+   Abweichende Werte bleiben dem Abgleich (zum Abhaken); Dokumente eines anderen Anbieters zählen nicht. */
+function ergaenzungPlan(c,ids){
+  var stand=Object.assign({},c,{details:Object.assign({},c.details||{})}),upd={},zeilen=[];
+  DOCS.filter(function(d){return ids.indexOf(d.id)>=0&&d.contract_id===c.id&&d.extracted&&!istMed(d)&&!d.extracted.istMedizin;})
+    .sort(function(a,b){var x=docDatum(a)||"",y=docDatum(b)||"";return x===y?0:(x<y?1:-1);})
+    .forEach(function(d){
+      if(!anbieterPasst(c,d.extracted))return;
+      abgleichZeilen(stand,d.extracted).forEach(function(z){
+        if(!z.an)return;
+        if(z.spalten)Object.keys(z.spalten).forEach(function(k){upd[k]=z.spalten[k];stand[k]=z.spalten[k];});
+        if(z.details){Object.keys(z.details).forEach(function(k){stand.details[k]=z.details[k];});upd.details=stand.details;}
+        zeilen.push({label:z.label,neu:z.neu});
+      });
+    });
+  return {upd:upd,zeilen:zeilen};
+}
+/* Beim Zuordnen: leere Felder gleich füllen. Liefert die Namen der ergänzten Felder. */
+async function vertragErgaenzen(cid,ids){
+  var c=cid&&vertragById(cid);if(!c||!ids||!ids.length)return [];
+  var p=ergaenzungPlan(c,ids);if(!p.zeilen.length)return [];
+  try{
+    var r=await sb.from("contracts").update(p.upd).eq("id",c.id).select("id");
+    if(r.error||!r.data||!r.data.length)return [];
+  }catch(e){return [];}
+  return p.zeilen.map(function(z){return z.label;});
+}
+function ergaenztText(namen,grund){return namen.length?tf("{0} · ergänzt: {1}",grund,namen.join(", ")):grund+" ✅";}
+/* Knopf am Vertrag: Angaben aus allen zugeordneten Dokumenten übernehmen */
+async function vertragAusDokumenten(id){
+  var namen=await vertragErgaenzen(id,DOCS.filter(function(d){return d.contract_id===id;}).map(function(d){return d.id;}));
+  await ladeDaten();render();
+  toast(namen.length?tf("Ergänzt: {0}",namen.join(", "))+" ✅":t("Nichts zu ergänzen"));
 }
 function abgleichFertig(){
   var d=REVIEW,cid=d&&d.contract_id;
@@ -4793,9 +4877,10 @@ async function dokumentVerknuepfen(ids,cid){
   try{
     for(var i=0;i<liste.length;i++){var r=await sb.from("documents").update({contract_id:cid||null}).eq("id",liste[i]);if(r.error)throw r.error;}
     closeModal(true);await ladeDaten();
+    var ergL=cid?await vertragErgaenzen(cid,liste):[];if(ergL.length)await ladeDaten();
     if(REVIEW&&liste.indexOf(REVIEW.id)>=0){REVIEW=DOCS.filter(function(x){return x.id===REVIEW.id;})[0]||REVIEW;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;}
     render();
-    toast(tn(liste.length,"Dokument zugeordnet ✅","{0} Dokumente zugeordnet ✅"));
+    toast(ergaenztText(ergL,tn(liste.length,"Dokument zugeordnet","{0} Dokumente zugeordnet")));
   }catch(e){toast(t("Zuordnen fehlgeschlagen")+": "+errMsg(e),true);await ladeDaten();render();}
 }
 /* Auslesen nachholen (Guthaben war leer oder „ohne KI“ abgelegt) – danach prüfen und abgleichen */
@@ -4818,9 +4903,10 @@ async function analyseNachholen(id){
     /* Volltext gibt es für Scans */
     if(d.seiten){if(quelle.bilder)volltextHolen(d.id,quelle.bilder,"");else volltextAusPdf(d.id,quelle.pdf);}
     closeModal(true);await ladeDaten();
+    var ergN=d.contract_id?await vertragErgaenzen(d.contract_id,[id]):[];if(ergN.length)await ladeDaten();
     REVIEW=DOCS.filter(function(x){return x.id===id;})[0]||null;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;
     if(REVIEW)go("#/neu");else render();
-    toast(t("Analyse nachgeholt ✅"));
+    toast(ergaenztText(ergN,t("Analyse nachgeholt")));
   }catch(e){toast(t("Nachholen fehlgeschlagen")+": "+errMsg(e),true);}
   finally{NACHHOLEN=false;if(knopf&&knopf.isConnected){knopf.disabled=false;knopf.textContent=t("Jetzt auslesen");}}
 }
@@ -5911,9 +5997,39 @@ function detailsAusExtrakt(ext,art){
     if(feld==="fin"||feld==="hsn"||feld==="tsn")v=String(v).toUpperCase().replace(/\s+/g,"");
     aus[feld]=v;
   });
+  /* Ältere Auslesungen nennen manches nur in den Stichpunkten („Zählernummer: 6DME…“, „Arbeitspreis: 14,14 → 14,28 ct/kWh“) */
+  Object.keys(erlaubt).forEach(function(k){
+    if(aus[k]!=null)return;
+    var v=detailAusStichpunkten(ext,k,erlaubt[k].t);if(v==null)return;
+    if(k==="kennzeichen")v=kzNorm(v);
+    if(k==="fin"||k==="hsn"||k==="tsn")v=String(v).toUpperCase().replace(/\s+/g,"");
+    aus[k]=v;
+  });
   /* Ausweise: Inhaber ist die Person, für die das Dokument ausgestellt ist */
   if(erlaubt.inhaber&&!aus.inhaber&&ext&&ext.vertragspartner)aus.inhaber=String(ext.vertragspartner).trim().slice(0,80);
   return aus;
+}
+/* Stichpunkt „Bezeichnung: Wert“ → Feldwert. Bei „alt → neu“ gilt der neue Wert. Nur exakte Bezeichnungen (oder feste Synonyme). */
+var FELD_SYNONYME={zaehlernummer:["Zähler-Nr","Zählernr","Zähler-Nummer"],rufnummer:["Telefonnummer","Mobilfunknummer"],
+  kennzeichen:["Amtliches Kennzeichen"],fin:["FIN","Fahrgestellnummer","Fahrzeug-Identifizierungsnummer"],mitgliedsnummer:["Mitglieds-Nr"],
+  deckungssumme:["Versicherungssumme"],tarif_stufe:["Tarif"]};
+function detailAusStichpunkten(ext,k,typ){
+  var liste=Array.isArray(ext&&ext.wichtig)?ext.wichtig:[];
+  if(!liste.length||!FELDER[k]||typ==="date")return null;
+  var namen=[FELDER[k].l].concat(FELD_SYNONYME[k]||[]).map(function(n){return artText(String(n).replace(/\s*\([^)]*\)\s*$/,"")).trim();});
+  for(var i=0;i<liste.length;i++){
+    var s=String(liste[i]||""),p=s.indexOf(":");if(p<1)continue;
+    if(namen.indexOf(artText(s.slice(0,p)).trim())<0)continue;
+    var w=s.slice(p+1);if(w.indexOf("→")>=0)w=w.slice(w.lastIndexOf("→")+1);
+    w=w.replace(/\s*\([^)]*\)\s*$/,"").trim();if(!w)continue;
+    if(typ==="num"||typ==="eur"){
+      var m=w.match(/-?\d[\d.]*(?:,\d+)?/),n=m?numOrNull(m[0]):null;if(n==null)continue;
+      if(k==="arbeitspreis"&&/€|eur/i.test(w)&&!/ct|cent/i.test(w))n=Math.round(n*100000)/1000;   /* €/kWh → ct/kWh */
+      return n;
+    }
+    return w.slice(0,80);
+  }
+  return null;
 }
 /* Plausibilität der Fahrzeugnummern: warnen, nie blockieren */
 function fahrzeugWarnungen(det){
@@ -7870,6 +7986,8 @@ async function scanSpeichern(){
       var sd=DOCS.filter(function(x){return x.id===dok.id;})[0];
       if(sd&&sd.nk_id){SCAN_SPEICHERN=null;scannerAus();SCAN_INAPP=false;nkZugeordnetMelden(sd.nk_id);location.replace("#/nebenkosten?id="+sd.nk_id);return;}
     }
+    /* Am Vertrag gescannt: leere Vertragsfelder gleich aus dem Dokument füllen */
+    if(opt.ki&&ziel.vertrag){var ergS=await vertragErgaenzen(ziel.vertrag,[dok.id]);if(ergS.length){await ladeDaten();toast(tf("Ergänzt: {0}",ergS.join(", "))+" ✅");}}
     scanFertig(dok.id,opt.ki,ziel);
   }catch(e){
     scanFehlerZeigen(errMsg(e));
@@ -9587,6 +9705,7 @@ document.addEventListener("click",function(ev){
   if(a==="nk-pos-weg"){laeuft(b,nkPosWeg(Number(b.dataset.i)));return;}
   if(a==="nk-datei"){NK_DATEI_ZIEL=id||null;var nd=$("#nkDatei");if(nd)nd.click();return;}
   if(a==="nk-lesen"){laeuft(b,nkAuslesen([],id,null));return;}
+  if(a==="v-ergaenzen"){laeuft(b,vertragAusDokumenten(id));return;}
   if(a==="nk-alle"){laeuft(b,nkAlleErfassen());return;}
   if(a==="nk-modus"){nkModus(b.dataset.k);return;}
   if(a==="nk-erfassen"){nkBerichtErfassen(Number(b.dataset.i));return;}
@@ -9654,10 +9773,11 @@ async function reviewZuordnen(cid){
     var r=await sb.from("documents").update({contract_id:cid}).eq("id",docId);
     if(r.error)throw r.error;
     await ladeDaten();
+    var ergR=await vertragErgaenzen(cid,[docId]);if(ergR.length)await ladeDaten();
     /* Danach der Abgleich: was soll vom Dokument in den Vertrag? */
     REVIEW=DOCS.filter(function(d){return d.id===docId;})[0]||null;REVIEW_WAHL=null;REVIEW_TROTZDEM=false;
     render();window.scrollTo(0,0);
-    toast(t("Dokument zugeordnet ✅"));
+    toast(ergaenztText(ergR,t("Dokument zugeordnet")));
   }catch(e){toast(t("Zuordnen fehlgeschlagen")+": "+errMsg(e),true);}
 }
 /* gruppe: {docs,ext} – mehrere Dokumente, die zusammen einen neuen Vertrag ergeben */
