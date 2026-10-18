@@ -9,6 +9,7 @@
 //      jedes Bild beschriftet; Auftrag mit Lesereihenfolge, Tabellen, Handschrift, Silbentrennung.
 // v21: "art" = feine Vertragsart aus dem Katalog der App (der Client prueft den Code und hat Stichwortregeln als Rueckfall).
 // v22: "details" je feiner art aus dem Katalog der App (Schluessel = Felder der App), "rechnungsnummer" getrennt von "vertragsnummer".
+// v23: "medizin" bei Arztdokumenten (Diagnosen mit ICD, Ereignisse, Medikamente, Laborwerte, Leistungen mit Ziffer, Folgetermin) fuer die Gesundheitsakte.
 // Gemeinsamer Kern (Anmeldung, Limits, Kosten-Protokoll, Claude-Aufruf): gemeinsam.ts
 
 import { ANTHROPIC_API_KEY, antwortText, claude, claudeFehler, cors, json, level, protokoll, pruefeAufruf, repairJson, stufe } from "./gemeinsam.ts";
@@ -75,6 +76,7 @@ function langHinweis(lang: string): string {
     ``,
     `WICHTIG - SPRACHE: Schreibe NUR diese Freitextfelder auf RUSSISCH:`,
     `"titel", "zusammenfassung", "wichtig" (alle Eintraege), "hinweise", "behandlung".`,
+    `Die Texte in "medizin" bleiben in der Sprache des Dokuments (sie dienen der Suche).`,
     ``,
     `ALLES ANDERE bleibt unveraendert:`,
     `- "docType", "kategorie", "art", "fachrichtung", "medTyp" sind feste Codes und MUESSEN exakt die oben`,
@@ -117,6 +119,7 @@ const PROMPT = [
   `- \"arzt\": Name Arzt/Praxis/Klinik/Apotheke (string)|null.`,
   `- \"medTyp\": rechnung/befund/rezept/attest/laborwerte/ueberweisung/impfung/roentgen/arztbrief/sonstiges|null.`,
   `- \"behandlung\": kurze sachliche Angabe (1 Satz)|null.`,
+  `- \"medizin\": NUR bei medizinischen Dokumenten (sonst null) ein Objekt fuer die Gesundheitsakte, nur was im Dokument steht: {\"diagnosen\": [{\"text\": Diagnose wie gedruckt, \"icd\": ICD-10-Code wenn angegeben|null}], \"ereignisse\": [{\"datum\": ISO|null, \"art\": \"untersuchung\"|\"diagnose\"|\"behandlung\"|\"eingriff\"|\"impfung\"|\"rezept\"|\"labor\"|\"bildgebung\"|\"ueberweisung\"|\"krankschreibung\"|\"termin\"|\"sonstiges\", \"text\": kurze sachliche Beschreibung, max. 120 Zeichen, z. B. \"Impfung gegen FSME (2. Dosis)\", \"MRT Knie rechts\", \"Zahnreinigung\"}], \"medikamente\": [{\"name\": Praeparat wie gedruckt, \"wirkstoff\": string|null, \"dosierung\": string|null}], \"laborwerte\": [{\"name\": Parameter, \"wert\": Wert wie gedruckt (string), \"einheit\": string|null, \"referenz\": Referenzbereich wie gedruckt|null, \"auffaellig\": true wenn ausserhalb der Referenz oder markiert, false wenn im Bereich, null wenn unklar}], \"leistungen\": [{\"ziffer\": GOAE-/GOZ-/EBM-Ziffer mit Kuerzel, z. B. \"GOZ 1040\"|null, \"text\": Leistung, \"betrag\": EUR|null}] (bei Rechnungen), \"folgetermin\": naechster Termin ISO|null}. Leere Listen als []. Diese Texte in der Sprache des Dokuments, Codes wie angegeben.`,
   `- \"zusammenfassung\": 2-3 Saetze.`,
   `- \"wichtig\": Array kurzer Stichpunkte (Preiserhoehung, Sonderkuendigungsrecht, Frist, Erstattung, Folgetermin, HU faellig ...). Leeres Array wenn nichts.`,
   `- \"hinweise\": kurzer Hinweis (1-2 Saetze) zu Annahmen/Unsicherheiten; leer \"\" wenn eindeutig.`,
@@ -138,7 +141,7 @@ Deno.serve(async (req: Request) => {
   const mitPdf = Array.isArray(p.dateien);
   if (!fileBase64 && !textContent && !(bilder && bilder.length)) return json({ error: "Keine Datei empfangen." }, 400);
   const st = stufe(p.level || p.model);
-  const lv = level(st, { basic: 4000, advanced: 8000, max: 10000 });
+  const lv = level(st, { basic: 6000, advanced: 10000, max: 12000 });
   const lang = (p.lang === "ru") ? "ru" : "de";
   let docBlock: Record<string, unknown>;
   const bloecke: Record<string, unknown>[] = [];

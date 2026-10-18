@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-BDpdYYHe/MA965bHRtZpUpxUD9qtK2cUUOGfcTU1o6Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-+0ZzKllvMmM63ceqxXTAW7O83CDB+Hme0vETEiR4RBc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -518,6 +518,11 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 .dokf{margin-bottom:12px}
 .dokf .lb{padding:10px 12px}
 .dokf .lb.on .pill{background:var(--surface)}
+.medtabs .lb{flex:1 1 0;min-width:0;padding:10px 4px;font-size:.84rem;text-align:center;overflow-wrap:anywhere}
+.cause.auff>b{color:var(--neg)}
+/* Gesundheit: Fach, Person, Jahr in einer Zeile; nur die Ereignisauswahl über die ganze Breite */
+.filt.medfilt .sel{flex:1 1 0;min-width:0}
+.filt.medfilt .sel.voll{flex-basis:100%}
 .filt.dsrow{flex-wrap:nowrap;align-items:center}
 .filt.dsrow .inp{flex:1 1 auto;min-width:0}
 .filt.dsrow .btn{flex:none}/* Pflichtfelder: dezentes Sternchen, Legende am Formularende */
@@ -778,7 +783,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.5";
+var APP_VERSION="1.9.6";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -833,6 +838,48 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.9.6 Fach ---- */
+  "Fach":"Специальность",
+
+
+/* ---- 1.9.6 Gesundheit ---- */
+  "Untersuchung":"Обследование",
+  "Diagnose":"Диагноз",
+  "Eingriff / OP":"Вмешательство / операция",
+  "Bildgebung":"Визуализация (снимки)",
+  "Krankschreibung":"Больничный лист",
+  "Termin":"Приём",
+  "Folgetermin":"Следующий приём",
+  "Medikament":"Лекарство",
+  "Laborwert":"Анализ",
+  "Leistung":"Услуга",
+  "im Text des Dokuments":"в тексте документа",
+  "Ohne Arztangabe":"Без указания врача",
+  "Referenz {0}":"Норма {0}",
+  "auffällig":"отклонение",
+  "Keine Einträge für diese Auswahl.":"Нет записей для этого выбора.",
+  "{0} Eintrag":"{0} запись",
+  "{0} Einträge":"Записей: {0}",
+  "Zeitleiste":"Хронология",
+  "Ärzte":"Врачи",
+  "Ereignisse":"События",
+  "Alle Ereignisse":"Все события",
+  "Diagnosen":"Диагнозы",
+  "Medikamente":"Лекарства",
+  "{0} Dokument noch nicht voll durchsuchbar":"{0} документ ещё не полностью доступен для поиска",
+  "{0} Dokumente noch nicht voll durchsuchbar":"Документов, ещё не полностью доступных для поиска: {0}",
+  "Diagnosen, Ereignisse und Volltext nachholen (KI).":"Дополнить диагнозы, события и полный текст (ИИ).",
+  "Arzt, Diagnose, Medikament, Leistung …":"Врач, диагноз, лекарство, услуга …",
+  "Gesundheit durchsuchen":"Поиск по здоровью",
+  "Diagnosen und Ereignisse noch nicht ausgelesen":"Диагнозы и события ещё не считаны",
+  "Leistungen":"Услуги",
+  "Medizinische Angaben":"Медицинские сведения",
+  "Dokumente werden vorbereitet …":"Документы подготавливаются …",
+  "Dokument {0} von {1} wird erschlossen …":"Обрабатывается документ {0} из {1} …",
+  "{0} Dokument erschlossen ✅":"{0} документ обработан ✅",
+  "{0} Dokumente erschlossen ✅":"Документов обработано: {0} ✅",
+
 
 /* ---- 1.9.5 Vertrag aus Dokumenten ---- */
   "Ergänzt: {0}":"Дополнено: {0}",
@@ -4106,6 +4153,8 @@ async function einesVerarbeiten(file,ziel){
     return;
   }
   try{await sb.from("documents").update(kiFelder(ext,name,false)).eq("id",reihe.id);}catch(e){}
+  /* Arztdokument: Volltext für die Suche im Hintergrund (günstigstes Modell) */
+  if(ext.istMedizin){if(istPdf)volltextAusPdf(reihe.id,bytes);else volltextHolen(reihe.id,[bytes],"");}
   IMPORT.ergebnisse.push({name:name,icon:"✅",text:t("eingelesen"),docId:reihe.id});
 }
 /* Was die KI gelesen hat → Spalten des Dokuments. med: im Gesundheitsbereich gescannt */
@@ -4966,7 +5015,171 @@ function medTypInfo(k){var o=MEDTYP[k]||MEDTYP.sonstiges;return {icon:o.icon,lab
 function personById(id){return PERSONS.filter(function(p){return p.id===id;})[0]||null;}
 function personName(id){var p=personById(id);return p?p.name:null;}
 
-var medFilter={fach:"",jahr:"",person:""};
+var medFilter={fach:"",jahr:"",person:"",ansicht:"zeit",ereignis:"",q:""};
+/* Ereignisarten der KI (butler-extract v23: extracted.medizin.ereignisse[].art) */
+var MED_EREIGNIS={
+  untersuchung:{label:"Untersuchung",icon:"🩺"},diagnose:{label:"Diagnose",icon:"📋"},behandlung:{label:"Behandlung",icon:"🩹"},
+  eingriff:{label:"Eingriff / OP",icon:"🏥"},impfung:{label:"Impfung",icon:"💉"},rezept:{label:"Rezept",icon:"💊"},
+  labor:{label:"Labor",icon:"🧪"},bildgebung:{label:"Bildgebung",icon:"🩻"},ueberweisung:{label:"Überweisung",icon:"➡️"},
+  krankschreibung:{label:"Krankschreibung",icon:"📃"},termin:{label:"Termin",icon:"📅"},sonstiges:{label:"Sonstiges",icon:"⚕️"}
+};
+function ereignisInfo(k){var o=MED_EREIGNIS[k]||MED_EREIGNIS.sonstiges;return {icon:o.icon,label:t(o.label)};}
+/* Ohne ausgelesene Ereignisse ist das Dokument selbst das Ereignis */
+var MEDTYP_EREIGNIS={rechnung:"behandlung",befund:"untersuchung",rezept:"rezept",attest:"krankschreibung",laborwerte:"labor",
+  ueberweisung:"ueberweisung",impfung:"impfung",roentgen:"bildgebung",arztbrief:"untersuchung",sonstiges:"sonstiges"};
+function medDatum(d){return String(d.behandlungsdatum||d.doc_date||String(d.created_at||"").slice(0,10)||"");}
+function isoTag(v){v=String(v||"").slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:null;}
+function kurzText(v,n){return v==null?"":String(v).replace(/\s+/g," ").trim().slice(0,n||200);}
+/* Strukturierte Angaben eines Arztdokuments – geprüft, damit eine kaputte KI-Antwort nichts sprengt */
+function medInfo(d){
+  var ext=(d&&d.extracted)||{},m=(ext.medizin&&typeof ext.medizin==="object")?ext.medizin:{};
+  function liste(a){return Array.isArray(a)?a.filter(function(x){return x&&typeof x==="object";}).slice(0,80):[];}
+  return {
+    da:!!ext.medizin,
+    diagnosen:liste(m.diagnosen).map(function(x){return {text:kurzText(x.text,200),icd:kurzText(x.icd,12)||null};}).filter(function(x){return x.text;}),
+    ereignisse:liste(m.ereignisse).map(function(x){return {datum:isoTag(x.datum),art:MED_EREIGNIS[x.art]?x.art:"sonstiges",text:kurzText(x.text,160)};}).filter(function(x){return x.text;}),
+    medikamente:liste(m.medikamente).map(function(x){return {name:kurzText(x.name,80),wirkstoff:kurzText(x.wirkstoff,80)||null,dosierung:kurzText(x.dosierung,80)||null};}).filter(function(x){return x.name;}),
+    laborwerte:liste(m.laborwerte).map(function(x){return {name:kurzText(x.name,80),wert:kurzText(x.wert,40),einheit:kurzText(x.einheit,20)||null,referenz:kurzText(x.referenz,40)||null,auffaellig:x.auffaellig===true};}).filter(function(x){return x.name;}),
+    leistungen:liste(m.leistungen).map(function(x){return {ziffer:kurzText(x.ziffer,20)||null,text:kurzText(x.text,160),betrag:numOrNull(x.betrag)};}).filter(function(x){return x.text;}),
+    folgetermin:isoTag(m.folgetermin)
+  };
+}
+/* Ereignisse eines Dokuments; ohne eigenes Datum gilt das Behandlungsdatum */
+function medEreignisse(d){
+  var mi=medInfo(d),dat=medDatum(d),aus=[];
+  mi.ereignisse.forEach(function(e){aus.push({datum:e.datum||dat,art:e.art,text:e.text,d:d});});
+  mi.diagnosen.forEach(function(x){
+    var k=artText(x.text).trim();
+    if(!aus.some(function(e){return e.art==="diagnose"&&artText(e.text).indexOf(k)>=0;}))aus.push({datum:dat,art:"diagnose",text:x.text+(x.icd?" ("+x.icd+")":""),d:d});
+  });
+  if(mi.folgetermin)aus.push({datum:mi.folgetermin,art:"termin",text:t("Folgetermin"),d:d});
+  if(!aus.length)aus.push({datum:dat,art:MEDTYP_EREIGNIS[d.med_typ]||"sonstiges",text:aiExt(d,"behandlung")||aiVal(d,"titel")||medTypInfo(d.med_typ).label,d:d});
+  return aus;
+}
+/* ---- Suche: Titel, Arzt, Fach, Art, Patient, Behandlung, Zusammenfassung, Stichpunkte, Diagnosen, Medikamente,
+   Laborwerte, Leistungen – jedes Wort muss vorkommen, Umlaute egal; dazu der Volltext in der Datenbank ---- */
+function medSuchtext(d){
+  var mi=medInfo(d),ext=d.extracted||{};
+  return artText([aiVal(d,"titel"),d.titel,d.arzt,fachInfo(d.fachrichtung||"sonstiges").label,medTypInfo(d.med_typ).label,personName(d.person_id),
+    aiExt(d,"behandlung"),aiVal(d,"zusammenfassung"),Array.isArray(ext.wichtig)?ext.wichtig.join(" "):"",fmtDate(medDatum(d)),
+    mi.diagnosen.map(function(x){return x.text+" "+(x.icd||"");}).join(" "),mi.ereignisse.map(function(x){return x.text;}).join(" "),
+    mi.medikamente.map(function(x){return [x.name,x.wirkstoff,x.dosierung].join(" ");}).join(" "),
+    mi.laborwerte.map(function(x){return x.name;}).join(" "),mi.leistungen.map(function(x){return (x.ziffer||"")+" "+x.text;}).join(" ")
+  ].filter(Boolean).join(" "));
+}
+function medWoerter(q){return artText(q).trim().split(" ").filter(Boolean);}
+function medTreffer(d,q){var w=medWoerter(q);if(!w.length)return true;var s=medSuchtext(d);return w.every(function(x){return s.indexOf(x)>=0;});}
+/* Wo steht der Begriff? Für die Trefferzeile */
+function medFundstelle(d,q){
+  var w=medWoerter(q);if(!w.length)return "";
+  var mi=medInfo(d),kand=[].concat(
+    mi.diagnosen.map(function(x){return [t("Diagnose"),x.text+(x.icd?" ("+x.icd+")":"")];}),
+    mi.medikamente.map(function(x){return [t("Medikament"),[x.name,x.dosierung].filter(Boolean).join(" · ")];}),
+    mi.laborwerte.map(function(x){return [t("Laborwert"),x.name+" "+x.wert+(x.einheit?" "+x.einheit:"")];}),
+    mi.leistungen.map(function(x){return [t("Leistung"),(x.ziffer?x.ziffer+" ":"")+x.text];}),
+    mi.ereignisse.map(function(x){return [ereignisInfo(x.art).label,x.text];}));
+  var f=kand.filter(function(k){var s=artText(k[1]);return w.some(function(x){return s.indexOf(x)>=0;});})[0];
+  return f?f[0]+": "+f[1]:"";
+}
+/* Volltext: welche Arztdokumente haben schon einen (für „noch nicht durchsuchbar“), und Treffer der letzten Suche */
+var MED_VT={geladen:false,versucht:false,ids:{},q:"",treffer:{}},MED_UHR=null;
+async function medVolltextLaden(neu){
+  if(!HH||(MED_VT.versucht&&!neu))return;
+  MED_VT.versucht=true;
+  try{
+    var r=await sb.from("documents").select("id").eq("household_id",HH.id).eq("bereich","medizin").not("volltext","is",null);
+    if(r&&!r.error){MED_VT.ids={};(r.data||[]).forEach(function(x){MED_VT.ids[x.id]=1;});MED_VT.geladen=true;
+      if(route().name==="gesundheit"&&!route().params.doc)render();}
+  }catch(e){}
+}
+function medUnvollstaendig(d){
+  if(d.ki_pending)return false;
+  return !(d.extracted&&d.extracted.medizin)||(MED_VT.geladen&&!MED_VT.ids[d.id]);
+}
+function medSuche(q){
+  medFilter.q=String(q||"");
+  var box=$("#medInhalt");if(box)box.innerHTML=medInhalt();
+  clearTimeout(MED_UHR);
+  var nq=medFilter.q.trim();if(nq.length<3)return;
+  MED_UHR=setTimeout(function(){
+    volltextSuche(nq).then(function(ids){
+      if(medFilter.q.trim()!==nq)return;
+      MED_VT.q=nq;MED_VT.treffer={};ids.forEach(function(id){MED_VT.treffer[id]=1;});
+      var b2=$("#medInhalt");if(b2)b2.innerHTML=medInhalt();
+    });
+  },300);
+}
+/* Filter Fach/Person/Jahr – gelten für jede Ansicht */
+function medGefiltert(){
+  return DOCS.filter(istMed).filter(function(d){
+    if(medFilter.fach&&d.fachrichtung!==medFilter.fach)return false;
+    if(medFilter.person&&d.person_id!==medFilter.person)return false;
+    if(medFilter.jahr&&medDatum(d).slice(0,4)!==medFilter.jahr)return false;
+    return true;
+  });
+}
+function medNeuesteZuerst(a,b){return medDatum(b).localeCompare(medDatum(a));}
+function medSumme(liste){return liste.reduce(function(s,d){return d.betrag!=null?s+Number(d.betrag):s;},0);}
+function medGruppe(icon,name,info,inhalt){
+  return '<div class="grp"><span class="gi">'+icon+'</span>'+esc(name)+'<span class="gn">'+esc(info)+'</span></div><section class="card">'+inhalt+'</section>';
+}
+function medGruppenInfo(liste){var s=medSumme(liste);return tf("{0} Dok.",liste.length)+(s>0?" · "+eur0(s):"");}
+/* Arzt/Praxis als Schlüssel: Titel, Initialen und Satzzeichen egal („Dr. med. A. Meier“ = „Praxis Meier“) */
+var ARZT_FUELL={dr:1,med:1,dent:1,prof:1,dipl:1,univ:1,praxis:1,herr:1,frau:1,und:1,kollegen:1};
+function arztSchluessel(a){return artText(a).trim().split(" ").filter(function(w){return w.length>1&&!ARZT_FUELL[w];}).join(" ");}
+function medInhalt(){
+  var liste=medGefiltert(),q=medFilter.q.trim();
+  if(q){
+    var vt=MED_VT.q===q?MED_VT.treffer:{};
+    var tr=liste.filter(function(d){return medTreffer(d,q)||vt[d.id];}).sort(medNeuesteZuerst);
+    return tr.length?'<section class="card">'+tr.map(function(d){return medZeile(d,medFundstelle(d,q)||(vt[d.id]&&!medTreffer(d,q)?t("im Text des Dokuments"):""));}).join("")+'</section>'
+      :'<section class="card"><p class="hint">'+tf("Nichts gefunden für „{0}“.",esc(q))+'</p></section>';
+  }
+  if(!liste.length)return '<section class="card"><p class="hint">'+t("Keine Dokumente für diese Auswahl.")+'</p></section>';
+  var a=medFilter.ansicht,gr={},keys=[];
+  function dazu(k,d){if(!gr[k]){gr[k]=[];keys.push(k);}gr[k].push(d);}
+  if(a==="aerzte"){
+    liste.slice().sort(medNeuesteZuerst).forEach(function(d){dazu(arztSchluessel(d.arzt)||"~",d);});
+    return keys.map(function(k){
+      var l=gr[k],d0=l[0],fa=fachInfo(d0.fachrichtung||"sonstiges");
+      return medGruppe(fa.icon,d0.arzt||t("Ohne Arztangabe"),medGruppenInfo(l)+" · "+tf("zuletzt {0}",fmtDate(medDatum(d0))),l.map(function(d){return medZeile(d);}).join(""));
+    }).join("");
+  }
+  if(a==="art"){
+    liste.forEach(function(d){dazu(MEDTYP[d.med_typ]?d.med_typ:"sonstiges",d);});
+    return Object.keys(MEDTYP).filter(function(k){return gr[k];}).map(function(k){
+      var mt=medTypInfo(k),l=gr[k].sort(medNeuesteZuerst);
+      return medGruppe(mt.icon,mt.label,medGruppenInfo(l),l.map(function(d){return medZeile(d);}).join(""));
+    }).join("");
+  }
+  if(a==="ereignisse")return medEreignisListe(liste);
+  /* Zeitleiste: nach Jahren, neueste oben */
+  liste.slice().sort(medNeuesteZuerst).forEach(function(d){dazu(medDatum(d).slice(0,4)||"–",d);});
+  return keys.map(function(j){var l=gr[j];return medGruppe("📅",j,medGruppenInfo(l),l.map(function(d){return medZeile(d);}).join(""));}).join("");
+}
+/* Ereignisse, Diagnosen, Medikamente, Laborwerte über alle (gefilterten) Dokumente */
+function medEreignisListe(liste){
+  var f=medFilter.ereignis,zeilen=[];
+  liste.forEach(function(d){
+    var mi=medInfo(d),dat=medDatum(d),wer=[d.arzt,personName(d.person_id)].filter(Boolean).join(" · ");
+    if(f==="medikamente")mi.medikamente.forEach(function(x){zeilen.push({datum:dat,icon:"💊",text:x.name+(x.dosierung?" · "+x.dosierung:""),info:[x.wirkstoff,wer].filter(Boolean).join(" · "),d:d});});
+    else if(f==="laborwerte")mi.laborwerte.forEach(function(x){zeilen.push({datum:dat,icon:x.auffaellig?"⚠️":"🧪",text:x.name+": "+x.wert+(x.einheit?" "+x.einheit:""),
+      info:[x.referenz?tf("Referenz {0}",x.referenz):"",x.auffaellig?t("auffällig"):"",wer].filter(Boolean).join(" · "),d:d});});
+    else if(f==="diagnosen")mi.diagnosen.forEach(function(x){zeilen.push({datum:dat,icon:"📋",text:x.text,info:[x.icd,wer].filter(Boolean).join(" · "),d:d});});
+    else medEreignisse(d).forEach(function(e){if(!f||e.art===f)zeilen.push({datum:e.datum,icon:ereignisInfo(e.art).icon,text:e.text,info:[ereignisInfo(e.art).label,wer].filter(Boolean).join(" · "),d:d});});
+  });
+  if(!zeilen.length)return '<section class="card"><p class="hint">'+t("Keine Einträge für diese Auswahl.")+'</p></section>';
+  zeilen.sort(function(a,b){return String(b.datum).localeCompare(String(a.datum));});
+  var gr={},keys=[];
+  zeilen.forEach(function(z){var j=String(z.datum).slice(0,4)||"–";if(!gr[j]){gr[j]=[];keys.push(j);}gr[j].push(z);});
+  return keys.map(function(j){
+    return medGruppe("📅",j,tn(gr[j].length,"{0} Eintrag","{0} Einträge"),gr[j].map(function(z){
+      return '<button class="drow3" data-a="med-open" data-id="'+z.d.id+'"><span class="di">'+z.icon+'</span>'+
+        '<span class="db"><span class="dn">'+esc(z.text)+'</span><span class="dm"><span>'+fmtDate(z.datum)+'</span>'+(z.info?'<span>'+esc(z.info)+'</span>':"")+'</span></span>'+
+        '<span class="go">'+ic("right",16)+'</span></button>';
+    }).join(""));
+  }).join("");
+}
 function viewGesundheit(){
   var p=route().params;
   if(p.doc){var d=DOCS.filter(function(x){return x.id===p.doc;})[0];if(d)return medDetail(d);}
@@ -4979,68 +5192,60 @@ function viewGesundheit(){
       '<div class="factions" style="margin-top:12px"><button class="btn" data-a="scan" data-med="1">'+ic("camera")+' '+t("Arztdokument scannen")+'</button>'+
       '<a class="btn ghost" href="#/neu">'+ic("folder")+' '+t("Datei hochladen")+'</a></div></div></section>';
   }
+  medVolltextLaden();
   var jahr=todayISO().slice(0,4);
-  var kostenJahr=meds.reduce(function(s,d){
-    var dt=d.behandlungsdatum||d.doc_date||"";
-    return (d.betrag!=null&&String(dt).slice(0,4)===jahr)?s+Number(d.betrag):s;
-  },0);
-  var kostenGes=meds.reduce(function(s,d){return d.betrag!=null?s+Number(d.betrag):s;},0);
+  var kostenJahr=meds.reduce(function(s,d){return (d.betrag!=null&&medDatum(d).slice(0,4)===jahr)?s+Number(d.betrag):s;},0);
+  var kostenGes=medSumme(meds),offen=meds.filter(medUnvollstaendig);
   /* Filter nur mit den Werten, die wirklich vorkommen */
-  var faecher={},jahre={};
+  var faecher={},jahre={},arten={};
   meds.forEach(function(d){
     if(d.fachrichtung)faecher[d.fachrichtung]=1;
-    var j=String(d.behandlungsdatum||d.doc_date||"").slice(0,4);
-    if(/^\d{4}$/.test(j))jahre[j]=1;
+    var j=medDatum(d).slice(0,4);if(/^\d{4}$/.test(j))jahre[j]=1;
+    medEreignisse(d).forEach(function(e){arten[e.art]=1;});
   });
-  var gefiltert=meds.filter(function(d){
-    if(medFilter.fach&&d.fachrichtung!==medFilter.fach)return false;
-    if(medFilter.person&&d.person_id!==medFilter.person)return false;
-    if(medFilter.jahr&&String(d.behandlungsdatum||d.doc_date||"").slice(0,4)!==medFilter.jahr)return false;
-    return true;
-  });
-  /* nach Fachrichtung gruppieren */
-  var gruppen={};
-  gefiltert.forEach(function(d){var f=d.fachrichtung||"sonstiges";(gruppen[f]=gruppen[f]||[]).push(d);});
-  var reihen=Object.keys(gruppen).sort(function(a,b){return fachInfo(a).label.localeCompare(fachInfo(b).label);})
-    .map(function(f){
-      var fa=fachInfo(f),liste=gruppen[f].slice().sort(function(a,b){
-        return String(b.behandlungsdatum||b.doc_date||"").localeCompare(String(a.behandlungsdatum||a.doc_date||""));
-      });
-      var sum=liste.reduce(function(s,d){return d.betrag!=null?s+Number(d.betrag):s;},0);
-      return '<div class="grp"><span class="gi">'+fa.icon+'</span>'+esc(fa.label)+
-        '<span class="gn">'+tf("{0} Dok.",liste.length)+(sum>0?" · "+eur0(sum):"")+'</span></div>'+
-        '<section class="card">'+liste.map(medZeile).join("")+'</section>';
-    }).join("");
+  var ansichten=[["zeit",t("Zeitleiste")],["aerzte",t("Ärzte")],["art",t("Art")],["ereignisse",t("Ereignisse")]];
+  var evOpts=[["",t("Alle Ereignisse")],["diagnosen","📋 "+t("Diagnosen")],["medikamente","💊 "+t("Medikamente")],["laborwerte","🧪 "+t("Laborwerte")]]
+    .concat(Object.keys(MED_EREIGNIS).filter(function(k){return arten[k];}).map(function(k){return [k,ereignisInfo(k).icon+" "+ereignisInfo(k).label];}));
   return topBar()+seitenTitel(t("Gesundheit"))+
     '<div class="kpis">'+
       '<div class="kpi"><div class="kl">'+tf("Arztkosten {0}",jahr)+'</div><div class="kv">'+eur0(kostenJahr)+'</div></div>'+
       '<div class="kpi"><div class="kl">'+t("Gesamt erfasst")+'</div><div class="kv">'+eur0(kostenGes)+'</div><div class="ks">'+tn(meds.length,"{0} Dokument","{0} Dokumente")+'</div></div>'+
     '</div>'+
-    (kostenGes>0?'<div class="factions" style="margin:0 0 14px"><button class="btn ghost" data-a="med-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button></div>':"")+
-    '<div class="filt">'+
+    (offen.length?'<div class="sug info" style="margin-bottom:14px"><span class="si">'+ic("search")+'</span><div class="sb2">'+
+      '<div class="st">'+tn(offen.length,"{0} Dokument noch nicht voll durchsuchbar","{0} Dokumente noch nicht voll durchsuchbar")+'</div>'+
+      '<div class="sx">'+t("Diagnosen, Ereignisse und Volltext nachholen (KI).")+'</div>'+
+      '<div class="sa"><button class="btn sm" data-a="med-nachholen">'+t("Nachholen")+'</button></div></div></div>':"")+
+    '<div class="filt dsrow"><input class="inp" id="msuche" type="search" value="'+esc(medFilter.q)+'" placeholder="'+esc(t("Arzt, Diagnose, Medikament, Leistung …"))+'" aria-label="'+esc(t("Gesundheit durchsuchen"))+'" autocomplete="off"></div>'+
+    '<div class="langrow dokf medtabs">'+ansichten.map(function(a){
+      return '<button class="lb'+(medFilter.ansicht===a[0]?" on":"")+'" data-a="med-ansicht" data-k="'+a[0]+'">'+a[1]+'</button>';
+    }).join("")+'</div>'+
+    '<div class="filt medfilt">'+
+      (medFilter.ansicht==="ereignisse"?'<select class="sel voll" id="mfEreignis" aria-label="'+esc(t("Ereignisse"))+'">'+evOpts.map(function(o){
+        return '<option value="'+o[0]+'"'+(medFilter.ereignis===o[0]?" selected":"")+'>'+esc(o[1])+'</option>';}).join("")+'</select>':"")+
       '<select class="sel" id="mfFach" aria-label="'+esc(t("Fachrichtung"))+'">'+
-        '<option value="">'+t("Alle Fachrichtungen")+'</option>'+
+        '<option value="">'+t("Fach")+'</option>'+
         Object.keys(faecher).map(function(f){
           return '<option value="'+f+'"'+(medFilter.fach===f?" selected":"")+'>'+fachInfo(f).icon+' '+esc(fachInfo(f).label)+'</option>';
         }).join("")+'</select>'+
       (PERSONS.length?'<select class="sel" id="mfPerson" aria-label="'+esc(t("Patient"))+'">'+
-        '<option value="">'+t("Alle Personen")+'</option>'+
+        '<option value="">'+t("Patient")+'</option>'+
         PERSONS.map(function(p){return '<option value="'+p.id+'"'+(medFilter.person===p.id?" selected":"")+'>'+esc(p.name)+'</option>';}).join("")+
       '</select>':"")+
       '<select class="sel" id="mfJahr" aria-label="'+esc(t("Jahr"))+'">'+
-        '<option value="">'+t("Alle Jahre")+'</option>'+
+        '<option value="">'+t("Jahr")+'</option>'+
         Object.keys(jahre).sort().reverse().map(function(j){
           return '<option value="'+j+'"'+(medFilter.jahr===j?" selected":"")+'>'+j+'</option>';
         }).join("")+'</select>'+
     '</div>'+
-    (reihen||'<section class="card"><p class="hint">'+t("Keine Dokumente für diese Auswahl.")+'</p></section>')+
+    '<div id="medInhalt">'+medInhalt()+'</div>'+
     '<div class="factions" style="margin-top:18px">'+
       '<button class="btn" data-a="scan" data-med="1" data-person="'+esc(medFilter.person||"")+'">'+ic("camera")+' '+t("Arztdokument scannen")+'</button>'+
       '<a class="btn ghost" href="#/neu">'+ic("folder")+' '+t("Datei hochladen")+'</a>'+
+      (kostenGes>0?'<button class="btn ghost" data-a="med-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button>':"")+
       '<button class="btn ghost" data-a="pers-verw">'+ic("user")+' '+t("Personen verwalten")+'</button>'+
     '</div>';
 }
-function medZeile(d){
+function medZeile(d,fund){
   var mt=medTypInfo(d.med_typ),pn=personName(d.person_id);
   var beh=aiExt(d,"behandlung");
   return '<button class="drow3" data-a="med-open" data-id="'+d.id+'">'+
@@ -5048,10 +5253,67 @@ function medZeile(d){
     '<span class="db"><span class="dn">'+esc(aiVal(d,"titel")||d.arzt||mt.label)+'</span>'+
     '<span class="dm"><span>'+mt.label+'</span>'+
       (pn?'<span>👤 '+esc(pn)+'</span>':"")+
-      '<span>'+fmtDate(d.behandlungsdatum||d.doc_date)+'</span>'+
+      '<span>'+fmtDate(medDatum(d))+'</span>'+
       (d.betrag!=null?'<span><b>'+eur(d.betrag)+'</b></span>':"")+
-    '</span>'+(beh?'<span class="dm"><span>'+esc(beh)+'</span></span>':"")+'</span>'+
+    '</span>'+(fund?'<span class="dm"><span>🔎 '+esc(fund)+'</span></span>':(beh?'<span class="dm"><span>'+esc(beh)+'</span></span>':""))+'</span>'+
     '<span class="go">'+ic("right",16)+'</span></button>';
+}
+/* ---- Strukturierte Angaben im Detail ---- */
+function medStrukturKarte(d){
+  var mi=medInfo(d);
+  if(!mi.da)return '<div class="sug info" style="margin-top:14px"><span class="si">'+ic("search")+'</span><div class="sb2">'+
+    '<div class="st">'+t("Diagnosen und Ereignisse noch nicht ausgelesen")+'</div>'+
+    '<div class="sa"><button class="btn sm" data-a="med-nachholen" data-id="'+d.id+'">'+t("Nachholen")+'</button></div></div></div>';
+  var teile=[];
+  if(mi.diagnosen.length)teile.push('<div class="mgrp">📋 '+t("Diagnosen")+'</div>'+mi.diagnosen.map(function(x){
+    return '<div class="cause"><b>'+esc(x.text)+'</b>'+(x.icd?' <span class="pill">'+esc(x.icd)+'</span>':"")+'</div>';}).join(""));
+  if(mi.ereignisse.length)teile.push('<div class="mgrp">🗓️ '+t("Ereignisse")+'</div>'+mi.ereignisse.map(function(x){
+    var ei=ereignisInfo(x.art);return '<div class="cause"><b>'+ei.icon+' '+esc(x.text)+'</b><div class="hint">'+esc([x.datum?fmtDate(x.datum):"",ei.label].filter(Boolean).join(" · "))+'</div></div>';}).join(""));
+  if(mi.medikamente.length)teile.push('<div class="mgrp">💊 '+t("Medikamente")+'</div>'+mi.medikamente.map(function(x){
+    return '<div class="cause"><b>'+esc(x.name)+'</b>'+((x.wirkstoff||x.dosierung)?'<div class="hint">'+esc([x.wirkstoff,x.dosierung].filter(Boolean).join(" · "))+'</div>':"")+'</div>';}).join(""));
+  if(mi.laborwerte.length)teile.push('<div class="mgrp">🧪 '+t("Laborwerte")+'</div>'+mi.laborwerte.map(function(x){
+    return '<div class="cause'+(x.auffaellig?" auff":"")+'"><b>'+esc(x.name)+': '+esc(x.wert)+(x.einheit?" "+esc(x.einheit):"")+'</b>'+(x.auffaellig?' <span class="pill warnp">'+t("auffällig")+'</span>':"")+
+      (x.referenz?'<div class="hint">'+tf("Referenz {0}",esc(x.referenz))+'</div>':"")+'</div>';}).join(""));
+  if(mi.leistungen.length)teile.push('<div class="mgrp">🧾 '+t("Leistungen")+'</div>'+mi.leistungen.map(function(x){
+    return '<div class="cause"><b>'+(x.ziffer?esc(x.ziffer)+" · ":"")+esc(x.text)+'</b>'+(x.betrag!=null?'<div class="hint">'+eur(x.betrag)+'</div>':"")+'</div>';}).join(""));
+  if(mi.folgetermin)teile.push('<div class="mgrp">📅 '+t("Folgetermin")+'</div><div class="cause"><b>'+fmtDate(mi.folgetermin)+'</b></div>');
+  if(!teile.length)return "";
+  return '<div class="sect">'+t("Medizinische Angaben")+'</div><section class="card">'+teile.join("")+'</section>';
+}
+/* ---- Nachholen: Diagnosen/Ereignisse (KI) und Volltext für ältere Arztdokumente ----
+   Nur extracted.medizin wird ergänzt – von Hand geänderte Felder (Arzt, Datum, Patient …) bleiben. */
+var MED_NACH=false;
+async function medNachholen(ids){
+  if(MED_NACH)return;
+  var liste=DOCS.filter(function(d){return istMed(d)&&(ids?ids.indexOf(d.id)>=0:medUnvollstaendig(d));});
+  if(!liste.length)return;
+  MED_NACH=true;var fertig=0,abbruch=null;
+  nkArbeit(t("Dokumente werden vorbereitet …"));
+  try{
+    for(var i=0;i<liste.length&&!abbruch;i++){
+      var d=liste[i];
+      nkArbeitText(liste.length>1?tf("Dokument {0} von {1} wird erschlossen …",i+1,liste.length):t("All-Home liest das Dokument … (10–30 Sek.)"));
+      try{
+        var bild=(d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||""),bilder=null,pdf=null;
+        if(bild)bilder=await bilderDesDokuments(d);
+        else{var dl=await sb.storage.from(BUCKET).download(d.storage_path);if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));pdf=new Uint8Array(await dl.data.arrayBuffer());}
+        if(!(d.extracted&&d.extracted.medizin)){
+          var body={model:kiStufe(),lang:curLang};
+          if(pdf){if(pdf.length>14*1024*1024)throw new Error(t("Datei zu groß für die Analyse (max. ca. 14 MB)."));body.fileBase64=bytesBase64(pdf);body.mimeType="application/pdf";}
+          else{body.bilder=bilderFuerKi(bilder.slice(0,SCAN_KI_SEITEN));body.mimeType="image/jpeg";}
+          var ext=(await edgeRuf(EDGE_EXTRACT,body)).dokument||{};
+          var neu=Object.assign({},d.extracted||{},{medizin:(ext.medizin&&typeof ext.medizin==="object")?ext.medizin:{}});
+          if(!neu.behandlung&&ext.behandlung)neu.behandlung=ext.behandlung;
+          var r=await sb.from("documents").update({extracted:neu}).eq("id",d.id);if(r.error)throw r.error;
+        }
+        if(!MED_VT.ids[d.id]){if(bilder)await volltextHolen(d.id,bilder,"");else await volltextAusPdf(d.id,pdf);}
+        fertig++;
+      }catch(x){if(x&&(x.code==="ki_guthaben"||x.code==="limit"||x.code==="budget"))abbruch=errMsg(x);}
+    }
+    await ladeDaten();MED_VT.versucht=false;await medVolltextLaden(true);
+  }finally{MED_NACH=false;closeModal(true);render();}
+  if(abbruch)toast(abbruch,true);
+  else toast(tn(fertig,"{0} Dokument erschlossen ✅","{0} Dokumente erschlossen ✅"));
 }
 /* ---- Detail eines Arztdokuments ---- */
 function medDetail(d){
@@ -5066,17 +5328,19 @@ function medDetail(d){
     '<section class="card"><div class="kvl">'+
       (d.arzt?kv(t("Arzt / Praxis"),esc(d.arzt)):"")+
       (d.person_id?kv(t("Patient"),esc(personName(d.person_id)||"–")):"")+
-      kv(t("Behandlungsdatum"),fmtDate(d.behandlungsdatum||d.doc_date))+
+      kv(t("Behandlungsdatum"),fmtDate(medDatum(d)))+
       (d.betrag!=null?kv(t("Betrag"),eur(d.betrag)):"")+
       (aiExt(d,"behandlung")?kv(t("Behandlung"),esc(aiExt(d,"behandlung"))):"")+
     '</div>'+
     (aiVal(d,"zusammenfassung")?'<p style="margin-top:12px">'+esc(aiVal(d,"zusammenfassung"))+'</p>':"")+
-    '<div class="factions" style="margin-top:12px">'+
+    '</section>'+
+    medStrukturKarte(d)+
+    '<div class="factions" style="margin-top:14px">'+
       '<button class="btn ghost" data-a="d-view" data-id="'+d.id+'">'+ic("doc")+' '+t("Öffnen")+'</button>'+
       '<button class="btn ghost" data-a="d-seiten" data-id="'+d.id+'">'+ic("plus")+' '+t("Seiten hinzufügen")+'</button>'+
       '<button class="btn ghost" data-a="med-edit" data-id="'+d.id+'">'+ic("pencil")+' '+t("Bearbeiten")+'</button>'+
       '<button class="btn ghost danger" data-a="d-del" data-id="'+d.id+'">'+ic("trash")+' '+t("Löschen")+'</button>'+
-    '</div></section>'+
+    '</div>'+
     /* Erklärung */
     (rc?medErklaerungKarte(d,rc)
        :'<div class="sect">'+t("Verständlich erklären")+'</div>'+
@@ -9676,6 +9940,8 @@ document.addEventListener("click",function(ev){
 
   /* --- Gesundheit --- */
   if(a==="med-open"){go("#/gesundheit?doc="+id);return;}
+  if(a==="med-ansicht"){medFilter.ansicht=b.dataset.k||"zeit";render();return;}
+  if(a==="med-nachholen"){laeuft(b,medNachholen(id?[id]:null));return;}
   if(a==="med-edit"){laeuft(b,medFormular(id));return;}
   if(a==="med-explain"){laeuft(b,medErklaeren(id));return;}
   if(a==="med-tovertrag"){laeuft(b,medZuVertrag(id));return;}
@@ -9745,6 +10011,7 @@ document.addEventListener("input",function(ev){
   if(/^f_/.test(tid))formVorschau();
   if(tid==="lsuche")logoFilter(ev.target.value);
   if(tid==="dsuche")dokFilter(ev.target.value);
+  if(tid==="msuche")medSuche(ev.target.value);
   if(tid==="l_muster"){var lt=$("#l_treffer");if(lt)lt.innerHTML=logoTreffer(ev.target.value);}
   if(ev.target&&ev.target.classList&&ev.target.classList.contains("bad"))ev.target.classList.remove("bad");
 });
@@ -9760,6 +10027,7 @@ document.addEventListener("change",function(ev){
   if(el.id==="f_art"){el.classList.remove("bad");if(el.value)artWechseln(el.value);return;}
   if(el.id==="l_file"){logoDatei(el.files&&el.files[0]);el.value="";return;}
   if(el.id==="mfFach"){medFilter.fach=el.value;render();return;}
+  if(el.id==="mfEreignis"){medFilter.ereignis=el.value;render();return;}
   if(el.id==="mfPerson"){medFilter.person=el.value;render();return;}
   if(el.id==="mfJahr"){medFilter.jahr=el.value;render();return;}
   if(/^f_/.test(el.id||""))formVorschau();
