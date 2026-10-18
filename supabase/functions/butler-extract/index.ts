@@ -7,6 +7,7 @@
 //      Heizkostenabrechnung strukturiert aus, Modus "nk-bewertung" ordnet alle Jahre ein (allhome-nk*).
 // v19: Volltext aus Streifen in voller Aufloesung (streifen = Anzahl je Seite, ab = erste Seitennummer),
 //      jedes Bild beschriftet; Auftrag mit Lesereihenfolge, Tabellen, Handschrift, Silbentrennung.
+// v21: "art" = feine Vertragsart aus dem Katalog der App (der Client prueft den Code und hat Stichwortregeln als Rueckfall).
 // Gemeinsamer Kern (Anmeldung, Limits, Kosten-Protokoll, Claude-Aufruf): gemeinsam.ts
 
 import { ANTHROPIC_API_KEY, antwortText, claude, claudeFehler, cors, json, level, protokoll, pruefeAufruf, repairJson, stufe } from "./gemeinsam.ts";
@@ -75,7 +76,7 @@ function langHinweis(lang: string): string {
     `"titel", "zusammenfassung", "wichtig" (alle Eintraege), "hinweise", "behandlung".`,
     ``,
     `ALLES ANDERE bleibt unveraendert:`,
-    `- "docType", "kategorie", "fachrichtung", "medTyp" sind feste Codes und MUESSEN exakt die oben`,
+    `- "docType", "kategorie", "art", "fachrichtung", "medTyp" sind feste Codes und MUESSEN exakt die oben`,
     `  genannten deutschen Kleinbuchstaben-Werte behalten (z. B. "rechnung", "strom", "zahnarzt").`,
     `- Eigennamen ("anbieter", "produkt", "arzt", "vertragspartner") NICHT uebersetzen.`,
     `- Nummern, Datumsangaben, Betraege, "details"-Schluessel und deren Werte bleiben wie sie sind.`,
@@ -92,6 +93,7 @@ const PROMPT = [
   `- \"titel\": kurzer sprechender Titel fuer die Dokumentenliste (max. 60 Zeichen), Muster: Anbieter/Arzt + Dokumentart + Zeitraum/Jahr. Beispiele: \"AXA Kfz-Beitragsrechnung 2026\", \"NEW Gas SEPA-Mandat\", \"Fahrzeugschein VW Golf FB-SK 1990\", \"Hautarzt Dr. Meier Befund 06/2026\". IMMER setzen.`,
   `- \"docType\": \"vertrag\"|\"rechnung\"|\"police\"|\"kuendigung\"|\"preisaenderung\"|\"schreiben\"|\"fahrzeugschein\"|\"sonstiges\". \"fahrzeugschein\" = Zulassungsbescheinigung Teil I oder Teil II (Fahrzeugbrief).`,
   `- \"kategorie\": \"mobilfunk\",\"internet\",\"strom\",\"gas\",\"wasser\",\"versicherung\",\"streaming\",\"bank\",\"kfz\",\"wohnen\",\"gesundheit\",\"mitgliedschaft\",\"sonstiges\". KFZ-Versicherungen und Fahrzeugscheine: \"kfz\".`,
+  `- \"art\": genau EIN Code der feinen Vertragsart (fester Code, nie uebersetzen): miete (Miete), eigentum (Wohneigentum / Finanzierung), strom (Strom), gas (Gas), wasser (Wasser & Abwasser), fernwaerme (Fernwaerme), heizoel (Heizoel / Pellets), hausverwaltung (Hausverwaltung / WEG), heizungswartung (Heizungswartung), schornsteinfeger (Schornsteinfeger), muell (Muellabfuhr), garage (Garage / Stellplatz), fahrzeug (Fahrzeug), kfz_steuer (KFZ-Steuer), leasing (Leasing / Autofinanzierung), oepnv (Deutschlandticket / OePNV), fahrrad (Fahrrad / E-Bike), haftpflicht (Privathaftpflicht), hausrat (Hausrat), wohngebaeude (Wohngebaeude), kfz_vers (KFZ-Versicherung), rechtsschutz (Rechtsschutz), kranken (Krankenversicherung), zahnzusatz (Zahnzusatz), bu (Berufsunfaehigkeit), unfall (Unfallversicherung), risikoleben (Risikoleben), tierhalter (Tierhalterhaftpflicht), tierkranken (Tierkrankenversicherung), reise_vers (Reiseversicherung), elektronik (Handy / Elektronik), fahrrad_vers (Fahrradversicherung), vers_sonst (Weitere Versicherung), internet (Internet / Festnetz), mobilfunk (Mobilfunk), streaming_video (Streaming Video), streaming_musik (Streaming Musik), presse (Zeitung / Zeitschrift), cloud (Cloud / Software-Abo), girokonto (Girokonto), kreditkarte (Kreditkarte), depot (Depot / Sparplan), bauspar (Bausparvertrag), rente (Private Rente / Riester), kredit (Ratenkredit), fitness (Fitnessstudio), verein (Verein), autoclub (Automobilclub), rundfunk (Rundfunkbeitrag), grundsteuer (Grundsteuer), personalausweis (Personalausweis), reisepass (Reisepass), fuehrerschein (Fuehrerschein), sonstiges (Sonstiges). Es entscheidet der GEGENSTAND des Dokuments (Hausratversicherung -> hausrat, Privathaftpflicht -> haftpflicht, Kfz-Versicherung -> kfz_vers), nicht der Firmenname (\"HUK-COBURG Haftpflicht-Unterstuetzungs-Kasse kraftfahrender Beamter\" oder \"Die Haftpflichtkasse\" sagen nichts ueber die Art) und nicht Nebensaetze wie \"wird per Lastschrift eingezogen\". Ausweise: personalausweis/reisepass/fuehrerschein; Zulassungsbescheinigung: fahrzeug; medizinische Dokumente und alles Unklare: \"sonstiges\".`,
   `- \"anbieter\": Name des Anbieters/Versicherers/Unternehmens (string|null). Nimm den offiziellen Firmennamen; bei Marken den Markennamen (z. B. \"naturstrom\"). Beim Fahrzeugschein null (die Zulassungsstelle ist kein Anbieter).`,
   `- \"vertragspartner\": Vor- und Nachname der PRIVATPERSON (Vertragsinhaber/Versicherungsnehmer/Halter/Rechnungsempfaenger/Patient/Adressat), NICHT der Anbieter/Arzt. string|null.`,
   `- \"produkt\": Tarif-/Produkt-/Policenname (string|null).`,

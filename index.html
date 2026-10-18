@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-R8LLxBsK/o6ULnEZ2FbQ5RJa/Pm0VC7HotiAPKuvl/4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-l6m7O45ffOVQXpJktZsKVB+iAk6PXaVZfFvIXoSoBVc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -777,7 +777,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.2";
+var APP_VERSION="1.9.3";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -4064,38 +4064,115 @@ async function edgeRuf(fn,body){
 }
 
 /* ================= Bestätigung nach dem Einlesen ================= */
-/* Welche Art passt zu dem, was die KI gelesen hat? */
+/* Welche Art passt zu dem, was die KI gelesen hat?
+   Reihenfolge der Belege (der erste eindeutige gewinnt):
+   1. die feine Art, die die KI selbst aus dem Katalog gewählt hat (ext.art, ab butler-extract v21)
+   2. Stichwörter in Produkt und Titel   3. Stichwörter im Anbieternamen
+   4. die grobe KI-Kategorie – die Zusammenfassung zählt nur, wenn diese nichts Genaues sagt.
+   Stichwörter stehen zentral in ART_REGELN: „teil“ = irgendwo im Wort (lange, eindeutige Stämme,
+   auch in Zusammensetzungen wie Privathaftpflicht), „wort“ = nur am Wortanfang, „ganz“ = nur als ganzes Wort,
+   „nicht“ = schließt die Regel aus. So steckt „gez“ nicht mehr in „eingezogen“, „auto“ nicht in „automatisch“,
+   „verein“ nicht in „Vereinbarung“. Texte werden vorher vereinheitlicht (ä→ae, Satzzeichen→Leerzeichen). */
+var ART_REGELN=[
+  /* Ausweise zuerst: das Dokument IST der Eintrag */
+  ["fuehrerschein",{teil:["fuehrerschein","fahrerlaubnis"]}],
+  ["personalausweis",{teil:["personalausweis"]}],
+  ["reisepass",{teil:["reisepass"]}],
+  ["fahrzeug",{teil:["zulassungsbescheinigung","fahrzeugbrief","fahrzeugschein"]}],
+  /* Versicherungen: die engen vor den weiten */
+  ["tierhalter",{teil:["tierhalter","hundehaftpflicht","pferdehaftpflicht"]}],
+  ["tierkranken",{teil:["tierkranken","hundekranken","katzenkranken","tier op versicherung"]}],
+  ["kfz_steuer",{teil:["kraftfahrzeugsteuer","kfz steuer","kfzsteuer"]}],
+  ["kfz_vers",{teil:["kfz versicherung","kfzversicherung","kfz haftpflicht","autoversicherung","kraftfahrtversicherung","kraftfahrzeugversicherung","teilkasko","vollkasko"],ganz:["kfz"]}],
+  ["haftpflicht",{teil:["privathaftpflicht","haftpflichtversicherung","privat haftpflicht"],ganz:["phv","haftpflicht"],
+    nicht:["kfz","kraftfahr","tierhalter","hundehaft","pferdehaft","bauherr","gewaesserschaden","oeltank","berufshaft","betriebshaft","vermoegensschaden"]}],
+  ["hausrat",{teil:["hausrat"]}],
+  ["wohngebaeude",{teil:["wohngebaeude","gebaeudeversicherung"]}],
+  ["rechtsschutz",{teil:["rechtsschutz"],nicht:["schadenersatz rechtsschutz","schadensersatz rechtsschutz"]}],
+  ["bu",{teil:["berufsunfaehig","erwerbsunfaehig"]}],
+  ["unfall",{teil:["unfallversicherung","unfallvers","unfallschutz","unfallpolice"]}],
+  ["zahnzusatz",{teil:["zahnzusatz","zahnersatzvers","zahnversicherung","zahnschutz"]}],
+  ["risikoleben",{teil:["risikoleben","risiko lebensvers","todesfallschutz"]}],
+  ["reise_vers",{teil:["reiseversicherung","reiseruecktritt","reiseabbruch","auslandskranken","auslandsreisekranken"]}],
+  ["elektronik",{teil:["handyversicherung","smartphoneversicherung","elektronikversicherung","geraeteversicherung","displayschutz"]}],
+  ["fahrrad_vers",{teil:["fahrradversicherung","e bike versicherung","ebike versicherung","radversicherung"]}],
+  ["kranken",{teil:["krankenversicherung","krankenkasse","krankenvollvers","krankenzusatz","pflegeversicherung","pflegezusatz","techniker krankenkasse"],ganz:["aok","dak","hkk","ikk","bkk"]}],
+  ["rente",{teil:["riester","ruerup","rentenversicherung","altersvorsorge","pensionskasse","direktversicherung","betriebsrente"]}],
+  /* Wohnen */
+  ["miete",{teil:["mietvertrag","kaltmiete","warmmiete","mieterhoehung","wohnungsmiete"]}],
+  ["garage",{teil:["garagenmiet","stellplatzmiet","tiefgaragenstellplatz","garagenvertrag"]}],
+  ["eigentum",{teil:["baufinanzierung","immobilienfinanzierung","immobiliendarlehen","hypothek","grundschuld","annuitaetendarlehen"]}],
+  ["hausverwaltung",{teil:["hausverwaltung","hausgeld","eigentuemergemeinschaft","wohnungseigentuemer"]}],
+  ["fernwaerme",{teil:["fernwaerme","nahwaerme"]}],
+  ["heizoel",{teil:["heizoel","holzpellets","pellets","fluessiggas"]}],
+  ["heizungswartung",{teil:["heizungswartung","thermenwartung","wartungsvertrag heizung"]}],
+  ["schornsteinfeger",{teil:["schornsteinfeger","feuerstaettenschau","kehrbezirk"]}],
+  ["muell",{teil:["muellabfuhr","abfallgebuehr","abfallwirtschaft","muellgebuehr","restmuell","abfallentsorgung"]}],
+  ["strom",{teil:["stromliefer","stromvertrag","stromtarif","oekostrom","strompreis","stromrechnung","stromabschlag"]}],
+  ["gas",{teil:["gasliefer","gasvertrag","gastarif","erdgas","gasrechnung","gasabschlag"]}],
+  ["wasser",{teil:["wasserversorg","trinkwasser","abwasser","wassergebuehr","wasserzweckverband"]}],
+  /* Mobilität */
+  ["leasing",{teil:["leasing","autofinanzierung","fahrzeugfinanzierung"]}],
+  ["oepnv",{teil:["deutschlandticket","deutschland ticket","oepnv","monatskarte","jobticket","verkehrsverbund","bahncard","abo ticket"]}],
+  /* Kommunikation & Medien */
+  ["mobilfunk",{teil:["mobilfunk","handyvertrag","prepaid","sim karte","simkarte"],nicht:["kreditkarte"]}],
+  ["internet",{teil:["glasfaser","festnetz","breitband","internetanschluss","kabelinternet"],ganz:["dsl","vdsl","adsl"]}],
+  ["streaming_musik",{teil:["spotify","apple music","deezer","tidal","amazon music","youtube music"]}],
+  ["streaming_video",{teil:["netflix","disney","prime video","amazon prime","dazn","paramount","rtl plus","magenta tv","waipu"],ganz:["sky","joyn"]}],
+  ["presse",{teil:["zeitung","zeitschrift","zeitungsabo"]}],
+  ["cloud",{teil:["icloud","google one","dropbox","microsoft 365","office 365","onedrive","adobe creative","cloud speicher"]}],
+  /* Finanzen */
+  ["kreditkarte",{teil:["kreditkarte","mastercard","american express"],ganz:["visa","amex"]}],
+  ["girokonto",{teil:["girokonto","kontofuehrung","kontoauszug","kontomodell"]}],
+  ["bauspar",{teil:["bauspar"]}],
+  ["depot",{teil:["wertpapierdepot","depotauszug","sparplan","depotfuehrung"],ganz:["depot","etf"]}],
+  ["kredit",{teil:["ratenkredit","kreditvertrag","darlehensvertrag","konsumentenkredit"]}],
+  /* Mitgliedschaften */
+  ["fitness",{teil:["fitness","mcfit","clever fit","john reed","urban sports","kieser training"],ganz:["gym"]}],
+  ["autoclub",{teil:["automobilclub","auto club europa"],ganz:["adac","avd","ace"]}],
+  ["verein",{teil:["sportverein","turnverein","fussballverein","musikverein","foerderverein","mitgliedsbeitrag"],ganz:["verein"]}],
+  /* Pflichten */
+  ["rundfunk",{teil:["rundfunk","beitragsservice","ard zdf"],ganz:["gez"]}],
+  ["grundsteuer",{teil:["grundsteuer"]}]
+];
+function artText(s){
+  s=String(s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss");
+  return " "+s.replace(/[^a-z0-9]+/g," ").trim()+" ";
+}
+/* Erste passende Regel für einen (vereinheitlichten) Text, sonst null */
+function stichwortArt(s){
+  if(!s||s.length<3)return null;
+  for(var i=0;i<ART_REGELN.length;i++){
+    var r=ART_REGELN[i][1];
+    if(r.nicht&&r.nicht.some(function(w){return s.indexOf(w)>=0;}))continue;
+    if((r.teil&&r.teil.some(function(w){return s.indexOf(w)>=0;}))||
+       (r.wort&&r.wort.some(function(w){return s.indexOf(" "+w)>=0;}))||
+       (r.ganz&&r.ganz.some(function(w){return s.indexOf(" "+w+" ")>=0;})))
+      return ARTEN[ART_REGELN[i][0]]?ART_REGELN[i][0]:null;
+  }
+  return null;
+}
+/* Arten, die nichts Genaues sagen – dann dürfen schwächere Belege entscheiden */
+function artUngenau(a){return !a||a==="sonstiges"||a==="vers_sonst"||a==="verein";}
 function artAusExtrakt(ext){
   if(!ext)return "sonstiges";
   if(ext.istMedizin)return "sonstiges";
   if(ext.docType==="fahrzeugschein")return "fahrzeug";
-  var k=ext.kategorie;
   /* Die groben KI-Kategorien auf den feinen Katalog abbilden */
   var karte={strom:"strom",gas:"gas",wasser:"wasser",internet:"internet",mobilfunk:"mobilfunk",
     streaming:"streaming_video",bank:"girokonto",kfz:"kfz_vers",wohnen:"miete",
     mitgliedschaft:"verein",versicherung:"vers_sonst",gesundheit:"kranken"};
-  var art=karte[k]||"sonstiges";
-  /* Feiner raten anhand des Anbieters und des Versicherungsworts */
-  var txt=((ext.anbieter||"")+" "+(ext.produkt||"")+" "+(ext.zusammenfassung||"")).toLowerCase();
-  if(k==="versicherung"||art==="vers_sonst"){
-    if(/haftpflicht/.test(txt)&&!/tier|kfz|auto/.test(txt))art="haftpflicht";
-    else if(/hausrat/.test(txt))art="hausrat";
-    else if(/wohngeb/.test(txt))art="wohngebaeude";
-    else if(/rechtsschutz/.test(txt))art="rechtsschutz";
-    else if(/berufsunf/.test(txt))art="bu";
-    else if(/unfall/.test(txt))art="unfall";
-    else if(/zahn/.test(txt))art="zahnzusatz";
-    else if(/kfz|auto|fahrzeug/.test(txt))art="kfz_vers";
+  var grob=karte[ext.kategorie]||"sonstiges";
+  var ki=(ext.art&&ext.art!=="sonstiges"&&ARTEN[ext.art])?ext.art:null;
+  if(ki&&!artUngenau(ki))return ki;
+  var fein=stichwortArt(artText((ext.produkt||"")+" "+(ext.titel||"")))||stichwortArt(artText(ext.anbieter));
+  if(fein)return fein;
+  var basis=ki||grob;
+  if(artUngenau(basis)){
+    var ausText=stichwortArt(artText(ext.zusammenfassung));
+    if(ausText)return ausText;
   }
-  if(/rundfunk|beitragsservice|gez/.test(txt))art="rundfunk";
-  if(/fitness|gym|mcfit|clever fit/.test(txt))art="fitness";
-  if(/adac|avd|acе/.test(txt))art="autoclub";
-  /* Ausweise: Titel und Zusammenfassung zählen, nicht die grobe KI-Kategorie */
-  var aus=((ext.titel||"")+" "+(ext.zusammenfassung||"")).toLowerCase();
-  if(/führerschein|fuehrerschein|fahrerlaubnis/.test(aus))art="fuehrerschein";
-  else if(/personalausweis/.test(aus))art="personalausweis";
-  else if(/reisepass/.test(aus))art="reisepass";
-  return ARTEN[art]?art:"sonstiges";
+  return ARTEN[basis]?basis:"sonstiges";
 }
 /* Passt das zu einem bestehenden Vertrag? */
 /* Liefert {c, grund}: grund "nummer" (Kunden-/Vertragsnummer gleich) oder "name" (Anbieter + Art).
@@ -4110,7 +4187,7 @@ function findeVertragMitGrund(ext){
   var kandidaten=CONTRACTS.filter(function(c){
     var ca=(c.anbieter||"").trim().toLowerCase();
     if(!ca)return false;
-    var passt=(ca===ab)||(ca.indexOf(ab)>=0)||(ab.indexOf(ca)>=0);
+    var passt=ca===ab||anbieterGleich(ca,ab)===true;
     return passt&&(c.art===art||artInfo(c.art).g===artInfo(art).g);
   });
   var genau=kandidaten.filter(function(c){return c.art===art;})[0]||kandidaten[0];
@@ -4140,8 +4217,7 @@ function dokGruppe(ids){
 }
 function gleicherVorgang(a,b){
   if(nummerGleich(a.vertragsnummer,b.vertragsnummer)||nummerGleich(a.kundennummer,b.kundennummer))return true;
-  var x=anbieterKern(a.anbieter),y=anbieterKern(b.anbieter);
-  return x.some(function(w){return w.length>=3&&y.some(function(v){return v.length>=3&&(v.indexOf(w)>=0||w.indexOf(v)>=0);});});
+  return anbieterGleich(a.anbieter,b.anbieter)===true;
 }
 /* Neu anlegen nur, wo die Unterlagen nach Vertrag aussehen – ein Befund oder Bescheid bleibt einfach abgelegt */
 function dokTaugtFuerVertrag(d,art){
@@ -4206,8 +4282,9 @@ function reviewKarte(){
   var d=REVIEW;if(!d)return "";
   var ext=d.extracted||{};
   if(istMed(d))return medReviewKarte(d);
-  var art=artFuerDok(d),a=artInfo(art),ty=dtInfo(d.doc_type);
   var c=hatVertrag(d)?vertragById(d.contract_id):null;
+  var nrFund=!c?findeVertragMitGrund(ext):null;
+  var art=c?(c.art||"sonstiges"):(nrFund&&nrFund.grund==="nummer"?(nrFund.c.art||"sonstiges"):artFuerDok(d)),a=artInfo(art),ty=dtInfo(d.doc_type);
   var wichtig=aiExt(d,"wichtig"),hinweise=aiExt(d,"hinweise");
   var kopf='<section class="card">'+
     '<div class="sug good"><span class="si">'+ic("sparkles")+'</span><div class="sb2">'+
@@ -4230,7 +4307,7 @@ function reviewKarte(){
           '<div class="sx">'+t("Bitte prüfen, bevor etwas übernommen wird.")+'</div></div></div>'+
         '<div class="factions" style="margin-top:16px">'+
           '<button class="btn" data-a="rv-anders">'+ic("link")+' '+t("Anderem Vertrag zuordnen")+'</button>'+
-          '<button class="btn ghost" data-a="rv-neu" data-k="'+art+'">'+ic("plus")+' '+t("Neuen Vertrag anlegen")+'</button>'+
+          '<button class="btn ghost" data-a="rv-neu" data-k="'+artFuerDok(d)+'">'+ic("plus")+' '+t("Neuen Vertrag anlegen")+'</button>'+
           '<button class="btn ghost" data-a="rv-trotzdem">'+tf("Trotzdem bei „{0}“ lassen",esc(c.anbieter||artInfo(c.art).label))+'</button>'+
         '</div></section>';
     return kopf+'</section>'+abgleichKarte(c,ext);
@@ -4249,21 +4326,35 @@ function reviewKarte(){
   '</section>';
 }
 /* Gehört das Dokument zu diesem Vertrag? Nummern oder Namenskern müssen passen. */
+/* Kern eines Firmennamens: Rechtsformen und Füllwörter fallen weg; Allerweltswörter („Allgemeine“, „Deutsche“,
+   „Bank“, „Stadtwerke“) nur, solange danach noch etwas übrig bleibt – sonst wäre „Deutsche Bank“ leer. */
 function anbieterKern(s){
-  var weg={gmbh:1,ag:1,se:1,kg:1,kgaa:1,co:1,ohg:1,mbh:1,ug:1,ev:1,e:1,v:1,deutschland:1,germany:1,
-    versicherung:1,versicherungen:1,versicherungs:1,bank:1,und:1,der:1,die:1,das:1};
-  return String(s||"").toLowerCase().replace(/[.,&+()\/"'„“\-]/g," ").split(/\s+/).filter(function(w){return w&&!weg[w];});
+  var form={gmbh:1,ag:1,se:1,kg:1,kgaa:1,co:1,ohg:1,mbh:1,ug:1,ev:1,e:1,v:1,und:1,der:1,die:1,das:1,aktiengesellschaft:1,gesellschaft:1,
+    niederlassung:1,filiale:1,zweigniederlassung:1};
+  var allerwelt={deutschland:1,germany:1,versicherung:1,versicherungen:1,versicherungs:1,bank:1,allgemeine:1,gruppe:1,group:1,
+    holding:1,service:1,services:1,international:1,deutsche:1,stadtwerke:1,energie:1,vertrieb:1,kundenservice:1};
+  var alle=String(s||"").toLowerCase().replace(/[.,&+()\/"'„“\-]/g," ").split(/\s+/).filter(function(w){return w&&!form[w];});
+  var kern=alle.filter(function(w){return !allerwelt[w];});
+  return kern.length?kern:alle;
 }
 function nummerGleich(a,b){
   a=String(a||"").replace(/[\s\/.\-]/g,"").toLowerCase();b=String(b||"").replace(/[\s\/.\-]/g,"").toLowerCase();
   return !!a&&a===b;
 }
+/* Gleicher Anbieter? true/false, null = nicht feststellbar (ein Name fehlt).
+   Ganze Namen oder Wortanfänge zählen, keine Teilwörter: „AXA“ ≠ „Taxadvisor“, „E.ON“ ≠ „Leonberg“,
+   aber „1&1“ = „1&1 Telecom“ und „Telekom Deutschland“ = „Deutsche Telekom“. */
+function anbieterGleich(x,y){
+  var a=anbieterKern(x),b=anbieterKern(y);
+  if(!a.length||!b.length)return null;
+  var ka=a.join(""),kb=b.join("");
+  if(ka===kb||(Math.min(ka.length,kb.length)>=2&&(ka.indexOf(kb)===0||kb.indexOf(ka)===0)))return true;
+  return a.some(function(w){return w.length>=3&&b.some(function(v){return v.length>=3&&(v.indexOf(w)===0||w.indexOf(v)===0);});});
+}
 function anbieterPasst(c,ext){
   if(!c||!ext||artInfo(c.art||"sonstiges").kein_anbieter)return true;
   if(nummerGleich(c.kundennummer,ext.kundennummer)||nummerGleich(c.vertragsnummer,ext.vertragsnummer))return true;
-  var a=anbieterKern(c.anbieter),b=anbieterKern(ext.anbieter);
-  if(!a.length||!b.length)return true;
-  return a.some(function(w){return w.length>=3&&b.some(function(v){return v.length>=3&&(v.indexOf(w)>=0||w.indexOf(v)>=0);});});
+  return anbieterGleich(c.anbieter,ext.anbieter)!==false;
 }
 /* ---- Abgleich: was die KI gelesen hat ↔ was im Vertrag steht ----
    Leere Felder sind vorab angehakt, Abweichungen nicht – ein Lesefehler soll
@@ -8774,9 +8865,16 @@ function nkAusKi(a,modell){
   return v;
 }
 /* Sieht ein gewöhnlich hochgeladenes Dokument nach Nebenkostenabrechnung aus? */
+/* Sieht das Dokument nach einer Nebenkostenabrechnung aus? Titel dürfen das Wort einfach nennen,
+   die Zusammenfassung nur mit „Abrechnung“ – sonst wäre jeder Mietvertrag mit „Nebenkostenvorauszahlung“ verdächtig. */
 function nkVerdacht(d){
-  var ext=(d&&d.extracted)||{},txt=[d&&d.titel,ext.titel,ext.zusammenfassung].filter(Boolean).join(" ");
-  return !d.nk_id&&/nebenkost|betriebskost|heizkostenabrechnung|heiz-? und warmwasserkost/i.test(txt);
+  if(!d||d.nk_id)return false;
+  var ext=d.extracted||{};
+  if(ext.docType==="vertrag"||ext.art==="miete")return false;
+  var titel=artText([d.titel,ext.titel,ext.produkt].filter(Boolean).join(" ")),lang=artText(ext.zusammenfassung);
+  var abrechnung=/nebenkostenabrechnung|betriebskostenabrechnung|heizkostenabrechnung|(neben|betriebs|heiz)kosten (jahres)?abrechnung|abrechnung (der |ueber die )?(neben|betriebs|heiz)kosten/;
+  if(abrechnung.test(titel)||abrechnung.test(lang))return true;
+  return /nebenkost|betriebskost|heizkost/.test(titel)&&!/mietvertrag|vorauszahlung|mieterhoehung/.test(titel);
 }
 
 /* ================= KI-Einschätzung über alle Jahre ================= */
