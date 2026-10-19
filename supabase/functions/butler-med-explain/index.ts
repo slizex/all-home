@@ -30,7 +30,7 @@ Deno.serve(async (req: Request) => {
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
   let p: { fileBase64?: string; mimeType?: string; kontext?: Record<string, unknown>; model?: string; level?: string; lang?: string; household_id?: string };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
-  const chk = await pruefeAufruf(req, p.household_id);
+  const chk = await pruefeAufruf(req, p.household_id, "allhome-med");
   if ("antwort" in chk) return chk.antwort;
   const { fileBase64, mimeType } = p;
   if (typeof fileBase64 !== "string" || !fileBase64) return json({ error: "Keine Datei empfangen." }, 400);
@@ -76,7 +76,7 @@ Deno.serve(async (req: Request) => {
   const body = { tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }], messages: [{ role: "user", content: [docBlock, { type: "text", text: frage }] }] };
   let r;
   try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
-  if (!r.resp.ok) return await claudeFehler(r.resp, "Erklaerung");
+  if (!r.resp.ok) return await claudeFehler(r.resp, "Erklaerung", chk.wer);
   const data = await r.resp.json();
   if (data.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
   const parsed = repairJson(antwortText(data));

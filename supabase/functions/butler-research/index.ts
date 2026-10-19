@@ -23,7 +23,7 @@ Deno.serve(async (req: Request) => {
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
   let p: { anbieter?: string; produkt?: string; kategorie?: string; kosten?: number; kostenIntervall?: string; vertragsstart?: string; model?: string; level?: string; lang?: string; household_id?: string };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
-  const chk = await pruefeAufruf(req, p.household_id);
+  const chk = await pruefeAufruf(req, p.household_id, "allhome-research");
   if ("antwort" in chk) return chk.antwort;
   const anbieter = String(p.anbieter || "").slice(0, 120).trim();
   if (!anbieter) return json({ error: "Kein Anbieter angegeben." }, 400);
@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
   const body = { tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }], messages: [{ role: "user", content: frage }] };
   let r;
   try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
-  if (!r.resp.ok) return await claudeFehler(r.resp, "Recherche");
+  if (!r.resp.ok) return await claudeFehler(r.resp, "Recherche", chk.wer);
   const data = await r.resp.json();
   if (data.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
   const parsed = repairJson(antwortText(data));

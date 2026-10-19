@@ -1,6 +1,6 @@
 // Gemeinsamer Kern der All-Home-KI-Funktionen (butler-extract, -research, -med-explain,
 // -translate). Wird jeder Funktion als eigene Datei mitgegeben.
-// Wer darf (nur angemeldet, Tageslimit, Tagesbudget), was kostet es (public.ai_calls,
+// Wer darf (nur angemeldet, Limit je Person, Tages- und Monatsbudget aus public.ki_einstellungen), was kostet es (public.ai_calls,
 // gemeinsam mit AllTracks tarif-extract), und die Anfrage an Claude mit Ersatzmodell.
 
 export const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
@@ -13,8 +13,9 @@ const MODELLE: Record<Stufe, string> = { basic: "claude-haiku-4-5", advanced: "c
 // US-Dollar je 1 Mio. Tokens (Eingabe, Ausgabe); Websuche 10 $ je 1000 Suchen
 const PREISE: Record<string, [number, number]> = { "claude-haiku-4-5": [1, 5], "claude-sonnet-5-5": [2, 10], "claude-opus-5-5": [4, 20] };
 const USD_JE_SUCHE = 0.01;
-const TAGES_LIMIT_PERSON = 60;   // Aufrufe je Person und Tag (Zähler gemeinsam mit AllTrack)
-const TAGES_BUDGET_USD = 5;      // alle Nutzer und KI-Funktionen zusammen
+// Grenzen stellt der Superadmin in der Zentrale ein (public.ki_einstellungen, gilt auch für AllTrack).
+// Nur wenn die Datenbank nicht antwortet, gelten diese Rückfallwerte.
+const RUECKFALL = { limit: 60, tag: 5, monat: 50 };
 
 export function stufe(v?: string): Stufe {
   if (v === "ultra") return "max";
@@ -47,7 +48,7 @@ function secretHeaders(): Record<string, string> | null {
 }
 
 /* ---------- Wer ruft auf, darf er? ---------- */
-export type Aufrufer = { id: string; email: string; hh: string | null };
+export type Aufrufer = { id: string; email: string; hh: string | null; modus: string };
 // verify_jwt prüft nur die Signatur – auch der öffentliche anon-Schlüssel der App ist ein
 // gültiges JWT. Darum: Rolle prüfen und den Nutzer beim Auth-Dienst nachschlagen.
 function rolleAngemeldet(auth: string): boolean {
@@ -61,8 +62,17 @@ function rolleAngemeldet(auth: string): boolean {
 async function rpc(name: string, headers: Record<string, string>, body: unknown): Promise<Response> {
   return await fetch(`${SB_URL}/rest/v1/rpc/${name}`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify(body) });
 }
-/* Liefert den Aufrufer – oder die fertige Ablehnung. hhWunsch zählt nur, wenn er Mitglied ist. */
-export async function pruefeAufruf(req: Request, hhWunsch: unknown): Promise<{ wer: Aufrufer } | { antwort: Response }> {
+/* Abgewiesenen Aufruf ins Ereignisprotokoll der Zentrale (best effort) */
+async function abgewiesen(wer: Aufrufer, grund: string): Promise<void> {
+  const sh = secretHeaders();
+  if (!sh || !SB_URL) return;
+  try {
+    const r = await rpc("ki_abgewiesen_melden", sh, { p_user: wer.id, p_email: wer.email, p_household: wer.hh, p_grund: grund, p_modus: wer.modus });
+    if (!r.ok) console.error("ki_abgewiesen_melden:", r.status, await r.text());
+  } catch (e) { console.error("ki_abgewiesen_melden:", String(e)); }
+}
+/* Liefert den Aufrufer – oder die fertige Ablehnung. hhWunsch zählt nur, wenn er Mitglied ist. modus: wofür (Protokoll) */
+export async function pruefeAufruf(req: Request, hhWunsch: unknown, modus = ""): Promise<{ wer: Aufrufer } | { antwort: Response }> {
   const auth = req.headers.get("authorization") || "";
   const key = publicKey();
   if (!rolleAngemeldet(auth) || !key || !SB_URL) return { antwort: json({ error: "Bitte anmelden.", code: "login" }, 401) };
@@ -81,19 +91,32 @@ export async function pruefeAufruf(req: Request, hhWunsch: unknown): Promise<{ w
       if (Array.isArray(rows) && rows.length) hh = hhWunsch;
     } catch (_) { /* ohne Haus protokollieren */ }
   }
-  // Tageslimit je Person (fail-open bei Technikfehlern, fail-closed beim echten Limit)
-  try {
-    const r = await rpc("ai_usage_bump", { apikey: key, authorization: auth }, { p_max: TAGES_LIMIT_PERSON });
-    if (!r.ok && /ai_quota_exceeded/.test(await r.text())) return { antwort: json({ error: "Tageslimit für KI-Auswertungen erreicht. Morgen geht es weiter.", code: "limit" }, 429) };
-  } catch (_) { /* Kontingent inaktiv */ }
-  // Tagesbudget aller Nutzer
+  const wer: Aufrufer = { id, email, hh, modus: String(modus || "").slice(0, 40) };
+  // Grenzen und bisherige Kosten aus der Datenbank (ein Aufruf)
+  let g: { limit?: number; tag?: number; monat?: number; heute?: number; monat_kosten?: number } | null = null;
   if (sh) {
+    try { const r = await rpc("ki_grenzen", sh, {}); if (r.ok) g = await r.json(); } catch (_) { /* Rückfall unten */ }
+  }
+  // Limit je Person (fail-open bei Technikfehlern, fail-closed beim echten Limit; gesperrte Konten: keine KI)
+  try {
+    const r = await rpc("ai_usage_bump", { apikey: key, authorization: auth }, { p_max: Number(g?.limit) || RUECKFALL.limit });
+    if (!r.ok) {
+      const t = await r.text();
+      if (/nicht freigegeben/.test(t)) return { antwort: json({ error: "Dein Konto ist nicht freigegeben.", code: "gesperrt" }, 403) };
+      if (/ai_quota_exceeded/.test(t)) { await abgewiesen(wer, "limit"); return { antwort: json({ error: "Tageslimit für KI-Auswertungen erreicht. Morgen geht es weiter.", code: "limit" }, 429) }; }
+    }
+  } catch (_) { /* Kontingent inaktiv */ }
+  // Tages- und Monatsbudget aller Nutzer (beide Apps zusammen)
+  if (g) {
+    if (Number(g.heute) >= Number(g.tag ?? RUECKFALL.tag)) { await abgewiesen(wer, "budget"); return { antwort: json({ error: "Das KI-Tagesbudget ist ausgeschöpft. Morgen geht es weiter.", code: "budget" }, 429) }; }
+    if (Number(g.monat_kosten) >= Number(g.monat ?? RUECKFALL.monat)) { await abgewiesen(wer, "budget_monat"); return { antwort: json({ error: "Das KI-Monatsbudget ist ausgeschöpft.", code: "budget" }, 429) }; }
+  } else if (sh) {
     try {
       const r = await rpc("ai_cost_today", sh, {});
-      if (r.ok && Number(await r.json()) >= TAGES_BUDGET_USD) return { antwort: json({ error: "Das KI-Tagesbudget ist ausgeschöpft. Morgen geht es weiter.", code: "budget" }, 429) };
+      if (r.ok && Number(await r.json()) >= RUECKFALL.tag) { await abgewiesen(wer, "budget"); return { antwort: json({ error: "Das KI-Tagesbudget ist ausgeschöpft. Morgen geht es weiter.", code: "budget" }, 429) }; }
     } catch (_) { /* weiter */ }
   }
-  return { wer: { id, email, hh } };
+  return { wer };
 }
 
 /* ---------- Kosten protokollieren (lesen dürfen nur Admins des Hauses) ---------- */
@@ -141,13 +164,15 @@ export async function claude(lv: Level, body: Record<string, unknown>): Promise<
   }
   return { resp, lv };
 }
-/* Fehlerantwort von Claude in eine klare Meldung übersetzen */
-export async function claudeFehler(resp: Response, was: string): Promise<Response> {
+/* Fehlerantwort von Claude in eine klare Meldung übersetzen; Guthaben/Limit bei Anthropic → Ereignisprotokoll */
+export async function claudeFehler(resp: Response, was: string, wer?: Aufrufer): Promise<Response> {
   const detail = await resp.text();
   const d = detail.toLowerCase();
-  if (resp.status === 402 || /credit balance|insufficient|billing|payment required|quota|out of credits/.test(d))
+  if (resp.status === 402 || /credit balance|insufficient|billing|payment required|quota|out of credits/.test(d)) {
+    if (wer) await abgewiesen(wer, "ki_guthaben");
     return json({ error: "Das KI-Guthaben ist aufgebraucht. Bitte spaeter erneut versuchen.", code: "ki_guthaben" }, 402);
-  if (resp.status === 429) return json({ error: "KI-Limit erreicht (429). Bitte spaeter erneut versuchen.", code: "limit" }, 429);
+  }
+  if (resp.status === 429) { if (wer) await abgewiesen(wer, "ki_limit"); return json({ error: "KI-Limit erreicht (429). Bitte spaeter erneut versuchen.", code: "limit" }, 429); }
   if (resp.status === 401) return json({ error: "KI-Schluessel ungueltig (401)." }, 502);
   console.error(was, resp.status, detail.slice(0, 500));
   return json({ error: was + " fehlgeschlagen (" + resp.status + ")." }, 502);

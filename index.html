@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-tlwxGxaqoJ3PqKh32/6JuZOk5Hp8P7IH+kciV7aIJ4c='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-2nBgnf//wKjfxET/wf/M5mq2nw+kgzIjmwX2Dea3kC0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -597,6 +597,38 @@ main>.sug+.card,main>.sug+.sug,main>.card+.sug,main>.card+.card{margin-top:12px}
 .zv{display:grid;gap:12px;margin:0 0 14px}
 .pickliste{display:grid;gap:8px}
 .cause+.cause{margin-top:8px}
+/* ---- Zentrale (1.10.0) ---- */
+.langrow.zttabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.zttabs .lb{min-width:0;padding:10px 4px;font-size:.86rem;text-align:center}
+.zttabs .lb .pill{margin-left:2px}
+@media(min-width:560px){.langrow.zttabs{grid-template-columns:repeat(5,minmax(0,1fr))}.langrow.ztzr{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.langrow.ztzr{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ztbar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.ztbar>i{display:block;height:100%;border-radius:inherit;background:var(--ink)}
+.ztbar.warn>i{background:var(--warn)}.ztbar.bad>i{background:var(--neg)}
+.ztbar.fein{height:6px;margin-top:4px}
+.ztbk{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ztbk>span{color:var(--muted);font-weight:800;font-size:.88rem}
+.ztbk b{font-size:1.15rem;font-weight:900}.ztbk b .mut{font-size:.86rem;font-weight:700}
+.ztbm{color:var(--muted);font-weight:700;font-size:.8rem;margin-top:6px}
+.kpis.ztkpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:760px){.kpis.ztkpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ztliste{display:grid;gap:12px}
+.ztzk{display:flex;justify-content:space-between;gap:10px;font-weight:800}
+.ztzn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ztzw{white-space:nowrap}
+.ztzm{color:var(--muted);font-weight:700;font-size:.78rem;margin-top:3px}
+.ztkarte{margin-bottom:12px}
+.ztkopf{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px}.ztkopf b{font-size:1.02rem;margin-right:4px}
+.ztzahlen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px}
+@media(min-width:480px){.ztzahlen{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.ztzahlen>div{background:var(--surface-2);border-radius:var(--r-md,10px);padding:8px 6px;text-align:center;min-width:0}
+.ztzahlen b{display:block;font-size:1.05rem;font-weight:900}.ztzahlen span{display:block;color:var(--muted);font-weight:700;font-size:.72rem;overflow:hidden;text-overflow:ellipsis}
+.ztmeta{display:flex;flex-wrap:wrap;gap:2px 14px;color:var(--muted);font-weight:700;font-size:.8rem;margin-bottom:8px}
+.ztmitgl{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;font-weight:700;overflow-wrap:anywhere}
+.zte.warn .di{color:var(--warn)}.zte.fehler .di{color:var(--neg)}
+.ztknoepfe{flex-direction:column;align-items:stretch}
+.ztz{min-width:0}
+.ztbudget .factions{margin-bottom:0}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -834,7 +866,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.9.9";
+var APP_VERSION="1.10.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -889,6 +921,23 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.10.0 Zentrale ---- */
+  "KI-Monatsbudget ausgeschöpft":"Месячный бюджет ИИ исчерпан",
+  "KI-Monatsbudget zu {0} % verbraucht":"Месячный бюджет ИИ израсходован на {0} %",
+  "{0} von {1} in diesem Monat":"{0} из {1} в этом месяце",
+  "Ändern":"Изменить",
+  "KI-Tagesbudget ausgeschöpft":"Дневной бюджет ИИ исчерпан",
+  "KI-Tagesbudget zu {0} % verbraucht":"Дневной бюджет ИИ израсходован на {0} %",
+  "{0} von {1} heute · neuer Tag ab {2} Uhr":"{0} из {1} сегодня · новый день с {2}",
+  "Nur heute +{0} $":"Только сегодня +{0} $",
+  "KI-Budget nur für heute um {0} $ erhöhen?":"Увеличить бюджет ИИ только на сегодня на {0} $?",
+  "Heute jetzt {0}":"Сегодня теперь {0}",
+  "Erhöhen fehlgeschlagen":"Не удалось увеличить",
+  "Zentrale":"Центр управления",
+  "KI heute {0} von {1}":"ИИ сегодня {0} из {1}",
+  "Konten, KI-Budget, Ereignisse":"Учётные записи, бюджет ИИ, события",
+
 
 /* ---- 1.9.9 KI gesperrt ---- */
   "noch nicht ausgelesen":"ещё не распознано",
@@ -2864,7 +2913,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug","zentrale"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -2952,7 +3001,7 @@ function render(){
   if(booting){r.innerHTML=ladeHtml();return;}
   if(!me){r.innerHTML=authHtml();return;}
   /* Konto noch nicht freigegeben: nur die Warteseite */
-  if(FREIGABE==="offen"){r.innerHTML=wartenHtml();return;}
+  if(freigabeFehlt()){r.innerHTML=wartenHtml();return;}
   var rt=route();
   /* Scanner: eigene Ebene über der App; die Adresse hält ihn offen */
   if(rt.name!=="scan"&&SCAN&&!SCAN_SPEICHERN)scannerAus();   /* beim Speichern bleibt er offen, bis alles oben ist */
@@ -2960,7 +3009,7 @@ function render(){
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   if(rt.name==="scan"){r.innerHTML=shell("","neu");scannerZeigen(rt.params);return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen","umzug"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen","umzug","zentrale"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -2981,7 +3030,8 @@ function render(){
   else if(rt.name==="haushalt")  {inhalt=viewHaushalt(rt.params.id);cur="mehr";}
   else if(rt.name==="logos")     {inhalt=viewLogos();cur="mehr";}
   else if(rt.name==="kikosten")  {inhalt=viewKiKosten();cur="mehr";}
-  else if(rt.name==="registrierungen"){inhalt=viewRegistrierungen();cur="mehr";}
+  else if(rt.name==="registrierungen"){ZT_ANSICHT.tab="konten";inhalt=viewZentrale();cur="mehr";}
+  else if(rt.name==="zentrale")  {inhalt=viewZentrale();cur="mehr";}
   else if(rt.name==="nebenkosten"){inhalt=viewNebenkosten();cur=rt.params.von==="vertrag"?"vertraege":"mehr";}
   else if(rt.name==="umzug")     {inhalt=viewUmzug();cur="mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
@@ -3315,7 +3365,7 @@ async function doLogout(){
   await entwurfLoeschen();
   try{await sb.auth.signOut();}catch(e){}
   me=null;HH=null;SETUP=null;CONTRACTS=[];DOCS=[];PERSONS=[];ENERGIE={};
-  FREIGABE=null;IST_SUPERADMIN=false;REG=null;AUTH_MODE="login";
+  FREIGABE=null;IST_SUPERADMIN=false;REG=null;ZT=null;AUTH_MODE="login";
   curLang="de";applyLangAttr();   /* Anmelde-Bildschirm ist immer deutsch */
   authMsg("");render();
 }
@@ -3609,10 +3659,7 @@ function viewMehr(){
       '<span class="dm"><span>'+t(KI_STUFEN[kiStufe()].name)+' · '+esc(KI_STUFEN[kiStufe()].model)+'</span></span></span>'+
       '<span class="go">'+ic("right",18)+'</span></button></section>'+
     (IST_SUPERADMIN||IST_APP_ADMIN||(HH&&ichAdmin(HH.id))?'<div class="mgrp">'+t("Verwaltung")+'</div><section class="card">'+
-      (IST_SUPERADMIN?'<a class="drow3" href="#/registrierungen"><span class="di">'+ic("users")+'</span>'+
-        '<span class="db"><span class="dn">'+t("Registrierungen")+'</span>'+
-        '<span class="dm"><span>'+(regOffen().length?tn(regOffen().length,"{0} wartet auf Freigabe","{0} warten auf Freigabe"):t("Konten freigeben oder ablehnen"))+'</span></span></span>'+
-        (regOffen().length?'<span class="pill warnp">'+regOffen().length+'</span>':"")+'<span class="go">'+ic("right",18)+'</span></a>':"")+
+      (IST_SUPERADMIN?ztMehrEintrag():"")+
       (HH&&ichAdmin(HH.id)?'<a class="drow3" href="#/kikosten"><span class="di">'+ic("euro")+'</span>'+
         '<span class="db"><span class="dn">'+t("KI-Kosten")+'</span>'+
         '<span class="dm"><span>'+t("Wer, wann, wie viel")+'</span></span></span>'+
@@ -5943,7 +5990,7 @@ function vorschlaege(){
   }
 
   if(smartAn("nebenkosten"))v=v.concat(nkVorschlaege());
-  v=regVorschlaege().concat(v);   /* Superadmin: wartende Registrierungen ganz vorn – nicht abschaltbar */
+  v=regVorschlaege().concat(ztVorschlaege(),v);   /* Superadmin: wartende Registrierungen ganz vorn – nicht abschaltbar */
   return v.filter(function(x){return !istWeg(x.key);});
 }
 function vorschlagHtml(x){
@@ -9521,7 +9568,7 @@ async function nkAuslesen(docIds,nkId,bilderVorab){
   }
 }
 /* KI gesperrt (Guthaben, Tageslimit, Tagesbudget) – nochmal versuchen bringt heute nichts */
-function nkKiGesperrt(x){return !!x&&(x.code==="ki_guthaben"||x.code==="limit"||x.code==="budget");}
+function nkKiGesperrt(x){return !!x&&(x.code==="ki_guthaben"||x.code==="limit"||x.code==="budget"||x.code==="gesperrt");}
 /* Auslesen ging nicht: Grund nennen. Die Dokumente sind abgelegt – später lesen oder gleich von Hand eintragen */
 var NK_FEHLER=null;
 function nkLeseFehler(x,ids,nkId){
@@ -10221,7 +10268,8 @@ function nkmNeuZeichnen(){var y=window.scrollY,box=document.querySelector(".nkmb
    Neue Konten starten „offen“: Die Datenbank zeigt ihnen nichts, bis der Superadmin sie freigibt –
    per Link aus der Benachrichtigungs-Mail (#/freigabe?t=…&a=…, geht auch ohne Anmeldung, der Link
    trägt ein Einmal-Token) oder unter Mehr › Registrierungen. Diese Seiten bleiben deutsch wie die Anmeldung. */
-var FREIGABE=null;          /* "freigegeben" | "offen" | null (noch unbekannt) */
+var FREIGABE=null;          /* "freigegeben" | "offen" | "gesperrt" | null (noch unbekannt) */
+function freigabeFehlt(){return FREIGABE==="offen"||FREIGABE==="gesperrt";}
 var IST_SUPERADMIN=false;
 var REG=null;               /* Liste für den Superadmin: {zeilen, fehler, am, laedt} */
 var FG=null;                /* Freigabe-Seite: {token, aktion, daten, fehler, ergebnis, laedt} */
@@ -10233,12 +10281,15 @@ async function ladeFreigabe(){
   try{var r=await sbPub.rpc("meine_freigabe");FREIGABE=(r&&!r.error&&r.data)?r.data:"freigegeben";}catch(e){FREIGABE="freigegeben";}
   if(FREIGABE!=="freigegeben")return;
   try{var s=await sbPub.rpc("ist_superadmin");IST_SUPERADMIN=!!(s&&!s.error&&s.data===true);}catch(e){}
-  if(IST_SUPERADMIN)ladeRegistrierungen();
+  if(IST_SUPERADMIN){ladeRegistrierungen();ladeZentrale();}
 }
 function wartenHtml(){
+  var gesperrt=FREIGABE==="gesperrt";
   return '<div class="auth"><div class="authc"><img class="logo" src="icon.svg?v=2" alt="">'+
-    '<h1>Fast geschafft</h1>'+
-    '<p>Dein Konto <b>'+esc((me&&me.email)||"")+'</b> wartet auf die Freigabe durch den Administrator. Sobald es freigegeben ist, kannst du All-Home und AllTrack nutzen.</p>'+
+    (gesperrt?'<h1>Konto gesperrt</h1>'+
+      '<p>Dein Konto <b>'+esc((me&&me.email)||"")+'</b> ist gesperrt. Wende dich an den Administrator.</p>'
+    :'<h1>Fast geschafft</h1>'+
+      '<p>Dein Konto <b>'+esc((me&&me.email)||"")+'</b> wartet auf die Freigabe durch den Administrator. Sobald es freigegeben ist, kannst du All-Home und AllTrack nutzen.</p>')+
     '<div class="amsg" id="amsg"></div>'+
     '<button class="btn lg full" type="button" data-a="freigabe-pruefen">Erneut prüfen</button>'+
     '<div class="arow"><button type="button" class="lnk" data-a="logout">Abmelden</button></div>'+
@@ -10246,7 +10297,7 @@ function wartenHtml(){
 }
 async function freigabePruefen(){
   await ladeFreigabe();
-  if(FREIGABE==="offen"){authMsg("Noch nicht freigegeben – bitte später noch einmal.","err");return;}
+  if(freigabeFehlt()){authMsg(FREIGABE==="gesperrt"?"Das Konto ist weiterhin gesperrt.":"Noch nicht freigegeben – bitte später noch einmal.","err");return;}
   await starteSitzung();
 }
 
@@ -10280,7 +10331,7 @@ function freigabeSeiteHtml(){
       ?'✅ <b>'+esc(fgName(e))+'</b> ist freigegeben und kann All-Home und AllTrack jetzt nutzen.'
       :'Die Registrierung von <b>'+esc(fgName(e))+'</b> ('+esc(e.email||"")+') ist abgelehnt, das Konto gelöscht.')+'</p>'+fuss;
   }
-  if(FG.fehler)return kopf+'<p>'+esc(FG.fehler)+'</p><p class="hint">Offene Registrierungen findest du in All-Home unter Mehr › Registrierungen.</p>'+fuss;
+  if(FG.fehler)return kopf+'<p>'+esc(FG.fehler)+'</p><p class="hint">Offene Registrierungen findest du in All-Home unter Mehr › Zentrale.</p>'+fuss;
   var d=FG.daten,ab=FG.aktion==="ablehnen";
   return kopf+'<p>'+(ab?"Diese Registrierung ablehnen?":"Diese Registrierung freigeben?")+'</p>'+
     '<div class="kvl" style="text-align:left;margin:4px 0 18px">'+
@@ -10307,44 +10358,22 @@ async function ladeRegistrierungen(){
   try{var r=await sbPub.rpc("registrierungen_liste");if(r.error)throw r.error;REG.zeilen=r.data||[];REG.fehler=null;}
   catch(e){REG.fehler=errMsg(e);if(!REG.zeilen)REG.zeilen=[];}
   REG.am=Date.now();REG.laedt=false;
-  if(["registrierungen","mehr","start","vorschlaege"].indexOf(route().name)>=0)render();
+  if(["registrierungen","zentrale","mehr","start","vorschlaege"].indexOf(route().name)>=0)render();
 }
 window.addEventListener("hashchange",function(){if(REG)REG.am=0;});
 function regOffen(){return ((REG&&REG.zeilen)||[]).filter(function(z){return z.status!=="freigegeben";});}
 function regName(z){return [z.vorname,z.nachname].filter(Boolean).join(" ");}
-function viewRegistrierungen(){
-  var kopf=zurueck("#/mehr",t("Mehr"))+seitenTitel(t("Registrierungen"));
-  if(!IST_SUPERADMIN)return kopf+'<section class="card"><p class="hint">'+t("Nur für den Superadmin.")+'</p></section>';
-  if(!REG||(!REG.laedt&&Date.now()-(REG.am||0)>10000))ladeRegistrierungen();
-  if(!REG.zeilen)return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';
-  var offen=regOffen(),frei=REG.zeilen.filter(function(z){return z.status==="freigegeben";});
-  return kopf+(REG.fehler?fehlerKarte(REG.fehler):"")+
-    '<div class="sect">'+t("Wartet auf Freigabe")+'</div>'+
-    (offen.length?'<section class="card"><div class="dlist">'+offen.map(function(z){
-      return '<div class="regz"><div class="db"><span class="dn">'+esc(regName(z)||z.email)+'</span>'+
-        '<span class="dm">'+(regName(z)?'<span>'+esc(z.email)+'</span>':'')+'<span>'+fmtDate(String(z.angelegt_am||"").slice(0,10))+'</span>'+
-          (z.email_bestaetigt?"":'<span class="pill">'+t("E-Mail noch nicht bestätigt")+'</span>')+'</span></div>'+
-        '<div class="factions"><button class="btn sm" data-a="reg-ja" data-id="'+z.user_id+'">'+ic("check")+' '+t("Freigeben")+'</button>'+
-        '<button class="btn sm ghost danger" data-a="reg-nein" data-id="'+z.user_id+'">'+t("Ablehnen")+'</button></div></div>';
-    }).join("")+'</div></section>'
-     :'<section class="card"><p class="hint" style="margin:0">'+t("Niemand wartet auf Freigabe.")+'</p></section>')+
-    '<div class="sect">'+t("Freigegebene Konten")+'</div><section class="card"><div class="dlist">'+frei.map(function(z){
-      return '<div class="regz"><div class="db"><span class="dn">'+esc(regName(z)||z.email)+(z.superadmin?' <span class="pill">'+t("Superadmin")+'</span>':"")+'</span>'+
-        '<span class="dm">'+(regName(z)?'<span>'+esc(z.email)+'</span>':'')+'<span>'+(z.zuletzt_angemeldet?tf("zuletzt {0}",fmtDate(String(z.zuletzt_angemeldet).slice(0,10))):t("nie angemeldet"))+'</span></span></div>'+
-        '<div class="factions"><button class="btn sm ghost" data-a="reg-pw" data-mail="'+esc(z.email)+'">'+ic("link")+' '+t("Passwort-Link senden")+'</button></div></div>';
-    }).join("")+'</div></section>';
-}
 function regZeile(id){return ((REG&&REG.zeilen)||[]).filter(function(z){return z.user_id===id;})[0]||null;}
 async function regFreigeben(id){
   try{var r=await sbPub.rpc("registrierung_freigeben",{p_user:id});if(r.error)throw r.error;
-    var z=regZeile(id);await ladeRegistrierungen();toast(tf("{0} ist freigegeben ✅",regName(z||{})||(z&&z.email)||""));}
+    var z=regZeile(id)||ztKonto(id);closeModal(true);await Promise.all([ladeRegistrierungen(),ladeZentrale()]);toast(tf("{0} ist freigegeben ✅",regName(z||{})||(z&&z.email)||""));}
   catch(e){toast(t("Freigeben fehlgeschlagen")+": "+errMsg(e),true);}
 }
 async function regAblehnen(id){
-  var z=regZeile(id);if(!z)return;
+  var z=regZeile(id)||ztKonto(id);if(!z)return;
   if(!confirm(tf("Registrierung von {0} ablehnen? Das Konto wird gelöscht.",regName(z)||z.email)))return;
   try{var r=await sbPub.rpc("registrierung_ablehnen",{p_user:id});if(r.error)throw r.error;
-    await ladeRegistrierungen();toast(t("Registrierung abgelehnt, Konto gelöscht"));}
+    closeModal(true);await Promise.all([ladeRegistrierungen(),ladeZentrale()]);toast(t("Registrierung abgelehnt, Konto gelöscht"));}
   catch(e){toast(t("Ablehnen fehlgeschlagen")+": "+errMsg(e),true);}
 }
 /* Passwort vergessen für jemanden: der Link geht an die hinterlegte Adresse – keine Tippfehler möglich */
@@ -10359,7 +10388,7 @@ function regVorschlaege(){
   var offen=regOffen().filter(function(z){return z.email_bestaetigt;});if(!offen.length)return [];
   return [{key:"reg:"+offen.map(function(z){return z.user_id;}).join(","),art:"warn",icon:"user",
     titel:tn(offen.length,"{0} Registrierung wartet auf Freigabe","{0} Registrierungen warten auf Freigabe"),
-    text:offen.map(function(z){return regName(z)||z.email;}).join(" · "),knopf:t("Ansehen"),href:"#/registrierungen"}];
+    text:offen.map(function(z){return regName(z)||z.email;}).join(" · "),knopf:t("Ansehen"),href:"#/zentrale?tab=konten"}];
 }
 
 /* ================= Umzug: Verträge, Dokumente, Arztdokumente, Nebenkosten in einen anderen Haushalt =================
@@ -10655,6 +10684,7 @@ async function umzugLos(){
   catch(x){b={zeilen:[{icon:"⚠️",name:t("Umzug"),text:errMsg(x)}],log:[],ziel:zd.id,quelle:HH.id};}
   finally{UMZUG.laeuft=false;}
   UMZUG.wahl={v:{},d:{},n:{}};UMZUG.plan=null;UMZUG.bericht=b;
+  umzugMelden(b);
   try{await ladeDaten();}catch(e){}
   closeModal(true);render();umzugBerichtZeigen();
 }
@@ -10766,6 +10796,295 @@ function umzugAlle(){
 }
 function umzugNeuZeichnen(){var y=window.scrollY;render();if(UMZUG.q)umzugFilter(UMZUG.q);window.scrollTo(0,y);}
 
+/* ================= Zentrale (Superadmin) =================
+   Verwaltungsdaten aller Konten und Haushalte – keine Inhalte: Dokumente, Verträge und Werte bleiben im Haushalt.
+   Alles kommt in einem Aufruf (zentrale_daten). Die KI-Grenzen gelten für All-Home und AllTrack zusammen
+   (public.ki_einstellungen, jede KI-Funktion liest sie bei jedem Aufruf). Die Seiten bleiben deutsch wie die Anmeldung. */
+var ZT=null;                                       /* {daten, fehler, am, laedt} */
+var ZT_ANSICHT={tab:"uebersicht",ef:"alle",zr:"monat"};
+var ZT_GESEHEN="ah_zentrale_gesehen";             /* letzter Blick auf die Ereignisse (je Gerät) */
+var ZT_TABS=[["uebersicht","Übersicht"],["ki","KI"],["konten","Konten"],["haushalte","Haushalte"],["ereignisse","Ereignisse"]];
+var ZT_TYP={registrierung:["user","konten"],freigabe:["check","konten"],ablehnung:["x","konten"],sperre:["shield","konten"],entsperrt:["check","konten"],
+  rolle:["users","konten"],konto_geloescht:["trash","konten"],budget:["euro","ki"],ki_abgewiesen:["alert","ki"],umzug:["swap","umzug"],fehler:["alert","fehler"]};
+var ZT_FILTER=[["alle","Alle"],["konten","Konten"],["ki","KI"],["fehler","Fehler"],["umzug","Umzüge"]];
+var ZT_ZEITRAUM=[["heute","Heute"],["7","7 Tage"],["monat","Monat"],["vormonat","Vormonat"]];
+var ZT_PLUS=5;                                     /* „Nur heute +5 $“ */
+var SPEICHER_FREI=1024*1024*1024;                  /* Supabase Free: 1 GB Speicher */
+
+function usd(n){if(n==null||isNaN(n))return "–";return Number(n).toLocaleString("de-DE",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});}
+function ztBytes(b){b=Number(b)||0;return b>=1073741824?num(b/1073741824,2)+" GB":(b>=1048576?num(b/1048576,1)+" MB":num(b/1024,0)+" kB");}
+function ztGesehen(){try{return Number(localStorage.getItem(ZT_GESEHEN))||0;}catch(e){return 0;}}
+function ztGesehenSetzen(){try{localStorage.setItem(ZT_GESEHEN,String(Date.now()));}catch(e){}}
+
+async function ladeZentrale(){
+  if(!IST_SUPERADMIN)return;
+  ZT=ZT||{daten:null,fehler:null};ZT.laedt=true;
+  try{var r=await sbPub.rpc("zentrale_daten");if(r.error)throw r.error;ZT.daten=r.data||null;ZT.fehler=null;}
+  catch(e){ZT.fehler=errMsg(e);}
+  ZT.am=Date.now();ZT.laedt=false;
+  if(["zentrale","registrierungen","mehr","start","vorschlaege"].indexOf(route().name)>=0)render();
+}
+window.addEventListener("hashchange",function(){if(ZT)ZT.am=0;});
+
+/* ---------- Kennzahlen aus den Rohdaten ---------- */
+/* Der KI-Tag und -Monat laufen in UTC wie in der Datenbank (ai_cost_today) */
+function ztTagBeginn(){var d=new Date();return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}
+function ztMonatBeginn(vor){var d=new Date();return Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-(vor?1:0),1);}
+function ztNeuerTag(){var d=new Date(ztTagBeginn()+864e5);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+function ztSumme(l){return l.reduce(function(s,r){return s+(Number(r.usd)||0);},0);}
+function ztKiSeit(ab,bis){return ((ZT&&ZT.daten&&ZT.daten.ki)||[]).filter(function(r){var z=Date.parse(r.t);return z>=ab&&(bis==null||z<bis);});}
+function ztBudget(){
+  var D=ZT&&ZT.daten;if(!D||!D.einstellungen)return null;
+  var e=D.einstellungen,heute=ztSumme(ztKiSeit(ztTagBeginn())),monat=ztSumme(ztKiSeit(ztMonatBeginn()));
+  return {heute:heute,tag:Number(e.tag_wirksam)||0,tagBasis:Number(e.tag)||0,extra:Number(e.extra)||0,monat:monat,monatBudget:Number(e.monat)||0,limit:Number(e.limit)||0};
+}
+function ztAnteil(a,b){return b>0?a/b:(a>0?1:0);}
+function ztStufe(q){return q>=1?"bad":(q>=0.8?"warn":"");}
+function ztBalken(a,b){var q=ztAnteil(a,b);
+  return '<div class="ztbar '+ztStufe(q)+'" role="img" aria-label="'+esc(Math.round(q*100)+" %")+'"><i style="width:'+Math.min(100,Math.round(q*100))+'%"></i></div>';}
+function ztEreignisse(){return (ZT&&ZT.daten&&ZT.daten.ereignisse)||[];}
+function ztNeu(){var g=ztGesehen();return ztEreignisse().filter(function(e){return (e.stufe==="warn"||e.stufe==="fehler")&&Date.parse(e.t)>g;});}
+function ztKonten(){return (ZT&&ZT.daten&&ZT.daten.konten)||[];}
+function ztHaushalte(){return (ZT&&ZT.daten&&ZT.daten.haushalte)||[];}
+function ztHhName(id){var h=ztHaushalte().filter(function(x){return x.id===id;})[0];return h?(h.name||"Haushalt"):null;}
+function ztName(k){return [k.vorname,k.nachname].filter(Boolean).join(" ")||k.email||"?";}
+function ztOffen(){return ztKonten().filter(function(k){return k.status==="offen";});}
+/* Zahl am Eintrag „Zentrale“: wartende Registrierungen + neue Warnungen/Fehler */
+function ztZahl(){return ztOffen().filter(function(k){return k.email_bestaetigt;}).length+ztNeu().length;}
+
+/* ---------- Hinweis auf der Startseite (nur Superadmin) ---------- */
+function ztVorschlaege(){
+  if(!IST_SUPERADMIN)return [];
+  var b=ztBudget();if(!b)return [];
+  var v=[],qt=ztAnteil(b.heute,b.tag),qm=ztAnteil(b.monat,b.monatBudget),tag=new Date(ztTagBeginn()).toISOString().slice(0,10);
+  if(qm>=0.8)v.push({key:"ztmonat:"+tag.slice(0,7)+":"+(qm>=1?"voll":"80"),art:qm>=1?"bad":"warn",icon:"euro",
+    titel:qm>=1?t("KI-Monatsbudget ausgeschöpft"):tf("KI-Monatsbudget zu {0} % verbraucht",Math.round(qm*100)),
+    text:tf("{0} von {1} in diesem Monat",usd(b.monat),usd(b.monatBudget)),knopf:t("Ändern"),href:"#/zentrale?tab=ki"});
+  if(qt>=0.8)v.push({key:"zttag:"+tag+":"+(qt>=1?"voll":"80")+":"+b.tag,art:qt>=1?"bad":"warn",icon:"euro",
+    titel:qt>=1?t("KI-Tagesbudget ausgeschöpft"):tf("KI-Tagesbudget zu {0} % verbraucht",Math.round(qt*100)),
+    text:tf("{0} von {1} heute · neuer Tag ab {2} Uhr",usd(b.heute),usd(b.tag),ztNeuerTag()),knopf:tf("Nur heute +{0} $",ZT_PLUS),aktion:"zt-plus"});
+  return v;
+}
+
+/* ---------- Ansicht ---------- */
+function viewZentrale(){
+  var kopf=zurueck("#/mehr","Mehr")+seitenTitel("Zentrale");
+  if(!IST_SUPERADMIN)return kopf+'<section class="card"><p class="hint">Nur für den Superadmin.</p></section>';
+  var p=route().params;
+  if(p.tab&&ZT_TABS.some(function(x){return x[0]===p.tab;}))ZT_ANSICHT.tab=p.tab;
+  if(!ZT||(!ZT.laedt&&Date.now()-(ZT.am||0)>10000))ladeZentrale();
+  if(!ZT||!ZT.daten)return kopf+(ZT&&ZT.fehler?fehlerKarte(ZT.fehler):'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>');
+  var neu=ztNeu().length,offen=ztOffen().length;
+  var tabs='<div class="langrow zttabs" role="tablist">'+ZT_TABS.map(function(x){
+    var z=x[0]==="konten"?offen:(x[0]==="ereignisse"?neu:0);
+    return '<button class="lb'+(ZT_ANSICHT.tab===x[0]?" on":"")+'" role="tab" aria-selected="'+(ZT_ANSICHT.tab===x[0])+'" data-a="zt-tab" data-k="'+x[0]+'">'+x[1]+(z?' <span class="pill">'+z+'</span>':"")+'</button>';
+  }).join("")+'</div>';
+  var inhalt={uebersicht:ztUebersicht,ki:ztKi,konten:ztKontenAnsicht,haushalte:ztHaushalteAnsicht,ereignisse:ztEreignisAnsicht}[ZT_ANSICHT.tab]();
+  if(ZT_ANSICHT.tab==="ereignisse")setTimeout(ztGesehenSetzen,0);
+  return kopf+(ZT.fehler?fehlerKarte(ZT.fehler):"")+tabs+inhalt;
+}
+function ztKpi(label,wert,unter,href,extra){
+  return (href?'<a class="kpi" href="'+href+'">':'<div class="kpi">')+'<div class="kl">'+label+'</div><div class="kv">'+wert+'</div>'+(extra||"")+
+    (unter?'<div class="ks">'+unter+'</div>':"")+(href?'</a>':'</div>');
+}
+function ztUebersicht(){
+  var b=ztBudget(),K=ztKonten(),H=ztHaushalte(),E=ztEreignisse(),tag=Date.now()-864e5;
+  var fehler24=E.filter(function(e){return e.typ==="fehler"&&Date.parse(e.t)>tag;}).length;
+  var abgew24=E.filter(function(e){return e.typ==="ki_abgewiesen"&&Date.parse(e.t)>tag;}).length;
+  var aktiv=K.filter(function(k){return k.zuletzt_angemeldet&&Date.parse(k.zuletzt_angemeldet)>Date.now()-7*864e5;}).length;
+  var offen=ztOffen();
+  return '<div class="kpis ztkpis">'+
+      ztKpi("KI heute",usd(b.heute),"von "+usd(b.tag)+(b.extra?" (inkl. +"+usd(b.extra)+")":""),"#/zentrale?tab=ki",ztBalken(b.heute,b.tag))+
+      ztKpi("KI im Monat",usd(b.monat),"von "+usd(b.monatBudget),"#/zentrale?tab=ki",ztBalken(b.monat,b.monatBudget))+
+      ztKpi("Registrierungen",String(offen.length),offen.length?"warten auf Freigabe":"niemand wartet","#/zentrale?tab=konten")+
+      ztKpi("Letzte 24 Stunden",String(fehler24+abgew24),[tn(fehler24,"{0} Fehler","{0} Fehler"),tn(abgew24,"{0} KI-Abweisung","{0} KI-Abweisungen")].join(" · "),"#/zentrale?tab=ereignisse")+
+      ztKpi("Aktiv (7 Tage)",String(aktiv),"von "+tn(K.length,"{0} Konto","{0} Konten"),"#/zentrale?tab=konten")+
+      ztKpi("Haushalte",String(H.length),ztBytes(H.reduce(function(s,h){return s+(Number(h.speicher)||0);},0))+" Speicher","#/zentrale?tab=haushalte")+
+    '</div>'+
+    '<div class="sect">Letzte Ereignisse</div>'+
+    (E.length?'<section class="card"><div class="dlist">'+E.slice(0,6).map(ztEreignisZeile).join("")+'</div>'+
+      '<div class="factions" style="margin-top:10px"><a class="btn ghost sm" href="#/zentrale?tab=ereignisse">Alle Ereignisse</a></div></section>'
+     :'<section class="card"><p class="hint" style="margin:0">Noch keine Ereignisse.</p></section>');
+}
+
+/* ---------- KI ---------- */
+function ztZeitraum(){
+  var z=ZT_ANSICHT.zr,jetzt=Date.now();
+  if(z==="heute")return [ztTagBeginn(),null];
+  if(z==="7")return [jetzt-7*864e5,null];
+  if(z==="vormonat")return [ztMonatBeginn(true),ztMonatBeginn()];
+  return [ztMonatBeginn(),null];
+}
+function ztApp(mode){return /^allhome-/.test(String(mode||""))?"All-Home":"AllTrack";}
+function ztGruppe(titel,rows,schluessel){
+  var g={};rows.forEach(function(r){var k=schluessel(r);(g[k]=g[k]||{n:0,usd:0});g[k].n++;g[k].usd+=Number(r.usd)||0;});
+  var l=Object.keys(g).map(function(k){return {k:k,n:g[k].n,usd:g[k].usd};}).sort(function(a,b){return b.usd-a.usd;});
+  if(!l.length)return "";
+  var max=l[0].usd||1;
+  return '<div class="sect">'+titel+'</div><section class="card"><div class="ztliste">'+l.map(function(x){
+    return '<div class="ztz"><div class="ztzk"><span class="ztzn">'+esc(x.k)+'</span><span class="ztzw">'+usd(x.usd)+'</span></div>'+
+      '<div class="ztbar fein"><i style="width:'+Math.max(2,Math.round(x.usd/max*100))+'%"></i></div>'+
+      '<div class="ztzm">'+tn(x.n,"{0} Aufruf","{0} Aufrufe")+'</div></div>';
+  }).join("")+'</div></section>';
+}
+function ztKi(){
+  var b=ztBudget(),e=ZT.daten.einstellungen||{},zr=ztZeitraum(),rows=ztKiSeit(zr[0],zr[1]);
+  var abgew=ztEreignisse().filter(function(x){var z=Date.parse(x.t);return x.typ==="ki_abgewiesen"&&z>=zr[0]&&(zr[1]==null||z<zr[1]);});
+  var fehl=rows.filter(function(r){return r.ok===false;}).length;
+  return '<section class="card ztbudget">'+
+      '<div class="ztbk"><span>Heute</span><b>'+usd(b.heute)+' <span class="mut">von '+usd(b.tag)+'</span></b></div>'+ztBalken(b.heute,b.tag)+
+      '<div class="ztbm">'+(b.extra?"davon nur heute +"+usd(b.extra)+" · ":"")+'neuer Tag ab '+ztNeuerTag()+' Uhr</div>'+
+      '<div class="ztbk" style="margin-top:14px"><span>Dieser Monat</span><b>'+usd(b.monat)+' <span class="mut">von '+usd(b.monatBudget)+'</span></b></div>'+ztBalken(b.monat,b.monatBudget)+
+      '<div class="factions" style="margin-top:14px"><button class="btn" data-a="zt-plus">'+ic("plus")+' Nur heute +'+ZT_PLUS+' $</button></div>'+
+    '</section>'+
+    '<div class="sect">Grenzen</div><section class="card"><form id="ztGrenzen" novalidate>'+
+      '<div class="two">'+fld("Tagesbudget ($)",inp("zt_tag",e.tag,"number",' min="0" max="500" step="0.5" inputmode="decimal"'))+
+        fld("Monatsbudget ($)",inp("zt_monat",e.monat,"number",' min="0" max="5000" step="1" inputmode="decimal"'))+'</div>'+
+      fld("Aufrufe je Person und Tag",inp("zt_limit",e.limit,"number",' min="1" max="1000" step="1" inputmode="numeric"'))+
+      '<p class="hint" style="margin:0 0 12px">Gilt für All-Home und AllTrack zusammen.'+(e.geaendert_am?' Zuletzt geändert '+datumZeit(e.geaendert_am)+'.':"")+'</p>'+
+      '<div class="factions"><button class="btn" type="submit">'+ic("check")+' Speichern</button></div>'+
+    '</form></section>'+
+    '<div class="langrow zttabs ztzr">'+ZT_ZEITRAUM.map(function(x){return '<button class="lb'+(ZT_ANSICHT.zr===x[0]?" on":"")+'" data-a="zt-zr" data-k="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
+    '<div class="kpis">'+
+      ztKpi("Verbrauch",usd(ztSumme(rows)),tn(rows.length,"{0} Aufruf","{0} Aufrufe")+(fehl?" · "+tn(fehl,"{0} ohne Ergebnis","{0} ohne Ergebnis"):""))+
+      ztKpi("Abgewiesen",String(abgew.length),abgew.length?"Budget, Limit oder Guthaben":"keine")+
+    '</div>'+
+    (rows.length?ztGruppe("Nach App",rows,function(r){return ztApp(r.mode);})+
+      ztGruppe("Nach Funktion",rows,function(r){return KI_ZWECK[r.mode]||r.mode||"KI";})+
+      ztGruppe("Nach Haushalt",rows,function(r){return ztHhName(r.hh)||"ohne Haushalt";})+
+      ztGruppe("Nach Person",rows,function(r){return r.email||"ehemaliges Konto";})+
+      ztGruppe("Nach Modell",rows,function(r){return kiModell(r.model);})
+     :'<section class="card"><p class="hint" style="margin:0">Keine KI-Aufrufe in diesem Zeitraum.</p></section>')+
+    (abgew.length?'<div class="sect">Abgewiesene Aufrufe</div><section class="card"><div class="dlist">'+abgew.slice(0,30).map(ztEreignisZeile).join("")+'</div></section>':"");
+}
+async function ztPlus(){
+  if(!confirm(tf("KI-Budget nur für heute um {0} $ erhöhen?",ZT_PLUS)))return;
+  try{var r=await sbPub.rpc("ki_heute_erhoehen",{p_usd:ZT_PLUS});if(r.error)throw r.error;
+    await ladeZentrale();toast(tf("Heute jetzt {0}",usd(r.data))+" ✅");}
+  catch(e){toast(t("Erhöhen fehlgeschlagen")+": "+errMsg(e),true);}
+}
+async function ztGrenzenSpeichern(){
+  if(zahlFehlt(["zt_tag","zt_monat","zt_limit"])){toast("Bitte eine Zahl eingeben, z. B. 9,90.",true);return;}
+  var tag=valNum("zt_tag"),monat=valNum("zt_monat"),lim=valNum("zt_limit");
+  if(tag==null||tag<0||tag>500){toast("Tagesbudget: 0 bis 500 $.",true);return;}
+  if(monat==null||monat<0||monat>5000){toast("Monatsbudget: 0 bis 5.000 $.",true);return;}
+  if(lim==null||lim<1||lim>1000||lim%1){toast("Aufrufe je Person: ganze Zahl von 1 bis 1.000.",true);return;}
+  if(monat<tag&&!confirm("Das Monatsbudget ist kleiner als das Tagesbudget. Trotzdem speichern?"))return;
+  try{var r=await sbPub.rpc("ki_einstellungen_setzen",{p_tag:tag,p_monat:monat,p_limit:lim});if(r.error)throw r.error;
+    await ladeZentrale();toast("Gespeichert ✅");}
+  catch(e){toast("Speichern fehlgeschlagen: "+errMsg(e),true);}
+}
+
+/* ---------- Konten ---------- */
+var ZT_STATUS={offen:["warnp","wartet"],gesperrt:["","gesperrt"],freigegeben:["pos","aktiv"]};
+function ztKontenAnsicht(){
+  var K=ztKonten(),gruppen=[["offen","Wartet auf Freigabe"],["gesperrt","Gesperrt"],["freigegeben","Freigegeben"]];
+  return gruppen.map(function(g){
+    var l=K.filter(function(k){return k.status===g[0];});if(!l.length&&g[0]!=="offen")return "";
+    return '<div class="sect">'+g[1]+'</div><section class="card">'+(l.length?'<div class="dlist">'+l.map(function(k){
+      return '<button class="drow3" data-a="zt-konto" data-id="'+esc(k.user_id)+'"><span class="di">'+ic(k.status==="gesperrt"?"shield":"user",18)+'</span>'+
+        '<span class="db"><span class="dn">'+esc(ztName(k))+(k.superadmin?' <span class="pill">Superadmin</span>':"")+(k.logo_rolle?' <span class="pill mut">Logos</span>':"")+'</span>'+
+        '<span class="dm">'+(ztName(k)!==k.email?'<span>'+esc(k.email)+'</span>':"")+
+          '<span>'+(k.status==="offen"?"seit "+fmtDate(String(k.angelegt_am||"").slice(0,10))+(k.email_bestaetigt?"":" · E-Mail nicht bestätigt")
+            :(k.zuletzt_angemeldet?"zuletzt "+fmtDate(String(k.zuletzt_angemeldet).slice(0,10)):"nie angemeldet"))+'</span>'+
+          '<span>'+tn(Number(k.haushalte)||0,"{0} Haushalt","{0} Haushalte")+'</span></span></span>'+
+        '<span class="go">'+ic("right",16)+'</span></button>';
+    }).join("")+'</div>':'<p class="hint" style="margin:0">Niemand wartet auf Freigabe.</p>')+'</section>';
+  }).join("");
+}
+function ztKonto(id){return ztKonten().filter(function(k){return k.user_id===id;})[0]||null;}
+function ztKontoBlatt(id){
+  var k=ztKonto(id);if(!k)return;
+  var app=k.app==="alltrack"?"AllTrack":(k.app==="all-home"?"All-Home":"–");
+  var knopf=[];
+  if(k.status==="offen"){
+    knopf.push('<button class="btn" data-a="reg-ja" data-id="'+esc(k.user_id)+'">'+ic("check")+' Freigeben</button>');
+    if(!k.superadmin)knopf.push('<button class="btn ghost danger" data-a="reg-nein" data-id="'+esc(k.user_id)+'">Ablehnen und löschen</button>');
+  }else{
+    if(k.status==="freigegeben"&&!k.superadmin)knopf.push('<button class="btn ghost danger" data-a="zt-sperren" data-id="'+esc(k.user_id)+'" data-k="an">'+ic("shield")+' Sperren</button>');
+    if(k.status==="gesperrt")knopf.push('<button class="btn" data-a="zt-sperren" data-id="'+esc(k.user_id)+'" data-k="aus">'+ic("check")+' Entsperren</button>');
+    knopf.push('<button class="btn ghost" data-a="zt-logo" data-id="'+esc(k.user_id)+'" data-k="'+(k.logo_rolle?"aus":"an")+'">'+ic("folder")+' '+(k.logo_rolle?"Logo-Pflege entziehen":"Logo-Pflege erlauben")+'</button>');
+    knopf.push('<button class="btn ghost" data-a="reg-pw" data-mail="'+esc(k.email)+'">'+ic("link")+' Passwort-Link senden</button>');
+  }
+  openModal('<h2 class="mhead">'+esc(ztName(k))+'</h2>'+
+    '<div class="kvl">'+kv("E-Mail",esc(k.email||"–"))+kv("Status",'<span class="pill '+(ZT_STATUS[k.status]||["",""])[0]+'">'+esc((ZT_STATUS[k.status]||["",k.status])[1])+'</span>')+
+      kv("Rollen",esc([k.superadmin?"Superadmin":"",k.logo_rolle?"Logo-Pflege":""].filter(Boolean).join(", ")||"–"))+
+      kv("Registriert",fmtDate(String(k.angelegt_am||"").slice(0,10))+(k.app?" · über "+app:""))+
+      kv("E-Mail bestätigt",k.email_bestaetigt?"ja":"nein")+
+      kv("Zuletzt angemeldet",k.zuletzt_angemeldet?datumZeit(k.zuletzt_angemeldet):"nie")+
+      kv("Haushalte",String(Number(k.haushalte)||0))+'</div>'+
+    '<div class="factions ztknoepfe">'+knopf.join("")+'<button class="btn ghost" data-a="modal-close">Schließen</button></div>');
+}
+async function ztSperren(id,an){
+  var k=ztKonto(id);if(!k)return;
+  if(an&&!confirm(ztName(k)+" sperren? Das Konto sieht danach keine Daten mehr und kann keine KI nutzen – in All-Home und AllTrack."))return;
+  try{var r=await sbPub.rpc("konto_sperren",{p_user:id,p_sperren:an});if(r.error)throw r.error;
+    closeModal(true);await ladeZentrale();toast(an?"Gesperrt":"Entsperrt ✅");}
+  catch(e){toast((an?"Sperren":"Entsperren")+" fehlgeschlagen: "+errMsg(e),true);}
+}
+async function ztLogoRolle(id,an){
+  try{var r=await sbPub.rpc("logo_rolle_setzen",{p_user:id,p_an:an});if(r.error)throw r.error;
+    closeModal(true);await ladeZentrale();toast(an?"Logo-Pflege erlaubt ✅":"Logo-Pflege entzogen");}
+  catch(e){toast("Ändern fehlgeschlagen: "+errMsg(e),true);}
+}
+
+/* ---------- Haushalte ---------- */
+function ztWarnungen(h){
+  var w=[],m=h.mitglieder||[];
+  if(!m.length)w.push("ohne Mitglieder");else if(!m.some(function(x){return x.admin;}))w.push("ohne Admin");
+  if(!(Number(h.dokumente)||Number(h.vertraege)||Number(h.abrechnungen)||Number(h.personen)))w.push("leer");
+  if((Number(h.speicher)||0)>200*1048576)w.push("viel Speicher");
+  return w;
+}
+function ztHaushalteAnsicht(){
+  var H=ztHaushalte(),ges=H.reduce(function(s,h){return s+(Number(h.speicher)||0);},0);
+  return '<section class="card ztbudget"><div class="ztbk"><span>Speicher gesamt</span><b>'+ztBytes(ges)+' <span class="mut">von '+ztBytes(SPEICHER_FREI)+'</span></b></div>'+ztBalken(ges,SPEICHER_FREI)+'</section>'+
+    '<div class="sect">'+tn(H.length,"{0} Haushalt","{0} Haushalte")+'</div>'+
+    H.map(function(h){
+      var w=ztWarnungen(h);
+      return '<section class="card ztkarte"><div class="ztkopf"><b>'+esc(h.name||"Haushalt")+'</b>'+w.map(function(x){return '<span class="pill warnp">'+esc(x)+'</span>';}).join("")+'</div>'+
+        '<div class="ztzahlen">'+[["Dokumente",h.dokumente],["Verträge",h.vertraege],["Abrechnungen",h.abrechnungen],["Personen",h.personen]].map(function(x){
+          return '<div><b>'+num(Number(x[1])||0,0)+'</b><span>'+x[0]+'</span></div>';}).join("")+'</div>'+
+        '<div class="ztmeta"><span>'+ztBytes(h.speicher)+'</span><span>angelegt '+fmtDate(String(h.angelegt_am||"").slice(0,10))+'</span>'+
+          '<span>aktiv '+fmtDate(String(h.aktiv||"").slice(0,10))+'</span></div>'+
+        '<div class="ztmitgl">'+(h.mitglieder||[]).map(function(m){return '<span>'+esc(m.email||"?")+(m.admin?' <span class="pill mut">Admin</span>':"")+'</span>';}).join("")+'</div>'+
+      '</section>';
+    }).join("");
+}
+
+/* ---------- Ereignisse ---------- */
+function ztEreignisZeile(e){
+  var typ=ZT_TYP[e.typ]||["info","alle"],hh=e.hh?ztHhName(e.hh):null;
+  return '<div class="drow3 zte '+(e.stufe||"")+'"><span class="di">'+ic(typ[0],18)+'</span><span class="db"><span class="dn">'+esc(e.text||"")+'</span>'+
+    '<span class="dm"><span>'+datumZeit(e.t)+'</span>'+(e.von?'<span>'+esc(e.von)+'</span>':"")+(hh?'<span>'+esc(hh)+'</span>':"")+'</span></span></div>';
+}
+function ztEreignisAnsicht(){
+  var f=ZT_ANSICHT.ef,E=ztEreignisse().filter(function(e){return f==="alle"||(ZT_TYP[e.typ]||[])[1]===f;}),g=ztGesehen();
+  return '<div class="langrow zttabs">'+ZT_FILTER.map(function(x){return '<button class="lb'+(f===x[0]?" on":"")+'" data-a="zt-ef" data-k="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
+    (E.length?'<section class="card"><div class="dlist">'+E.slice(0,300).map(function(e){
+      var z=ztEreignisZeile(e);return (e.stufe==="warn"||e.stufe==="fehler")&&Date.parse(e.t)>g?z.replace('<span class="dn">','<span class="dn"><span class="pill">neu</span> '):z;
+    }).join("")+'</div>'+(E.length>300?'<p class="hint" style="margin:10px 0 0">Die neuesten 300 von '+E.length+'.</p>':"")+'</section>'
+     :'<section class="card"><p class="hint" style="margin:0">Keine Ereignisse.</p></section>')+
+    '<p class="hint" style="text-align:center;margin-top:12px">Ereignisse werden nach 12 Monaten gelöscht.</p>';
+}
+
+/* Umzug zwischen Haushalten ins Protokoll (nach erfolgreichem Umzug, best effort) */
+async function umzugMelden(b){
+  if(!b||!b.log||!b.log.length||!b.quelle||!b.ziel)return;
+  var z={vertraege:0,dokumente:0,abrechnungen:0};
+  b.log.forEach(function(x){if(x.typ==="v")z.vertraege++;else if(x.typ==="d")z.dokumente++;else if(x.typ==="n")z.abrechnungen++;});
+  try{await sbPub.rpc("umzug_melden",{p_von:b.quelle,p_nach:b.ziel,p_zahlen:z});}catch(e){}
+}
+
+/* Eintrag unter Mehr › Verwaltung */
+function ztMehrEintrag(){
+  var b=ztBudget(),z=ztZahl();
+  return '<a class="drow3" href="#/zentrale"><span class="di">'+ic("gauge")+'</span>'+
+    '<span class="db"><span class="dn">'+t("Zentrale")+'</span>'+
+    '<span class="dm"><span>'+(b?tf("KI heute {0} von {1}",usd(b.heute),usd(b.tag)):t("Konten, KI-Budget, Ereignisse"))+'</span></span></span>'+
+    (z?'<span class="pill warnp">'+z+'</span>':"")+'<span class="go">'+ic("right",18)+'</span></a>';
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 /* Knopf mit Hintergrund-Arbeit: sofort gedimmt mit Kreisel, weitere Klicks zählen nicht, bis sie fertig ist */
@@ -10802,6 +11121,13 @@ document.addEventListener("click",function(ev){
   if(a==="reg-ja"){laeuft(b,regFreigeben(id));return;}
   if(a==="reg-nein"){laeuft(b,regAblehnen(id));return;}
   if(a==="reg-pw"){laeuft(b,regPasswort(b.dataset.mail));return;}
+  if(a==="zt-tab"){ZT_ANSICHT.tab=b.dataset.k||"uebersicht";if(route().params.tab)location.replace("#/zentrale");else render();return;}
+  if(a==="zt-zr"){ZT_ANSICHT.zr=b.dataset.k||"monat";var ztY=window.scrollY;render();window.scrollTo(0,ztY);return;}
+  if(a==="zt-ef"){ZT_ANSICHT.ef=b.dataset.k||"alle";render();return;}
+  if(a==="zt-plus"){laeuft(b,ztPlus());return;}
+  if(a==="zt-konto"){ztKontoBlatt(id);return;}
+  if(a==="zt-sperren"){laeuft(b,ztSperren(id,b.dataset.k==="an"));return;}
+  if(a==="zt-logo"){laeuft(b,ztLogoRolle(id,b.dataset.k==="an"));return;}
   if(a==="forgot"){laeuft(b,doForgot());return;}
 
   /* --- Haushalt --- */
@@ -10964,6 +11290,7 @@ document.addEventListener("submit",function(ev){
   if(f.dataset.form==="beitreten"){ev.preventDefault();laeuft(f,beitreten());return;}
   if(f.dataset.form==="haus-loeschen"){ev.preventDefault();laeuft(f,hausLoeschen(f.dataset.id));return;}
   if(f.id==="nkForm"){ev.preventDefault();laeuft(f,nkSpeichern());return;}
+  if(f.id==="ztGrenzen"){ev.preventDefault();laeuft(f,ztGrenzenSpeichern());return;}
   if(f.id==="medForm"){ev.preventDefault();laeuft(f,medSpeichern(f.dataset.id));return;}
   if(f.id==="persForm"){
     ev.preventDefault();
@@ -11130,7 +11457,7 @@ async function boot(){
 async function starteSitzung(){
   booting=true;render();
   await ladeFreigabe();
-  if(FREIGABE==="offen"){booting=false;render();return;}
+  if(freigabeFehlt()){booting=false;render();return;}
   try{await ladeAlles();}
   catch(e){LADEFEHLER=errMsg(e);}
   booting=false;

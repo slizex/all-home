@@ -133,7 +133,7 @@ Deno.serve(async (req: Request) => {
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
   let p: { fileBase64?: string; mimeType?: string; textContent?: string; bilder?: { data?: string; mime?: string }[]; dateien?: { data?: string; mime?: string }[]; modus?: string; streifen?: number[]; ab?: number; model?: string; level?: string; lang?: string; household_id?: string };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
-  const chk = await pruefeAufruf(req, p.household_id);
+  const chk = await pruefeAufruf(req, p.household_id, "allhome-" + (typeof p.modus === "string" ? p.modus : "extract"));
   if ("antwort" in chk) return chk.antwort;
   const { fileBase64, mimeType, textContent } = p;
   // dateien: PDF und Bilder gemischt (Nebenkosten), bilder: nur Seitenbilder eines Scans
@@ -196,7 +196,7 @@ Deno.serve(async (req: Request) => {
     const bodyT = { messages: [{ role: "user", content: [...inhaltT, { type: "text", text: TEXT_PROMPT }] }] };
     let rt;
     try { rt = await claude(lvT, bodyT); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
-    if (!rt.resp.ok) return await claudeFehler(rt.resp, "Texterkennung");
+    if (!rt.resp.ok) return await claudeFehler(rt.resp, "Texterkennung", chk.wer);
     const dt = await rt.resp.json();
     if (dt.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
     const text = antwortText(dt).trim();
@@ -215,7 +215,7 @@ Deno.serve(async (req: Request) => {
     const bodyN = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: (bew ? NK_BEWERTUNG : NK_PROMPT) + sprache }] }] };
     let rn;
     try { rn = await claude(lvN, bodyN); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
-    if (!rn.resp.ok) return await claudeFehler(rn.resp, bew ? "Einschaetzung" : "Auswertung");
+    if (!rn.resp.ok) return await claudeFehler(rn.resp, bew ? "Einschaetzung" : "Auswertung", chk.wer);
     const dn = await rn.resp.json();
     if (dn.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
     const ergebnis = repairJson(antwortText(dn));
@@ -227,7 +227,7 @@ Deno.serve(async (req: Request) => {
   const body = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: PROMPT + langHinweis(lang) }] }] };
   let r;
   try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
-  if (!r.resp.ok) return await claudeFehler(r.resp, "Auswertung");
+  if (!r.resp.ok) return await claudeFehler(r.resp, "Auswertung", chk.wer);
   const data = await r.resp.json();
   if (data.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
   const parsed = repairJson(antwortText(data));

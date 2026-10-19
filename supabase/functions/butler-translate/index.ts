@@ -14,7 +14,7 @@ Deno.serve(async (req: Request) => {
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
   let p: { texte?: unknown; ziel?: string; quelle?: string; model?: string; level?: string; lang?: string; household_id?: string };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
-  const chk = await pruefeAufruf(req, p.household_id);
+  const chk = await pruefeAufruf(req, p.household_id, "allhome-translate");
   if ("antwort" in chk) return chk.antwort;
   const ziel = String(p.ziel || "").toLowerCase();
   if (!SPRACHE[ziel]) return json({ error: "Zielsprache wird nicht unterstuetzt." }, 400);
@@ -47,7 +47,7 @@ Deno.serve(async (req: Request) => {
   const body = { messages: [{ role: "user", content: anweisung + "\n\nJSON:\n" + roh }] };
   let r;
   try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
-  if (!r.resp.ok) return await claudeFehler(r.resp, "Uebersetzung");
+  if (!r.resp.ok) return await claudeFehler(r.resp, "Uebersetzung", chk.wer);
   const data = await r.resp.json();
   if (data.stop_reason === "refusal") return json({ error: "Die KI hat dieses Dokument nicht ausgewertet." }, 422);
   const parsed = repairJson(antwortText(data));
