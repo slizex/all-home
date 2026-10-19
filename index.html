@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-2nBgnf//wKjfxET/wf/M5mq2nw+kgzIjmwX2Dea3kC0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-vzZ2rjIK1aDA6meKAByPtmUxRtI0Zolj1LBN4DZbJNs='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -848,6 +848,53 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
 .nkm td.nkm-a{min-width:76px}
 .nkm tr.nkm-f td,.nkm tr.nkm-f th{border-bottom:1px solid var(--line)}
 .nkm .nkm-vs .sa{gap:8px}
+/* ---- Nebenkosten-Analyse (1.11.0) ---- */
+.nkakopf{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:10px}
+.nkakopf .btn{margin-left:auto}
+.nkakurz{margin:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nkafazit{margin:0;font-size:1.02rem;line-height:1.55}
+.nkapot{margin-top:12px;display:flex;align-items:center;gap:8px;font-weight:800;color:var(--pos)}
+.nkasl{display:grid;gap:10px}.nkasls ul{margin:6px 0 0;padding-left:20px}.nkasls b{display:flex;align-items:center;gap:6px}
+.nkatr{display:grid;gap:12px}
+.nkatrkopf{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;font-weight:700}
+.nkatrl{display:flex;justify-content:space-between;gap:10px;font-weight:700}
+.nkatrbahn{position:relative;height:10px;margin-top:5px;background:linear-gradient(to right,transparent calc(50% - 1px),var(--line-2) calc(50% - 1px),var(--line-2) calc(50% + 1px),transparent calc(50% + 1px))}
+.nkatrbahn>i{position:absolute;top:0;bottom:0;border-radius:4px}
+.nkatrbahn>i.hoch{background:var(--neg)}.nkatrbahn>i.runter{background:var(--pos)}
+.nkatru{margin-top:6px;color:var(--muted);font-size:.86rem;line-height:1.45}
+.nkabeleg{display:block;margin-top:6px;padding:6px 10px;border-left:3px solid var(--line-2);background:var(--surface-2);border-radius:0 8px 8px 0;font-size:.84rem;line-height:1.45;color:var(--ink);overflow-wrap:anywhere}
+.nkabeleg.ok{border-left-color:var(--pos)}
+.nkabok{color:var(--pos);display:inline-flex;vertical-align:middle}
+.nkapps{display:grid;gap:12px}
+.nkapp p{margin:8px 0 0;line-height:1.5}
+.nkappk{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.nkappb{font-weight:900;white-space:nowrap;color:var(--pos)}
+.nkappm{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:6px;font-size:.84rem}
+.nkaakt{display:flex;gap:6px;align-items:flex-start;font-weight:700}
+.nkatodo{display:grid;gap:10px}
+.nkatd{display:flex;gap:10px;align-items:flex-start;line-height:1.45}.nkatd>span:first-child{color:var(--muted);flex:none;margin-top:2px}
+.nkatd.wichtig>span:first-child{color:var(--warn)}
+.nkafrist{white-space:nowrap}
+.nkafuss{text-align:center;margin-top:14px}
+.nkafragen{display:grid;gap:12px;margin-bottom:12px}
+.nkafq{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.nkaant{margin-top:8px;line-height:1.55}.nkaant p{margin:0 0 8px}.nkaant ul{margin:0 0 8px;padding-left:20px}
+.nkabelege{display:grid;gap:4px}
+.nkaquellen{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:.84rem}
+.nkaquellen a{display:inline-flex;align-items:center;gap:4px;min-height:32px}
+.nkafm{font-size:.78rem;margin-top:8px}
+.nkarech{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-weight:700;min-height:40px}
+.nkapreis{font-weight:700;opacity:.8;margin-left:4px}
+.nkamerk{display:flex;gap:8px;margin-top:12px}.nkamerk .inp{flex:1;min-width:0}
+.nkagt{white-space:normal}
+.nkaknoepfe{display:grid;gap:10px;margin-top:14px}
+.btn.nkawahl{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left}
+.btn.nkawahl>span:last-child{font-weight:700;opacity:.85;white-space:nowrap}
+.drow3.on{background:var(--surface-2)}
+textarea#nka_frage{width:100%;resize:vertical}
+.nkakarte p{line-height:1.5}
+.nkatrz{min-width:0}
+.nkafr{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -866,7 +913,7 @@ html.dark{--nk1:#ffb23e;--nk2:#4cc3f5;--nk3:#a58bff;--nk4:#45d28f;--nk5:#ff7d70;
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.10.0";
+var APP_VERSION="1.11.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -922,6 +969,93 @@ var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:
 var curLang="de";
 var T={ru:{
 
+/* ---- 1.11.0 Zeit ---- */
+  "Die Analyse hat zu lange gedauert. Bitte „Schnell“ wählen oder später erneut versuchen.":"Анализ занял слишком много времени. Выбери «Быстро» или попробуй позже.",
+
+
+/* ---- 1.11.0 NK-Analyse ---- */
+  "{0} Fehler":"Ошибок: {0}",
+  "{0} KI-Abweisung":"{0} отказ ИИ",
+  "{0} KI-Abweisungen":"Отказов ИИ: {0}",
+  "{0} Konto":"{0} учётная запись",
+  "{0} Konten":"Учётных записей: {0}",
+  "{0} Aufruf":"{0} запрос",
+  "{0} Aufrufe":"Запросов: {0}",
+  "{0} ohne Ergebnis":"{0} без результата",
+  "{0} Haushalt":"{0} домохозяйство",
+  "{0} Haushalte":"Домохозяйств: {0}",
+  "Nebenkosten-Analyse":"Анализ коммунальных расходов",
+  "Bericht über alle Jahre: Entwicklung, Kostentreiber, Prüfpunkte mit Betrag, Prognose – mit Rückfragen.":"Отчёт за все годы: динамика, причины роста, пункты для проверки с суммой, прогноз – с уточняющими вопросами.",
+  "Analyse starten":"Начать анализ",
+  "Neue Daten seit dem letzten Bericht":"Новые данные после последнего отчёта",
+  "Aktualisieren":"Обновить",
+  "Bericht öffnen":"Открыть отчёт",
+  "Noch keine Abrechnung mit Werten.":"Пока нет расчёта с данными.",
+  "Daten werden zusammengestellt …":"Данные собираются …",
+  "Laden fehlgeschlagen":"Не удалось загрузить",
+  "Dokumente mit Text":"Документы с текстом",
+  "Einmal abschreiben":"Распознать текст один раз",
+  "Gedächtnis":"Память",
+  "Das KI-Budget reicht heute nicht mehr":"Бюджета ИИ на сегодня не хватает",
+  "Noch frei: {0}":"Осталось: {0}",
+  "Geschätzt – der echte Preis steht danach unter dem Bericht.":"Оценка – точная цена будет указана под отчётом.",
+  "Datei zu groß zum Abschreiben.":"Файл слишком большой для распознавания текста.",
+  "Dokument {0} von {1} wird abgeschrieben …":"Распознаётся документ {0} из {1} …",
+  "Die KI analysiert alle Jahre … (30–120 Sek.)":"ИИ анализирует все годы … (30–120 сек.)",
+  "Bericht erstellt":"Отчёт создан",
+  "Analyse fehlgeschlagen":"Анализ не удался",
+  "nur eingeschränkt vergleichbar (Teilzeitraum)":"сравнимо лишь частично (неполный период)",
+  "Im Dokument gefunden":"Найдено в документе",
+  "nicht im Text gefunden":"не найдено в тексте",
+  "Noch kein Bericht":"Отчёта пока нет",
+  "Übersetzen":"Перевести",
+  "Neue Daten seit diesem Bericht":"Новые данные после этого отчёта",
+  "Älterer Bericht":"Более старый отчёт",
+  "Zum neuesten":"К последнему",
+  "Möglicher Betrag zu deinen Gunsten: bis zu {0}":"Возможная сумма в твою пользу: до {0}",
+  "Seit dem letzten Bericht":"С последнего отчёта",
+  "Kostenentwicklung":"Динамика расходов",
+  "Kostentreiber":"Причины роста расходов",
+  "Prüfpunkte":"Пункты для проверки",
+  "Keine Auffälligkeiten.":"Ничего необычного.",
+  "Prognose":"Прогноз",
+  "Erwartete Kosten":"Ожидаемые расходы",
+  "unsicher":"неточно",
+  "Passende Vorauszahlung":"Подходящий аванс",
+  "Nächste Schritte":"Следующие шаги",
+  "Rückfragen":"Уточняющие вопросы",
+  "Rückfrage löschen":"Удалить вопрос",
+  "mit Recherche":"с поиском в интернете",
+  "z. B. Warum ist die Heizung so gestiegen? · Schreib mir einen Widerspruch":"напр. Почему так выросло отопление? · Напиши возражение",
+  "Rückfrage":"Вопрос",
+  "mit Internet-Recherche":"с поиском в интернете",
+  "Fragen":"Спросить",
+  "Was der Bot weiß":"Что знает бот",
+  "von der KI":"от ИИ",
+  "Eintrag löschen":"Удалить запись",
+  "Noch nichts gemerkt.":"Пока ничего не запомнено.",
+  "Merk dir: …":"Запомни: …",
+  "Merk dir":"Запомни",
+  "Merken":"Запомнить",
+  "Alle Berichte":"Все отчёты",
+  "Bericht löschen":"Удалить отчёт",
+  "Die KI recherchiert und antwortet … (20–90 Sek.)":"ИИ ищет и отвечает … (20–90 сек.)",
+  "Die KI antwortet … (10–40 Sek.)":"ИИ отвечает … (10–40 сек.)",
+  "Rückfrage fehlgeschlagen":"Вопрос не удался",
+  "Gemerkt":"Запомнено",
+  "Übersetzen fehlgeschlagen":"Не удалось перевести",
+  "Diesen Bericht samt Rückfragen löschen?":"Удалить этот отчёт вместе с вопросами?",
+  "Diese Rückfrage löschen?":"Удалить этот вопрос?",
+  "Diesen Eintrag aus dem Gedächtnis löschen?":"Удалить эту запись из памяти?",
+  "Unauffällig":"Без замечаний",
+  "Handeln":"Действовать",
+  "sicher":"точно",
+  "wahrscheinlich":"вероятно",
+  "prüfen":"проверить",
+  "Erledigt":"Выполнено",
+  "Weiterhin offen":"Всё ещё открыто",
+
+
 /* ---- 1.10.0 Zentrale ---- */
   "KI-Monatsbudget ausgeschöpft":"Месячный бюджет ИИ исчерпан",
   "KI-Monatsbudget zu {0} % verbraucht":"Месячный бюджет ИИ израсходован на {0} %",
@@ -970,6 +1104,7 @@ var T={ru:{
   "Zusammenfassen":"Объединить",
   "Nein":"Нет",
   "Positionen zusammenfassen":"Объединить позиции",
+  "{0} zusammenfassen":"Объединить: {0}",
   "Verlauf":"Динамика",
   "Vorjahr":"прошлый год",
   "Δ seit {0}":"Δ с {0}",
@@ -1419,6 +1554,7 @@ var T={ru:{
   "Entwicklung":"Динамика",
   "Kosten je Kategorie":"Расходы по категориям",
   "Abrechnungen":"Расчёты",
+  "Abrechnung {0}":"Расчёт {0}",
   "Vergleichswerte: Betriebskostenspiegel des Deutschen Mieterbunds, Abrechnungsjahr {0}. Hinweise sind Anhaltspunkte, keine Rechtsberatung.":"Сравнительные значения: Betriebskostenspiegel Союза арендаторов Германии (Deutscher Mieterbund), расчётный год {0}. Подсказки служат ориентиром и не являются юридической консультацией.",
   "Seite scannen":"Сканировать страницу",
   "Abrechnung scannen":"Сканировать расчёт",
@@ -2913,7 +3049,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug","zentrale"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug","zentrale","nkanalyse"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -3009,7 +3145,7 @@ function render(){
   if(LADEFEHLER){r.innerHTML=shell(ladefehlerHtml(),"start");return;}
   if(rt.name==="scan"){r.innerHTML=shell("","neu");scannerZeigen(rt.params);return;}
   /* Noch nicht eingerichtet? Dann führt alles zuerst in die Arten-Auswahl. */
-  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen","umzug","zentrale"].indexOf(rt.name)<0){
+  if(SETUP&&!SETUP.eingerichtet&&["einrichten","mehr","haushalte","haushalt","logos","dokumente","ablage","kikosten","nebenkosten","registrierungen","umzug","zentrale","nkanalyse"].indexOf(rt.name)<0){
     r.innerHTML=shell(viewEinrichten(true),"start");
     return;
   }
@@ -3032,6 +3168,7 @@ function render(){
   else if(rt.name==="kikosten")  {inhalt=viewKiKosten();cur="mehr";}
   else if(rt.name==="registrierungen"){ZT_ANSICHT.tab="konten";inhalt=viewZentrale();cur="mehr";}
   else if(rt.name==="zentrale")  {inhalt=viewZentrale();cur="mehr";}
+  else if(rt.name==="nkanalyse") {inhalt=viewNkAnalyse();cur="mehr";}
   else if(rt.name==="nebenkosten"){inhalt=viewNebenkosten();cur=rt.params.von==="vertrag"?"vertraege":"mehr";}
   else if(rt.name==="umzug")     {inhalt=viewUmzug();cur="mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
@@ -6783,7 +6920,7 @@ async function logoLoeschen(id){
    lesen dürfen es nur Admins des Hauses (RLS über my_admin_household_ids). */
 var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
 var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
-  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
+  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen","allhome-nk-analyse":"Nebenkosten-Analyse","allhome-nk-frage":"Nebenkosten-Rückfrage",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
 var KI_MODELLNAME={"claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
 var KI_KOSTEN=null;   /* {hh, zeilen, fehler, am, laedt} */
 function kiEur(usd){
@@ -9090,7 +9227,7 @@ function viewNebenkosten(){
       '<div class="sect">'+t("Kosten je Kategorie")+'</div>'+
       '<section class="card">'+nkMatrixHtml(liste)+'</section>':"")+
     (vor?nkTreiber(neu,vor):"")+
-    nkEinschaetzungKarte(liste)+
+    nkaKarte()+
     nkListeKarte(alle)+
     '<div class="factions" style="margin-top:16px"><button class="btn ghost" data-a="nk-csv">'+ic("doc")+' '+t("Steuerübersicht (CSV)")+'</button></div>'+
     '<p class="hint" style="margin-top:14px">'+tf("Vergleichswerte: Betriebskostenspiegel des Deutschen Mieterbunds, Abrechnungsjahr {0}. Hinweise sind Anhaltspunkte, keine Rechtsberatung.",NK_SPIEGEL.jahr)+'</p>';
@@ -9476,6 +9613,7 @@ async function nkAblegen(v,nkId,c){
   var ins=await sb.from("documents").insert({household_id:HH.id,filename:v.name,storage_path:pfad,mime_type:v.mime,size_bytes:v.bytes.length,
     doc_type:"nebenkosten",content_hash:v.hash,contract_id:c?c.id:null,nk_id:nkId||null}).select("id").single();
   if(ins.error){await dateienWeg([pfad]);throw new Error(netzFehler(ins.error));}
+  nkaTextImHintergrund(ins.data.id,v);   /* für die Nebenkosten-Analyse */
   return ins.data.id;
 }
 /* Dateien gewählt: an eine bestehende Abrechnung oder nur eine Datei → direkt; mehrere für eine neue → fragen */
@@ -9834,49 +9972,6 @@ function nkVerdacht(d){
   var ext=d.extracted||{};
   if(ext.docType==="vertrag")return false;
   return nkSicher(d)||NK_ABRECHNUNG.test(artText(ext.zusammenfassung));
-}
-
-/* ================= KI-Einschätzung über alle Jahre ================= */
-function nkStand(liste){return liste.map(function(n){return n.id+":"+(n.updated_at||"");}).join("|");}
-function nkEinschaetzungKarte(liste){
-  var e=SETUP&&SETUP.nk_einschaetzung,inh=e&&e.inhalt,alt=e&&e.stand!==nkStand(liste);
-  var art={gut:["good","check"],auffaellig:["warn","alert"],handeln:["bad","alert"]};
-  return '<div class="sect">'+t("KI-Einschätzung")+'</div><section class="card">'+
-    (inh?'<p style="margin:0 0 12px">'+esc(inh.kurz||"")+'</p>'+
-      (Array.isArray(inh.punkte)?'<div class="sugs">'+inh.punkte.slice(0,7).map(function(p){var a=art[p.art]||["info","info"];
-        return '<div class="sug '+a[0]+'"><span class="si">'+ic(a[1])+'</span><div class="sb2"><div class="st">'+esc(p.titel||"")+'</div><div class="sx">'+esc(p.text||"")+'</div></div></div>';}).join("")+'</div>':"")+
-      (inh.empfehlung?'<p style="margin:12px 0 0"><b>'+t("Empfehlung")+':</b> '+esc(inh.empfehlung)+'</p>':"")+
-      '<p class="hint" style="margin-top:10px">'+tf("Stand {0}",fmtDate(String(e.am||"").slice(0,10)))+(alt?" · "+t("seitdem neue Daten"):"")+'</p>'
-     :'<p class="hint" style="margin:0">'+t("Die KI liest alle Jahre zusammen und sagt in ein paar Sätzen, was auffällt und was du tun kannst. Kostet wenige Cent.")+'</p>')+
-    '<div class="factions" style="margin-top:12px"><button class="btn'+(inh&&!alt?" ghost":"")+'" data-a="nk-ki">'+ic("sparkles")+' '+(inh?t("Neu einschätzen"):t("Jahre einschätzen lassen"))+'</button></div>'+
-  '</section>';
-}
-async function nkEinschaetzen(){
-  var liste=nkMitWerten(nkSortiert());if(!liste.length||!HH)return;
-  var daten={spiegel_gesamt:NK_SPIEGEL.gesamt,spiegel_jahr:NK_SPIEGEL.jahr,zeitraeume:liste.map(function(n){
-    var k=nkKat(n),kat={};
-    Object.keys(k).forEach(function(x){kat[x]={betrag:Math.round(k[x]*100)/100,je_m2_monat:nkJeM2(k[x],n)==null?null:Math.round(nkJeM2(k[x],n)*100)/100,spiegel:nkSpiegel(x,n)};});
-    return {zeitraum:nkLabel(n),von:n.von,bis:n.bis,monate:Math.round(nkMonate(n)*10)/10,wohnflaeche:numOrNull(n.wohnflaeche),personen:numOrNull(n.personen),
-      kosten:Math.round(nkSumme(n)*100)/100,je_m2_monat:nkJeM2(nkSumme(n),n)==null?null:Math.round(nkJeM2(nkSumme(n),n)*100)/100,
-      vorauszahlungen:numOrNull(n.vorauszahlungen),ergebnis:nkErgebnis(n),kategorien:kat,heizung:n.heizung||{},
-      hinweise:nkPruefen(n).filter(function(x){return x.art!=="gut";}).map(function(x){return x.titel+(x.betrag?" ("+x.betrag+" EUR)":"");})};
-  })};
-  nkArbeit(t("Die KI ordnet die Jahre ein …"));
-  try{
-    var b=await edgeRuf(EDGE_EXTRACT,{modus:"nk-bewertung",textContent:JSON.stringify(daten),model:kiStufe(),lang:curLang});
-    if(!b.einschaetzung)throw new Error(t("Nichts erkannt."));
-    var wert={inhalt:b.einschaetzung,am:new Date().toISOString(),stand:nkStand(liste),lang:curLang,modell:b.modell||null};
-    var r=await sb.from("household_setup").update({nk_einschaetzung:wert}).eq("household_id",HH.id).select("household_id");
-    if(r.error)throw r.error;
-    if(!r.data||!r.data.length){
-      var r2=await sb.from("household_setup").upsert({household_id:HH.id,arten:aktiveArten(),eingerichtet:!!(SETUP&&SETUP.eingerichtet),nk_einschaetzung:wert}).select("*").single();
-      if(r2.error)throw r2.error;
-    }
-    SETUP=Object.assign({},SETUP||{},{nk_einschaetzung:wert});
-    closeModal(true);render();toast(t("Einschätzung erstellt ✅"));
-  }catch(x){closeModal(true);
-    if(x&&x.code==="ki_guthaben")toast(t("Das KI-Guthaben ist aufgebraucht – bitte später erneut."),true);
-    else toast(t("Einschätzung fehlgeschlagen")+": "+errMsg(x),true);}
 }
 
 /* ================= Steuerübersicht (CSV) ================= */
@@ -11085,6 +11180,513 @@ function ztMehrEintrag(){
     (z?'<span class="pill warnp">'+z+'</span>':"")+'<span class="go">'+ic("right",18)+'</span></a>';
 }
 
+/* ================= Nebenkosten-Analyse (KI-Bot) =================
+   Bericht über alle Jahre eines Haushalts plus Rückfragen. Die App rechnet alle Zahlen selbst (nkaFakten),
+   schickt den abgeschriebenen Text der Abrechnungen und das Gedächtnis mit; die KI deutet, belegt und empfiehlt.
+   Was die KI behauptet, prüft die App nach (nkaGeprueft): Zitate müssen im Dokumenttext stehen, Beträge plausibel sein.
+   Gespeichert in butler.nk_berichte / nk_fragen / nk_gedaechtnis (alle Mitglieder lesen, Admins oder Urheber löschen). */
+var EDGE_NKA="butler-nk-analyse";
+var NKA=null;   /* {hh, berichte, fragen, gedaechtnis, texte, fehlend, laedt, fehler, am, laeuft, recherche, uebersetzt} */
+/* ausTok: gemessen mit fiktiven Testdaten (Opus mittlere Denktiefe ≈ 8.200, Sonnet ≈ 6.800 inkl. Denken); recherche: Zuschlag je Rückfrage */
+var NKA_PREIS={gruendlich:{name:"Gründlich",modell:"Opus 5.5",ein:4,aus:20,ausTok:8500,recherche:0.15},
+               schnell:{name:"Schnell",modell:"Sonnet 5.5",ein:2,aus:10,ausTok:7000,recherche:0.05}};
+var NKA_ABSCHREIBEN_USD=0.045;   /* je Dokument (Haiku, Erfahrungswert aus ai_calls) */
+var NKA_PROMPT_ZEICHEN=9500;     /* fester Teil der Anfrage (Rechtsstand, Aufgabe) */
+var NKA_START=null;              /* offenes Startblatt: {schaetzung, rest} */
+
+function nkaR(x,d){var f=Math.pow(10,d==null?2:d);return x==null||isNaN(x)?null:Math.round(x*f)/f;}
+
+/* ---------- Laden ---------- */
+async function ladeNkAnalyse(neu){
+  if(!HH)return;
+  var hh=HH.id;
+  if(!NKA||NKA.hh!==hh||neu)NKA={hh:hh,berichte:null,fragen:[],gedaechtnis:[],texte:null,fehlend:[],recherche:false,uebersetzt:{}};
+  var A=NKA;A.laedt=true;
+  try{
+    var r=await Promise.all([
+      sb.from("nk_berichte").select("id,created_at,user_id,user_email,modell,qualitaet,kosten_usd,lang,stand,bericht").eq("household_id",hh).order("created_at",{ascending:false}).limit(20),
+      sb.from("nk_fragen").select("*").eq("household_id",hh).order("created_at",{ascending:true}).limit(400),
+      sb.from("nk_gedaechtnis").select("*").eq("household_id",hh).order("created_at",{ascending:true}).limit(200)
+    ]);
+    r.forEach(function(x){if(x.error)throw x.error;});
+    function zeit(x){return Date.parse(x.created_at)||0;}
+    A.berichte=(r[0].data||[]).sort(function(a,b){return zeit(b)-zeit(a);});
+    A.fragen=(r[1].data||[]).sort(function(a,b){return zeit(a)-zeit(b);});A.gedaechtnis=(r[2].data||[]).sort(function(a,b){return zeit(a)-zeit(b);});A.fehler=null;
+  }catch(e){A.fehler=errMsg(e);if(!A.berichte)A.berichte=[];}
+  A.am=Date.now();A.laedt=false;
+  if(["nebenkosten","nkanalyse"].indexOf(route().name)>=0)render();
+}
+/* Abgeschriebener Text der Abrechnungsdokumente (nicht in DOCS geladen – zu groß) */
+function nkaDokumente(){
+  var ids={};nkMitWerten(nkSortiert()).forEach(function(n){ids[n.id]=n;});
+  return DOCS.filter(function(d){return d.nk_id&&ids[d.nk_id];});
+}
+async function nkaTexteLaden(){
+  var A=NKA;if(!A)return;
+  var doks=nkaDokumente(),ids=doks.map(function(d){return d.id;});
+  if(!ids.length){A.texte=[];A.fehlend=[];return;}
+  var r=await sb.from("documents").select("id,nk_id,volltext").in("id",ids);
+  if(r.error)throw r.error;
+  var vt={};(r.data||[]).forEach(function(x){if(x.volltext&&String(x.volltext).trim())vt[x.id]=x.volltext;});
+  A.texte=doks.filter(function(d){return vt[d.id];}).map(function(d){return {id:d.id,titel:nkaDokTitel(d),text:vt[d.id]};});
+  A.fehlend=doks.filter(function(d){return !vt[d.id];});
+}
+function nkaDokTitel(d){var n=nkById(d.nk_id);return tf("Abrechnung {0}",n?nkLabel(n):"?")+" – "+docTitel(d);}
+
+/* ---------- Fakten: alles, was die App selbst exakt rechnen kann ---------- */
+function nkaArt(alle){
+  var c=nkMieteVertrag(null);
+  var mieter=!!c||alle.some(function(n){return numOrNull(n.vorauszahlungen)!=null||numOrNull(n.vorauszahlung_neu)!=null||(n.ki&&n.ki.vermieter);});
+  return mieter?"mieter":"eigentuemer";
+}
+function nkaPrognoseBasis(alle){
+  if(!alle.length)return null;
+  var w=alle.map(function(n){return nkSumme(n)*nkFaktor(n);}),d=[];
+  for(var i=Math.max(1,w.length-3);i<w.length;i++)if(w[i-1]>0)d.push((w[i]-w[i-1])/w[i-1]);
+  d.sort(function(a,b){return a-b;});
+  var trend=d.length?d[Math.floor(d.length/2)]:0;trend=Math.max(-0.1,Math.min(0.25,trend));
+  var letzte=w[w.length-1],basis=letzte*(1+trend);
+  return {letzter_zeitraum:nkLabel(alle[alle.length-1]),kosten_letzte_12_monate:nkaR(letzte,0),trend_pct:nkaR(trend*100,1),
+    erwartete_kosten:nkaR(basis,0),vorauszahlung_monat_vorschlag:Math.ceil(basis/12/5)*5,
+    hinweis:"Median der letzten Veränderungen, begrenzt auf -10 bis +25 Prozent"};
+}
+function nkaFakten(){
+  var alle=nkMitWerten(nkSortiert()),c=nkMieteVertrag(null),gr=nkGruppenDaten();
+  var jahre=alle.map(function(n){
+    var kat=nkKat(n),vor=nkVorgaenger(n,true),ka=vor?nkKat(vor):{},kats={};
+    Object.keys(kat).forEach(function(k){
+      var d=vor&&ka[k]>0&&nkVergleichbarKat(k,n,vor)?nkDelta(kat[k]*nkFaktor(n),ka[k]*nkFaktor(vor)):null;
+      kats[k]={betrag:nkaR(kat[k]),je_m2_monat:nkaR(nkJeM2(kat[k],n),3),spiegel_je_m2:nkSpiegel(k,n),veraenderung_vorjahr_pct:d==null?null:nkaR(d*100,1)};
+    });
+    var st=nkSteuer(n),sum=nkSumme(n);
+    return {label:nkLabel(n),von:n.von,bis:n.bis,monate:nkaR(nkMonate(n),1),vollstaendig:nkVoll(n),
+      wohnflaeche:numOrNull(n.wohnflaeche),personen:numOrNull(n.personen),kosten:nkaR(sum),kosten_auf_12_monate:nkaR(sum*nkFaktor(n)),
+      je_m2_monat:nkaR(nkJeM2(sum,n),3),vorauszahlungen:numOrNull(n.vorauszahlungen),ergebnis:nkErgebnis(n),
+      ergebnis_text:nkErgebnis(n)==null?null:(nkErgebnis(n)>0?"Nachzahlung":"Guthaben"),vorauszahlung_neu_monat:numOrNull(n.vorauszahlung_neu),
+      abrechnung_vom:n.erstellt_am||null,erhalten_am:n.zugang_am||null,abrechnungsfrist:nkFristAbrechnung(n),einwaende_bis:nkFristEinwand(n),
+      erledigt:!!n.erledigt,vermieter:(n.ki&&n.ki.vermieter)||null,kategorien:kats,
+      positionen:nkPos(n).map(function(p){var b=nkBetrag(p),h=numOrNull(p.haus);
+        return {bezeichnung:p.bez||"",kategorie:nkKatVon(p),betrag:nkaR(b),hauskosten:h,anteil_pct:h>0?nkaR(b/h*100,2):null,
+          schluessel:p.schluessel||null,anteil_text:p.anteil||null,p35a:p.p35a||null,p35a_betrag:numOrNull(p.p35a_betrag)};}),
+      heizung:nkHeiz(n),
+      app_hinweise:nkPruefen(n).filter(function(x){return x.art!=="gut";}).map(function(x){return {art:x.art,titel:x.titel,text:x.text,betrag:x.betrag||null};}),
+      steuer_35a:{dienstleistungen:nkaR(st.dienst),handwerk:nkaR(st.handwerk),ermaessigung:nkaR(st.ermaessigung),geschaetzt:!!st.geschaetzt}};
+  });
+  /* Positionen über alle Jahre (gleiche Posten, auch in anderer Schreibweise, in einer Zeile wie in der Heatmap) */
+  var verlauf=[];
+  if(alle.length){
+    var M=nkMatrix(alle,gr,alle.length);
+    M.kats.forEach(function(K){K.positionen.forEach(function(P){
+      var w={};M.spalten.forEach(function(n,i){if(P.roh[i]!=null)w[nkLabel(n)]=nkaR(P.roh[i]);});
+      verlauf.push({kategorie:K.k,position:P.name,werte:w});
+    });});
+  }
+  var sp={};Object.keys(NK_KAT).forEach(function(k){if(NK_KAT[k].sp!=null)sp[k]=NK_KAT[k].sp;});
+  return {heute:todayISO(),
+    haushalt:{name:HH?HH.name:null,art:nkaArt(alle),mietvertrag:c?{anbieter:c.anbieter||null,vorauszahlung_monat:numOrNull((c.details||{}).nebenkosten)}:null},
+    kategorien:Object.keys(NK_KAT).map(function(k){return {code:k,name:NK_KAT[k].l};}),
+    jahre:jahre,positionsverlauf:verlauf,prognose_basis:nkaPrognoseBasis(alle),
+    betriebskostenspiegel:{abrechnungsjahr:NK_SPIEGEL.jahr,gesamt_je_m2_monat:NK_SPIEGEL.gesamt,maximal:NK_SPIEGEL.max,kategorien:sp}};
+}
+/* Stand der Daten: ändert sich, sobald eine Abrechnung dazukommt oder bearbeitet wird („Neue Daten seit dem letzten Bericht“) */
+function nkStand(liste){return liste.map(function(n){return n.id+":"+(n.updated_at||"");}).join("|");}
+function nkaStandJetzt(){return nkStand(nkMitWerten(nkSortiert()));}
+function nkaGedaechtnisTexte(){return ((NKA&&NKA.gedaechtnis)||[]).map(function(g){return g.text;});}
+
+/* ---------- Kosten vorab ---------- */
+function nkaZeichen(){
+  var A=NKA||{},s=JSON.stringify(nkaFakten()).length+NKA_PROMPT_ZEICHEN;
+  (A.texte||[]).forEach(function(x){s+=Math.min(60000,x.text.length);});
+  nkaGedaechtnisTexte().forEach(function(g){s+=g.length+3;});
+  return s;
+}
+/* Tokens grob aus Zeichen (deutsch + JSON ≈ 3,2 Zeichen je Token); Spanne für Ungenauigkeit und Denkaufwand */
+function nkaSchaetzung(q,zeichen,fehlend){
+  var P=NKA_PREIS[q],ein=zeichen/3.2+(fehlend||0)*2500,usd=(ein*P.ein+P.ausTok*P.aus)/1e6;
+  return {usd:usd,von:usd*0.75,bis:usd*1.4,abschreiben:(fehlend||0)*NKA_ABSCHREIBEN_USD};
+}
+function nkaFrageSchaetzung(q,zeichen,frisch,recherche){
+  var P=NKA_PREIS[q],ein=zeichen/3.2,usd=(ein*(frisch?0.1:1.25)*P.ein+1800*P.aus)/1e6+(recherche?P.recherche:0);
+  return {usd:usd,von:usd*0.7,bis:usd*1.5};
+}
+function nkaEur(usd){return kiEur(usd).replace("≈ ","");}
+function nkaSpanne(s){return "≈ "+nkaEur(s.von)+" – "+nkaEur(s.bis);}
+
+/* ---------- Karte auf der Nebenkosten-Seite (ersetzt die alte KI-Einschätzung) ---------- */
+var NKA_AMPEL={gruen:["pos","Unauffällig"],gelb:["warnp","Prüfen"],rot:["bad","Handeln"]};
+function nkaKarte(){
+  if(!NKA||NKA.hh!==(HH&&HH.id))ladeNkAnalyse();
+  var b=NKA&&NKA.berichte&&NKA.berichte[0],veraltet=b&&b.stand!==nkaStandJetzt();
+  if(!b)return '<div class="sect">'+t("Nebenkosten-Analyse")+'</div><section class="card nkakarte">'+
+    '<p style="margin:0 0 12px">'+t("Bericht über alle Jahre: Entwicklung, Kostentreiber, Prüfpunkte mit Betrag, Prognose – mit Rückfragen.")+'</p>'+
+    '<div class="factions"><button class="btn" data-a="nka-start">'+ic("sparkles")+' '+t("Analyse starten")+'</button></div></section>';
+  var bb=b.bericht||{},am=NKA_AMPEL[bb.ampel]||NKA_AMPEL.gelb;
+  return '<div class="sect">'+t("Nebenkosten-Analyse")+'</div><section class="card nkakarte">'+
+    '<div class="nkakopf"><span class="pill '+am[0]+'">'+t(am[1])+'</span><span class="mut">'+datumZeit(b.created_at)+'</span></div>'+
+    '<p class="nkakurz">'+esc(bb.kurzfazit||"")+'</p>'+
+    (veraltet?'<div class="sug info" style="margin-top:10px"><span class="si">'+ic("refresh")+'</span><div class="sb2"><div class="st">'+t("Neue Daten seit dem letzten Bericht")+'</div>'+
+      '<div class="sa"><button class="btn sm" data-a="nka-start">'+t("Aktualisieren")+'</button></div></div></div>':"")+
+    '<div class="factions" style="margin-top:12px"><a class="btn'+(veraltet?" ghost":"")+'" href="#/nkanalyse?id='+b.id+'">'+t("Bericht öffnen")+'</a></div></section>';
+}
+
+/* ---------- Startblatt: Preis vorab, Modell wählen ---------- */
+async function nkaStartBlatt(){
+  if(!HH||(NKA&&NKA.laeuft))return;
+  if(!nkMitWerten(nkSortiert()).length){toast(t("Noch keine Abrechnung mit Werten."),true);return;}
+  nkArbeit(t("Daten werden zusammengestellt …"));
+  try{
+    if(!NKA||NKA.hh!==HH.id||!NKA.berichte)await ladeNkAnalyse();
+    await nkaTexteLaden();
+  }catch(e){closeModal(true);toast(t("Laden fehlgeschlagen")+": "+errMsg(e),true);return;}
+  var rest=null;
+  try{var r=await sbPub.rpc("ki_budget_rest");if(!r.error&&r.data)rest=Math.min(Number(r.data.tag),Number(r.data.monat));}catch(e){}
+  var z=nkaZeichen(),f=NKA.fehlend.length;
+  NKA_START={g:nkaSchaetzung("gruendlich",z,f),s:nkaSchaetzung("schnell",z,f),rest:rest};
+  nkaStartZeichnen();
+}
+function nkaStartZeichnen(){
+  var S=NKA_START;if(!S)return;
+  var alle=nkMitWerten(nkSortiert()),f=NKA.fehlend.length,txt=NKA.texte.length;
+  function knopf(q,s,prim){
+    var summe=s.bis+s.abschreiben,zuwenig=S.rest!=null&&summe>S.rest;
+    return '<button class="btn'+(prim?"":" ghost")+' full nkawahl" data-a="nka-los" data-k="'+q+'"'+(zuwenig?" disabled":"")+'>'+
+      '<span><b>'+t(NKA_PREIS[q].name)+'</b> · '+NKA_PREIS[q].modell+'</span><span>'+nkaSpanne(s)+'</span></button>';
+  }
+  var knapp=S.rest!=null&&S.s.bis+S.s.abschreiben>S.rest;
+  openModal('<h2 class="mhead">'+ic("sparkles")+' '+t("Nebenkosten-Analyse")+'</h2>'+
+    '<div class="kvl">'+kv(t("Abrechnungen"),esc(alle.length+" · "+nkLabel(alle[0])+(alle.length>1?" – "+nkLabel(alle[alle.length-1]):"")))+
+      kv(t("Dokumente mit Text"),String(txt))+
+      (f?kv(t("Einmal abschreiben"),tn(f,"{0} Dokument","{0} Dokumente")+" · ≈ "+nkaEur(f*NKA_ABSCHREIBEN_USD)):"")+
+      kv(t("Gedächtnis"),tn(NKA.gedaechtnis.length,"{0} Eintrag","{0} Einträge"))+'</div>'+
+    (knapp?'<div class="sug bad" style="margin:12px 0 0"><span class="si">'+ic("alert")+'</span><div class="sb2"><div class="st">'+t("Das KI-Budget reicht heute nicht mehr")+'</div>'+
+      '<div class="sx">'+tf("Noch frei: {0}",usd(S.rest))+'</div>'+(IST_SUPERADMIN?'<div class="sa"><button class="btn sm" data-a="zt-plus">'+tf("Nur heute +{0} $",ZT_PLUS)+'</button></div>':"")+'</div></div>':"")+
+    '<div class="nkaknoepfe">'+knopf("gruendlich",S.g,true)+knopf("schnell",S.s,false)+'</div>'+
+    '<p class="hint" style="margin:10px 0 0">'+t("Geschätzt – der echte Preis steht danach unter dem Bericht.")+'</p>'+
+    '<div class="factions"><button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button></div>');
+}
+
+/* ---------- Abschreiben (einmal je Dokument, danach dauerhaft gespeichert) ---------- */
+async function nkaAbschreiben(d){
+  var bilder=(d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||""),text="";
+  if(!bilder){
+    var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+    if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+    var bytes=new Uint8Array(await dl.data.arrayBuffer());
+    if(bytes.length>10*1024*1024)throw new Error(t("Datei zu groß zum Abschreiben."));
+    var b=await edgeRuf(EDGE_EXTRACT,{modus:"text",fileBase64:bytesBase64(bytes),mimeType:"application/pdf",lang:curLang});
+    text=String(b.text||"");
+  }else{
+    var seiten=await bilderDesDokuments(d),teile=[];
+    for(var i=0;i<seiten.length;i+=4){
+      var paket=seiten.slice(i,i+4),bl=[],streifen=[];
+      for(var j=0;j<paket.length;j++){var st=await textStreifen(paket[j]);streifen.push(st.length);bl=bl.concat(st);}
+      var b2=await edgeRuf(EDGE_EXTRACT,{modus:"text",bilder:bilderFuerKi(bl),streifen:streifen,ab:i+1,mimeType:"image/jpeg",lang:curLang});
+      teile.push(String(b2.text||"").trim());
+    }
+    text=teile.filter(Boolean).join("\n\n");
+  }
+  text=text.trim().slice(0,200000);
+  if(text){var u=await sb.from("documents").update({volltext:text}).eq("id",d.id);if(u.error)throw u.error;}
+  return text;
+}
+/* Neue Nebenkosten-Datei: Text gleich im Hintergrund abschreiben (Fehler still – der Bot holt es sonst nach) */
+function nkaTextImHintergrund(id,v){
+  if(!id||!v||!v.bytes)return;
+  if(v.mime==="application/pdf")volltextAusPdf(id,v.bytes);else volltextHolen(id,[v.bytes]);
+}
+
+/* ---------- Analyse starten ---------- */
+async function nkaLos(q){
+  if(!HH||!NKA||NKA.laeuft)return;
+  NKA.laeuft=true;closeModal(true);
+  var A=NKA,hh=HH.id;
+  try{
+    /* 1. fehlende Texte abschreiben */
+    for(var i=0;i<A.fehlend.length;i++){
+      nkArbeit(tf("Dokument {0} von {1} wird abgeschrieben …",i+1,A.fehlend.length));
+      try{await nkaAbschreiben(A.fehlend[i]);}
+      catch(e){if(nkKiGesperrt(e))throw e;}   /* einzelnes Dokument kaputt: ohne Text weiter */
+    }
+    if(A.fehlend.length)await nkaTexteLaden();
+    /* 2. analysieren */
+    nkArbeit(t("Die KI analysiert alle Jahre … (30–120 Sek.)"));
+    var fakten=nkaFakten(),vorher=A.berichte[0]?nkaVorherKurz(A.berichte[0].bericht):null;
+    var b=await edgeRuf(EDGE_NKA,{modus:"bericht",qualitaet:q,fakten:fakten,texte:A.texte.map(function(x){return {titel:x.titel,text:x.text};}),
+      gedaechtnis:nkaGedaechtnisTexte(),vorher:vorher,lang:curLang});
+    if(!b.bericht)throw new Error(t("Nichts erkannt."));
+    /* 3. speichern (Bericht + neue Gedächtnis-Einträge) */
+    nkArbeitText(t("Wird gespeichert …"));
+    var ins=await sb.from("nk_berichte").insert({household_id:hh,modell:b.modell||null,qualitaet:q,kosten_usd:b.kosten_usd||null,lang:b.lang||curLang,
+      stand:nkaStandJetzt(),bericht:b.bericht,fakten:fakten}).select("id").single();
+    if(ins.error)throw ins.error;
+    await nkaMerkenAusBot(b.bericht.gedaechtnis_neu,ins.data.id);
+    await ladeNkAnalyse();
+    closeModal(true);go("#/nkanalyse?id="+ins.data.id);
+    toast(t("Bericht erstellt")+" ✅"+(b.kosten_usd?" · "+kiEur(b.kosten_usd):""));
+  }catch(x){
+    closeModal(true);
+    if(nkKiGesperrt(x))nkLeseFehler(x,[],null);
+    else if(/546|504|timeout|zeitüberschreitung|non-2xx|failed to fetch/i.test(errMsg(x)))toast(t("Die Analyse hat zu lange gedauert. Bitte „Schnell“ wählen oder später erneut versuchen."),true);
+    else toast(t("Analyse fehlgeschlagen")+": "+errMsg(x),true);
+  }finally{A.laeuft=false;}
+}
+/* Was vom vorigen Bericht für „Seit dem letzten Bericht“ gebraucht wird */
+function nkaVorherKurz(b){
+  if(!b)return null;
+  return {kurzfazit:b.kurzfazit||"",pruefpunkte:(b.pruefpunkte||[]).map(function(p){return {titel:p.titel,betrag:p.betrag,jahr:p.jahr};}),
+    todos:(b.todos||[]).map(function(x){return x.text;})};
+}
+function nkaNorm(s){return String(s||"").toLowerCase().replace(/\s+/g," ").replace(/[„“"'«»]/g,"").trim();}
+async function nkaMerkenAusBot(liste,berichtId){
+  var da={};nkaGedaechtnisTexte().forEach(function(g){da[nkaNorm(g)]=1;});
+  var neu=(Array.isArray(liste)?liste:[]).map(function(x){return String(x||"").trim().slice(0,300);})
+    .filter(function(x){return x.length>=2&&!da[nkaNorm(x)]&&(da[nkaNorm(x)]=1);}).slice(0,5);
+  if(!neu.length||!HH)return;
+  var r=await sb.from("nk_gedaechtnis").insert(neu.map(function(x){return {household_id:HH.id,text:x,quelle:"bot",bericht_id:berichtId||null};}));
+  if(r.error)console.warn("Gedächtnis:",errMsg(r.error));
+}
+
+/* ---------- Nachprüfen, was die KI schreibt ---------- */
+/* Zitat steht (bis auf Leerraum und Groß/klein) im Text eines Dokuments? Lange Zitate: die ersten 60 Zeichen genügen. */
+/* Zitat-Abgleich nur über Buchstaben und Ziffern: Tabellenstriche, Zeilenumbrüche und €/EUR aus dem Abschreiben stören nicht */
+function nkaKern(s){return String(s||"").toLowerCase().replace(/€/g,"eur").replace(/[^0-9a-zäöüß]+/g,"");}
+function nkaBelegOk(beleg,texte,namen){
+  var z=nkaKern(beleg);if(z.length<5)return false;
+  if(z.length>70)z=z.slice(0,50);
+  return (texte||[]).some(function(x){return nkaKern(x.text).indexOf(z)>=0;})||
+    (namen||[]).some(function(n){var k=nkaKern(n);return k.length>=5&&(k===z||k.indexOf(z)>=0);});
+}
+var NKA_STUFE_RUNTER={sicher:"wahrscheinlich",wahrscheinlich:"pruefen",pruefen:"pruefen"};
+function nkaGeprueft(b,texte){
+  var labels={},sum={},namen=[];nkMitWerten(nkSortiert()).forEach(function(n){labels[nkLabel(n)]=n;sum[nkLabel(n)]=nkSumme(n);
+    nkPos(n).forEach(function(p){if(p.bez)namen.push(p.bez);});});
+  var maxSumme=Math.max.apply(null,[0].concat(Object.keys(sum).map(function(k){return sum[k];})));
+  var mitText=(texte||[]).some(function(x){return String(x.text||"").trim().length>50;});
+  var pp=(b.pruefpunkte||[]).map(function(p){
+    var x=Object.assign({},p),belegOk=x.beleg?nkaBelegOk(x.beleg,texte,namen):null;
+    x.belegOk=belegOk;
+    if(x.jahr&&!labels[x.jahr])x.jahr=null;
+    if(x.kategorie&&!NK_KAT[x.kategorie])x.kategorie=null;
+    var grenze=x.jahr?sum[x.jahr]:maxSumme;
+    x.betragOk=x.betrag==null||(Number(x.betrag)>0&&Number(x.betrag)<=grenze*1.001);
+    if(!x.betragOk)x.betrag=null;
+    if(!NKA_STUFE_RUNTER[x.sicherheit])x.sicherheit="pruefen";
+    /* unbelegt = eine Stufe vorsichtiger (nur wenn Text zum Abgleich da ist) */
+    if(mitText&&!belegOk)x.sicherheit=NKA_STUFE_RUNTER[x.sicherheit];
+    return x;
+  }).sort(function(a,c){return (Number(c.betrag)||0)-(Number(a.betrag)||0);});
+  var tr=Object.assign({},b.treiber||{});
+  var L=Object.keys(labels);
+  if(!labels[tr.bis])tr.bis=L[L.length-1];
+  if(!labels[tr.von]||tr.von===tr.bis)tr.von=L.length>1?L[L.indexOf(tr.bis)-1]||L[L.length-2]:null;
+  tr.punkte=(tr.punkte||[]).filter(function(x){return NK_KAT[x.kategorie];}).map(function(x){return Object.assign({},x,{belegOk:x.beleg?nkaBelegOk(x.beleg,texte,namen):null});});
+  var pr=Object.assign({},b.prognose||{}),letzte=L.length?sum[L[L.length-1]]*nkFaktor(labels[L[L.length-1]]):null;
+  pr.unsicher=pr.kosten!=null&&letzte>0&&(pr.kosten<letzte*0.5||pr.kosten>letzte*2);
+  var todos=(b.todos||[]).map(function(x){return Object.assign({},x,{frist:/^\d{4}-\d{2}-\d{2}$/.test(String(x.frist||""))?x.frist:null});})
+    .sort(function(a,c){return (a.frist||"9999")<(c.frist||"9999")?-1:1;});
+  var potenzial=pp.filter(function(x){return x.betrag&&x.sicherheit!=="pruefen";}).reduce(function(s,x){return s+Number(x.betrag);},0);
+  return Object.assign({},b,{pruefpunkte:pp,treiber:tr,prognose:pr,todos:todos,potenzial:potenzial});
+}
+
+/* ---------- Kostentreiber: Veränderung je Kategorie zwischen zwei Zeiträumen (auf 12 Monate) ---------- */
+function nkaTreiberDaten(von,bis){
+  var a=nkMitWerten(nkSortiert()).filter(function(n){return nkLabel(n)===von;})[0],b=nkMitWerten(nkSortiert()).filter(function(n){return nkLabel(n)===bis;})[0];
+  if(!a||!b)return null;
+  var ka=nkKat(a),kb=nkKat(b),fa=nkFaktor(a),fb=nkFaktor(b),keys={};
+  Object.keys(ka).concat(Object.keys(kb)).forEach(function(k){keys[k]=1;});
+  var l=Object.keys(keys).map(function(k){return {k:k,diff:(kb[k]||0)*fb-(ka[k]||0)*fa,vergleichbar:nkVergleichbarKat(k,a,b)};})
+    .filter(function(x){return Math.abs(x.diff)>=1;}).sort(function(x,y){return Math.abs(y.diff)-Math.abs(x.diff);});
+  return {von:a,bis:b,start:nkSumme(a)*fa,ende:nkSumme(b)*fb,zeilen:l};
+}
+function nkaTreiberHtml(T,punkte){
+  if(!T||!T.zeilen.length)return "";
+  var max=Math.max.apply(null,T.zeilen.map(function(x){return Math.abs(x.diff);}).concat([1])),diff=T.ende-T.start;
+  var urs={};(punkte||[]).forEach(function(p){urs[p.kategorie]=p;});
+  return '<div class="nkatr"><div class="nkatrkopf"><span>'+esc(nkLabel(T.von))+' <b>'+eur0(T.start)+'</b></span><span>→</span>'+
+      '<span>'+esc(nkLabel(T.bis))+' <b>'+eur0(T.ende)+'</b></span><span class="nkd '+(diff>0?"hoch":"runter")+'">'+(diff>0?"+":"−")+eur0(Math.abs(diff))+'</span></div>'+
+    T.zeilen.slice(0,8).map(function(x){
+      var w=Math.max(2,Math.round(Math.abs(x.diff)/max*50)),p=urs[x.k];
+      return '<div class="nkatrz"><div class="nkatrl"><span>'+NK_KAT[x.k].icon+' '+esc(t(NK_KAT[x.k].l))+(x.vergleichbar?"":' <span class="mut">*</span>')+'</span>'+
+          '<b class="nkd '+(x.diff>0?"hoch":"runter")+'">'+(x.diff>0?"+":"−")+eur0(Math.abs(x.diff))+'</b></div>'+
+        '<div class="nkatrbahn"><i class="'+(x.diff>0?"hoch":"runter")+'" style="'+(x.diff>0?"left:50%":"right:50%")+';width:'+w+'%"></i></div>'+
+        (p?'<div class="nkatru">'+esc(p.ursache||"")+nkaBelegHtml(p)+'</div>':"")+'</div>';
+    }).join("")+
+    (T.zeilen.some(function(x){return !x.vergleichbar;})?'<p class="hint" style="margin:6px 0 0">* '+t("nur eingeschränkt vergleichbar (Teilzeitraum)")+'</p>':"")+
+  '</div>';
+}
+function nkaBelegHtml(p){
+  if(!p||!p.beleg)return "";
+  return '<span class="nkabeleg'+(p.belegOk?" ok":"")+'" translate="no">„'+esc(p.beleg)+'“'+(p.dokument?' <span class="mut">– '+esc(p.dokument)+'</span>':"")+
+    (p.belegOk?' <span class="nkabok" title="'+esc(t("Im Dokument gefunden"))+'">'+ic("check",12)+'</span>':' <span class="mut">('+t("nicht im Text gefunden")+')</span>')+'</span>';
+}
+
+/* ---------- Ansicht ---------- */
+var NKA_SICHER={sicher:["bad","sicher"],wahrscheinlich:["warnp","wahrscheinlich"],pruefen:["mut","prüfen"]};
+function viewNkAnalyse(){
+  var kopf=zurueck("#/nebenkosten",t("Nebenkosten"))+seitenTitel(t("Nebenkosten-Analyse"));
+  if(!HH)return kopf;
+  if(!NKA||NKA.hh!==HH.id||(!NKA.laedt&&Date.now()-(NKA.am||0)>15000))ladeNkAnalyse();
+  if(!NKA||!NKA.berichte)return kopf+'<section class="card"><div class="abrbusy"><span class="spin"></span></div></section>';
+  if(NKA.texte==null&&!NKA.texteLaedt){NKA.texteLaedt=true;nkaTexteLaden().then(function(){NKA.texteLaedt=false;if(route().name==="nkanalyse")render();},function(){NKA.texteLaedt=false;NKA.texte=[];});}
+  var id=route().params.id,B=NKA.berichte.filter(function(x){return x.id===id;})[0]||NKA.berichte[0];
+  if(!B)return kopf+(NKA.fehler?fehlerKarte(NKA.fehler):"")+'<section class="card"><div class="empty"><div class="ei">'+ic("sparkles",28)+'</div>'+
+    '<h3>'+t("Noch kein Bericht")+'</h3></div><div class="factions"><button class="btn" data-a="nka-start">'+ic("sparkles")+' '+t("Analyse starten")+'</button></div></section>'+nkaGedaechtnisHtml();
+  var roh=NKA.uebersetzt[B.id]||B.bericht||{},b=nkaGeprueft(roh,NKA.texte||[]),am=NKA_AMPEL[b.ampel]||NKA_AMPEL.gelb;
+  var veraltet=B.stand!==nkaStandJetzt(),neuester=B.id===NKA.berichte[0].id;
+  var alle=nkMitWerten(nkSortiert());
+  var sl=b.seit_letztem||{},slDa=(sl.neu||[]).length+(sl.erledigt||[]).length+(sl.offen||[]).length;
+  return kopf+(NKA.fehler?fehlerKarte(NKA.fehler):"")+
+    '<div class="nkakopf"><span class="pill '+am[0]+'">'+t(am[1])+'</span><span class="mut">'+datumZeit(B.created_at)+'</span>'+
+      (B.lang&&B.lang!==curLang&&!NKA.uebersetzt[B.id]?'<button class="btn ghost sm" data-a="nka-uebersetzen" data-id="'+B.id+'">'+ic("globe")+' '+t("Übersetzen")+'</button>':"")+'</div>'+
+    (neuester&&veraltet?'<div class="sug info" style="margin-bottom:12px"><span class="si">'+ic("refresh")+'</span><div class="sb2"><div class="st">'+t("Neue Daten seit diesem Bericht")+'</div>'+
+      '<div class="sa"><button class="btn sm" data-a="nka-start">'+t("Aktualisieren")+'</button></div></div></div>':"")+
+    (!neuester?'<div class="sug info" style="margin-bottom:12px"><span class="si">'+ic("clock")+'</span><div class="sb2"><div class="st">'+t("Älterer Bericht")+'</div>'+
+      '<div class="sa"><a class="btn sm ghost" href="#/nkanalyse">'+t("Zum neuesten")+'</a></div></div></div>':"")+
+    '<section class="card"><p class="nkafazit">'+esc(b.kurzfazit||"")+'</p>'+
+      (b.potenzial>0?'<div class="nkapot">'+ic("euro",16)+' '+tf("Möglicher Betrag zu deinen Gunsten: bis zu {0}",eur0(b.potenzial))+'</div>':"")+'</section>'+
+    (slDa?'<div class="sect">'+t("Seit dem letzten Bericht")+'</div><section class="card nkasl">'+
+      [["neu","Neu","sparkles"],["erledigt","Erledigt","check"],["offen","Weiterhin offen","clock"]].map(function(x){
+        var l=sl[x[0]]||[];return l.length?'<div class="nkasls"><b>'+ic(x[2],14)+' '+t(x[1])+'</b><ul>'+l.map(function(y){return '<li>'+esc(y)+'</li>';}).join("")+'</ul></div>':"";
+      }).join("")+'</section>':"")+
+    /* Entwicklung */
+    '<div class="sect">'+t("Kostenentwicklung")+'</div><section class="card">'+(alle.length?nkSaeulen(alle):"")+
+      (b.entwicklung&&b.entwicklung.text?'<p style="margin:12px 0 0">'+esc(b.entwicklung.text)+'</p>':"")+'</section>'+
+    (alle.some(function(n){return numOrNull(n.wohnflaeche)>0;})?'<section class="card" style="margin-top:12px">'+nkLinie(alle)+'</section>':"")+
+    /* Kostentreiber */
+    (b.treiber&&b.treiber.von&&b.treiber.bis?'<div class="sect">'+t("Kostentreiber")+'</div><section class="card">'+
+      nkaTreiberHtml(nkaTreiberDaten(b.treiber.von,b.treiber.bis),b.treiber.punkte)+
+      (b.treiber.text?'<p style="margin:12px 0 0">'+esc(b.treiber.text)+'</p>':"")+'</section>':"")+
+    /* Prüfpunkte */
+    '<div class="sect">'+t("Prüfpunkte")+'</div>'+
+    (b.pruefpunkte.length?'<div class="nkapps">'+b.pruefpunkte.map(function(p){
+      var s=NKA_SICHER[p.sicherheit]||NKA_SICHER.pruefen;
+      return '<section class="card nkapp"><div class="nkappk"><b>'+esc(p.titel||"")+'</b>'+(p.betrag?'<span class="nkappb">'+eur(Number(p.betrag))+'</span>':"")+'</div>'+
+        '<div class="nkappm"><span class="pill '+s[0]+'">'+t(s[1])+'</span>'+(p.jahr?'<span class="mut">'+esc(p.jahr)+'</span>':"")+
+          (p.kategorie?'<span class="mut">'+NK_KAT[p.kategorie].icon+' '+esc(t(NK_KAT[p.kategorie].l))+'</span>':"")+'</div>'+
+        '<p>'+esc(p.text||"")+'</p>'+nkaBelegHtml(p)+
+        (/[0-9A-Za-zÄÖÜäöüА-Яа-яЁё]/.test(p.aktion||"")?'<p class="nkaakt">'+ic("right",14)+' '+esc(p.aktion)+'</p>':"")+'</section>';
+    }).join("")+'</div>':'<section class="card"><p class="hint" style="margin:0">'+t("Keine Auffälligkeiten.")+'</p></section>')+
+    /* Prognose */
+    (b.prognose&&(b.prognose.kosten!=null||b.prognose.text)?'<div class="sect">'+t("Prognose")+'</div><section class="card"><div class="kvl">'+
+      kv(t("Zeitraum"),esc(b.prognose.zeitraum||"–"))+
+      (b.prognose.kosten!=null?kv(t("Erwartete Kosten"),eur0(b.prognose.kosten)+(b.prognose.unsicher?' <span class="pill warnp">'+t("unsicher")+'</span>':"")):"")+
+      (b.prognose.vorauszahlung_monat!=null?kv(t("Passende Vorauszahlung"),eur0(b.prognose.vorauszahlung_monat)+" / "+t("Monat")):"")+'</div>'+
+      (b.prognose.text?'<p style="margin:10px 0 0">'+esc(b.prognose.text)+'</p>':"")+'</section>':"")+
+    /* To-dos */
+    (b.todos.length?'<div class="sect">'+t("Nächste Schritte")+'</div><section class="card"><div class="nkatodo">'+b.todos.map(function(x){
+      return '<div class="nkatd'+(x.wichtig?" wichtig":"")+'"><span>'+ic(x.wichtig?"alert":"check",16)+'</span><span>'+esc(x.text||"")+
+        (x.frist?' <b class="nkafrist">'+t("bis")+' '+fmtDate(x.frist)+'</b>':"")+'</span></div>';
+    }).join("")+'</div></section>':"")+
+    (b.hinweise?'<p class="hint" style="margin-top:12px">'+esc(b.hinweise)+'</p>':"")+
+    '<p class="hint nkafuss">'+esc([B.modell||"",B.kosten_usd!=null?kiEur(B.kosten_usd):"",B.user_email||""].filter(Boolean).join(" · "))+'</p>'+
+    nkaFragenHtml(B)+nkaGedaechtnisHtml()+nkaAeltereHtml(B);
+}
+/* Rückfragen zum Bericht */
+function nkaFragenHtml(B){
+  var l=NKA.fragen.filter(function(f){return f.bericht_id===B.id;}),letzte=l[l.length-1];
+  var frisch=letzte&&Date.now()-Date.parse(letzte.created_at)<4.5*60000;
+  var q=B.qualitaet==="schnell"?"schnell":"gruendlich",s=nkaFrageSchaetzung(q,nkaZeichen(),frisch,NKA.recherche);
+  return '<div class="sect">'+t("Rückfragen")+'</div>'+
+    (l.length?'<div class="nkafragen">'+l.map(function(f){
+      var a=f.antwort||{},darf=ichAdmin(HH.id)||(me&&f.user_id===me.id);
+      return '<section class="card nkafr"><div class="nkafq"><b>'+esc(f.frage)+'</b>'+
+          (darf?'<button class="ibtn" data-a="nka-fdel" data-id="'+f.id+'" aria-label="'+esc(t("Rückfrage löschen"))+'">'+ic("trash",16)+'</button>':"")+'</div>'+
+        '<div class="nkaant">'+nkaAbsatz(a.text||"")+'</div>'+
+        ((a.belege||[]).length?'<div class="nkabelege">'+a.belege.map(function(x){return '<span class="nkabeleg ok" translate="no">„'+esc(x.zitat)+'“ <span class="mut">– '+esc(x.dokument||"")+'</span></span>';}).join("")+'</div>':"")+
+        (nkaQuellen(a).length?'<div class="nkaquellen">'+nkaQuellen(a).map(function(x){return '<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">'+ic("link",12)+' '+esc(x.titel)+'</a>';}).join("")+'</div>':"")+
+        '<div class="mut nkafm">'+esc([datumZeit(f.created_at),f.user_email||"",f.recherche?t("mit Recherche"):"",f.kosten_usd!=null?kiEur(f.kosten_usd):""].filter(Boolean).join(" · "))+'</div></section>';
+    }).join("")+'</div>':"")+
+    '<section class="card"><form id="nkaFrage" novalidate>'+
+      '<textarea class="inp" id="nka_frage" rows="3" maxlength="2000" placeholder="'+esc(t("z. B. Warum ist die Heizung so gestiegen? · Schreib mir einen Widerspruch"))+'" aria-label="'+esc(t("Rückfrage"))+'"></textarea>'+
+      '<label class="chk nkarech"><input type="checkbox" id="nka_recherche"'+(NKA.recherche?" checked":"")+'> '+t("mit Internet-Recherche")+'</label>'+
+      '<div class="factions"><button class="btn" type="submit">'+ic("sparkles")+' '+t("Fragen")+' <span class="nkapreis">'+nkaSpanne(s)+'</span></button></div>'+
+    '</form></section>';
+}
+/* Antworttext: Absätze und Aufzählungen, sonst nur Text */
+/* Web-Quellen der Recherche: nur echte http(s)-Adressen verlinken */
+function nkaQuellen(a){return (a&&Array.isArray(a.quellen)?a.quellen:[]).filter(function(x){return x&&/^https?:\/\//i.test(String(x.url||""));});}
+function nkaFett(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\*/g,"");}
+function nkaAbsatz(txt){
+  txt=String(txt||"").replace(/^\s*#{1,6}\s+/gm,"").replace(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/gm,"");
+  return txt.split(/\n{2,}/).filter(function(a){return a.trim();}).map(function(abs){
+    var z=abs.split("\n");
+    if(z.every(function(x){return /^\s*([-*•]|\d+[.)])\s+/.test(x);}))return '<ul>'+z.map(function(x){return '<li>'+nkaFett(x.replace(/^\s*([-*•]|\d+[.)])\s+/,""))+'</li>';}).join("")+'</ul>';
+    return '<p>'+z.map(nkaFett).join("<br>")+'</p>';
+  }).join("");
+}
+function nkaGedaechtnisHtml(){
+  var G=NKA.gedaechtnis||[];
+  return '<div class="sect">'+t("Was der Bot weiß")+'</div><section class="card">'+
+    (G.length?'<div class="dlist">'+G.map(function(g){
+      var darf=ichAdmin(HH.id)||(me&&g.user_id===me.id);
+      return '<div class="drow3"><span class="di">'+ic(g.quelle==="bot"?"sparkles":"user",16)+'</span><span class="db"><span class="dn nkagt">'+esc(g.text)+'</span>'+
+        '<span class="dm">'+(g.created_at?'<span>'+fmtDate(String(g.created_at).slice(0,10))+'</span>':"")+'<span>'+esc(g.quelle==="bot"?t("von der KI"):(g.user_email||""))+'</span></span></span>'+
+        (darf?'<button class="ibtn" data-a="nka-gdel" data-id="'+g.id+'" aria-label="'+esc(t("Eintrag löschen"))+'">'+ic("trash",16)+'</button>':"")+'</div>';
+    }).join("")+'</div>':'<p class="hint" style="margin:0 0 10px">'+t("Noch nichts gemerkt.")+'</p>')+
+    '<form id="nkaMerken" class="nkamerk" novalidate><input class="inp" id="nka_merken" maxlength="300" placeholder="'+esc(t("Merk dir: …"))+'" aria-label="'+esc(t("Merk dir"))+'">'+
+      '<button class="btn sm" type="submit">'+ic("plus")+' '+t("Merken")+'</button></form></section>';
+}
+function nkaAeltereHtml(B){
+  var l=NKA.berichte;if(l.length<2)return "";
+  return '<div class="sect">'+t("Alle Berichte")+'</div><section class="card"><div class="dlist">'+l.map(function(x){
+    var am=NKA_AMPEL[(x.bericht||{}).ampel]||NKA_AMPEL.gelb,darf=ichAdmin(HH.id)||(me&&x.user_id===me.id);
+    return '<div class="drow3'+(x.id===B.id?" on":"")+'"><a class="db" href="#/nkanalyse?id='+x.id+'"><span class="dn">'+datumZeit(x.created_at)+' <span class="pill '+am[0]+'">'+t(am[1])+'</span></span>'+
+      '<span class="dm"><span>'+esc(t(NKA_PREIS[x.qualitaet==="schnell"?"schnell":"gruendlich"].name))+'</span>'+(x.kosten_usd!=null?'<span>'+kiEur(x.kosten_usd)+'</span>':"")+'</span></a>'+
+      (darf?'<button class="ibtn" data-a="nka-del" data-id="'+x.id+'" aria-label="'+esc(t("Bericht löschen"))+'">'+ic("trash",16)+'</button>':"")+'</div>';
+  }).join("")+'</div></section>';
+}
+
+/* ---------- Rückfrage ---------- */
+async function nkaFragen(){
+  if(!HH||!NKA||NKA.laeuft)return;
+  var frage=val("nka_frage").trim();if(!frage){var e=$("#nka_frage");if(e)e.focus();return;}
+  var id=route().params.id,B=NKA.berichte.filter(function(x){return x.id===id;})[0]||NKA.berichte[0];if(!B)return;
+  NKA.recherche=!!($("#nka_recherche")&&$("#nka_recherche").checked);
+  NKA.laeuft=true;nkArbeit(NKA.recherche?t("Die KI recherchiert und antwortet … (20–90 Sek.)"):t("Die KI antwortet … (10–40 Sek.)"));
+  try{
+    if(NKA.texte==null)await nkaTexteLaden();
+    var verlauf=NKA.fragen.filter(function(f){return f.bericht_id===B.id;}).slice(-6).map(function(f){return {frage:f.frage,antwort:(f.antwort||{}).text||""};});
+    var b=await edgeRuf(EDGE_NKA,{modus:"frage",qualitaet:B.qualitaet||"gruendlich",frage:frage,recherche:NKA.recherche,fakten:nkaFakten(),
+      texte:(NKA.texte||[]).map(function(x){return {titel:x.titel,text:x.text};}),gedaechtnis:nkaGedaechtnisTexte(),bericht:B.bericht,verlauf:verlauf,lang:curLang});
+    if(!b.antwort)throw new Error(t("Keine Antwort erhalten."));
+    var ins=await sb.from("nk_fragen").insert({household_id:HH.id,bericht_id:B.id,frage:frage,antwort:b.antwort,modell:b.modell||null,kosten_usd:b.kosten_usd||null,recherche:NKA.recherche});
+    if(ins.error)throw ins.error;
+    await nkaMerkenAusBot(b.antwort.merken,B.id);
+    await ladeNkAnalyse();closeModal(true);
+    var y=document.querySelector(".nkafragen");if(y)y.lastElementChild&&y.lastElementChild.scrollIntoView({block:"start"});
+  }catch(x){closeModal(true);if(nkKiGesperrt(x))nkLeseFehler(x,[],null);else toast(t("Rückfrage fehlgeschlagen")+": "+errMsg(x),true);}
+  finally{NKA.laeuft=false;}
+}
+async function nkaMerken(){
+  var txt=val("nka_merken").trim().slice(0,300);if(txt.length<2||!HH)return;
+  try{var r=await sb.from("nk_gedaechtnis").insert({household_id:HH.id,text:txt,quelle:"nutzer"});if(r.error)throw r.error;
+    await ladeNkAnalyse();toast(t("Gemerkt")+" ✅");}
+  catch(e){toast(t("Speichern fehlgeschlagen")+": "+errMsg(e),true);}
+}
+async function nkaLoeschen(tabelle,id,frage){
+  if(!confirm(frage))return;
+  try{var r=await sb.from(tabelle).delete().eq("id",id).select("id");if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error(t("Es wurde nichts gelöscht – fehlende Berechtigung?"));
+    await ladeNkAnalyse();
+    if(tabelle==="nk_berichte"&&route().params.id===id)location.replace("#/nkanalyse");
+    toast(t("Gelöscht"));}
+  catch(e){toast(t("Löschen fehlgeschlagen")+": "+errMsg(e),true);}
+}
+/* Bericht in die eigene Sprache übersetzen (nur für diese Sitzung) */
+async function nkaUebersetzen(id){
+  var B=(NKA.berichte||[]).filter(function(x){return x.id===id;})[0];if(!B)return;
+  var kopie=JSON.parse(JSON.stringify(B.bericht||{})),zitate=[];
+  function weg(o){if(o&&o.beleg){zitate.push([o,o.beleg,o.dokument]);o.beleg="#"+(zitate.length-1);o.dokument=null;}}
+  (kopie.pruefpunkte||[]).forEach(weg);((kopie.treiber||{}).punkte||[]).forEach(weg);
+  try{var b=await edgeRuf("butler-translate",{texte:kopie,ziel:curLang,quelle:B.lang||"de",level:"basic"});
+    if(!b.uebersetzung)throw new Error(t("Nichts erkannt."));
+    var u=b.uebersetzung;
+    function zurueckLegen(o){var m=o&&/^#(\d+)$/.exec(String(o.beleg||""));if(m&&zitate[+m[1]]){o.beleg=zitate[+m[1]][1];o.dokument=zitate[+m[1]][2];}}
+    (u.pruefpunkte||[]).forEach(zurueckLegen);((u.treiber||{}).punkte||[]).forEach(zurueckLegen);
+    NKA.uebersetzt[id]=u;render();}
+  catch(e){toast(t("Übersetzen fehlgeschlagen")+": "+errMsg(e),true);}
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 /* Knopf mit Hintergrund-Arbeit: sofort gedimmt mit Kreisel, weitere Klicks zählen nicht, bis sie fertig ist */
@@ -11121,6 +11723,12 @@ document.addEventListener("click",function(ev){
   if(a==="reg-ja"){laeuft(b,regFreigeben(id));return;}
   if(a==="reg-nein"){laeuft(b,regAblehnen(id));return;}
   if(a==="reg-pw"){laeuft(b,regPasswort(b.dataset.mail));return;}
+  if(a==="nka-start"){laeuft(b,nkaStartBlatt());return;}
+  if(a==="nka-los"){nkaLos(b.dataset.k==="schnell"?"schnell":"gruendlich");return;}
+  if(a==="nka-del"){laeuft(b,nkaLoeschen("nk_berichte",id,t("Diesen Bericht samt Rückfragen löschen?")));return;}
+  if(a==="nka-fdel"){laeuft(b,nkaLoeschen("nk_fragen",id,t("Diese Rückfrage löschen?")));return;}
+  if(a==="nka-gdel"){laeuft(b,nkaLoeschen("nk_gedaechtnis",id,t("Diesen Eintrag aus dem Gedächtnis löschen?")));return;}
+  if(a==="nka-uebersetzen"){laeuft(b,nkaUebersetzen(id));return;}
   if(a==="zt-tab"){ZT_ANSICHT.tab=b.dataset.k||"uebersicht";if(route().params.tab)location.replace("#/zentrale");else render();return;}
   if(a==="zt-zr"){ZT_ANSICHT.zr=b.dataset.k||"monat";var ztY=window.scrollY;render();window.scrollTo(0,ztY);return;}
   if(a==="zt-ef"){ZT_ANSICHT.ef=b.dataset.k||"alle";render();return;}
@@ -11235,7 +11843,6 @@ document.addEventListener("click",function(ev){
   if(a==="nk-del"){laeuft(b,nkLoeschen(id));return;}
   if(a==="nk-erledigt"){laeuft(b,nkErledigt(id));return;}
   if(a==="nk-vz"){laeuft(b,nkVzUebernehmen(id));return;}
-  if(a==="nk-ki"){laeuft(b,nkEinschaetzen());return;}
   if(a==="nk-csv"){laeuft(b,nkCsv());return;}
   if(a==="nk-pos-neu"){laeuft(b,nkPosNeu());return;}
   if(a==="nk-pos-weg"){laeuft(b,nkPosWeg(Number(b.dataset.i)));return;}
@@ -11291,6 +11898,8 @@ document.addEventListener("submit",function(ev){
   if(f.dataset.form==="haus-loeschen"){ev.preventDefault();laeuft(f,hausLoeschen(f.dataset.id));return;}
   if(f.id==="nkForm"){ev.preventDefault();laeuft(f,nkSpeichern());return;}
   if(f.id==="ztGrenzen"){ev.preventDefault();laeuft(f,ztGrenzenSpeichern());return;}
+  if(f.id==="nkaFrage"){ev.preventDefault();laeuft(f,nkaFragen());return;}
+  if(f.id==="nkaMerken"){ev.preventDefault();laeuft(f,nkaMerken());return;}
   if(f.id==="medForm"){ev.preventDefault();laeuft(f,medSpeichern(f.dataset.id));return;}
   if(f.id==="persForm"){
     ev.preventDefault();
@@ -11312,6 +11921,7 @@ document.addEventListener("input",function(ev){
 });
 document.addEventListener("change",function(ev){
   var el=ev.target;if(!el)return;
+  if(ev.target&&ev.target.id==="nka_recherche"&&NKA){NKA.recherche=ev.target.checked;var nkaB=NKA.berichte&&(NKA.berichte.filter(function(x){return x.id===route().params.id;})[0]||NKA.berichte[0]);var nkaP=document.querySelector(".nkapreis");if(nkaP&&nkaB){var nkaL=NKA.fragen.filter(function(f){return f.bericht_id===nkaB.id;}).pop();nkaP.textContent=nkaSpanne(nkaFrageSchaetzung(nkaB.qualitaet==="schnell"?"schnell":"gruendlich",nkaZeichen(),nkaL&&Date.now()-Date.parse(nkaL.created_at)<4.5*60000,NKA.recherche));}return;}
   if(el.id==="nkDatei"){var nkFs=Array.prototype.slice.call(el.files||[]),nkZ=NK_DATEI_ZIEL;NK_DATEI_ZIEL=null;el.value="";if(nkFs.length)nkDateienHochladen(nkFs,nkZ);return;}
   if(el.id==="pdfAn"){var pf=el.files&&el.files[0];el.value="";if(pf)pdfAnhaengen(el.dataset.id,pf);return;}
   if(el.id==="fPick"){
