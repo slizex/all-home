@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-XTL8yN2t1xcq4EPrTzammINQyJbALA9jpIf4rQDiMSM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-kT9ANAvWpjw5LOAonxAKP728g3vVoChMKu704xi/FDg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -920,7 +920,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.11.1";
+var APP_VERSION="1.11.2";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -2276,8 +2276,18 @@ var T={ru:{
   "ansehen":"посмотреть",
   "Weitere hochladen":"Загрузить ещё",
   "Noch nicht ausgelesen":"Ещё не считано",
-  "Das KI-Guthaben war leer.":"Лимит ИИ был исчерпан.",
-  "Jetzt nachholen":"Выполнить сейчас",
+  "Die KI war beim Hochladen nicht verfügbar.":"При загрузке ИИ был недоступен.",
+  "Neu auslesen":"Считать заново",
+  "{0} Dokument noch nicht ausgelesen":"Не считано документов: {0}",
+  "{0} Dokumente noch nicht ausgelesen":"Не считано документов: {0}",
+  "Dokument {0} von {1} wird gelesen …":"Считывается документ {0} из {1} …",
+  "{0} Dokument ausgelesen":"Считано документов: {0}",
+  "{0} Dokumente ausgelesen":"Считано документов: {0}",
+  "{0} ging nicht":"не удалось: {0}",
+  "{0} gingen nicht":"не удалось: {0}",
+  "Nichts ausgelesen":"Ничего не считано",
+  "gespeichert – Analyse später":"сохранено — анализ позже",
+  "Jetzt auslesen und dem passenden Vertrag zuordnen?":"Считать сейчас и привязать к подходящему договору?",
   "Art":"Вид",
   "Dokumentdatum":"Дата документа",
   "nicht zugeordnet":"не привязано",
@@ -2389,7 +2399,6 @@ var T={ru:{
   "{0} Dokumente ohne Vertrag":"Документов без договора: {0}",
   "Zuordnen hilft dem Archiv und den Fristen.":"Привязка помогает архиву и контролю сроков.",
   "{0} Dokumente warten auf die KI":"Документов ждут анализа ИИ: {0}",
-  "Das Guthaben war leer – jetzt nachholen?":"Лимит был исчерпан — выполнить сейчас?",
   "Nachholen":"Выполнить",
   "Ausblenden":"Скрыть",
   "{0} weitere anzeigen":"Показать ещё {0}",
@@ -4513,6 +4522,11 @@ async function einesVerarbeiten(file,ziel){
       IMPORT.ergebnisse.push({name:name,icon:"⏳",text:t("gespeichert – KI-Guthaben leer, Analyse später"),docId:reihe.id});
       return;
     }
+    if(nkKiGesperrt(e)){
+      try{await sb.from("documents").update({ki_pending:true}).eq("id",reihe.id);}catch(_e){}
+      IMPORT.ergebnisse.push({name:name,icon:"⏳",text:t("gespeichert – Analyse später")+": "+errMsg(e),docId:reihe.id});
+      return;
+    }
     IMPORT.ergebnisse.push({name:name,icon:"⚠️",text:t("abgelegt, aber KI-Analyse fehlgeschlagen"),docId:reihe.id});
     return;
   }
@@ -4717,12 +4731,18 @@ function gleicherVorgang(a,b){
   return anbieterGleich(a.anbieter,b.anbieter)===true;
 }
 /* Neu anlegen nur, wo die Unterlagen nach Vertrag aussehen – ein Befund oder Bescheid bleibt einfach abgelegt */
+/* Bestätigung eines (neuen) Vertrags – die KI nennt sie oft „Schreiben“. Nur lange Wortstämme, keine Teilwörter. */
+function istVertragsBestaetigung(d){
+  var ext=d.extracted||{},s=artText([d.titel,d.filename,ext.titel,ext.produkt].filter(Boolean).join(" "));
+  return /(auftrags|vertrags|tarif|bestell|wechsel)bestaetigung|vertragszusammenfassung|auftragseingang/.test(s);
+}
 function dokTaugtFuerVertrag(d,art){
   var ext=d.extracted||{},dt=d.doc_type;
   if(ext.istMedizin||art==="sonstiges")return false;
   if(ZIEL_ART_DOK[d.id]||artInfo(art).kein_anbieter)return true;   /* gewählte Art; Ausweise: das Dokument IST der Eintrag */
   if(dt==="vertrag"||dt==="police"||dt==="fahrzeugschein")return true;
   if(ext.kategorie==="gesundheit")return false;                      /* Arztrechnung, Befund */
+  if((dt==="schreiben"||dt==="sonstiges")&&istVertragsBestaetigung(d))return true;
   return dt==="rechnung"||dt==="preisaenderung"||dt==="kuendigung";
 }
 function zuordnungsVorschlaege(docs){
@@ -5035,9 +5055,9 @@ async function dokumentOeffnen(id){
   var c=d.contract_id?vertragById(d.contract_id):null;
   var wichtig=aiExt(d,"wichtig"),hinweise=aiExt(d,"hinweise");
   openModal('<h2 class="mhead">'+ty.icon+' '+esc(docTitel(d))+'</h2>'+
-    (d.ki_pending?'<div class="sug bad"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
-      '<div class="st">'+t("Noch nicht ausgelesen")+'</div><div class="sx">'+t("Das KI-Guthaben war leer.")+'</div>'+
-      '<div class="sa"><button class="btn" data-a="d-reanalyze" data-id="'+d.id+'">'+t("Jetzt nachholen")+'</button></div>'+
+    (kiFehlt(d)&&!d.ohne_ki?'<div class="sug bad"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+      '<div class="st">'+t("Noch nicht ausgelesen")+'</div><div class="sx">'+t("Die KI war beim Hochladen nicht verfügbar.")+'</div>'+
+      '<div class="sa"><button class="btn" data-a="d-reanalyze" data-id="'+d.id+'">'+ic("sparkles")+' '+t("Jetzt auslesen")+'</button></div>'+
     '</div></div>':"")+
     (d.ohne_ki&&!d.ki_pending?'<div class="sug info"><span class="si">'+ic("info")+'</span><div class="sb2">'+
       '<div class="st">'+t("Ohne KI abgelegt")+'</div><div class="sx">'+t("Auslesen lässt sich jederzeit nachholen.")+'</div>'+
@@ -5060,6 +5080,7 @@ async function dokumentOeffnen(id){
       '<button class="btn" data-a="d-view" data-id="'+d.id+'">'+ic("doc")+' '+t("Öffnen")+'</button>'+
       '<button class="btn ghost" data-a="d-seiten" data-id="'+d.id+'">'+ic("plus")+' '+t("Seiten hinzufügen")+'</button>'+
       (c?"":'<button class="btn ghost" data-a="d-link" data-id="'+d.id+'">'+ic("link")+' '+t("Zuordnen")+'</button>')+
+      (d.extracted&&!d.nk_id?'<button class="btn ghost" data-a="d-reanalyze" data-id="'+d.id+'">'+ic("sparkles")+' '+t("Neu auslesen")+'</button>':"")+
       '<button class="btn ghost danger" data-a="d-del" data-id="'+d.id+'">'+ic("trash")+' '+t("Löschen")+'</button>'+
       '<button class="btn ghost" data-a="modal-close">'+t("Schließen")+'</button>'+
     '</div>');
@@ -5121,7 +5142,10 @@ async function dokumentLoeschen(id){
 /* Zugeordnet ist nur, was an einem Vertrag DIESES Hauses hängt – ein Verweis auf
    einen Vertrag, den es hier nicht gibt, ließe das Dokument sonst nirgends erscheinen. */
 function hatVertrag(d){return !!(d.contract_id&&vertragById(d.contract_id));}
-function dokumenteOhneVertrag(){return DOCS.filter(function(d){return !istMed(d)&&!hatVertrag(d)&&!d.ki_pending;});}
+/* Noch nicht ausgelesen: ausdrücklich markiert oder die KI lief nie durch (z. B. Tagesbudget aufgebraucht, Netzfehler) */
+function kiFehlt(d){return !!d&&(!!d.ki_pending||(!d.extracted&&!d.ohne_ki&&!d.nk_id&&d.bereich!=="medizin"));}
+function dokumenteOhneVertrag(){return DOCS.filter(function(d){return !istMed(d)&&!hatVertrag(d);});}
+function dokumenteOhneKi(){return DOCS.filter(function(d){return !istMed(d)&&kiFehlt(d);});}
 function alleDokumente(){
   return DOCS.filter(function(d){return !istMed(d);})
     .sort(function(x,y){return String(docDatum(y)||"").localeCompare(String(docDatum(x)||""));});
@@ -5133,6 +5157,13 @@ function dokAdresse(p,neu){
   var q=Object.assign({f:p.f,wahl:p.wahl,von:p.von},neu||{});
   var teile=Object.keys(q).filter(function(k){return q[k];}).map(function(k){return k+"="+encodeURIComponent(q[k]);});
   return "#/dokumente"+(teile.length?"?"+teile.join("&"):"");
+}
+/* Karte über der Liste: noch nicht ausgelesene Dokumente auf einmal lesen */
+function nachholKarte(){
+  var n=dokumenteOhneKi().length;if(!n)return "";
+  return '<div class="sug warn" style="margin-bottom:12px"><span class="si">'+ic("refresh")+'</span><div class="sb2">'+
+    '<div class="st">'+tn(n,"{0} Dokument noch nicht ausgelesen","{0} Dokumente noch nicht ausgelesen")+'</div>'+
+    '<div class="sa"><button class="btn sm" data-a="d-alle-nachholen">'+ic("sparkles")+' '+t("Jetzt auslesen")+'</button></div></div></div>';
 }
 function dokFilterAktiv(){var rt=route();return (rt.name==="ablage"||rt.params.f==="ohne")?"ohne":"alle";}
 function dokListeAktuell(){return dokFilterAktiv()==="ohne"?dokumenteOhneVertrag():alleDokumente();}
@@ -5171,8 +5202,8 @@ function dokZeile(d,wahl,mitVertrag){
   var ty=dtInfo(d.doc_type),c=hatVertrag(d)?vertragById(d.contract_id):null,an=!!ABLAGE_WAHL[d.id];
   var such=' data-such="'+esc(dokSuchtext(d))+'"'+(dokPasst(d)?"":" hidden");
   var meta='<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span>'+
-    (!mitVertrag?"":c?'<span>'+esc(c.anbieter||artInfo(c.art||"sonstiges").label)+'</span>'
-      :'<span class="pill">'+(d.ki_pending?t("Noch nicht ausgelesen"):t("nicht zugeordnet"))+'</span>')+'</span>';
+    (!mitVertrag?(kiFehlt(d)?'<span class="pill warnp">'+t("Noch nicht ausgelesen")+'</span>':""):c?'<span>'+esc(c.anbieter||artInfo(c.art||"sonstiges").label)+'</span>'
+      :'<span class="pill'+(kiFehlt(d)?" warnp":"")+'">'+(kiFehlt(d)?t("Noch nicht ausgelesen"):t("nicht zugeordnet"))+'</span>')+'</span>';
   such+=' data-dok="'+d.id+'"';
   if(wahl)return '<div class="drow3 wahl'+(an?" an":"")+'"'+such+'>'+
     '<button class="wbox" data-a="ab-wahl" data-id="'+d.id+'" role="checkbox" aria-checked="'+an+'" aria-label="'+esc(t("Auswählen"))+'">'+(an?ic("check",16):"")+'</button>'+
@@ -5201,7 +5232,7 @@ function viewDokumente(){
       '<a class="lb'+(f==="alle"?" on":"")+'" href="'+dokAdresse(p,{f:"",wahl:""})+'">'+t("Alle")+' <span class="pill">'+nAlle+'</span></a>'+
       '<a class="lb'+(f==="ohne"?" on":"")+'" href="'+dokAdresse(p,{f:"ohne",wahl:""})+'">'+t("Ohne Vertrag")+' <span class="pill">'+nOhne+'</span></a>'+
     '</div>'+
-    (f==="ohne"&&!wahl?vorschlagListe(liste):"")+
+    (f==="ohne"&&!wahl?nachholKarte()+vorschlagListe(liste):"")+
     (liste.length
       ?'<div class="filt dsrow"><input class="inp" id="dsuche" type="search" value="'+esc(DOK_Q)+'" placeholder="'+esc(t("Dokument suchen"))+'" aria-label="'+esc(t("Dokument suchen"))+'" autocomplete="off">'+
           '<a class="btn ghost sm" href="'+dokAdresse(p,{wahl:wahl?"":"1"})+'">'+(wahl?t("Fertig"):t("Auswählen"))+'</a></div>'+
@@ -5301,21 +5332,45 @@ async function dokumentVerknuepfen(ids,cid){
     toast(ergaenztText(ergL,tn(liste.length,"Dokument zugeordnet","{0} Dokumente zugeordnet")));
   }catch(e){toast(t("Zuordnen fehlgeschlagen")+": "+errMsg(e),true);await ladeDaten();render();}
 }
-/* Auslesen nachholen (Guthaben war leer oder „ohne KI“ abgelegt) – danach prüfen und abgleichen */
+/* Datei eines Dokuments für die KI: Scan-Seiten als Bilder, sonst das PDF */
+async function dokQuelle(d){
+  if((d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||""))return {bilder:await bilderDesDokuments(d)};
+  var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+  if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+  var pdf=new Uint8Array(await dl.data.arrayBuffer());
+  if(pdf.length>14*1024*1024)throw new Error(t("Datei zu groß für die Analyse (max. ca. 14 MB)."));
+  return {pdf:pdf};
+}
+/* Alle noch nicht ausgelesenen Dokumente nacheinander lesen. Danach zeigt „Ohne Vertrag“ die Vorschläge:
+   passender Vertrag → zuordnen, sonst neuer Vertrag aus dem Dokument (Dokumente hängen danach automatisch daran). */
+async function analyseAlleNachholen(){
+  var liste=dokumenteOhneKi();if(!liste.length||NACHHOLEN)return;
+  NACHHOLEN=true;var gut=[],stopp=null,fehler=0;
+  try{
+    for(var i=0;i<liste.length;i++){
+      nkArbeit(tf("Dokument {0} von {1} wird gelesen …",i+1,liste.length));
+      var erg;
+      try{erg=await kiAuslesen(liste[i],await dokQuelle(liste[i]),false,true);}catch(e){erg="fehler";}
+      if(erg==="ok")gut.push(liste[i]);else if(erg==="fehler")fehler++;else{stopp=erg;break;}
+    }
+    closeModal(true);await ladeDaten();
+    var ergN=[];
+    for(var j=0;j<gut.length;j++)if(gut[j].contract_id&&vertragById(gut[j].contract_id))ergN=ergN.concat(await vertragErgaenzen(gut[j].contract_id,[gut[j].id]));
+    if(ergN.length)await ladeDaten();
+    go("#/dokumente?f=ohne");render();
+    if(stopp)toast((gut.length?tn(gut.length,"{0} Dokument ausgelesen","{0} Dokumente ausgelesen")+" · ":"")+stopp,true);
+    else toast(gut.length?ergaenztText(ergN,tn(gut.length,"{0} Dokument ausgelesen","{0} Dokumente ausgelesen"))+(fehler?" · "+tn(fehler,"{0} ging nicht","{0} gingen nicht"):""):t("Nichts ausgelesen"),!gut.length);
+  }catch(e){closeModal(true);toast(t("Nachholen fehlgeschlagen")+": "+errMsg(e),true);}
+  finally{NACHHOLEN=false;}
+}
+/* Auslesen nachholen oder neu auslesen – danach prüfen und abgleichen */
 var NACHHOLEN=false;
 async function analyseNachholen(id){
   var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d||NACHHOLEN)return;
   NACHHOLEN=true;
   var knopf=document.querySelector('[data-a="d-reanalyze"]');if(knopf){knopf.disabled=true;knopf.textContent=t("All-Home liest …");}
   try{
-    var quelle,bild=(d.weitere_seiten||[]).length||/^image\//.test(d.mime_type||"");
-    if(bild)quelle={bilder:await bilderDesDokuments(d)};
-    else{
-      var dl=await sb.storage.from(BUCKET).download(d.storage_path);
-      if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
-      quelle={pdf:new Uint8Array(await dl.data.arrayBuffer())};
-      if(quelle.pdf.length>14*1024*1024)throw new Error(t("Datei zu groß für die Analyse (max. ca. 14 MB)."));
-    }
+    var quelle=await dokQuelle(d);
     var erg=await kiAuslesen(d,quelle,istMed(d));
     if(erg!=="ok")return;
     /* Volltext gibt es für Scans */
@@ -6139,7 +6194,7 @@ function vorschlaege(){
         knopf:t("Verträge"),href:"#/vertraege"});
     }
     /* Dokumente, die keinem Vertrag zugeordnet sind */
-    var frei=dokumenteOhneVertrag();
+    var frei=dokumenteOhneVertrag().filter(function(d){return !kiFehlt(d);});
     if(frei.length){
       v.push({key:"frei:"+frei.length,art:"info",icon:"link",
         titel:tn(frei.length,"{0} Dokument ohne Vertrag","{0} Dokumente ohne Vertrag"),
@@ -6147,13 +6202,13 @@ function vorschlaege(){
           return zv?tn(zv,"Ein Vorschlag zum Zuordnen liegt bereit.","{0} Vorschläge zum Zuordnen liegen bereit."):t("Zuordnen hilft dem Archiv und den Fristen.");})(),
         knopf:t("Ansehen"),href:"#/dokumente?f=ohne&von=start"});
     }
-    /* Noch nicht ausgelesen (Guthaben war leer) */
-    var offen=DOCS.filter(function(d){return d.ki_pending;});
+    /* Noch nicht ausgelesen (Guthaben/Budget war weg, Netzfehler) */
+    var offen=dokumenteOhneKi();
     if(offen.length){
       v.push({key:"kipend:"+offen.length,art:"warn",icon:"refresh",
         titel:tn(offen.length,"{0} Dokument wartet auf die KI","{0} Dokumente warten auf die KI"),
-        text:t("Das Guthaben war leer – jetzt nachholen?"),
-        knopf:t("Nachholen"),aktion:"d-reanalyze",id:offen[0].id});
+        text:t("Jetzt auslesen und dem passenden Vertrag zuordnen?"),
+        knopf:t("Jetzt auslesen"),aktion:"d-alle-nachholen"});
     }
   }
 
@@ -8650,7 +8705,7 @@ async function dateienWeg(pfade){if(pfade&&pfade.length){try{await sb.storage.fr
 function bilderFuerKi(bilder){return bilder.map(function(b){return {data:bytesBase64(b),mime:"image/jpeg"};});}
 /* KI-Auslesung für ein gespeichertes Dokument. quelle: {bilder:[Uint8Array]} oder {pdf:Uint8Array}.
    Liefert "ok", "guthaben" oder "fehler" – das Dokument ist in jedem Fall gespeichert. */
-async function kiAuslesen(dok,quelle,med){
+async function kiAuslesen(dok,quelle,med,still){
   try{
     var body={model:kiStufe(),lang:curLang};
     if(quelle.pdf){body.fileBase64=bytesBase64(quelle.pdf);body.mimeType="application/pdf";}
@@ -8664,9 +8719,10 @@ async function kiAuslesen(dok,quelle,med){
     if(r.error)throw r.error;
     return "ok";
   }catch(e){
-    if(e&&e.code==="ki_guthaben"){try{await sb.from("documents").update({ki_pending:true}).eq("id",dok.id);}catch(x){}
-      toast(t("gespeichert – KI-Guthaben leer, Analyse später"),true);return "guthaben";}
-    toast(t("abgelegt, aber KI-Analyse fehlgeschlagen")+": "+errMsg(e),true);
+    if(nkKiGesperrt(e)){try{await sb.from("documents").update({ki_pending:true}).eq("id",dok.id);}catch(x){}
+      var grund=e.code==="ki_guthaben"?t("gespeichert – KI-Guthaben leer, Analyse später"):t("gespeichert – Analyse später")+": "+errMsg(e);
+      if(!still)toast(grund,true);return still?grund:"guthaben";}
+    if(!still)toast(t("abgelegt, aber KI-Analyse fehlgeschlagen")+": "+errMsg(e),true);
     return "fehler";
   }
 }
@@ -11862,6 +11918,7 @@ document.addEventListener("click",function(ev){
   if(a==="d-link-neu"){dokumentNeuerEintrag(id,b.dataset.k);return;}
   if(a==="d-link-pick"){laeuft(b,dokumentVerknuepfen(id,b.dataset.cid));return;}
   if(a==="d-reanalyze"){laeuft(b,analyseNachholen(id));return;}
+  if(a==="d-alle-nachholen"){laeuft(b,analyseAlleNachholen());return;}
   if(a==="d-seiten"){laeuft(b,seitenHinzufuegen(id));return;}
   if(a==="d-pdf-an"){var pa=$("#pdfAn");if(pa)pa.click();return;}
   if(a==="bb"){laeuft(b,bbBlaettern(Number(b.dataset.r)||0));return;}
