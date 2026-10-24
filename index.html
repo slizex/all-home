@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-kT9ANAvWpjw5LOAonxAKP728g3vVoChMKu704xi/FDg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-HIZt7xKC6irMqjbFQezryNdOde/r0cD7w5K7VDnU+/w='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -334,7 +334,7 @@ button.mrow2:hover,a.mrow2:hover{background:var(--surface-2)}
 
 
 .dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
-.dot.red{background:var(--neg)}.dot.amber{background:var(--warn)}.dot.green{background:var(--pos)}.dot.gray{background:var(--muted-2)}
+.dot.red{background:var(--neg)}.dot.amber{background:var(--warn)}.dot.green{background:var(--pos)}.dot.gray{background:var(--muted-2)}.dot.blue{background:var(--info)}
 .trow{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid var(--line)}
 .trow:last-child{border-bottom:none}
 .trow .tb{flex:1;min-width:0}
@@ -405,7 +405,7 @@ a.kpi:hover{border-color:var(--line-2)}/* drei Kacheln: auf dem Handy die dritte
 .kvr{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 2px;border-bottom:1px solid var(--line)}
 .kvr:last-child{border-bottom:none}
 .kvr .kk{color:var(--muted);font-weight:700;font-size:.88rem;flex:none;max-width:48%}
-.kvr .kw{font-weight:800;text-align:right;min-width:0;overflow-wrap:anywhere}/* Kacheln nicht an die folgende Karte stoßen lassen */
+.kvr .kw{font-weight:800;text-align:right;min-width:0;overflow-wrap:break-word}/* Kacheln nicht an die folgende Karte stoßen lassen */
 
 .kpis{margin-bottom:14px}/* Zurück zeigt nach links */
 
@@ -457,7 +457,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 @media (min-width:900px){.slots{grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}}/* Kopfzeilen: Titel einer Detailseite bricht um, der Hausname-Knopf kürzt mit „…" */
 
 .top>div{min-width:0}
-.top div.hh{white-space:normal;overflow-wrap:anywhere}/* ================= All-Home: Fahrzeuge ================= */
+.top div.hh{white-space:normal;overflow-wrap:break-word}/* ================= All-Home: Fahrzeuge ================= */
 /* Kennzeichen als Schild: weiß, schwarzer Rand, blauer EU-Streifen */
 
 
@@ -518,7 +518,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 .dokf{margin-bottom:12px}
 .dokf .lb{padding:10px 12px}
 .dokf .lb.on .pill{background:var(--surface)}
-.medtabs .lb{flex:1 1 0;min-width:0;padding:10px 4px;font-size:.84rem;text-align:center;overflow-wrap:anywhere}
+.medtabs .lb{flex:1 1 0;min-width:0;padding:10px 4px;font-size:.84rem;text-align:center;overflow-wrap:break-word}
 .cause.auff>b{color:var(--neg)}
 /* Gesundheit: Fach, Person, Jahr in einer Zeile; nur die Ereignisauswahl über die ganze Breite */
 .filt.medfilt .sel{flex:1 1 0;min-width:0}
@@ -561,7 +561,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 /* ================= 1.8.2: Lesbarkeit aus der Gesamtprüfung ================= */
 /* Zweizeilig statt abgeschnitten, wo sonst Wichtiges fehlt (Kennzeichen, Kündigungsdatum, lange Vertragsarten) */
 .trow .tn,.slot .sn,.slot .ss,.artpick .pn,.hhw,.hhwa,.fzn,.krow .kl,.drow3 .dn,.drow3.wahl .wtxt .dn{
-  white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+  white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word}
 /* Trefferflächen mindestens 40 px hoch – Lage und Aussehen bleiben */
 .back{padding:9px 0;margin:-7px 0}
 main>a.lnk,.arow .lnk{display:inline-block;padding:9px 0;margin:-9px 0}
@@ -629,6 +629,21 @@ main>.sug+.card,main>.sug+.sug,main>.card+.sug,main>.card+.card{margin-top:12px}
 .ztknoepfe{flex-direction:column;align-items:stretch}
 .ztz{min-width:0}
 .ztbudget .factions{margin-bottom:0}
+
+/* ================= 1.12.0: Umbruch – Wörter nach Silben trennen, nie mitten im Wort ================= */
+/* Vertragskopf: Text neben dem Logo nimmt die ganze freie Breite (sonst brach „Ostrom“ als „Ostro|m“ um) */
+.vkopf .vk>div{flex:1 1 auto}
+/* Lange Wörter (Tierkrankenversicherung, Nebenkostenabrechnung, Хронология) mit Trennstrich nach Silben */
+.top div.hh,.trow .tn,.slot .sn,.slot .ss,.artpick .pn,.drow3 .dn,.st,.lb,.hhn,.kvr .kk,.sug .sx,.empty h3{-webkit-hyphens:auto;hyphens:auto}
+/* Listentitel: drei statt zwei Zeilen, bevor gekürzt wird (Kennzeichen + langer Versicherername) */
+.trow .tn,.slot .sn,.artpick .pn,.drow3 .dn,.drow3.wahl .wtxt .dn{-webkit-line-clamp:3}
+/* Vorschlags-Einstellungen: Titel und Erklärung vollständig */
+.pickliste .artpick .pn{display:block;-webkit-line-clamp:unset;overflow:visible}
+/* Lange Werte (FIN, IBAN, Nummern) rutschen unter die Bezeichnung statt zerschnitten zu werden */
+.kvr{flex-wrap:wrap}
+.kvr .kw{margin-left:auto}
+/* Gesundheit auf dem Handy: Reiter 2 × 2, Filter umbrechen statt abgeschnitten */
+@media(max-width:559px){.langrow.medtabs{display:grid;grid-template-columns:1fr 1fr}.filt.medfilt .sel{flex:1 1 140px}}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -920,7 +935,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.11.2";
+var APP_VERSION="1.12.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -2278,6 +2293,28 @@ var T={ru:{
   "Noch nicht ausgelesen":"Ещё не считано",
   "Die KI war beim Hochladen nicht verfügbar.":"При загрузке ИИ был недоступен.",
   "Neu auslesen":"Считать заново",
+  "Beendet am {0}":"Завершён {0}",
+  "Im Archiv":"В архиве",
+  "endet heute":"заканчивается сегодня",
+  "endet morgen":"заканчивается завтра",
+  "endet in {0} Tagen":"заканчивается через {0} дн.",
+  "Beginnt am {0}":"Начинается {0}",
+  "beginnt am {0}":"начинается {0}",
+  "gekündigt zum {0}":"расторгнут с {0}",
+  "Archiv":"Архив",
+  "Beendete Verträge":"Завершённые договоры",
+  "{0} beendeter Vertrag im Archiv":"В архиве: {0}",
+  "{0} beendete Verträge im Archiv":"В архиве: {0}",
+  "Noch nichts im Archiv":"В архиве пока пусто",
+  "Nachfolger":"Новый договор",
+  "Ersetzt":"Заменяет",
+  "ab {0}":"с {0}",
+  "Nachfolger: {0} ab {1}":"Новый договор: {0} с {1}",
+  "Dieser Vertrag ist noch nicht gekündigt.":"Этот договор ещё не расторгнут.",
+  "Zum {0} als gekündigt markieren":"Отметить расторгнутым с {0}",
+  "{0} läuft noch":"{0} ещё действует",
+  "{0} beginnt am {1} – alten Vertrag kündigen?":"{0} начинается {1} — расторгнуть старый договор?",
+  "Die MaLo-ID hat 11 Ziffern, die letzte ist eine Prüfziffer – bitte prüfen.":"MaLo-ID состоит из 11 цифр, последняя — контрольная. Проверьте, пожалуйста.",
   "{0} Dokument noch nicht ausgelesen":"Не считано документов: {0}",
   "{0} Dokumente noch nicht ausgelesen":"Не считано документов: {0}",
   "Dokument {0} von {1} wird gelesen …":"Считывается документ {0} из {1} …",
@@ -2498,7 +2535,7 @@ var T={ru:{
 
 /* ---- Zusatzfelder ---- */
 "Objekt / Adresse":"Объект / адрес","Fläche (m²)":"Площадь (м²)","Zimmer":"Комнаты",
-"Nebenkosten (€/Monat)":"Коммунальные (€/мес.)","Zählernummer":"Номер счётчика",
+"Nebenkosten (€/Monat)":"Коммунальные (€/мес.)","Zählernummer":"Номер счётчика","MaLo-ID":"MaLo-ID (точка поставки)",
 "Jahresverbrauch":"Годовое потребление","Arbeitspreis (ct/Einheit)":"Цена за единицу (цент)",
 "Grundpreis (€/Monat)":"Базовая плата (€/мес.)","Marke":"Марка","Modell":"Модель",
 "Kennzeichen":"Гос. номер","Fahrgestellnummer (FIN)":"Номер кузова (FIN)",
@@ -2699,10 +2736,25 @@ function kuendigungBis(ende,kf){
   if(rest>0)d.setUTCDate(d.getUTCDate()-Math.round(rest*28));
   return isoAusUTC(d);
 }
+/* Lebenslauf: kommend (Beginn in der Zukunft), laufend, gekuendigt (läuft noch bis gekuendigt_zum),
+   beendet (Archiv: als beendet markiert oder Kündigungsdatum vorbei) – berechnet, nichts wird umgeschrieben */
+function vertragPhase(c,heute){
+  if(!c)return "beendet";heute=heute||todayISO();
+  if(c.status==="beendet")return "beendet";
+  if(c.status==="gekuendigt")return (c.gekuendigt_zum&&String(c.gekuendigt_zum).slice(0,10)<heute)?"beendet":"gekuendigt";
+  if(c.vertragsstart&&String(c.vertragsstart).slice(0,10)>heute)return "kommend";
+  return "laufend";
+}
+function imArchiv(c){return vertragPhase(c)==="beendet";}
+/* Zählt heute zu den laufenden Kosten: läuft, oder gekündigt mit bekanntem Ende, das noch nicht erreicht ist */
+function zaehltJetzt(c){var ph=vertragPhase(c);return ph==="laufend"||(ph==="gekuendigt"&&!!c.gekuendigt_zum);}
 function fristInfo(c){
-  if(c.status==="beendet")  return {kind:"beendet",  level:"gray",label:t("Beendet"),sub:""};
-  if(c.status==="gekuendigt")return {kind:"gekuendigt",level:"gray",
-    label:c.gekuendigt_zum?tf("Gekündigt zum {0}",fmtDate(c.gekuendigt_zum)):t("Gekündigt"),sub:""};
+  var ph=vertragPhase(c);
+  if(ph==="beendet")return {kind:"beendet",level:"gray",label:c.status==="gekuendigt"&&c.gekuendigt_zum?tf("Beendet am {0}",fmtDate(c.gekuendigt_zum)):t("Beendet"),sub:t("Im Archiv")};
+  if(ph==="gekuendigt"){var rest=c.gekuendigt_zum?daysUntil(c.gekuendigt_zum):null;
+    return {kind:"gekuendigt",level:"gray",label:c.gekuendigt_zum?tf("Gekündigt zum {0}",fmtDate(c.gekuendigt_zum)):t("Gekündigt"),
+      sub:rest==null?"":(rest<=0?t("endet heute"):tn(rest,"endet morgen","endet in {0} Tagen"))};}
+  if(ph==="kommend")return {kind:"kommend",level:"blue",label:tf("Beginnt am {0}",fmtDate(c.vertragsstart)),sub:""};
   if(!hatFristen(c.art))return {kind:"keine",level:"gray",label:"",sub:""};
   var ml=numOrNull(c.mindestlaufzeit_monate),kf=numOrNull(c.kuendigungsfrist_monate),vl=numOrNull(c.verlaengerung_monate);
   var neu=neuesRechtGilt(c);
@@ -2756,7 +2808,7 @@ function fristTxt(m){
 function ivLabel(k){return INTERVALL_LABEL[k]?t(INTERVALL_LABEL[k]):"?";}
 /* Monatskosten eines Vertrags (einmalige Zahlungen zählen nicht als laufend) */
 function monatskosten(c){
-  if(c.kosten==null||c.status!=="aktiv")return 0;
+  if(c.kosten==null||!zaehltJetzt(c))return 0;
   var m=INTERVALL[c.kosten_intervall];
   if(!m)return 0;
   return Number(c.kosten)/m;
@@ -2799,6 +2851,7 @@ var FELDER={
   zimmer:         {l:"Zimmer",                      t:"num"},
   nebenkosten:    {l:"Nebenkosten (€/Monat)",       t:"eur"},
   zaehlernummer:  {l:"Zählernummer",                t:"text"},
+  malo:           {l:"MaLo-ID",                     t:"text"},
   jahresverbrauch:{l:"Jahresverbrauch",             t:"num"},
   arbeitspreis:   {l:"Arbeitspreis (ct/Einheit)",   t:"num"},
   grundpreis:     {l:"Grundpreis (€/Monat)",        t:"eur"},
@@ -2844,7 +2897,7 @@ var ARTEN={
   /* ---------- Wohnen & Energie ---------- */
   miete:          {g:"wohnen",label:"Miete",                      icon:"🔑",std:1,einzig:1,felder:["objekt","flaeche","zimmer","nebenkosten"]},
   eigentum:       {g:"wohnen",label:"Wohneigentum / Finanzierung", icon:"🏡",felder:["objekt","flaeche","restschuld","zinssatz","laufzeit_bis"]},
-  strom:          {g:"wohnen",label:"Strom",                      icon:"⚡",std:1,spiegel:"strom",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
+  strom:          {g:"wohnen",label:"Strom",                      icon:"⚡",std:1,spiegel:"strom",felder:["zaehlernummer","malo","jahresverbrauch","arbeitspreis","grundpreis"]},
   gas:            {g:"wohnen",label:"Gas",                        icon:"🔥",spiegel:"gas",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
   wasser:         {g:"wohnen",label:"Wasser & Abwasser",           icon:"💧",std:1,spiegel:"wasser",felder:["zaehlernummer","jahresverbrauch"]},
   fernwaerme:     {g:"wohnen",label:"Fernwärme",                   icon:"🌡️",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
@@ -3068,7 +3121,7 @@ function applyTheme(dark){
 }
 
 /* ================= Routing ================= */
-var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug","zentrale","nkanalyse"];
+var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug","zentrale","nkanalyse","archiv"];
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
@@ -3178,6 +3231,7 @@ function render(){
   else if(rt.name==="einrichten"){inhalt=viewEinrichten(false);cur="mehr";}
   else if(rt.name==="art")       {inhalt=viewArt(rt.params.k);cur="vertraege";}
   else if(rt.name==="vertrag")   {inhalt=viewVertrag(rt.params.id);cur="vertraege";}
+  else if(rt.name==="archiv")    {inhalt=viewArchiv();cur="vertraege";}
   else if(rt.name==="termine")   {inhalt=viewTermine();cur="start";}
   else if(rt.name==="kosten")    {inhalt=viewKosten();cur="start";}
   else if(rt.name==="vorschlaege"){inhalt=viewVorschlaege();cur="start";}
@@ -3528,8 +3582,9 @@ async function doLogout(){
 }
 
 /* ================= Verträge einer Art ================= */
-function vertraegeDerArt(k){
-  return CONTRACTS.filter(function(c){return (c.art||"sonstiges")===k;});
+/* Ohne Archiv (beendete Verträge stehen unter #/archiv); mitArchiv=true: alle */
+function vertraegeDerArt(k,mitArchiv){
+  return CONTRACTS.filter(function(c){return (c.art||"sonstiges")===k&&(mitArchiv||!imArchiv(c));});
 }
 function artMonatskosten(k){
   var sp=spiegelArt(k);
@@ -3544,7 +3599,7 @@ function kostenPosten(){
     var m=artMonatskosten(k);
     if(m>0)posten.push({k:k,label:artInfo(k).label,icon:artInfo(k).icon,m:m});
   });
-  var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return k==="sonstiges"||!ARTEN[k]||!artAktiv(k);})
+  var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return !imArchiv(c)&&(k==="sonstiges"||!ARTEN[k]||!artAktiv(k));})
     .reduce(function(s,c){return s+monatskosten(c);},0);
   if(weitere>0)posten.push({k:"weitere",label:t("Weitere"),icon:"📄",m:weitere});
   /* Nebenkosten-Vorauszahlung aus dem Mietvertrag – die „zweite Miete“ */
@@ -3600,7 +3655,7 @@ function viewEinrichten(erstmalig){
 
 /* ================= Start ================= */
 function viewStart(){
-  var aktive=CONTRACTS.filter(function(c){return c.status==="aktiv";});
+  var aktive=CONTRACTS.filter(zaehltJetzt);
   /* Monatskosten: dieselbe Rechnung wie auf der Kostenseite */
   var mk=kostenPosten().reduce(function(s,p){return s+p.m;},0);
   var fristen=naheTermine(60);
@@ -3659,16 +3714,21 @@ function viewVertraege(){
              (kosten>0?'<span class="gn">'+eur0(kosten)+' / '+t("Monat")+'</span>':"")+'</div>'+
            '<div class="slots">'+arten.map(artSlot).join("")+'</div>';
   }).filter(Boolean).join("");
-  var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return k==="sonstiges"||!ARTEN[k]||!artAktiv(k);});
+  var weitere=CONTRACTS.filter(function(c){var k=c.art||"sonstiges";return !imArchiv(c)&&(k==="sonstiges"||!ARTEN[k]||!artAktiv(k));});
   if(weitere.length)body+='<div class="grp"><span class="gi">📄</span>'+t("Weitere")+'</div>'+
     '<div class="slots">'+weitere.map(function(c){
       var a=artInfo(c.art||"sonstiges"),f=fristInfo(c);
       return '<a class="slot" href="#/vertrag?id='+c.id+'">'+anbieterKachel(c.anbieter,a.icon)+
         '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span>'+
         '<span class="ss"><span class="dot '+f.level+'"></span> '+esc(a.label)+'</span></span>'+
-        '<span class="srt">'+(c.kosten!=null?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
+        '<span class="srt">'+(monatskosten(c)>0?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
         '<span class="go">'+ic("right",18)+'</span></span></a>';
     }).join("")+'</div>';
+  var nArchiv=CONTRACTS.filter(imArchiv).length;
+  if(nArchiv)body+='<div class="grp"><span class="gi">📦</span>'+t("Archiv")+'</div>'+
+    '<div class="slots"><a class="slot" href="#/archiv"><span class="ai">📦</span>'+
+      '<span class="sb3"><span class="sn">'+t("Beendete Verträge")+'</span><span class="ss">'+tn(nArchiv,"{0} Vertrag","{0} Verträge")+'</span></span>'+
+      '<span class="srt"><span class="go">'+ic("right",18)+'</span></span></a></div>';
   return topBar()+seitenTitel(t("Verträge"))+body+
     '<div class="factions" style="margin-top:20px">'+
       '<a class="btn ghost" href="#/einrichten">'+ic("tool")+' '+t("Arten anpassen")+'</a>'+
@@ -3733,7 +3793,7 @@ function naheTermine(tage){
                    href:"#/vertrag?id="+c.id});
     }
     /* Pflichttermin aus den Zusatzfeldern */
-    if(c.status!=="beendet"&&a.termin&&c.details&&c.details[a.termin.k]){
+    if(!imArchiv(c)&&a.termin&&c.details&&c.details[a.termin.k]){
       var d=daysUntil(c.details[a.termin.k]);
       if(d!=null&&d<=tage)
         raus.push({days:d,level:ampel(d),icon:a.icon,
@@ -3919,11 +3979,12 @@ function viewArt(k){
            '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span>'+
            (fahrzeugVon(c)?'<span class="ss">'+fahrzeugZeile(c)+'</span>':"")+
            '<span class="ss"><span class="dot '+f.level+'"></span> '+esc(f.label)+(nd?' · '+tf("{0} Dok.",nd):"")+'</span></span>'+
-           '<span class="srt">'+(c.kosten!=null?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
+           '<span class="srt">'+(monatskosten(c)>0?'<span class="scost">'+eur0(monatskosten(c))+'</span>':"")+
            '<span class="go">'+ic("right",18)+'</span></span></a>';
        }).join("")+'</div>'
       :'<section class="card"><div class="empty"><div class="ei">'+a.icon+'</div>'+
        '<h3>'+t("Noch nichts hinterlegt")+'</h3><p>'+t("Lade ein Dokument hoch oder trage den Vertrag von Hand ein.")+'</p></div></section>')+
+    (function(){var n=vertraegeDerArt(a.key,true).filter(imArchiv).length;return n?'<a class="lnk" href="#/archiv?k='+a.key+'" style="display:inline-block;margin-top:12px">📦 '+tn(n,"{0} beendeter Vertrag im Archiv","{0} beendete Verträge im Archiv")+'</a>':"";})()+
     '<div class="factions" style="margin-top:18px">'+
       '<a class="btn" href="#/neu?art='+a.key+'">'+ic("plus")+' '+t("Dokument hochladen")+'</a>'+
       '<button class="btn ghost" data-a="v-neu" data-k="'+a.key+'">'+ic("pencil")+' '+t("Von Hand eintragen")+'</button>'+
@@ -3940,6 +4001,71 @@ function terminKarte(c){
 
 /* ================= Vertragsdetail ================= */
 function vertragById(id){return CONTRACTS.filter(function(c){return c.id===id;})[0]||null;}
+/* Wofür gilt ein Vertrag? Gleiche Art + gleicher Schlüssel = Vorgänger/Nachfolger.
+   Fahrzeug (Kennzeichen/FIN), Zähler (MaLo/Zählernummer), sonst Arten, die es nur einmal gibt (Miete, Strom …) */
+function objektSchluessel(c){
+  var a=artInfo(c.art||"sonstiges"),d=c.details||{},f=fahrzeugVon(c);
+  if(f&&f.kz)return "kz:"+String(f.kz).toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(d.fin)return "fin:"+String(d.fin).toUpperCase().replace(/\s+/g,"");
+  if(d.malo)return "malo:"+String(d.malo);
+  if(d.zaehlernummer)return "zn:"+String(d.zaehlernummer).toUpperCase().replace(/\s+/g,"");
+  var A=ARTEN[a.key]||{};
+  return (A.einzig||A.spiegel)?"art":null;
+}
+function gleichesObjekt(x,c){
+  if(x.id===c.id||(x.art||"sonstiges")!==(c.art||"sonstiges"))return false;
+  var kx=objektSchluessel(x),kc=objektSchluessel(c);
+  if(kx&&kc&&kx===kc)return true;
+  /* Zähler gewechselt: bei Arten, die es nur einmal gibt, zählt die Art */
+  var A=ARTEN[c.art]||{};return !!(A.einzig||A.spiegel)&&!!kx&&!!kc&&kx.indexOf("kz:")<0&&kc.indexOf("kz:")<0;
+}
+/* Nachfolger: späterer Beginn, nicht im Archiv. Vorgänger: früherer Beginn (auch im Archiv) */
+function nachfolgerVon(c){
+  return CONTRACTS.filter(function(x){return gleichesObjekt(x,c)&&!imArchiv(x)&&x.vertragsstart&&(!c.vertragsstart||x.vertragsstart>c.vertragsstart);})
+    .sort(function(x,y){return x.vertragsstart<y.vertragsstart?-1:1;})[0]||null;
+}
+function vorgaengerVon(c){
+  if(!c.vertragsstart)return null;
+  return CONTRACTS.filter(function(x){return gleichesObjekt(x,c)&&(!x.vertragsstart||x.vertragsstart<c.vertragsstart);})
+    .sort(function(x,y){return String(x.vertragsstart||"")>String(y.vertragsstart||"")?-1:1;})[0]||null;
+}
+function tagDavor(iso){var d=new Date(String(iso).slice(0,10)+"T00:00:00Z");d.setUTCDate(d.getUTCDate()-1);return isoAusUTC(d);}
+function statusText(c){
+  var ph=vertragPhase(c);
+  if(ph==="laufend")return "✅ "+t("aktiv");
+  if(ph==="kommend")return "🕒 "+tf("beginnt am {0}",fmtDate(c.vertragsstart));
+  if(ph==="gekuendigt")return "✂️ "+(c.gekuendigt_zum?tf("gekündigt zum {0}",fmtDate(c.gekuendigt_zum)):t("gekündigt"));
+  return "📦 "+t("beendet")+" · "+t("Im Archiv");
+}
+/* Läuft der alte Vertrag noch, obwohl ein Nachfolger feststeht? Dann gleich passend als gekündigt markieren */
+function abloeseKarte(c){
+  if(vertragPhase(c)!=="laufend")return "";
+  var n=nachfolgerVon(c);if(!n)return "";
+  var zum=tagDavor(n.vertragsstart);
+  return '<div class="sug warn" style="margin-bottom:12px"><span class="si">'+ic("alert")+'</span><div class="sb2">'+
+    '<div class="st">'+tf("Nachfolger: {0} ab {1}",esc(n.anbieter||artInfo(n.art).label),fmtDate(n.vertragsstart))+'</div>'+
+    '<div class="sx">'+t("Dieser Vertrag ist noch nicht gekündigt.")+'</div>'+
+    '<div class="sa"><button class="btn sm" data-a="v-abloesen" data-id="'+c.id+'" data-k="'+n.id+'">✂️ '+tf("Zum {0} als gekündigt markieren",fmtDate(zum))+'</button></div></div></div>';
+}
+function vertragAbloesen(id,nid){
+  var n=vertragById(nid);if(!n||!n.vertragsstart)return;
+  return setzeStatus(id,"gekuendigt",tagDavor(n.vertragsstart));
+}
+/* Archiv: beendete Verträge, neueste zuerst; Dokumente bleiben daran */
+function viewArchiv(){
+  var k=route().params.k||"";
+  var l=CONTRACTS.filter(function(c){return imArchiv(c)&&(!k||(c.art||"sonstiges")===k);})
+    .sort(function(x,y){return String(y.gekuendigt_zum||y.updated_at||"").localeCompare(String(x.gekuendigt_zum||x.updated_at||""));});
+  var kopf=zurueck(k?"#/art?k="+k:"#/vertraege",k?artInfo(k).label:t("Verträge"))+seitenTitel("📦 "+t("Archiv"));
+  if(!l.length)return kopf+'<section class="card"><div class="empty"><div class="ei">📦</div><h3>'+t("Noch nichts im Archiv")+'</h3></div></section>';
+  return kopf+'<div class="slots">'+l.map(function(c){
+    var a=artInfo(c.art||"sonstiges"),f=fristInfo(c),nd=DOCS.filter(function(d){return d.contract_id===c.id;}).length;
+    return '<a class="slot" href="#/vertrag?id='+c.id+'">'+anbieterKachel(c.anbieter,a.icon)+
+      '<span class="sb3"><span class="sn">'+esc(c.anbieter||a.label)+'</span>'+(fahrzeugVon(c)?'<span class="ss">'+fahrzeugZeile(c)+'</span>':"")+
+      '<span class="ss">'+esc(a.label)+' · '+esc(f.label)+(nd?' · '+tf("{0} Dok.",nd):"")+'</span></span>'+
+      '<span class="srt"><span class="go">'+ic("right",18)+'</span></span></a>';
+  }).join("")+'</div>';
+}
 function viewVertrag(id){
   var c=vertragById(id);
   if(!c)return zurueck("#/vertraege",t("Verträge"))+'<section class="card"><p class="hint">'+t("Vertrag nicht gefunden.")+'</p></section>';
@@ -3961,6 +4087,7 @@ function viewVertrag(id){
       (fahrzeugVon(c)?'<div class="vfzg">'+fahrzeugZeile(c,true)+'</div>':"")+
       (c.produkt?'<div class="greet">'+esc(c.produkt)+'</div>':"")+
     '</div></div></div>'+
+    abloeseKarte(c)+
     /* Frist bzw. Pflichttermin */
     (!hatFristen(a.key)?terminKarte(c):'<section class="card">'+
       '<div style="display:flex;align-items:center;gap:10px"><span class="dot '+f.level+'"></span>'+
@@ -3986,7 +4113,10 @@ function viewVertrag(id){
       (c.kuendigungsfrist_monate!=null?kv(t("Kündigungsfrist"),fristTxt(c.kuendigungsfrist_monate)):"")+
       (c.verlaengerung_monate!=null?kv(t("Verlängerung"),c.verlaengerung_monate<=1?t("monatlich"):tf("um {0} Monate",c.verlaengerung_monate)):"")+
       zusatz+
-      kv(t("Status"),c.status==="aktiv"?"✅ "+t("aktiv"):(c.status==="gekuendigt"?"✂️ "+t("gekündigt"):t("beendet")))+
+      kv(t("Status"),statusText(c))+
+      (function(){var n=nachfolgerVon(c),v=vorgaengerVon(c);
+        return (n?kv(t("Nachfolger"),'<a class="lnk" href="#/vertrag?id='+n.id+'">'+esc(n.anbieter||artInfo(n.art).label)+'</a> · '+tf("ab {0}",fmtDate(n.vertragsstart))):"")+
+               (v?kv(t("Ersetzt"),'<a class="lnk" href="#/vertrag?id='+v.id+'">'+esc(v.anbieter||artInfo(v.art).label)+'</a>'):"");})()+
       (c.notizen?kv(t("Notizen"),esc(c.notizen)):"")+
     '</div></section>'+
     rechercheKarte(c)+
@@ -4011,10 +4141,19 @@ function viewVertrag(id){
 /* ================= Vertragsformular ================= */
 var FORM=null;   /* {art, id, prefill} – offenes Formular */
 /* Felder, die nebeneinander stehen (erstes Feld → Partner) */
-var FELD_PAARE={marke:"modell",hsn:"tsn",sf_klasse:"sf_prozent",zaehlernummer:"jahresverbrauch",rufnummer:"datenvolumen"};
+/* Felder, die nebeneinander stehen; bei mehreren Kandidaten zählt der erste, den die Art hat */
+var FELD_PAARE={marke:"modell",hsn:"tsn",sf_klasse:"sf_prozent",zaehlernummer:["malo","jahresverbrauch"],rufnummer:"datenvolumen"};
 /* Eingaben, die als Großbuchstaben gespeichert werden */
 var FELD_GROSS={kennzeichen:1,fin:1,hsn:1,tsn:1};
-var FELD_PLATZ={kennzeichen:"FB-AB 1234",marke:"Volkswagen",modell:"Golf",fin:"WVWZZZ1KZ6W000000",hsn:"0603",tsn:"BJH"};
+/* MaLo-ID (Marktlokation): 11 Ziffern, die letzte ist die Prüfziffer.
+   BDEW: Ziffern an ungeraden Stellen + 2 × Ziffern an geraden Stellen, Prüfziffer = Rest bis zum nächsten Zehner. */
+function maloOk(z){
+  if(!/^\d{11}$/.test(z))return false;
+  var a=0,b=0;for(var i=0;i<10;i++){if(i%2===0)a+=+z[i];else b+=+z[i];}
+  return (10-(a+2*b)%10)%10===+z[10];
+}
+function maloNorm(s){var z=String(s==null?"":s).replace(/[\s.\-\/]/g,"");return maloOk(z)?z:null;}
+var FELD_PLATZ={malo:"41373559241",kennzeichen:"FB-AB 1234",marke:"Volkswagen",modell:"Golf",fin:"WVWZZZ1KZ6W000000",hsn:"0603",tsn:"BJH"};
 /* Art-Auswahl, nach Gruppen geordnet; leer = „bitte wählen“ */
 function artAuswahl(akt){
   return '<select class="inp" id="f_art" required>'+
@@ -4066,14 +4205,15 @@ function vertragFormular(){
   function feldHtml(fd){
     var typ=fd.t==="date"?"date":((fd.t==="eur"||fd.t==="num")?"number":"text");
     var extra=(FELD_GROSS[fd.k]?' class="inp gross" autocapitalize="characters" spellcheck="false"':"")+
-              (FELD_PLATZ[fd.k]?' placeholder="'+esc(FELD_PLATZ[fd.k])+'"':"")+(fd.k==="fin"?' maxlength="17"':"");
+              (FELD_PLATZ[fd.k]?' placeholder="'+esc(FELD_PLATZ[fd.k])+'"':"")+(fd.k==="fin"?' maxlength="17"':"")+
+              (fd.k==="malo"?' inputmode="numeric" autocomplete="off" spellcheck="false"':"");
     var html=inp("f_d_"+fd.k,det[fd.k]==null?"":det[fd.k],typ,extra);
     if(FELD_GROSS[fd.k])html=html.replace('<input class="inp" ','<input ');
     return fld(fd.l,html,pr.pf.indexOf(fd.k)>=0);
   }
   var zusatz=felder.map(function(fd,i){
     if(genutzt[fd.k])return "";
-    var partner=FELD_PAARE[fd.k],pf=partner&&felder.filter(function(x){return x.k===partner;})[0];
+    var pf=null;[].concat(FELD_PAARE[fd.k]||[]).some(function(p){pf=felder.filter(function(x){return x.k===p&&!genutzt[x.k];})[0]||null;return !!pf;});
     if(pf){genutzt[pf.k]=1;return '<div class="two">'+feldHtml(fd)+feldHtml(pf)+'</div>';}
     return feldHtml(fd);
   }).join("");
@@ -4159,6 +4299,9 @@ async function speichereVertrag(){
   var zahlFelder=["f_kosten","f_ml","f_kf","f_vl"].concat(artFelder(a.key)
     .filter(function(fd){return fd.t==="eur"||fd.t==="num";}).map(function(fd){return "f_d_"+fd.k;}));
   if(zahlFehlt(zahlFelder)){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
+  /* MaLo-ID: Tippfehler fallen über die Prüfziffer auf */
+  var maloEl=$("#f_d_malo");
+  if(maloEl&&val("f_d_malo")&&!maloNorm(val("f_d_malo"))){maloEl.classList.add("bad");maloEl.focus();toast(t("Die MaLo-ID hat 11 Ziffern, die letzte ist eine Prüfziffer – bitte prüfen."),true);return;}
   /* Details: Felder der Art aus dem Formular; Angaben, die die Art nicht kennt
      (z. B. nach einem Art-Wechsel), bleiben erhalten statt still zu verschwinden. */
   var altDet=(FORM.id&&vertragById(FORM.id)&&vertragById(FORM.id).details)||{};
@@ -4168,6 +4311,7 @@ async function speichereVertrag(){
     delete det[fd.k];
     if(!raw)return;
     if(fd.k==="kennzeichen")raw=kzNorm(raw);
+    else if(fd.k==="malo")raw=maloNorm(raw)||raw;
     else if(FELD_GROSS[fd.k])raw=raw.toUpperCase().replace(/\s+/g,"");
     det[fd.k]=(fd.t==="eur"||fd.t==="num")?numOrNull(raw):raw;
   });
@@ -4201,7 +4345,7 @@ async function speichereVertrag(){
     warn.push(tf("Der Vertragsbeginn liegt weit in der Zukunft ({0}).",fmtDate(spalten.vertragsstart)));
   if(spalten.kosten!=null&&spalten.kosten>3000&&spalten.kosten_intervall==="monatlich")
     warn.push(tf("Monatliche Kosten von {0} sind ungewöhnlich hoch – Tippfehler?",eur(spalten.kosten)));
-  if(!FORM.id&&a.einzig&&vertraegeDerArt(a.key).some(function(c){return c.status==="aktiv";}))
+  if(!FORM.id&&a.einzig&&vertraegeDerArt(a.key).some(function(c){return vertragPhase(c)==="laufend";}))
     warn.push(tf("Für „{0}“ gibt es schon einen aktiven Vertrag. Doppelt versichert?",a.label));
   warn=warn.concat(fahrzeugWarnungen(det));
   if(warn.length&&!confirm("🏠 "+t("All-Home ist stutzig:")+"\n\n• "+warn.join("\n• ")+"\n\n"+t("Trotzdem speichern?")))return;
@@ -6081,6 +6225,16 @@ function vorschlaege(){
         text:tf("Letzter Kündigungstag: {0}",fmtDate(f.lastDay)),
         knopf:t("Ansehen"),href:"#/vertrag?id="+c.id});
     });
+    /* Neuer Vertrag steht fest, der alte läuft ungekündigt weiter */
+    CONTRACTS.forEach(function(c){
+      if(vertragPhase(c)!=="laufend")return;
+      var n=nachfolgerVon(c);if(!n)return;
+      var a=artInfo(c.art||"sonstiges");
+      v.push({key:"abloesen:"+c.id+":"+n.id,art:"warn",icon:"alert",
+        titel:tf("{0} läuft noch",c.anbieter||a.label),
+        text:tf("{0} beginnt am {1} – alten Vertrag kündigen?",n.anbieter||a.label,fmtDate(n.vertragsstart)),
+        knopf:t("Ansehen"),href:"#/vertrag?id="+c.id});
+    });
     /* Fristdaten fehlen → kann nicht überwacht werden */
     CONTRACTS.forEach(function(c){
       if(c.status!=="aktiv"||!hatFristen(c.art))return;
@@ -6136,7 +6290,7 @@ function vorschlaege(){
   if(smartAn("termine")){
     CONTRACTS.forEach(function(c){
       var a=artInfo(c.art||"sonstiges");
-      if(c.status==="beendet"||!a.termin||!c.details||!c.details[a.termin.k])return;
+      if(imArchiv(c)||!a.termin||!c.details||!c.details[a.termin.k])return;
       var d=daysUntil(c.details[a.termin.k]);
       if(d==null||d>60)return;
       v.push({key:"termin:"+c.id+":"+c.details[a.termin.k],art:d<=14?"bad":"warn",icon:"calendar",
@@ -6171,7 +6325,7 @@ function vorschlaege(){
   if(smartAn("doppelt")){
     Object.keys(ARTEN).forEach(function(k){
       if(!ARTEN[k].einzig)return;
-      var aktiv=vertraegeDerArt(k).filter(function(c){return c.status==="aktiv";});
+      var aktiv=vertraegeDerArt(k).filter(function(c){return vertragPhase(c)==="laufend";});
       if(aktiv.length<2)return;
       var a=artInfo(k);
       v.push({key:"doppelt:"+k+":"+aktiv.length,art:"bad",icon:"alert",
@@ -6686,7 +6840,7 @@ var KI_DETAIL_KARTE={
   erstzulassung:"erstzulassung",huBis:"hu_bis",
   rufnummer:"rufnummer",datenvolumen:"datenvolumen",endgeraet:"endgeraet",
   geschwindigkeit:"geschwindigkeit",router:"router",
-  zaehlernummer:"zaehlernummer",jahresverbrauch:"jahresverbrauch",arbeitspreis:"arbeitspreis",grundpreis:"grundpreis",
+  zaehlernummer:"zaehlernummer",malo:"malo",maloId:"malo",marktlokation:"malo",jahresverbrauch:"jahresverbrauch",arbeitspreis:"arbeitspreis",grundpreis:"grundpreis",
   aboStufe:"tarif_stufe",profile:"profile",zinssatz:"zinssatz",iban:"iban",
   objekt:"objekt",flaeche:"flaeche",nebenkosten:"nebenkosten",
   leistungsumfang:"leistungsumfang",mitgliedsnummer:"mitgliedsnummer"
@@ -6703,6 +6857,7 @@ function detailsAusExtrakt(ext,art){
     else v=String(v).trim();
     if(feld==="kennzeichen")v=kzNorm(v);
     if(feld==="fin"||feld==="hsn"||feld==="tsn")v=String(v).toUpperCase().replace(/\s+/g,"");
+    if(feld==="malo"){v=maloNorm(v);if(!v)return;}
     aus[feld]=v;
   });
   /* Ältere Auslesungen nennen manches nur in den Stichpunkten („Zählernummer: 6DME…“, „Arbeitspreis: 14,14 → 14,28 ct/kWh“) */
@@ -6711,6 +6866,7 @@ function detailsAusExtrakt(ext,art){
     var v=detailAusStichpunkten(ext,k,erlaubt[k].t);if(v==null)return;
     if(k==="kennzeichen")v=kzNorm(v);
     if(k==="fin"||k==="hsn"||k==="tsn")v=String(v).toUpperCase().replace(/\s+/g,"");
+    if(k==="malo"){v=maloNorm(v);if(!v)return;}
     aus[k]=v;
   });
   /* Ausweise: Inhaber ist die Person, für die das Dokument ausgestellt ist */
@@ -6718,7 +6874,8 @@ function detailsAusExtrakt(ext,art){
   return aus;
 }
 /* Stichpunkt „Bezeichnung: Wert“ → Feldwert. Bei „alt → neu“ gilt der neue Wert. Nur exakte Bezeichnungen (oder feste Synonyme). */
-var FELD_SYNONYME={zaehlernummer:["Zähler-Nr","Zählernr","Zähler-Nummer"],rufnummer:["Telefonnummer","Mobilfunknummer"],
+var FELD_SYNONYME={zaehlernummer:["Zähler-Nr","Zählernr","Zähler-Nummer"],
+  malo:["MaLo","MaLo-Id","MaLo-Nr","Marktlokation","Marktlokations-ID","Marktlokations-Id","Marktlokationsnummer","Marktlokations-Identifikationsnummer","ID der Marktlokation"],rufnummer:["Telefonnummer","Mobilfunknummer"],
   kennzeichen:["Amtliches Kennzeichen"],fin:["FIN","Fahrgestellnummer","Fahrzeug-Identifizierungsnummer"],mitgliedsnummer:["Mitglieds-Nr"],
   deckungssumme:["Versicherungssumme"],tarif_stufe:["Tarif"]};
 function detailAusStichpunkten(ext,k,typ){
@@ -11884,6 +12041,7 @@ document.addEventListener("click",function(ev){
   if(a==="v-edit"){var c=vertragById(id);if(c)oeffneForm(c.art||"sonstiges",id,null);return;}
   if(a==="v-del"){laeuft(b,loescheVertrag(id));return;}
   if(a==="v-kuendigen"){laeuft(b,kuendigenBlatt(id));return;}
+  if(a==="v-abloesen"){laeuft(b,vertragAbloesen(id,b.dataset.k));return;}
   if(a==="v-kuend-ok"){var zum=val("k_zum");closeModal(true);setzeStatus(id,"gekuendigt",zum);return;}
   if(a==="v-aktiv"){laeuft(b,setzeStatus(id,"aktiv"));return;}
   if(a==="ics"){laeuft(b,icsExport(id));return;}
