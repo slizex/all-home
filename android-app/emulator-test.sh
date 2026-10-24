@@ -87,8 +87,13 @@ adb shell cmd uimode night no; sleep 1
 
 # 4. Bildschirmschutz
 prefs false true
-starten; sleep 8
-if adb shell dumpsys window windows | grep -A40 "$PKG" | grep "fl=" | grep -q "SECURE"; then ok "Bildschirmschutz: Fenster ist FLAG_SECURE"; else nein "Bildschirmschutz: FLAG_SECURE fehlt"; fi
+# Der Emulator beendet Apps gelegentlich, wenn die Google-Play-Dienste neu starten – dann noch einmal starten
+SICHER=0
+for v in 1 2 3; do
+  starten; sleep 8
+  if vorne | grep -q "$PKG" && adb shell dumpsys window windows | grep -A40 "$PKG/$PKG.MainActivity" | grep "fl=" | grep -q "SECURE"; then SICHER=1; break; fi
+done
+if [ $SICHER = 1 ]; then ok "Bildschirmschutz: Fenster ist FLAG_SECURE"; else nein "Bildschirmschutz: FLAG_SECURE fehlt (vorne: $(vorne))"; fi
 foto 4-schutz-schwarz
 
 # 5. App-Sperre mit Geräte-PIN
@@ -102,7 +107,9 @@ starten; sleep 4
 warte 5-sperre "All-Home entsperren" 15; foto 5-sperre
 echo "vorne vor PIN: $(vorne)" >> "$OUT/ablauf.txt"
 if hat 5-sperre "All-Home entsperren"; then ok "Sperre: PIN-Abfrage erscheint beim Start"; else nein "Sperre: keine Abfrage (vorne: $(vorne))"; fi
-# Abfrage abbrechen → das native Sperrbild bleibt; über „Entsperren“ erneut
+# Abfrage abbrechen → das native Sperrbild bleibt; über „Entsperren“ erneut.
+# Das erste „Zurück“ schließt nur die Tastatur der PIN-Eingabe, das zweite die Abfrage.
+adb shell input keyevent 4; sleep 1
 adb shell input keyevent 4; sleep 2
 warte 5c-sperrbild "All-Home ist gesperrt" 10; foto 5c-sperrbild
 if hat 5c-sperrbild "All-Home ist gesperrt" && hat 5c-sperrbild "Entsperren"; then ok "Sperre: Abbrechen lässt das Sperrbild stehen"; else nein "Sperre: nach Abbrechen kein Sperrbild"; fi
