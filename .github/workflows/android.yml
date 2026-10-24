@@ -1,0 +1,160 @@
+# All-Home Android-App: bauen, signieren, im Emulator prüfen, auf Wunsch veröffentlichen.
+# Die App lädt https://slizex.github.io/all-home/ – Web-Änderungen brauchen keinen neuen Bau.
+# Neu gebaut wird nur, wenn sich android-app/ ändert. Veröffentlichen: „Run workflow“ mit Haken.
+name: Android-App
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+    inputs:
+      veroeffentlichen:
+        description: 'Als Release veröffentlichen (Version aus android-app/app-version.json)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-app
+  cancel-in-progress: false
+
+jobs:
+  app:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write   # Release und Prüfbilder
+    env:
+      HAT_SCHLUESSEL: ${{ secrets.ALLHOME_KEYSTORE_B64 != '' && secrets.ALLHOME_KEYSTORE_PASSWORT != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+
+      # Der Gradle-Wrapper führt Code aus – nur das offizielle Original zulassen
+      - name: Gradle-Wrapper prüfen
+        run: |
+          V=$(sed -n 's/.*gradle-\([0-9.]*\)-all\.zip/\1/p' android-app/android/gradle/wrapper/gradle-wrapper.properties)
+          SOLL=$(curl -fsSL "https://services.gradle.org/distributions/gradle-$V-wrapper.jar.sha256")
+          IST=$(sha256sum android-app/android/gradle/wrapper/gradle-wrapper.jar | cut -d' ' -f1)
+          if [ "$SOLL" != "$IST" ]; then echo "::error title=Gradle-Wrapper::Prüfsumme weicht ab ($IST statt $SOLL)"; exit 1; fi
+
+      - name: Version
+        id: v
+        run: |
+          echo "name=$(node -p "require('./android-app/app-version.json').name")" >> "$GITHUB_OUTPUT"
+          echo "code=$(node -p "require('./android-app/app-version.json').code")" >> "$GITHUB_OUTPUT"
+
+      - name: Abhängigkeiten und Capacitor
+        working-directory: android-app
+        run: |
+          npm ci --no-audit --no-fund
+          npx cap sync android
+
+      - name: Signaturschlüssel
+        if: env.HAT_SCHLUESSEL == 'true'
+        env:
+          KS: ${{ secrets.ALLHOME_KEYSTORE_B64 }}
+        run: |
+          printf '%s' "$KS" | base64 -d > "$RUNNER_TEMP/allhome.p12"
+          echo "ALLHOME_KEYSTORE=$RUNNER_TEMP/allhome.p12" >> "$GITHUB_ENV"
+
+      - name: Ohne Schlüssel nur Testbau
+        if: env.HAT_SCHLUESSEL != 'true'
+        run: echo "::warning title=Signatur::Secrets ALLHOME_KEYSTORE_B64 / ALLHOME_KEYSTORE_PASSWORT fehlen – Testbau mit Debug-Signatur, kein Release."
+
+      - name: APK bauen
+        working-directory: android-app/android
+        env:
+          ALLHOME_KEYSTORE_PASSWORT: ${{ secrets.ALLHOME_KEYSTORE_PASSWORT }}
+        run: |
+          chmod +x gradlew
+          set +e
+          ./gradlew --no-daemon --stacktrace assembleRelease > "$RUNNER_TEMP/gradle.log" 2>&1
+          status=$?
+          set -e
+          tail -40 "$RUNNER_TEMP/gradle.log"
+          if [ $status -ne 0 ]; then
+            grep -E "error:|e: |What went wrong|FAILURE|> " "$RUNNER_TEMP/gradle.log" | head -12 | while IFS= read -r z; do echo "::error title=Gradle::${z:0:900}"; done
+            exit $status
+          fi
+          rm -f "$RUNNER_TEMP/allhome.p12"
+
+      - name: Signatur prüfen und benennen
+        id: apk
+        run: |
+          APK=android-app/android/app/build/outputs/apk/release/app-release.apk
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > zert.txt
+          ZERT=$(grep -m1 "certificate SHA-256 digest" zert.txt | sed 's/.*: //')
+          SCHEMA=$(grep -E "Verified using v[0-9] scheme.*true" zert.txt | sed 's/Verified using //;s/ scheme.*//' | tr '\n' ' ')
+          cp "$APK" all-home.apk
+          SHA=$(sha256sum all-home.apk | cut -d' ' -f1)
+          GR=$(stat -c %s all-home.apk)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "groesse=$GR" >> "$GITHUB_OUTPUT"
+          echo "::notice title=APK::Version ${{ steps.v.outputs.name }} (${{ steps.v.outputs.code }}) · $GR Bytes · SHA-256 $SHA · Zertifikat $ZERT · Schema $SCHEMA"
+
+      - name: KVM für den Emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Im Emulator prüfen
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: bash android-app/emulator-test.sh all-home.apk
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: all-home-app
+          path: |
+            all-home.apk
+            emulator-ergebnis/
+          if-no-files-found: ignore
+
+      # Bildschirmfotos aus dem Emulator (nur Anmelde-, Offline- und Sperrbild, keine echten Daten)
+      - name: Prüfbilder ablegen
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls emulator-ergebnis/*.png > /dev/null 2>&1 || exit 0
+          gh release delete app-pruefung --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+          gh release create app-pruefung emulator-ergebnis/*.png --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+            --target "$GITHUB_SHA" --title "App-Prüfung (Emulator)" \
+            --notes "Bildschirmfotos aus dem automatischen Emulator-Test, Lauf ${{ github.run_number }}. Keine echten Daten."
+
+      - name: Release veröffentlichen
+        if: inputs.veroeffentlichen && env.HAT_SCHLUESSEL == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.v.outputs.name }}"
+          cp all-home.apk "all-home-$V.apk"
+          gh release create "app-v$V" "all-home-$V.apk" all-home.apk --repo "$GITHUB_REPOSITORY" --latest \
+            --target "$GITHUB_SHA" --title "All-Home App $V" \
+            --notes "Android-App von All-Home. Installieren: Datei am Handy öffnen. SHA-256: ${{ steps.apk.outputs.sha }}"
+          echo "::notice title=Release::url=https://github.com/$GITHUB_REPOSITORY/releases/download/app-v$V/all-home-$V.apk sha256=${{ steps.apk.outputs.sha }} groesse=${{ steps.apk.outputs.groesse }} code=${{ steps.v.outputs.code }}"

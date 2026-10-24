@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="allhome_hg">#15130F</color>
+    <color name="allhome_text">#F3EDE4</color>
+    <color name="colorPrimary">#F3EDE4</color>
+    <color name="colorPrimaryDark">#15130F</color>
+    <color name="colorAccent">#EC6431</color>
+</resources>

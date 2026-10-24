@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/allhome_hg</item>
+    </style>
+
+    <!-- Nach dem Start: Capacitor setzt dieses Thema, der Hintergrund passt zu All-Home -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:windowBackground">@color/allhome_hg</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Startbildschirm: All-Home-Symbol auf dem App-Hintergrund -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/allhome_hg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_vordergrund</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

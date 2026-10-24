@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Langes Tippen aufs App-Symbol → „Scannen“ -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="scannen"
+        android:enabled="true"
+        android:icon="@drawable/ic_scannen"
+        android:shortcutShortLabel="@string/kurz_scannen"
+        android:shortcutLongLabel="@string/kurz_scannen_lang">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="allhome://scan"
+            android:targetClass="de.slizex.allhome.MainActivity"
+            android:targetPackage="de.slizex.allhome" />
+    </shortcut>
+</shortcuts>

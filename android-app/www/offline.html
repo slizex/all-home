@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-nvTNAe2IapqC1X9QgJ8ruKSykicurf94hzS95TTKXpM='; img-src data:">
+<title>All-Home</title>
+<style>
+:root{--bg:#f7f4ef;--text:#231f1a;--muted:#6a6156;--ink:#231f1a;--ink-fg:#fffaf2}
+@media (prefers-color-scheme:dark){:root{--bg:#15130f;--text:#f3ede4;--muted:#a39a8d;--ink:#f3ede4;--ink-fg:#15130f}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center;gap:14px}
+h1{font-size:1.25rem;margin:8px 0 0}
+p{margin:0;color:var(--muted)}
+button{margin-top:10px;border:0;border-radius:14px;padding:13px 22px;font:600 1rem/1 inherit;background:var(--ink);color:var(--ink-fg);min-height:48px}
+</style>
+</head>
+<body>
+<main>
+<svg width="72" height="72" viewBox="0 0 512 512" aria-hidden="true"><rect x="182" y="232" width="66" height="66" rx="18" fill="#ec6431"/><rect x="264" y="232" width="66" height="66" rx="18" fill="#1a9fd8"/><rect x="182" y="314" width="66" height="66" rx="18" fill="#e8930c"/><rect x="264" y="314" width="66" height="66" rx="18" fill="#1f9d62"/><path d="M256 104 L408 226 L408 392 Q408 412 388 412 L124 412 Q104 412 104 392 L104 226 Z" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="round"/></svg>
+<h1>Keine Verbindung</h1>
+<p id="info">All-Home versucht es gleich wieder.</p>
+<button id="nochmal" type="button">Erneut versuchen</button>
+</main>
+<script>
+(function(){
+  var ZIEL="https://slizex.github.io/all-home/",STUFEN=[2,5,15,30,60],K="allhome_offline_versuch",n=0,uhr=null;
+  try{n=parseInt(sessionStorage.getItem(K)||"0",10)||0;}catch(e){}
+  function laden(){try{sessionStorage.setItem(K,String(n+1));}catch(e){}location.replace(ZIEL);}
+  var s=STUFEN[Math.min(n,STUFEN.length-1)];
+  document.getElementById("info").textContent=s<60?"Neuer Versuch in "+s+" Sekunden.":"Neuer Versuch in einer Minute.";
+  uhr=setTimeout(laden,s*1000);
+  document.getElementById("nochmal").addEventListener("click",function(){clearTimeout(uhr);n=0;try{sessionStorage.removeItem(K);}catch(e){}laden();});
+  window.addEventListener("online",function(){clearTimeout(uhr);laden();});
+})();
+</script>
+</body>
+</html>

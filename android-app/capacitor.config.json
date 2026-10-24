@@ -1,0 +1,23 @@
+{
+  "appId": "de.slizex.allhome",
+  "appName": "All-Home",
+  "webDir": "www",
+  "server": {
+    "url": "https://slizex.github.io/all-home/",
+    "errorPath": "offline.html",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": false,
+    "appendUserAgent": "AllHomeApp"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_allhome",
+      "iconColor": "#2F6B4F"
+    }
+  }
+}

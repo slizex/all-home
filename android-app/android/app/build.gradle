@@ -1,0 +1,66 @@
+apply plugin: 'com.android.application'
+
+// Eine Stelle für die App-Version: android-app/app-version.json (liest auch der Cloud-Bau)
+def appVersion = new groovy.json.JsonSlurper().parse(file('../../app-version.json'))
+
+// Signaturschlüssel kommt im Cloud-Bau aus den GitHub-Secrets (siehe .github/workflows/android.yml)
+def schluessel = System.getenv('ALLHOME_KEYSTORE')
+
+android {
+    namespace = "de.slizex.allhome"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "de.slizex.allhome"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode appVersion.code as int
+        versionName appVersion.name as String
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (schluessel) {
+                storeFile file(schluessel)
+                storeType 'pkcs12'
+                storePassword System.getenv('ALLHOME_KEYSTORE_PASSWORT')
+                keyAlias 'allhome'
+                keyPassword System.getenv('ALLHOME_KEYSTORE_PASSWORT')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Ohne Schlüssel (Testbau): Debug-Signatur – installierbar, aber nie als Release veröffentlicht
+            signingConfig schluessel ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation "androidx.biometric:biometric:1.1.0"
+    implementation "com.google.android.gms:play-services-mlkit-document-scanner:16.0.0"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'

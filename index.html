@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-2hglFkHAYieytN/U3kZS75kCqaw6zV/nuWu9j3GAzEE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-Ltq6QTXRHQXAZtypdTYht26vwWeZFS2jpWR0n5Xpp98='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -644,6 +644,30 @@ main>.sug+.card,main>.sug+.sug,main>.card+.sug,main>.card+.card{margin-top:12px}
 .kvr .kw{margin-left:auto}
 /* Gesundheit auf dem Handy: Reiter 2 × 2, Filter umbrechen statt abgeschnitten */
 @media(max-width:559px){.langrow.medtabs{display:grid;grid-template-columns:1fr 1fr}.filt.medfilt .sel{flex:1 1 140px}}
+
+/* ================= 1.13.0: Android-App ================= */
+/* Update-Karte oben auf der Startseite */
+.appupd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.appupd-z{display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:0}
+.appupd .btn{flex:none;white-space:nowrap}
+.appupd .di{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--info-bg);color:var(--info);flex:none}
+.appupd .db{display:flex;flex-direction:column;min-width:0}
+.appupd .dn{font-weight:800}
+.appupd .dm{color:var(--muted);font-size:.86rem}
+/* Versionszeile unter der Anmeldung (nur in der App) */
+.authc .appv{margin:16px 0 0;text-align:center;font-size:.8rem}
+/* Dokument-Ansicht: ganze Fläche, Kopf mit Schließen / Öffnen mit / Teilen */
+#appAnsicht{position:fixed;inset:0;z-index:120;background:var(--bg);display:flex;flex-direction:column}
+body.ansicht-open{overflow:hidden}
+.aa-kopf{display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top)) 8px 8px;border-bottom:1px solid var(--line);background:var(--surface)}
+.aa-titel{flex:1 1 auto;min-width:0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aa-flaeche{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px 12px calc(12px + env(safe-area-inset-bottom));touch-action:pan-x pan-y}
+.aa-seiten{width:100%;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.aa-seite{width:100%;aspect-ratio:1/1.414;background:#fff;border-radius:6px;box-shadow:var(--sh-1);display:grid;place-items:center;overflow:hidden}
+.aa-bild{display:block;width:100%;height:auto;border-radius:6px;background:#fff}
+.aa-leer{display:grid;place-items:center;min-height:50vh;color:var(--muted);text-align:center;padding:16px}
+/* Untertitel in Auswahl-Kacheln: eigener Absatz mit engem Zeilenabstand */
+.artpick .pn .ps{display:block;margin-top:3px;font-size:.8rem;font-weight:700;line-height:1.35;color:var(--muted)}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -935,7 +959,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.12.1";
+var APP_VERSION="1.13.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -990,6 +1014,82 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.13.0 Android-App ---- */
+  "App-Version":"Версия приложения",
+  "Der Scanner läuft bereits.":"Сканер уже запущен.",
+  "Der Scanner ließ sich nicht öffnen.":"Не удалось открыть сканер.",
+  "Scanner nicht verfügbar.":"Сканер недоступен.",
+  "Seite gibt es nicht.":"Такой страницы нет.",
+  "Seite konnte nicht gelesen werden.":"Не удалось прочитать страницу.",
+  "Seite konnte nicht gezeichnet werden.":"Не удалось отобразить страницу.",
+  "Datei gibt es nicht.":"Такого файла нет.",
+  "Die Datei konnte nicht gespeichert werden.":"Не удалось сохранить файл.",
+  "Keine passende App gefunden.":"Подходящее приложение не найдено.",
+  "Die Datei konnte nicht weitergegeben werden.":"Не удалось передать файл.",
+  "Dieses PDF lässt sich nicht anzeigen (vielleicht mit Passwort geschützt).":"Этот PDF нельзя показать (возможно, он защищён паролем).",
+  "Ungültige Update-Angabe.":"Неверные данные обновления.",
+  "Die Prüfsumme des Updates stimmt nicht.":"Контрольная сумма обновления не совпадает.",
+  "Update fehlgeschlagen.":"Обновление не удалось.",
+  "Das Update ist nicht mehr da – bitte erneut tippen.":"Обновление пропало — нажми ещё раз.",
+  "Der Android-Installer wurde nicht gefunden.":"Установщик Android не найден.",
+  "Der Download wurde zu oft umgeleitet.":"Загрузку перенаправляли слишком часто.",
+  "Der Download ist nicht verschlüsselt.":"Загрузка не зашифрована.",
+  "Das Update ist zu groß.":"Обновление слишком большое.",
+  "Die Datei ist keine gültige App.":"Файл не является приложением.",
+  "Das Update gehört nicht zu All-Home.":"Обновление не относится к All-Home.",
+  "Das Update ist nicht neuer als die installierte App.":"Обновление не новее установленного приложения.",
+  "Das Update ist nicht mit dem Schlüssel von All-Home signiert.":"Обновление подписано не ключом All-Home.",
+  "App":"Приложение",
+  "App einrichten":"Настройка приложения",
+  "Mit Fingerabdruck schützen":"Защитить отпечатком пальца",
+  "Fingerabdruck, Gesicht oder Geräte-PIN":"Отпечаток, лицо или PIN-код устройства",
+  "Erst eine Bildschirmsperre am Handy einrichten":"Сначала настрой блокировку экрана на телефоне",
+  "Erst eine Bildschirmsperre am Handy einrichten.":"Сначала настрой блокировку экрана на телефоне.",
+  "Erinnerungen":"Напоминания",
+  "Fristen und Termine · 30 und 7 Tage vorher, am letzten Tag":"Сроки и даты · за 30 и 7 дней, в последний день",
+  "Fristen und Termine · 30 und 7 Tage vorher, am letzten Tag · 9 Uhr":"Сроки и даты · за 30 и 7 дней, в последний день · 9:00",
+  "App-Sperre":"Блокировка приложения",
+  "Fingerabdruck, Gesicht oder Geräte-PIN · nach 5 Minuten im Hintergrund":"Отпечаток, лицо или PIN-код · через 5 минут в фоне",
+  "Bildschirmschutz":"Защита экрана",
+  "Keine Screenshots, keine Vorschau in der App-Übersicht":"Без скриншотов и без превью в списке приложений",
+  "Version":"Версия",
+  "Auf {0} aktualisieren":"Обновить до {0}",
+  "Android-App installieren":"Установить приложение для Android",
+  "Version {0}":"Версия {0}",
+  "App-Sperre an":"Блокировка включена",
+  "App-Sperre aus":"Блокировка выключена",
+  "Bildschirmschutz an":"Защита экрана включена",
+  "Bildschirmschutz aus":"Защита экрана выключена",
+  "Neue App-Version":"Новая версия приложения",
+  "{0} statt {1}":"{0} вместо {1}",
+  "Lädt …":"Загрузка …",
+  "App-Update nötig":"Нужно обновить приложение",
+  "Diese Version ({0}) wird nicht mehr unterstützt.":"Эта версия ({0}) больше не поддерживается.",
+  "Lädt … {0} %":"Загрузка … {0} %",
+  "Ohne die Erlaubnis „Apps installieren“ geht es nicht – bitte erneut tippen und erlauben.":"Без разрешения «Установка приложений» не получится — нажми ещё раз и разреши.",
+  "Gespeichert ✅":"Сохранено ✅",
+  "Öffnen mit":"Открыть с помощью",
+  "Teilen":"Поделиться",
+  "Seite öffnen mit …":"Открыть страницу с помощью …",
+  "Datei konnte nicht gelesen werden.":"Не удалось прочитать файл.",
+  "Scanner wird geöffnet …":"Открывается сканер …",
+  "Seite {0} von {1} wird übernommen …":"Страница {0} из {1} переносится …",
+  "Seite wird übernommen …":"Страница переносится …",
+  "Google-Scanner nicht verfügbar – es geht mit dem eigenen weiter.":"Сканер Google недоступен — продолжаем со встроенным.",
+  "{0} Seite ließ sich nicht übernehmen.":"{0} страницу не удалось перенести.",
+  "{0} Seiten ließen sich nicht übernehmen.":"{0} страниц не удалось перенести.",
+  "Benachrichtigungen sind für All-Home ausgeschaltet (Android-Einstellungen).":"Уведомления для All-Home выключены (настройки Android).",
+  "Erinnerungen an":"Напоминания включены",
+  "Erinnerungen aus":"Напоминания выключены",
+  "in {0} Tag":"через {0} день",
+  "{0}: heute letzter Kündigungstag":"{0}: сегодня последний день для расторжения",
+  "{0}: Kündigungsfrist {1}":"{0}: срок расторжения {1}",
+  "{0}: Sonderkündigung prüfen":"{0}: проверить досрочное расторжение",
+  "Preiserhöhung vom {0} – kündigen meist nur bis zum Wirksamwerden.":"Повышение цены от {0} — расторгнуть обычно можно только до вступления в силу.",
+  "{0}: Einwände bis {1}":"{0}: возражения до {1}",
+  "Fristen und Termine":"Сроки и даты",
+  "Preiserhöhung":"Повышение цены",
 
 /* ---- 1.11.0 Zeit ---- */
   "Die Analyse hat zu lange gedauert. Bitte „Schnell“ wählen oder später erneut versuchen.":"Анализ занял слишком много времени. Выбери «Быстро» или попробуй позже.",
@@ -2626,6 +2726,9 @@ var ICONS={
 ,
   plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
   health:'<path d="M19.5 12.6 12 20l-7.5-7.4A4.6 4.6 0 0 1 12 6.3a4.6 4.6 0 0 1 7.5 6.3z"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  download:'<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+  extern:'<path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   shield:'<path d="M12 3l7.5 3v6c0 4.4-3.1 7.9-7.5 9-4.4-1.1-7.5-4.6-7.5-9V6z"/>',
   folder:'<path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2.5h8.5A1.5 1.5 0 0 1 21 10v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/>',
   bell:'<path d="M18 15V10a6 6 0 1 0-12 0v5l-1.5 2.5h15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
@@ -3118,6 +3221,7 @@ function applyTheme(dark){
   var m=document.querySelector('meta[name="theme-color"]');
   if(m)m.setAttribute("content",dark?"#15130f":"#f7f4ef");
   try{localStorage.setItem("ahTheme",dark?"dark":"light");}catch(e){}
+  systemLeisten();
 }
 
 /* ================= Routing ================= */
@@ -3206,6 +3310,7 @@ function render(){
   var r=$("#root");if(!r)return;
   /* Freigabe-Link aus der Mail: geht auch ohne Anmeldung */
   if(route().name==="freigabe"){r.innerHTML=freigabeSeiteHtml();return;}
+  if(appUpdatePflicht()){r.innerHTML=appPflichtHtml();return;}
   if(booting){r.innerHTML=ladeHtml();return;}
   if(!me){r.innerHTML=authHtml();return;}
   /* Konto noch nicht freigegeben: nur die Warteseite */
@@ -3486,9 +3591,11 @@ async function ladeAlles(){
    Der Anmelde-Bildschirm bleibt bewusst immer deutsch: die Sprache liegt pro
    Benutzer in der Datenbank und ist vor dem Login unbekannt. */
 var AUTH_MODE="login";
+var AUTH_CODE=null;   /* {mail, art:"recovery"|"signup"} – wofür der Code aus der Mail gilt */
 function authHtml(){
   var reset=AUTH_MODE==="reset";
   if(AUTH_MODE==="signup")return signupHtml();
+  if(AUTH_MODE==="code")return codeHtml();
   return '<div class="auth"><form class="authc" id="authForm" novalidate><img class="logo" src="icon.svg?v=2" alt="">'+
     '<h1>'+(reset?"Neues Passwort":"All-Home")+'</h1>'+
     '<p>'+(reset?"Vergib jetzt ein neues Passwort.":"Alle Verträge deines Haushalts an einem Ort.")+'</p>'+
@@ -3499,7 +3606,19 @@ function authHtml(){
        '<label class="fld"><span>Passwort</span><input class="inp" id="a_pass" type="password" autocomplete="current-password"></label>'+
        '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="login">Anmelden</button>'+
        '<div class="arow"><button type="button" class="lnk" data-a="signup">Neues Konto</button><button type="button" class="lnk" data-a="forgot">Passwort vergessen?</button></div>')+
-  '</form></div>';
+  appVersionZeile()+'</form></div>';
+}
+/* Code aus der Mail: geht in der App und im Browser, auch wenn der Link in einer anderen App aufgeht */
+function codeHtml(){
+  var neu=AUTH_CODE&&AUTH_CODE.art==="signup";
+  return '<div class="auth"><form class="authc" id="authForm" novalidate><img class="logo" src="icon.svg?v=2" alt="">'+
+    '<h1>Code aus der Mail</h1>'+
+    '<p>'+(neu?"Zum Bestätigen deiner E-Mail-Adresse.":"Zum Zurücksetzen deines Passworts.")+'</p>'+
+    '<label class="fld"><span>E-Mail</span><input class="inp" id="a_mail" type="email" autocomplete="username" inputmode="email" value="'+esc((AUTH_CODE&&AUTH_CODE.mail)||"")+'"></label>'+
+    '<label class="fld"><span>Code</span><input class="inp" id="a_code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="12"></label>'+
+    '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="code">Bestätigen</button>'+
+    '<div class="arow"><button type="button" class="lnk" data-a="auth-login">Zur Anmeldung</button><button type="button" class="lnk" data-a="code-neu">Neuen Code senden</button></div>'+
+  appVersionZeile()+'</form></div>';
 }
 /* Neues Konto: Vor- und Nachname gehen an den Administrator, der das Konto freigibt */
 function signupHtml(){
@@ -3545,8 +3664,8 @@ async function doSignup(){
     var r=await sb.auth.signUp({email:mail,password:pass,options:{emailRedirectTo:location.origin+location.pathname,data:{vorname:vn.slice(0,80),nachname:nn.slice(0,80),app:"all-home"}}});
     if(r.error){authMsg(loginFehler(r.error),"err");return;}
     if(r.data&&r.data.session){authMsg("Konto erstellt – du wirst angemeldet …","ok");return;}
-    AUTH_MODE="login";render();var am=$("#a_mail");if(am)am.value=mail;
-    authMsg("Fast fertig! Bitte bestätige deine E-Mail-Adresse über den Link in unserer Mail an "+mail+". Danach gibt der Administrator dein Konto frei.","ok");
+    AUTH_CODE={mail:mail,art:"signup"};AUTH_MODE="code";render();
+    authMsg("Fast fertig! Bitte bestätige deine E-Mail-Adresse: Code aus unserer Mail an "+mail+" eingeben oder den Link öffnen. Danach gibt der Administrator dein Konto frei.","ok");
   }catch(e){authMsg(loginFehler(e),"err");}
 }
 async function doForgot(){
@@ -3557,7 +3676,34 @@ async function doForgot(){
     var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname});
     if(r.error){authMsg(loginFehler(r.error),"err");return;}
     /* Der Server sagt aus Datenschutzgründen nicht, ob es die Adresse gibt – darum ehrlich formulieren */
-    authMsg("Falls es ein Konto mit "+mail+" gibt, ist jetzt eine E-Mail zum Zurücksetzen unterwegs. Nichts angekommen? Schreibweise und Spam-Ordner prüfen.","ok");
+    AUTH_CODE={mail:mail,art:"recovery"};AUTH_MODE="code";render();
+    authMsg("Falls es ein Konto mit "+mail+" gibt, ist jetzt eine E-Mail unterwegs. Code hier eingeben oder den Link in der Mail öffnen. Nichts angekommen? Spam-Ordner prüfen.","ok");
+  }catch(e){authMsg(loginFehler(e),"err");}
+}
+async function doCode(){
+  var mail=($("#a_mail").value||"").trim(),code=($("#a_code").value||"").replace(/\D/g,"");
+  if(!mail){authMsg("Bitte deine E-Mail-Adresse eingeben.","err");return;}
+  if(code.length<6||code.length>10){authMsg("Bitte den Code aus der Mail eingeben (nur Ziffern).","err");return;}
+  var art=(AUTH_CODE&&AUTH_CODE.art)||"recovery";
+  authMsg("Code wird geprüft …");
+  try{
+    var r=await sb.auth.verifyOtp({email:mail,token:code,type:art});
+    if(r.error){authMsg(/expired|invalid/i.test(errMsg(r.error))?"Der Code ist falsch oder abgelaufen.":loginFehler(r.error),"err");return;}
+    AUTH_CODE=null;
+    if(art==="recovery"){AUTH_MODE="reset";render();authMsg("Code bestätigt – jetzt das neue Passwort.","ok");}
+    else{AUTH_MODE="login";authMsg("E-Mail bestätigt ✅","ok");}
+  }catch(e){authMsg(loginFehler(e),"err");}
+}
+async function codeNeuSenden(){
+  var mail=($("#a_mail").value||"").trim();
+  if(!mail){authMsg("Bitte deine E-Mail-Adresse eingeben.","err");return;}
+  var art=(AUTH_CODE&&AUTH_CODE.art)||"recovery";
+  try{
+    var r=art==="signup"?await sb.auth.resend({type:"signup",email:mail,options:{emailRedirectTo:location.origin+location.pathname}})
+                        :await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname});
+    if(r.error){authMsg(loginFehler(r.error),"err");return;}
+    AUTH_CODE={mail:mail,art:art};
+    authMsg("Neuer Code ist unterwegs.","ok");
   }catch(e){authMsg(loginFehler(e),"err");}
 }
 async function doSetPass(){
@@ -3659,7 +3805,7 @@ function viewStart(){
   /* Monatskosten: dieselbe Rechnung wie auf der Kostenseite */
   var mk=kostenPosten().reduce(function(s,p){return s+p.m;},0);
   var fristen=naheTermine(60);
-  return topBar()+
+  return topBar()+appUpdateKarte()+
     '<div class="kpis k3">'+
       '<a class="kpi" href="#/kosten"><div class="kl">'+t("Pro Monat")+'</div><div class="kv">'+eur0(mk)+'</div><div class="ks">'+tn(aktive.length,"{0} laufender Vertrag","{0} laufende Verträge")+'</div></a>'+
       '<a class="kpi" href="#/kosten"><div class="kl">'+t("Pro Jahr")+'</div><div class="kv">'+eur0(mk*12)+'</div><div class="ks">'+t("hochgerechnet")+'</div></a>'+
@@ -3886,6 +4032,7 @@ function viewMehr(){
         '<span class="dm"><span>'+tn(LOGO_REG.length,"{0} Logo","{0} Logos")+(anbieterOhneLogo().length?' · '+tn(anbieterOhneLogo().length,"{0} Anbieter ohne Logo","{0} Anbieter ohne Logo"):"")+'</span></span></span>'+
         '<span class="go">'+ic("right",18)+'</span></a>':"")+
       '</section>':"")+
+    appMehrBlock()+
     '<div class="mgrp">'+t("Sprache")+'</div>'+
     '<section class="card">'+
       '<p class="hint" style="margin:0 0 10px">'+t("Gilt nur für dich – andere im Haushalt behalten ihre Sprache.")+'</p>'+
@@ -4432,6 +4579,7 @@ function icsExport(id){
   toast(t("Kalender-Datei erstellt 📅"));
 }
 function lade(blob,name){
+  if(istApp()){appSpeichern(blob,name);return;}
   var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
   document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);
@@ -5233,6 +5381,7 @@ async function dokumentAnzeigen(id){
   var d=DOCS.filter(function(x){return x.id===id;})[0];if(!d)return;
   var pfade=[d.storage_path].concat(d.weitere_seiten||[]).filter(Boolean);
   if(pfade.length>1){bildBetrachter(d,pfade);return;}
+  if(istApp()){appDokAnsicht(d);return;}
   try{
     var r=await sb.storage.from(BUCKET).createSignedUrl(d.storage_path,120);
     if(r.error)throw r.error;
@@ -5252,7 +5401,7 @@ async function bildBetrachter(d,pfade){
       '<div class="bbnav"><button class="ibtn" data-a="bb" data-r="-1" id="bbZ" disabled aria-label="'+esc(t("Vorherige Seite"))+'">'+ic("left")+'</button>'+
         '<span id="bbN">'+tf("Seite {0} von {1}",1,BB.urls.length)+'</span>'+
         '<button class="ibtn" data-a="bb" data-r="1" id="bbV" aria-label="'+esc(t("Nächste Seite"))+'">'+ic("right")+'</button></div>'+
-      '<div class="factions"><button class="btn ghost" data-a="bb-tab">'+ic("share")+' '+t("Seite in neuem Tab öffnen")+'</button>'+
+      '<div class="factions"><button class="btn ghost" data-a="bb-tab">'+ic(istApp()?"extern":"share")+' '+(istApp()?t("Seite öffnen mit …"):t("Seite in neuem Tab öffnen"))+'</button>'+
       '<button class="btn ghost" data-a="modal-close">'+t("Schließen")+'</button></div>');
   }catch(e){toast(t("Konnte Dokument nicht öffnen")+": "+errMsg(e),true);}
 }
@@ -8032,6 +8181,7 @@ function scanModus(m){
   if(!SCAN)return;
   SCAN.modus=m;
   var kam=$("#scKam"),inh=$("#scInhalt");
+  if(m==="kamera"&&appScannerNutzen()){appScannen();return;}
   if(m==="kamera"){
     inh.hidden=true;inh.innerHTML="";kam.hidden=false;
     stapelZeichnen();autoZeichnen();kameraAn();
@@ -8400,18 +8550,20 @@ function bildLaden(blob){
 function leinwandBlob(c,typ,q){return new Promise(function(ok,nein){c.toBlob(function(b){b?ok(b):nein(new Error(t("Bild konnte nicht verarbeitet werden.")));},typ||"image/jpeg",q||0.9);});}
 
 /* Aus einem Bild eine Seite machen: Original (≤ 3264 px) aufheben, Ecken suchen und schärfen */
-async function seiteAusBild(quelle,w,h,eckenHinweis){
+async function seiteAusBild(quelle,w,h,eckenHinweis,fertig){
   var s=Math.min(1,3264/Math.max(w,h)),ow=Math.round(w*s),oh=Math.round(h*s);
   var c=document.createElement("canvas");c.width=ow;c.height=oh;
   var x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(quelle,0,0,ow,oh);
   var blob=await leinwandBlob(c,"image/jpeg",0.9);
-  var ecken=null,klein=puffer(c,ow,oh,400),r=sbViereck(klein);
-  if(r&&r.guete>=0.25)ecken=r.ecken;
+  /* fertig = schon zugeschnitten (Googles Scanner): ganze Fläche, kein eigener Filter */
+  var ecken=null,klein=fertig?null:puffer(c,ow,oh,400),r=fertig?null:sbViereck(klein);
+  if(fertig)ecken=[[0,0],[1,0],[1,1],[0,1]];
+  else if(r&&r.guete>=0.25)ecken=r.ecken;
   else if(eckenHinweis)ecken=eckenHinweis;
-  if(ecken){try{ecken=sbVerfeinern(puffer(c,ow,oh,1400),ecken);}catch(e){}}
+  if(ecken&&!fertig){try{ecken=sbVerfeinern(puffer(c,ow,oh,1400),ecken);}catch(e){}}
   else ecken=[[0.02,0.02],[0.98,0.02],[0.98,0.98],[0.02,0.98]];
   var seite={id:"s"+Date.now()+Math.random().toString(36).slice(2,6),blob:blob,w:ow,h:oh,ecken:ecken,dreh:0,
-             filter:SCAN.filterStd||"auto",erkannt:!!(r||eckenHinweis),unscharf:seiteUnscharf(c,ecken)};
+             filter:fertig?"original":(SCAN.filterStd||"auto"),erkannt:!!(r||eckenHinweis||fertig),unscharf:fertig?null:seiteUnscharf(c,ecken)};
   /* „Neu aufnehmen“: die neue Aufnahme tritt an die Stelle der alten. Still = Wiederholung wegen
      Unschärfe im Sucher, ohne in die Seitenansicht zu springen. */
   var alt=SCAN.ersetzen?SCAN.seiten.map(function(p){return p.id;}).indexOf(SCAN.ersetzen):-1;
@@ -10254,9 +10406,7 @@ function nkCsv(){
   });
   if(zeilen.length<2){toast(t("Keine steuerlich absetzbaren Positionen erfasst."),true);return;}
   var csv="﻿"+zeilen.map(function(r){return r.map(z).join(";");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
-  a.download="nebenkosten-steuer.csv";document.body.appendChild(a);a.click();
-  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);
+  lade(new Blob([csv],{type:"text/csv;charset=utf-8"}),"nebenkosten-steuer.csv");
 }
 
 /* ================= Einbindung: Termine, Vorschläge, Kosten ================= */
@@ -11951,6 +12101,534 @@ async function nkaUebersetzen(id){
   catch(e){toast(t("Übersetzen fehlgeschlagen")+": "+errMsg(e),true);}
 }
 
+/* ================= Android-App =================
+   Die App (android-app/ im Repo) lädt genau diese Seite und reicht über
+   Capacitor native Funktionen herein (Plugin „AllHome“, App, LocalNotifications,
+   SystemBars). Im Browser gibt es window.Capacitor nicht – dort bleibt hier
+   alles stumm. Neue Web-Funktionen brauchen deshalb keine neue APK; eine
+   neue APK nur, wenn sich am nativen Teil etwas ändert. */
+var APP=null;              /* AllHome.info(): version, code, sperre, sperreMoeglich, schutz, eingerichtet */
+var APP_UPDATE=null;       /* android-app.json: version, code, mindest, url, sha256, groesse */
+var APP_UPDATE_AM=0;
+var APP_UPD=null;          /* laufendes Update: {geladen, gesamt} */
+var APP_ZIEL=null;         /* Sprung (Verknüpfung, Erinnerung), bis die Daten geladen sind */
+var APP_SCAN_FEHLT=false;  /* Google-Scanner fehlt → eigener Scanner */
+var APP_EINRICHTEN_GEZEIGT=false;
+var APP_ERINNERN_KEY="ah_app_erinnerungen";
+var APP_PLAN_AM=0;
+var APP_GETEILT_LAEUFT=false;
+
+function istApp(){
+  try{return !!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.AllHome);}
+  catch(e){return false;}
+}
+function appP(n){try{return (window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins[n])||null;}catch(e){return null;}}
+function appFehler(e){return t(errMsg(e));}
+function istAndroidBrowser(){return !istApp()&&/Android/i.test(navigator.userAgent||"");}
+
+/* ---- Base64 ↔ Blob (die Brücke kennt nur Text) ---- */
+function blobBase64(blob){
+  return new Promise(function(ok,nein){
+    var r=new FileReader();
+    r.onload=function(){var s=String(r.result||"");ok(s.slice(s.indexOf(",")+1));};
+    r.onerror=function(){nein(r.error||new Error(t("Datei konnte nicht gelesen werden.")));};
+    r.readAsDataURL(blob);
+  });
+}
+function base64Blob(b64,mime){
+  var bin=atob(b64||""),n=bin.length,b=new Uint8Array(n);
+  for(var i=0;i<n;i++)b[i]=bin.charCodeAt(i);
+  return new Blob([b],{type:mime||"application/octet-stream"});
+}
+
+/* ================= Start ================= */
+async function appStart(){
+  if(!istApp())return;
+  document.documentElement.classList.add("in-app");
+  var A=appP("AllHome");
+  try{APP=await A.info();}catch(e){APP={};}
+  A.addListener("geteilt",function(){geteiltAbholen();});
+  A.addListener("updateFortschritt",function(p){appUpdateFortschritt(p);});
+  var Ap=appP("App");
+  if(Ap){
+    Ap.addListener("backButton",appZurueck);
+    Ap.addListener("appUrlOpen",function(d){appLink(d&&d.url);});
+    Ap.addListener("resume",appWiederDa);
+  }
+  var LN=appP("LocalNotifications");
+  if(LN)LN.addListener("localNotificationActionPerformed",function(a){
+    var x=a&&a.notification&&a.notification.extra;
+    if(x&&x.href)appSprung(x.href,x.hh||null);
+  });
+  systemLeisten();
+  appUpdatePruefen(true);
+  if(!me||booting)render();   /* Versionszeile auf der Anmeldeseite */
+}
+/* Nach dem Laden der Daten (starteSitzung): Sprungziel, Geteiltes, Einrichtung, Erinnerungen */
+function appNachLaden(){
+  if(!istApp()||!me)return;
+  if(APP_ZIEL){var z=APP_ZIEL;APP_ZIEL=null;appSprung(z.href,z.hh);}
+  geteiltAbholen();
+  appEinrichtenZeigen();
+  erinnerungenPlanen();
+}
+function appWiederDa(){
+  if(!istApp())return;
+  appUpdatePruefen(false);
+  if(me&&!booting&&Date.now()-APP_PLAN_AM>10*60*1000)erinnerungenPlanen();
+}
+/* Statusleiste passend zu Hell/Dunkel der App (nicht des Handys) */
+function systemLeisten(){
+  var S=appP("SystemBars");if(!S||!istApp())return;
+  try{S.setStyle({style:isDark()?"DARK":"LIGHT"});}catch(e){}
+}
+
+/* ---- Zurück-Taste: erst Ansicht/Blatt/Scanner schließen, dann eine Seite zurück, am Start minimieren ---- */
+function appZurueck(){
+  if(APP_ANSICHT){ansichtZu();return;}
+  var m=$("#modal");if(m&&!m.hidden){closeModal();return;}
+  if(SCAN){scanZurueck();return;}
+  var h=location.hash||"";
+  if(h&&h!=="#/start"&&h!=="#/"){if(window.history.length>1)window.history.back();else go("#/start");return;}
+  var Ap=appP("App");if(Ap&&Ap.minimizeApp)Ap.minimizeApp();
+}
+/* Verknüpfung „Scannen“ am App-Symbol (allhome://scan) */
+function appLink(url){
+  if(!url)return;
+  if(/^allhome:\/\/scan/i.test(url))appSprung("#/scan",null);
+}
+async function appSprung(href,hh){
+  if(!href||href.charAt(0)!=="#")return;
+  if(!me||booting||!HH){APP_ZIEL={href:href,hh:hh};return;}
+  if(hh&&HH.id!==hh&&hausById(hh))await haushaltSetzen(hh);
+  if(href==="#/scan")scanStart({});
+  else go(href);
+}
+
+/* ================= Einrichtung (einmal je Gerät) ================= */
+function appEinrichtenZeigen(){
+  if(!istApp()||!APP||APP.eingerichtet||APP_EINRICHTEN_GEZEIGT||freigabeFehlt())return;
+  APP_EINRICHTEN_GEZEIGT=true;
+  openModal('<h2 class="mhead">'+ic("lock")+' '+t("App einrichten")+'</h2>'+
+    '<div class="pickliste">'+
+      appWahl("app-e-sperre",APP.sperreMoeglich,t("Mit Fingerabdruck schützen"),
+        APP.sperreMoeglich?t("Fingerabdruck, Gesicht oder Geräte-PIN"):t("Erst eine Bildschirmsperre am Handy einrichten"),!APP.sperreMoeglich)+
+      appWahl("app-e-erinnern",true,t("Erinnerungen"),t("Fristen und Termine · 30 und 7 Tage vorher, am letzten Tag"),false)+
+    '</div>'+
+    '<div class="factions"><button class="btn lg full" data-a="app-einrichten-ok">'+t("Fertig")+'</button></div>');
+}
+function appWahl(a,an,titel,text,aus){
+  return '<button class="artpick'+(an?" on":"")+'" data-a="'+a+'"'+(aus?' disabled':'')+'>'+
+    '<span class="pn">'+esc(titel)+'<span class="ps">'+esc(text)+'</span></span>'+
+    '<span class="ck">'+ic("check",14)+'</span></button>';
+}
+async function appEinrichtenFertig(){
+  var sp=$('[data-a="app-e-sperre"]'),er=$('[data-a="app-e-erinnern"]');
+  var sperre=!!(sp&&sp.classList.contains("on")&&!sp.disabled),erinnern=!!(er&&er.classList.contains("on"));
+  var A=appP("AllHome");
+  if(sperre){try{var r=await A.sperreSetzen({an:true});APP.sperre=!!(r&&r.an);}catch(e){}}
+  if(erinnern)await erinnerungenSchalten(true,true);
+  try{await A.eingerichtet();}catch(e){}
+  APP.eingerichtet=true;
+  closeModal();
+}
+
+/* ================= Einstellungen in „Mehr“ ================= */
+function appMehrBlock(){
+  if(istApp()&&APP){
+    var neu=APP_UPDATE&&APP_UPDATE.code>(APP.code||0);
+    return '<div class="mgrp">'+t("App")+'</div>'+
+      '<section class="card"><div class="pickliste">'+
+        appWahl("app-sperre",APP.sperre,t("App-Sperre"),
+          APP.sperreMoeglich?t("Fingerabdruck, Gesicht oder Geräte-PIN · nach 5 Minuten im Hintergrund"):t("Erst eine Bildschirmsperre am Handy einrichten"),!APP.sperreMoeglich&&!APP.sperre)+
+        appWahl("app-schutz",APP.schutz!==false,t("Bildschirmschutz"),t("Keine Screenshots, keine Vorschau in der App-Übersicht"),false)+
+        appWahl("app-erinnern",erinnerungenAn(),t("Erinnerungen"),t("Fristen und Termine · 30 und 7 Tage vorher, am letzten Tag · 9 Uhr"),false)+
+      '</div>'+
+      '<div class="kvr" style="margin-top:12px"><span class="kk">'+t("App-Version")+'</span><span class="kw">'+esc(APP.version||"?")+'</span></div>'+
+      (neu?'<button class="btn full" style="margin-top:10px" data-a="app-update">'+ic("download")+' '+tf("Auf {0} aktualisieren",esc(APP_UPDATE.version))+'</button>':"")+
+      '</section>';
+  }
+  if(istAndroidBrowser()&&APP_UPDATE&&APP_UPDATE.url)
+    return '<div class="mgrp">'+t("App")+'</div>'+
+      '<section class="card"><a class="drow3" href="'+esc(APP_UPDATE.url)+'" rel="noopener"><span class="di">'+ic("download")+'</span>'+
+        '<span class="db"><span class="dn">'+t("Android-App installieren")+'</span>'+
+        '<span class="dm"><span>'+tf("Version {0}",esc(APP_UPDATE.version))+'</span></span></span>'+
+        '<span class="go">'+ic("right",18)+'</span></a></section>';
+  return "";
+}
+async function appSperreUmschalten(){
+  var A=appP("AllHome");if(!A||!APP)return;
+  try{
+    var r=await A.sperreSetzen({an:!APP.sperre});
+    APP.sperre=!!(r&&r.an);
+    if(r&&r.grund==="nicht-moeglich")toast(t("Erst eine Bildschirmsperre am Handy einrichten."),true);
+    else toast(APP.sperre?t("App-Sperre an"):t("App-Sperre aus"));
+  }catch(e){toast(appFehler(e),true);}
+  render();
+}
+async function appSchutzUmschalten(){
+  var A=appP("AllHome");if(!A||!APP)return;
+  try{var r=await A.schutzSetzen({an:APP.schutz===false});APP.schutz=!!(r&&r.an);
+    toast(APP.schutz?t("Bildschirmschutz an"):t("Bildschirmschutz aus"));}
+  catch(e){toast(appFehler(e),true);}
+  render();
+}
+
+/* ================= App-Update ================= */
+async function appUpdatePruefen(sofort){
+  if(!istApp()&&!istAndroidBrowser())return;
+  if(!sofort&&Date.now()-APP_UPDATE_AM<6*3600*1000)return;
+  APP_UPDATE_AM=Date.now();
+  try{
+    var r=await fetch("android-app.json?t="+Date.now(),{cache:"no-store"});
+    if(!r.ok)return;
+    var j=await r.json();
+    if(!j||!(j.code>0)||!/^https:\/\/github\.com\/slizex\/all-home\/releases\/download\//.test(String(j.url||"")))return;
+    var vorher=APP_UPDATE?APP_UPDATE.code:0;
+    APP_UPDATE={version:String(j.version||""),code:+j.code,mindest:+j.mindest||0,url:String(j.url),sha256:String(j.sha256||""),groesse:+j.groesse||0};
+    if(APP_UPDATE.code!==vorher&&$("#root"))render();
+  }catch(e){}
+}
+function appUpdatePflicht(){return !!(istApp()&&APP&&APP.code&&APP_UPDATE&&APP.code<APP_UPDATE.mindest);}
+function appUpdateFrei(){return !!(istApp()&&APP&&APP.code&&APP_UPDATE&&APP_UPDATE.code>APP.code);}
+/* Karte oben auf der Startseite */
+function appUpdateKarte(){
+  if(!appUpdateFrei())return "";
+  return '<section class="card appupd"><div class="appupd-z"><span class="di">'+ic("download")+'</span>'+
+    '<span class="db"><span class="dn">'+t("Neue App-Version")+'</span><span class="dm" id="appUpdStand">'+
+      (APP_UPD?appUpdText():tf("{0} statt {1}",esc(APP_UPDATE.version),esc(APP.version||"?")))+'</span></span></div>'+
+    '<button class="btn sm" data-a="app-update"'+(APP_UPD?' disabled':'')+'>'+(APP_UPD?t("Lädt …"):t("Aktualisieren"))+'</button></section>';
+}
+/* Website braucht eine neuere Hülle: nur noch das Update */
+function appPflichtHtml(){
+  return '<div class="auth"><div class="authc"><img class="logo" src="icon.svg?v=2" alt="">'+
+    '<h1>'+t("App-Update nötig")+'</h1><p>'+tf("Diese Version ({0}) wird nicht mehr unterstützt.",esc(APP.version||"?"))+'</p>'+
+    '<p class="mut" id="appUpdStand">'+(APP_UPD?appUpdText():"")+'</p>'+
+    '<button class="btn lg full" data-a="app-update"'+(APP_UPD?' disabled':'')+'>'+(APP_UPD?t("Lädt …"):tf("Auf {0} aktualisieren",esc(APP_UPDATE.version)))+'</button>'+
+  '</div></div>';
+}
+function appUpdText(){
+  if(!APP_UPD)return "";
+  var g=APP_UPD.gesamt||APP_UPDATE.groesse||0;
+  return esc(APP_UPDATE.version)+(g>0?" · "+Math.min(100,Math.round(APP_UPD.geladen*100/g))+" %":"");
+}
+function appUpdateFortschritt(p){
+  if(!APP_UPD)return;
+  APP_UPD.geladen=+(p&&p.geladen)||0;if(p&&p.gesamt>0)APP_UPD.gesamt=+p.gesamt;
+  var e=$("#appUpdStand");if(e)e.textContent=appUpdText();
+}
+async function appAktualisieren(){
+  if(!APP_UPDATE||APP_UPD)return;
+  var A=appP("AllHome");if(!A)return;
+  APP_UPD={geladen:0,gesamt:APP_UPDATE.groesse||0};render();
+  try{
+    var r=await A.appAktualisieren({url:APP_UPDATE.url,sha256:APP_UPDATE.sha256});
+    if(r&&r.status==="keine-erlaubnis")toast(t("Ohne die Erlaubnis „Apps installieren“ geht es nicht – bitte erneut tippen und erlauben."),true);
+  }catch(e){toast(appFehler(e),true);}
+  APP_UPD=null;render();
+}
+
+/* ================= Teilen an All-Home ================= */
+async function geteiltAbholen(){
+  if(!istApp()||APP_GETEILT_LAEUFT)return;
+  if(!me||booting||!HH||freigabeFehlt())return;   /* nach dem Laden ruft appNachLaden erneut */
+  var A=appP("AllHome");
+  APP_GETEILT_LAEUFT=true;
+  try{
+    var l=await A.geteilteDateien(),liste=(l&&l.dateien)||[];
+    if(!liste.length)return;
+    if(IMPORT.laeuft){toast(t("Es läuft bereits ein Import."),true);return;}
+    var dateien=[];
+    for(var i=0;i<liste.length;i++){
+      var d=await A.geteilteDatei({i:liste[i].i});
+      dateien.push(new File([base64Blob(d.daten,d.mime)],d.name||t("Datei"),{type:d.mime}));
+    }
+    await A.geteiltFertig();
+    if(SCAN)scannerAus();
+    closeModal(true);
+    go("#/neu");
+    dateienVerarbeiten(dateien,{});
+  }catch(e){toast(appFehler(e),true);}
+  finally{APP_GETEILT_LAEUFT=false;}
+}
+
+/* ================= Dateien: Speichern unter / Öffnen mit / Teilen ================= */
+async function appSpeichern(blob,name){
+  var A=appP("AllHome");
+  try{
+    var r=await A.dateiSpeichern({name:name,mime:(blob.type||"application/octet-stream").split(";")[0],daten:await blobBase64(blob)});
+    if(r&&r.gespeichert)toast(t("Gespeichert ✅"));
+  }catch(e){toast(appFehler(e),true);}
+}
+async function appWeitergeben(blob,name,art){
+  var A=appP("AllHome");
+  try{await A.dateiWeitergeben({name:name,mime:(blob.type||"application/octet-stream").split(";")[0],daten:await blobBase64(blob),art:art});}
+  catch(e){toast(appFehler(e),true);}
+}
+/* Mehrseitige Bild-Dokumente: aktuelle Seite an eine andere App */
+async function appBildWeitergeben(url,name){
+  try{
+    var r=await fetch(url);if(!r.ok)throw new Error(t("Datei konnte nicht geladen werden."));
+    var b=await r.blob();
+    await appWeitergeben(b,name,"oeffnen");
+  }catch(e){toast(appFehler(e),true);}
+}
+
+/* ================= Dokument-Ansicht in der App =================
+   PDFs zeichnet Androids eigener PDF-Renderer seitenweise als Bild,
+   Bilder zeigt die Seite direkt. Nichts landet in „Downloads“. */
+var APP_ANSICHT=null;   /* {d, blob, name, pdf:bool, seiten, url} */
+async function appDokAnsicht(d){
+  var A=appP("AllHome");
+  ansichtZu();
+  APP_ANSICHT={d:d,laedt:true};
+  ansichtZeichnen();
+  try{
+    var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+    if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
+    if(!APP_ANSICHT||APP_ANSICHT.d!==d)return;
+    var blob=dl.data,pdf=istPdfDok(d)||blob.type==="application/pdf";
+    APP_ANSICHT={d:d,blob:blob,name:dateiNameFuer(d,pdf),pdf:pdf,seiten:0,zoom:1};
+    if(pdf){
+      var r=await A.pdfOeffnen({daten:await blobBase64(blob)});
+      if(!APP_ANSICHT||APP_ANSICHT.d!==d)return;
+      APP_ANSICHT.seiten=(r&&r.seiten)||0;
+    }else APP_ANSICHT.url=URL.createObjectURL(blob);
+    ansichtZeichnen();
+    if(pdf)ansichtSeitenLaden();
+  }catch(e){
+    if(APP_ANSICHT&&APP_ANSICHT.d===d){APP_ANSICHT.fehler=appFehler(e);ansichtZeichnen();}
+  }
+}
+function dateiNameFuer(d,pdf){
+  var n=String(d.filename||docTitel(d)||"dokument").replace(/[\\/:*?"<>|]+/g,"_");
+  if(pdf&&!/\.pdf$/i.test(n))n+=".pdf";
+  if(!pdf&&!/\.(jpe?g|png|webp|heic)$/i.test(n))n+=".jpg";
+  return n;
+}
+function ansichtZeichnen(){
+  var v=APP_ANSICHT,e=$("#appAnsicht");
+  if(!v){if(e)e.remove();document.body.classList.remove("ansicht-open");return;}
+  if(!e){e=document.createElement("div");e.id="appAnsicht";e.setAttribute("role","dialog");e.setAttribute("aria-modal","true");document.body.appendChild(e);}
+  document.body.classList.add("ansicht-open");
+  var kopf='<div class="aa-kopf"><button class="ibtn" data-a="ansicht-zu" aria-label="'+esc(t("Schließen"))+'">'+ic("x")+'</button>'+
+    '<div class="aa-titel">'+esc(docTitel(v.d))+'</div>'+
+    (v.blob?'<button class="ibtn" data-a="ansicht-oeffnen" aria-label="'+esc(t("Öffnen mit"))+'" title="'+esc(t("Öffnen mit"))+'">'+ic("extern")+'</button>'+
+      '<button class="ibtn" data-a="ansicht-teilen" aria-label="'+esc(t("Teilen"))+'" title="'+esc(t("Teilen"))+'">'+ic("share")+'</button>':"")+
+    '</div>';
+  var inhalt;
+  if(v.fehler)inhalt='<div class="aa-leer">'+esc(v.fehler)+'</div>';
+  else if(v.laedt)inhalt='<div class="aa-leer"><span class="spin"></span></div>';
+  else if(v.pdf){
+    var s="";for(var i=0;i<v.seiten;i++)s+='<div class="aa-seite" data-i="'+i+'"><span class="spin"></span></div>';
+    inhalt='<div class="aa-seiten" id="aaSeiten">'+s+'</div>';
+  }else inhalt='<div class="aa-seiten" id="aaSeiten"><img class="aa-bild" src="'+esc(v.url)+'" alt=""></div>';
+  e.innerHTML=kopf+'<div class="aa-flaeche" id="aaFlaeche">'+inhalt+'</div>';
+  zoomAn($("#aaFlaeche"));
+}
+/* Seiten nacheinander holen – 2× Bildschirmbreite, damit Zoomen scharf bleibt */
+async function ansichtSeitenLaden(){
+  var v=APP_ANSICHT,A=appP("AllHome");if(!v||!v.pdf)return;
+  var breite=Math.min(2400,Math.round(Math.min(window.innerWidth,900)*(window.devicePixelRatio||1)*2));
+  for(var i=0;i<v.seiten;i++){
+    if(APP_ANSICHT!==v)return;
+    try{
+      var r=await A.pdfSeite({i:i,breite:breite});
+      if(APP_ANSICHT!==v)return;
+      var el=document.querySelector('.aa-seite[data-i="'+i+'"]');
+      if(el){el.innerHTML='<img class="aa-bild" alt="'+esc(tf("Seite {0}",i+1))+'" src="data:image/jpeg;base64,'+r.daten+'">';
+        el.style.aspectRatio=r.breite+" / "+r.hoehe;}
+    }catch(e){var el2=document.querySelector('.aa-seite[data-i="'+i+'"]');if(el2)el2.textContent=appFehler(e);}
+  }
+}
+function ansichtZu(){
+  var v=APP_ANSICHT;if(!v)return;
+  APP_ANSICHT=null;
+  if(v.url)URL.revokeObjectURL(v.url);
+  if(v.pdf){var A=appP("AllHome");if(A)A.pdfSchliessen().catch(function(){});}
+  ansichtZeichnen();
+}
+/* Zwei Finger: Seitenbreite 100–400 %, die Fläche scrollt in beide Richtungen */
+function zoomAn(f){
+  if(!f)return;
+  var start=null;
+  function abstand(ev){var a=ev.touches[0],b=ev.touches[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);}
+  f.addEventListener("touchstart",function(ev){if(ev.touches.length===2&&APP_ANSICHT)start={d:abstand(ev),z:APP_ANSICHT.zoom||1};},{passive:true});
+  f.addEventListener("touchmove",function(ev){
+    if(!start||ev.touches.length!==2||!APP_ANSICHT)return;
+    ev.preventDefault();
+    var z=Math.max(1,Math.min(4,start.z*abstand(ev)/start.d)),s=$("#aaSeiten");
+    APP_ANSICHT.zoom=z;if(s)s.style.width=(z*100)+"%";
+  },{passive:false});
+  f.addEventListener("touchend",function(ev){if(ev.touches.length<2)start=null;},{passive:true});
+  f.addEventListener("dblclick",function(){if(!APP_ANSICHT)return;var s=$("#aaSeiten");APP_ANSICHT.zoom=(APP_ANSICHT.zoom||1)>1?1:2;if(s)s.style.width=(APP_ANSICHT.zoom*100)+"%";});
+}
+
+/* ================= Google-Dokumentenscanner =================
+   Liefert fertig zugeschnittene Seiten; sie laufen danach durch denselben
+   Ablauf wie Fotos aus dem eigenen Scanner (Abgleich, KI, Anfügen). */
+function appScannerNutzen(){return istApp()&&!APP_SCAN_FEHLT&&SCAN&&!SCAN.eigeneKamera;}
+async function appScannen(){
+  if(!SCAN)return;
+  var A=appP("AllHome"),platz=SCAN_MAX_SEITEN-SCAN.seiten.length;
+  if(platz<=0&&!SCAN.ersetzen){toast(tf("Höchstens {0} Seiten je Dokument.",SCAN_MAX_SEITEN),true);scanModus("seiten");return;}
+  arbeitZeigen(t("Scanner wird geöffnet …"));
+  try{
+    var r=await A.scannen({seiten:SCAN.ersetzen?1:Math.min(platz,40)});
+    if(!SCAN)return;
+    var n=(r&&r.seiten)||0;
+    if(!n){SCAN.ersetzen=null;if(SCAN.seiten.length)scanModus("seiten");else scanZurueck();return;}
+    var bloecke=[];
+    for(var i=0;i<n;i++){
+      arbeitZeigen(n>1?tf("Seite {0} von {1} wird übernommen …",i+1,n):t("Seite wird übernommen …"));
+      var s=await A.scanSeite({i:i});
+      bloecke.push(base64Blob(s.daten,"image/jpeg"));
+    }
+    A.scanFertig().catch(function(){});
+    await fertigeSeitenDazu(bloecke);
+  }catch(e){
+    if(!SCAN)return;
+    if(e&&e.code==="NICHT_VERFUEGBAR"){APP_SCAN_FEHLT=true;toast(t("Google-Scanner nicht verfügbar – es geht mit dem eigenen weiter."),true);scanModus("kamera");return;}
+    toast(appFehler(e),true);
+    if(SCAN.seiten.length)scanModus("seiten");else scanZurueck();
+  }
+}
+async function fertigeSeitenDazu(bloecke){
+  if(!SCAN)return;
+  var fehler=0;
+  for(var i=0;i<bloecke.length;i++){
+    if(!SCAN)return;
+    if(SCAN.seiten.length>=SCAN_MAX_SEITEN&&!SCAN.ersetzen)break;
+    try{var img=await bildLaden(bloecke[i]);await seiteAusBild(img,img.naturalWidth,img.naturalHeight,null,true);}
+    catch(e){fehler++;}
+  }
+  if(!SCAN)return;
+  if(fehler)toast(tn(fehler,"{0} Seite ließ sich nicht übernehmen.","{0} Seiten ließen sich nicht übernehmen."),true);
+  entwurfMerken();
+  if(SCAN.seiten.length){if(SCAN.ersetzt)SCAN.ersetzt=false;else SCAN.akt=SCAN.seiten.length-1;scanModus("seiten");}
+  else scanZurueck();
+}
+
+/* ================= Erinnerungen =================
+   Lokal geplant, kein Server: bei jedem Öffnen für alle Haushalte neu.
+   Dieselben Regeln und Schalter wie die Vorschläge; Weggeklicktes erinnert nicht. */
+function erinnerungenAn(){try{return localStorage.getItem(APP_ERINNERN_KEY)==="1";}catch(e){return false;}}
+async function erinnerungenSchalten(an,still){
+  var LN=appP("LocalNotifications");if(!LN)return;
+  if(an){
+    try{
+      var p=await LN.checkPermissions();
+      if(p.display!=="granted")p=await LN.requestPermissions();
+      if(p.display!=="granted"){toast(t("Benachrichtigungen sind für All-Home ausgeschaltet (Android-Einstellungen)."),true);an=false;}
+    }catch(e){an=false;}
+  }
+  try{localStorage.setItem(APP_ERINNERN_KEY,an?"1":"0");}catch(e){}
+  if(an)await erinnerungenPlanen();
+  else{try{var o=await LN.getPending();if(o&&o.notifications&&o.notifications.length)await LN.cancel({notifications:o.notifications.map(function(n){return {id:n.id};})});}catch(e){}}
+  if(!still)toast(an?t("Erinnerungen an"):t("Erinnerungen aus"));
+}
+/* Daten eines anderen Haushalts – gleiche Abfragen wie ladeDaten/ladeSetup */
+async function haushaltDaten(id){
+  var a=await Promise.all([
+    sb.from("contracts").select("*").eq("household_id",id),
+    sb.from("documents").select(DOK_SPALTEN).eq("household_id",id).eq("doc_type","preisaenderung"),
+    sb.from("persons").select("*").eq("household_id",id),
+    sb.from("nk_abrechnungen").select("*").eq("household_id",id).order("von",{ascending:true}),
+    sb.from("household_setup").select("*").eq("household_id",id).maybeSingle()
+  ]);
+  for(var i=0;i<a.length;i++)if(a[i].error)throw a[i].error;
+  return {contracts:a[0].data||[],docs:a[1].data||[],persons:a[2].data||[],nk:a[3].data||[],setup:a[4].data||{household_id:id,arten:[],eingerichtet:true}};
+}
+/* Rechnet mit den Daten eines anderen Haushalts, ohne die Anzeige anzufassen (alles synchron) */
+function mitHaushalt(h,daten,fn){
+  if(!daten)return fn(h);
+  var alt=[HH,CONTRACTS,DOCS,PERSONS,NK,SETUP];
+  HH=h;CONTRACTS=daten.contracts;DOCS=daten.docs;PERSONS=daten.persons;NK=daten.nk;SETUP=daten.setup;
+  try{return fn(h);}
+  finally{HH=alt[0];CONTRACTS=alt[1];DOCS=alt[2];PERSONS=alt[3];NK=alt[4];SETUP=alt[5];}
+}
+/* Name in der Benachrichtigung: Kennzeichen vor dem Versicherer, bei Ausweisen der Inhaber */
+function erinnerungName(c){var a=artInfo(c.art||"sonstiges"),d=c.details||{};return terminTitel(c,a)+(a.kein_anbieter&&d.inhaber?" · "+d.inhaber:"");}
+function plusTage(iso,n){var d=new Date(iso+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+/* Fristen eines Haushalts: {key, datum, art, name, text, href} */
+function fristenDesHaushalts(h){
+  var aus=[],heute=todayISO();
+  if(smartAn("fristen"))CONTRACTS.forEach(function(c){
+    if(c.status!=="aktiv")return;
+    var f=fristInfo(c);
+    if(f.kind!=="fest"||!f.lastDay||f.lastDay<heute)return;
+    aus.push({key:"frist:"+c.id+":"+f.lastDay,datum:f.lastDay,art:"frist",name:erinnerungName(c),href:"#/vertrag?id="+c.id});
+  });
+  /* Preiserhöhung: wirksam frühestens rund einen Monat nach dem Schreiben – bis dahin gilt meist das Sonderkündigungsrecht */
+  if(smartAn("preis"))DOCS.forEach(function(d){
+    if(d.doc_type!=="preisaenderung")return;
+    var dt=d.doc_date||String(d.created_at||"").slice(0,10);if(!dt)return;
+    var bis=plusTage(dt,28);if(bis<heute)return;
+    var c=d.contract_id?vertragById(d.contract_id):null;
+    aus.push({key:"preis:"+d.id,datum:bis,art:"preis",name:(c&&c.anbieter)||t("Preiserhöhung"),vom:dt,href:c?"#/vertrag?id="+c.id:"#/dokumente"});
+  });
+  if(smartAn("termine"))CONTRACTS.forEach(function(c){
+    var a=artInfo(c.art||"sonstiges");
+    if(imArchiv(c)||!a.termin||!c.details||!c.details[a.termin.k])return;
+    var dt=String(c.details[a.termin.k]).slice(0,10);if(!/^\d{4}-\d\d-\d\d$/.test(dt)||dt<heute)return;
+    aus.push({key:"termin:"+c.id+":"+c.details[a.termin.k],datum:dt,art:"termin",name:erinnerungName(c),was:t(a.termin.l),href:"#/vertrag?id="+c.id});
+  });
+  if(smartAn("nebenkosten")){
+    var neu=nkNeueste();
+    if(neu){var e=nkFristEinwand(neu);
+      if(e&&e>=heute&&nkAuffaellig(neu).length)aus.push({key:"nkeinwand:"+neu.id,datum:e,art:"nk",name:tf("Nebenkosten {0}",nkLabel(neu)),href:"#/nebenkosten?id="+neu.id});}
+  }
+  return aus.filter(function(x){return !istWeg(x.key);}).map(function(x){x.hh=h.id;x.haus=h.name||"";return x;});
+}
+function erinnerungText(f,vorher){
+  var wann=vorher===0?t("heute"):tn(vorher,"in {0} Tag","in {0} Tagen");
+  if(f.art==="frist")return {titel:vorher===0?tf("{0}: heute letzter Kündigungstag",f.name):tf("{0}: Kündigungsfrist {1}",f.name,wann),
+    text:tf("Letzter Kündigungstag: {0}",fmtDate(f.datum))};
+  if(f.art==="termin")return {titel:f.name+": "+f.was+" "+wann,text:fmtDate(f.datum)};
+  if(f.art==="preis")return {titel:tf("{0}: Sonderkündigung prüfen",f.name),
+    text:tf("Preiserhöhung vom {0} – kündigen meist nur bis zum Wirksamwerden.",fmtDate(f.vom))};
+  return {titel:tf("{0}: Einwände bis {1}",f.name,fmtDate(f.datum)),text:t("Danach gilt die Abrechnung als anerkannt.")};
+}
+async function erinnerungenPlanen(){
+  if(!istApp()||!erinnerungenAn()||!me||!HH)return;
+  var LN=appP("LocalNotifications");if(!LN)return;
+  APP_PLAN_AM=Date.now();
+  try{var p=await LN.checkPermissions();if(p.display!=="granted")return;}catch(e){return;}
+  var fristen=[];
+  for(var i=0;i<HOUSEHOLDS.length;i++){
+    var h=HOUSEHOLDS[i];
+    try{
+      var daten=h.id===HH.id?null:await haushaltDaten(h.id);
+      fristen=fristen.concat(mitHaushalt(h,daten,fristenDesHaushalts));
+    }catch(e){/* ein Haushalt nicht erreichbar – die anderen trotzdem planen */}
+  }
+  var jetzt=Date.now(),liste=[],mehrHaeuser=HOUSEHOLDS.length>1;
+  fristen.forEach(function(f){
+    (f.art==="preis"?[7,0]:[30,7,0]).forEach(function(v){
+      var p=f.datum.split("-"),at=new Date(+p[0],+p[1]-1,+p[2]-v,9,0,0);
+      if(at.getTime()<=jetzt)return;
+      var tx=erinnerungText(f,v);
+      liste.push({at:at,titel:tx.titel,text:tx.text+(mehrHaeuser&&f.haus?" · "+f.haus:""),hh:f.hh,href:f.href});
+    });
+  });
+  liste.sort(function(a,b){return a.at-b.at;});
+  liste=liste.slice(0,60);
+  try{
+    await LN.createChannel({id:"fristen",name:t("Fristen und Termine"),importance:4,visibility:0});
+    var offen=await LN.getPending();
+    if(offen&&offen.notifications&&offen.notifications.length)await LN.cancel({notifications:offen.notifications.map(function(n){return {id:n.id};})});
+    if(liste.length)await LN.schedule({notifications:liste.map(function(x,i){
+      return {id:1000+i,title:x.titel,body:x.text,channelId:"fristen",smallIcon:"ic_stat_allhome",
+        schedule:{at:x.at,allowWhileIdle:true},isExactNotification:false,extra:{hh:x.hh,href:x.href}};
+    })});
+  }catch(e){}
+}
+
+/* ================= Anmeldeseite: Versionszeile ================= */
+function appVersionZeile(){
+  return istApp()&&APP&&APP.version?'<p class="mut appv">'+esc("All-Home-App "+APP.version)+'</p>':"";
+}
+
 /* ================= Bedienung =================
    Eine delegierte Behandlung für die ganze App: jeder Knopf trägt data-a. */
 /* Knopf mit Hintergrund-Arbeit: sofort gedimmt mit Kreisel, weitere Klicks zählen nicht, bis sie fertig ist */
@@ -12001,6 +12679,16 @@ document.addEventListener("click",function(ev){
   if(a==="zt-sperren"){laeuft(b,ztSperren(id,b.dataset.k==="an"));return;}
   if(a==="zt-logo"){laeuft(b,ztLogoRolle(id,b.dataset.k==="an"));return;}
   if(a==="forgot"){laeuft(b,doForgot());return;}
+  if(a==="code-neu"){laeuft(b,codeNeuSenden());return;}
+  /* --- Android-App --- */
+  if(a==="app-e-sperre"||a==="app-e-erinnern"){if(!b.disabled)b.classList.toggle("on");return;}
+  if(a==="app-einrichten-ok"){laeuft(b,appEinrichtenFertig());return;}
+  if(a==="app-sperre"){laeuft(b,appSperreUmschalten());return;}
+  if(a==="app-schutz"){laeuft(b,appSchutzUmschalten());return;}
+  if(a==="app-erinnern"){laeuft(b,erinnerungenSchalten(!erinnerungenAn()).then(render));return;}
+  if(a==="app-update"){laeuft(b,appAktualisieren());return;}
+  if(a==="ansicht-zu"){ansichtZu();return;}
+  if(a==="ansicht-oeffnen"||a==="ansicht-teilen"){if(APP_ANSICHT&&APP_ANSICHT.blob)laeuft(b,appWeitergeben(APP_ANSICHT.blob,APP_ANSICHT.name,a==="ansicht-oeffnen"?"oeffnen":"teilen"));return;}
 
   /* --- Haushalt --- */
   if(a==="hh-switch"){laeuft(b,haushaltWaehlen());return;}
@@ -12080,7 +12768,7 @@ document.addEventListener("click",function(ev){
   if(a==="d-seiten"){laeuft(b,seitenHinzufuegen(id));return;}
   if(a==="d-pdf-an"){var pa=$("#pdfAn");if(pa)pa.click();return;}
   if(a==="bb"){laeuft(b,bbBlaettern(Number(b.dataset.r)||0));return;}
-  if(a==="bb-tab"){if(BB&&BB.urls[BB.i])window.open(BB.urls[BB.i],"_blank","noopener");return;}
+  if(a==="bb-tab"){if(BB&&BB.urls[BB.i]){if(istApp())laeuft(b,appBildWeitergeben(BB.urls[BB.i],tf("Seite {0}",BB.i+1)+".jpg"));else window.open(BB.urls[BB.i],"_blank","noopener");}return;}
 
   /* --- Gesundheit --- */
   if(a==="med-open"){go("#/gesundheit?doc="+id);return;}
@@ -12156,7 +12844,7 @@ document.addEventListener("submit",function(ev){
     ev.preventDefault();
     var btn=f.querySelector('button[type="submit"]');
     var am=btn&&btn.dataset.mode;
-    laeuft(f,am==="setpass"?doSetPass():(am==="signup"?doSignup():doLogin()));
+    laeuft(f,am==="setpass"?doSetPass():(am==="signup"?doSignup():(am==="code"?doCode():doLogin())));
     return;
   }
   if(f.id==="vForm"){ev.preventDefault();laeuft(f,speichereVertrag());return;}
@@ -12341,9 +13029,11 @@ async function starteSitzung(){
   booting=false;
   if(!location.hash)location.hash="#/start";
   render();
+  appNachLaden();
 }
 /* Service Worker = Offline-Rückfall; nur über https, lokal würden zwischengespeicherte Stände das Testen stören */
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
+appStart();
 boot();
 })();
 </script>

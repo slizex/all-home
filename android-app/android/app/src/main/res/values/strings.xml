@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">All-Home</string>
+    <string name="title_activity_main">All-Home</string>
+    <string name="package_name">de.slizex.allhome</string>
+    <string name="custom_url_scheme">de.slizex.allhome</string>
+    <string name="kurz_scannen">Scannen</string>
+    <string name="kurz_scannen_lang">Dokument scannen</string>
+</resources>

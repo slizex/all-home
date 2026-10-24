@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nur diese zwei privaten Cache-Ordner dürfen an andere Apps gereicht werden:
+     teilen/  – Kopie für „Öffnen mit / Teilen“ (wird aufgeräumt)
+     updates/ – heruntergeladene APK für den Android-Installer -->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="teilen" path="teilen/" />
+    <cache-path name="updates" path="updates/" />
+</paths>
