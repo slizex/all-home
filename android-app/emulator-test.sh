@@ -4,7 +4,7 @@
 #  2. mit Netz       → All-Home-Anmeldung live, Versionszeile beweist Brücke + Plugin „AllHome“
 #  3. dunkel         → Darstellung im Nachtmodus
 #  4. Schutz an      → FLAG_SECURE am Fenster
-#  5. Sperre an      → Sperrbild + Geräte-PIN, danach wieder die Anmeldung
+#  5. Sperre an      → PIN-Abfrage, Abbrechen lässt das Sperrbild stehen, „Entsperren“ + PIN öffnet
 #  6. Verknüpfung, Teilen ohne Datei → kein Absturz
 # Bildschirmfotos (ohne Bildschirmschutz), Bildschirmtexte und ein gefiltertes Protokoll landen in emulator-ergebnis/.
 set -u
@@ -29,6 +29,23 @@ text() {
   return 1
 }
 hat() { grep -q "$2" "$OUT/$1.xml"; }
+# WebView baut seinen Bildschirmtext verzögert auf – bis zu n Sekunden auf das Muster warten
+warte() {
+  local ende=$((SECONDS + $3))
+  while [ $SECONDS -lt $ende ]; do
+    if text "$1" && hat "$1" "$2"; then return 0; fi
+    sleep 2
+  done
+  return 1
+}
+# Mitte eines nativen Elements mit genau diesem Text antippen
+tippe() {
+  local b
+  b=$(tr '>' '\n' < "$OUT/$1.xml" | grep "text=\"$2\"" | grep -o 'bounds="[^"]*"' | head -1 | grep -o '[0-9]\+' | tr '\n' ' ')
+  [ -n "$b" ] || return 1
+  set -- $b
+  adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
+}
 vorne() { adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity" | sed 's/^ *//' | tr -d '\r'; }
 starten() { adb shell am start -W -n "$AKT" > /dev/null; }
 # Einstellungen der App direkt setzen (sperre, bildschirmschutz) – nur mit adb root möglich
@@ -52,21 +69,20 @@ adb logcat -c
 # 1. ohne Netz
 prefs false false
 adb shell svc wifi disable; adb shell svc data disable; sleep 3
-starten; sleep 12
-text 1-offline; foto 1-offline
+starten; sleep 8
+warte 1-offline "Keine Verbindung" 20; foto 1-offline
 if hat 1-offline "Keine Verbindung"; then ok "Ohne Netz: Offline-Seite"; else nein "Ohne Netz: Offline-Seite fehlt (vorne: $(vorne))"; fi
 
 # 2. mit Netz – die Offline-Seite versucht es selbst wieder
 adb shell svc wifi enable; adb shell svc data enable
-for i in $(seq 1 18); do sleep 5; text 2-anmeldung; if hat 2-anmeldung "Anmelden"; then break; fi; done
-sleep 2; text 2-anmeldung; foto 2-anmeldung
+warte 2-anmeldung "All-Home-App" 90; sleep 1; foto 2-anmeldung
 if hat 2-anmeldung "Anmelden"; then ok "Mit Netz: All-Home-Anmeldung geladen"; else nein "Mit Netz: Anmeldung nicht geladen"; fi
 if hat 2-anmeldung "All-Home-App"; then ok "Brücke und Plugin AllHome laufen (Versionszeile)"; else nein "Versionszeile fehlt – Brücke oder Plugin?"; fi
 
 # 3. dunkel
 adb shell cmd uimode night yes; sleep 1
-adb shell am force-stop "$PKG"; starten; sleep 10
-foto 3-dunkel
+adb shell am force-stop "$PKG"; starten
+warte 3-dunkel "Anmelden" 30; foto 3-dunkel
 adb shell cmd uimode night no; sleep 1
 
 # 4. Bildschirmschutz
@@ -79,23 +95,28 @@ foto 4-schutz-schwarz
 adb shell locksettings set-pin 2580 > /dev/null
 adb shell wm dismiss-keyguard > /dev/null 2>&1
 prefs true false
-starten; sleep 6
-text 5-sperre; foto 5-sperre
+starten; sleep 4
+warte 5-sperre "All-Home entsperren" 15; foto 5-sperre
 echo "vorne vor PIN: $(vorne)" >> "$OUT/ablauf.txt"
-if hat 5-sperre "All-Home ist gesperrt\|All-Home entsperren\|PIN"; then ok "Sperre: Sperrbild bzw. PIN-Abfrage erscheint"; else nein "Sperre: kein Sperrbild (vorne: $(vorne))"; fi
+if hat 5-sperre "All-Home entsperren"; then ok "Sperre: PIN-Abfrage erscheint beim Start"; else nein "Sperre: keine Abfrage (vorne: $(vorne))"; fi
+# Abfrage abbrechen → das native Sperrbild bleibt; über „Entsperren“ erneut
+adb shell input keyevent 4; sleep 2
+warte 5c-sperrbild "All-Home ist gesperrt" 10; foto 5c-sperrbild
+if hat 5c-sperrbild "All-Home ist gesperrt" && hat 5c-sperrbild "Entsperren"; then ok "Sperre: Abbrechen lässt das Sperrbild stehen"; else nein "Sperre: nach Abbrechen kein Sperrbild"; fi
+tippe 5c-sperrbild "Entsperren"; sleep 2
+warte 5d-erneut "All-Home entsperren" 10 || nein "Sperre: „Entsperren“ öffnet keine Abfrage"
 adb shell input text 2580; sleep 1
-text 5b-pin-getippt
-adb shell input keyevent 66; sleep 6
+adb shell input keyevent 66; sleep 3
 echo "vorne nach PIN: $(vorne)" >> "$OUT/ablauf.txt"
-text 6-entsperrt; foto 6-entsperrt
+warte 6-entsperrt "Anmelden" 20; foto 6-entsperrt
 if hat 6-entsperrt "Anmelden" && ! hat 6-entsperrt "All-Home ist gesperrt"; then ok "Sperre: nach PIN wieder offen"; else nein "Sperre: nach PIN nicht offen (vorne: $(vorne))"; fi
 adb shell locksettings clear --old 2580 > /dev/null
 
 # 6. Verknüpfung „Scannen“ und Teilen ohne Datei
 prefs false false
 adb shell am start -W -a android.intent.action.VIEW -d "allhome://scan" -n "$AKT" > /dev/null; sleep 6
-adb shell am start -W -a android.intent.action.SEND -t application/pdf -n "$AKT" > /dev/null; sleep 4
-text 7-danach; foto 7-danach
+adb shell am start -W -a android.intent.action.SEND -t application/pdf -n "$AKT" > /dev/null; sleep 2
+warte 7-danach "Anmelden" 20; foto 7-danach
 if hat 7-danach "Anmelden"; then ok "Verknüpfung und Teilen: App bleibt stabil"; else nein "Verknüpfung/Teilen: Anmeldung nicht sichtbar (vorne: $(vorne))"; fi
 
 # Protokoll: nur die App, Capacitor, Biometrie/Anmeldedialog, Abstürze, Aktivitäten
