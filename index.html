@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-Ltq6QTXRHQXAZtypdTYht26vwWeZFS2jpWR0n5Xpp98='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-mX/tkHi/73D9zwNPNQVK205iwe4kp9zSEopk/b1DtIw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -668,6 +668,9 @@ body.ansicht-open{overflow:hidden}
 .aa-leer{display:grid;place-items:center;min-height:50vh;color:var(--muted);text-align:center;padding:16px}
 /* Untertitel in Auswahl-Kacheln: eigener Absatz mit engem Zeilenabstand */
 .artpick .pn .ps{display:block;margin-top:3px;font-size:.8rem;font-weight:700;line-height:1.35;color:var(--muted)}
+/* Links in Werten (Nachfolger, Vorgänger): Tippfläche 44 px, ohne die Zeile zu verschieben */
+.kvr .kw a.lnk{position:relative}
+.kvr .kw a.lnk::after{content:"";position:absolute;inset:-11px -4px}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -959,7 +962,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.13.0";
+var APP_VERSION="1.13.1";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1016,6 +1019,11 @@ var curLang="de";
 var T={ru:{
 
 /* ---- 1.13.0 Android-App ---- */
+  "Eine Datei von einer anderen App":"Файл из другого приложения",
+  "{0} Dateien von einer anderen App":"{0} файлов из другого приложения",
+  "Verwerfen":"Отклонить",
+  "Verworfen":"Отклонено",
+  "Hochladen nach „{0}“":"Загрузить в «{0}»",
   "App-Version":"Версия приложения",
   "Der Scanner läuft bereits.":"Сканер уже запущен.",
   "Der Scanner ließ sich nicht öffnen.":"Не удалось открыть сканер.",
@@ -3720,6 +3728,7 @@ async function doSetPass(){
 async function doLogout(){
   if(SCAN)scannerAus();
   await entwurfLoeschen();
+  await appAbmelden();
   try{await sb.auth.signOut();}catch(e){}
   me=null;HH=null;SETUP=null;CONTRACTS=[];DOCS=[];PERSONS=[];ENERGIE={};
   FREIGABE=null;IST_SUPERADMIN=false;REG=null;ZT=null;AUTH_MODE="login";
@@ -12328,15 +12337,39 @@ async function appAktualisieren(){
   APP_UPD=null;render();
 }
 
-/* ================= Teilen an All-Home ================= */
+/* ================= Teilen an All-Home =================
+   Jede App kann Dateien an All-Home schicken – hochgeladen (und von der KI gelesen)
+   wird erst, wenn man es hier bestätigt. */
+var APP_GETEILT=null;   /* Liste, über die gerade gefragt wird */
+function groesseTxt(b){return b>=1048576?num(b/1048576,1)+" MB":Math.max(1,Math.round((b||0)/1024))+" KB";}
 async function geteiltAbholen(){
   if(!istApp()||APP_GETEILT_LAEUFT)return;
   if(!me||booting||!HH||freigabeFehlt())return;   /* nach dem Laden ruft appNachLaden erneut */
+  var m=$("#modal");if(APP_GETEILT&&m&&!m.hidden)return;
+  try{
+    var l=await appP("AllHome").geteilteDateien(),liste=(l&&l.dateien)||[];
+    if(!liste.length)return;
+    APP_GETEILT=liste;
+    if(SCAN)scannerAus();
+    openModal('<h2 class="mhead">'+ic("download")+' '+esc(tn(liste.length,"Eine Datei von einer anderen App","{0} Dateien von einer anderen App"))+'</h2>'+
+      '<div class="card" style="margin:0 0 14px">'+liste.map(function(x){
+        return '<div class="kvr"><span class="kk">'+esc(x.name||t("Datei"))+'</span><span class="kw">'+esc(groesseTxt(x.groesse))+'</span></div>';
+      }).join("")+'</div>'+
+      '<p class="mut" style="margin:0 0 14px">'+esc(tf("Hochladen nach „{0}“",HH.name||t("Haushalt")))+'</p>'+
+      '<div class="factions"><button class="btn lg full" data-a="geteilt-ja">'+t("Hochladen")+'</button>'+
+      '<button class="btn ghost full" data-a="geteilt-nein">'+t("Verwerfen")+'</button></div>');
+  }catch(e){toast(appFehler(e),true);}
+}
+async function geteiltVerwerfen(){
+  APP_GETEILT=null;
+  try{await appP("AllHome").geteiltFertig();}catch(e){}
+  closeModal();toast(t("Verworfen"));
+}
+async function geteiltHochladen(){
+  var liste=APP_GETEILT;if(!liste||APP_GETEILT_LAEUFT)return;
   var A=appP("AllHome");
   APP_GETEILT_LAEUFT=true;
   try{
-    var l=await A.geteilteDateien(),liste=(l&&l.dateien)||[];
-    if(!liste.length)return;
     if(IMPORT.laeuft){toast(t("Es läuft bereits ein Import."),true);return;}
     var dateien=[];
     for(var i=0;i<liste.length;i++){
@@ -12344,7 +12377,7 @@ async function geteiltAbholen(){
       dateien.push(new File([base64Blob(d.daten,d.mime)],d.name||t("Datei"),{type:d.mime}));
     }
     await A.geteiltFertig();
-    if(SCAN)scannerAus();
+    APP_GETEILT=null;
     closeModal(true);
     go("#/neu");
     dateienVerarbeiten(dateien,{});
@@ -12624,6 +12657,13 @@ async function erinnerungenPlanen(){
   }catch(e){}
 }
 
+async function appAbmelden(){
+  if(!istApp())return;
+  APP_EINRICHTEN_GEZEIGT=false;APP_GETEILT=null;
+  var LN=appP("LocalNotifications");if(!LN)return;
+  try{var o=await LN.getPending();if(o&&o.notifications&&o.notifications.length)await LN.cancel({notifications:o.notifications.map(function(n){return {id:n.id};})});}catch(e){}
+}
+
 /* ================= Anmeldeseite: Versionszeile ================= */
 function appVersionZeile(){
   return istApp()&&APP&&APP.version?'<p class="mut appv">'+esc("All-Home-App "+APP.version)+'</p>':"";
@@ -12687,6 +12727,8 @@ document.addEventListener("click",function(ev){
   if(a==="app-schutz"){laeuft(b,appSchutzUmschalten());return;}
   if(a==="app-erinnern"){laeuft(b,erinnerungenSchalten(!erinnerungenAn()).then(render));return;}
   if(a==="app-update"){laeuft(b,appAktualisieren());return;}
+  if(a==="geteilt-ja"){laeuft(b,geteiltHochladen());return;}
+  if(a==="geteilt-nein"){laeuft(b,geteiltVerwerfen());return;}
   if(a==="ansicht-zu"){ansichtZu();return;}
   if(a==="ansicht-oeffnen"||a==="ansicht-teilen"){if(APP_ANSICHT&&APP_ANSICHT.blob)laeuft(b,appWeitergeben(APP_ANSICHT.blob,APP_ANSICHT.name,a==="ansicht-oeffnen"?"oeffnen":"teilen"));return;}
 
@@ -13033,6 +13075,7 @@ async function starteSitzung(){
 }
 /* Service Worker = Offline-Rückfall; nur über https, lokal würden zwischengespeicherte Stände das Testen stören */
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
+if(window.top!==window.self)throw new Error("All-Home startet nicht in einem fremden Rahmen.");
 appStart();
 boot();
 })();
