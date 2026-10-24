@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-HIZt7xKC6irMqjbFQezryNdOde/r0cD7w5K7VDnU+/w='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-2hglFkHAYieytN/U3kZS75kCqaw6zV/nuWu9j3GAzEE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -935,7 +935,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.12.0";
+var APP_VERSION="1.12.1";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -2898,7 +2898,7 @@ var ARTEN={
   miete:          {g:"wohnen",label:"Miete",                      icon:"🔑",std:1,einzig:1,felder:["objekt","flaeche","zimmer","nebenkosten"]},
   eigentum:       {g:"wohnen",label:"Wohneigentum / Finanzierung", icon:"🏡",felder:["objekt","flaeche","restschuld","zinssatz","laufzeit_bis"]},
   strom:          {g:"wohnen",label:"Strom",                      icon:"⚡",std:1,spiegel:"strom",felder:["zaehlernummer","malo","jahresverbrauch","arbeitspreis","grundpreis"]},
-  gas:            {g:"wohnen",label:"Gas",                        icon:"🔥",spiegel:"gas",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
+  gas:            {g:"wohnen",label:"Gas",                        icon:"🔥",spiegel:"gas",felder:["zaehlernummer","malo","jahresverbrauch","arbeitspreis","grundpreis"]},
   wasser:         {g:"wohnen",label:"Wasser & Abwasser",           icon:"💧",std:1,spiegel:"wasser",felder:["zaehlernummer","jahresverbrauch"]},
   fernwaerme:     {g:"wohnen",label:"Fernwärme",                   icon:"🌡️",felder:["zaehlernummer","jahresverbrauch","arbeitspreis","grundpreis"]},
   heizoel:        {g:"wohnen",label:"Heizöl / Pellets",            icon:"🛢️",felder:["jahresverbrauch"]},
