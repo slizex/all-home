@@ -12,6 +12,8 @@ on:
     paths:
       - 'android-app/**'
       - '.github/workflows/android.yml'
+    # Tag app-vX.Y.Z (passend zu android-app/app-version.json) = bauen und veröffentlichen
+    tags: ['app-v*']
   workflow_dispatch:
     inputs:
       veroeffentlichen:
@@ -170,9 +172,10 @@ jobs:
             --notes "Bildschirmfotos aus dem automatischen Emulator-Test, Lauf $GITHUB_RUN_NUMBER. Keine echten Daten."
 
       - name: Release veröffentlichen
-        if: needs.bauen.result == 'success' && inputs.veroeffentlichen && needs.bauen.outputs.signiert == 'true'
+        if: needs.bauen.result == 'success' && needs.bauen.outputs.signiert == 'true' && (inputs.veroeffentlichen || startsWith(github.ref, 'refs/tags/app-v'))
         run: |
           V="${{ needs.bauen.outputs.name }}"
+          if [ "${GITHUB_REF#refs/tags/}" != "$GITHUB_REF" ] && [ "${GITHUB_REF#refs/tags/}" != "app-v$V" ]; then echo "::error title=Release::Tag ${GITHUB_REF#refs/tags/} passt nicht zu Version $V"; exit 1; fi
           SHA=$(sha256sum all-home.apk | cut -d' ' -f1)
           if [ "$SHA" != "${{ needs.bauen.outputs.sha }}" ]; then echo "::error title=Release::Prüfsumme hat sich unterwegs geändert"; exit 1; fi
           cp all-home.apk "all-home-$V.apk"
