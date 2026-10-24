@@ -181,7 +181,9 @@ public class AllHomePlugin extends Plugin {
     public Boolean shouldOverrideLoad(Uri url) {
         if (url == null || !"https".equals(url.getScheme()) || !APP_HOST.equals(url.getHost())) return null;
         String pfad = url.getPath() == null ? "" : url.getPath();
-        if (pfad.equals(APP_PFAD) || pfad.startsWith(APP_PFAD + "/")) return null;
+        String roh = url.getEncodedPath() == null ? "" : url.getEncodedPath().toLowerCase(Locale.ROOT);
+        boolean umweg = pfad.contains("..") || roh.contains("%2e") || roh.contains("%2f") || roh.contains("%5c");
+        if (!umweg && (pfad.equals(APP_PFAD) || pfad.startsWith(APP_PFAD + "/"))) return null;
         try {
             getContext().startActivity(new Intent(Intent.ACTION_VIEW, url).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         } catch (ActivityNotFoundException e) {
@@ -209,6 +211,15 @@ public class AllHomePlugin extends Plugin {
             if (an) a.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             else a.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         });
+        vorschauAnwenden();
+    }
+
+    /* Android 13+: mit Sperre oder Schutz kein Vorschaubild in der App-Übersicht – Screenshots bleiben bei Schutz aus erlaubt */
+    private void vorschauAnwenden() {
+        Activity a = getActivity();
+        if (a == null || Build.VERSION.SDK_INT < 33) return;
+        boolean ohne = prefs.getBoolean(K_SPERRE, false) || prefs.getBoolean(K_SCHUTZ, true);
+        a.runOnUiThread(() -> a.setRecentsScreenshotEnabled(!ohne));
     }
 
     /* ================= App-Sperre ================= */
@@ -227,6 +238,7 @@ public class AllHomePlugin extends Plugin {
         boolean an = Boolean.TRUE.equals(call.getBoolean("an", false));
         if (!an) {
             prefs.edit().putBoolean(K_SPERRE, false).apply();
+            vorschauAnwenden();
             JSObject o = new JSObject();
             o.put("an", false);
             call.resolve(o);
@@ -244,6 +256,7 @@ public class AllHomePlugin extends Plugin {
                 "Sperre einschalten",
                 () -> {
                     prefs.edit().putBoolean(K_SPERRE, true).apply();
+                    vorschauAnwenden();
                     JSObject o = new JSObject();
                     o.put("an", true);
                     call.resolve(o);

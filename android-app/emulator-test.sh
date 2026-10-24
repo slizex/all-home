@@ -6,7 +6,7 @@
 #  4. Schutz an      → FLAG_SECURE am Fenster
 #  5. Sperre an      → Sperrbild + Geräte-PIN, danach wieder die Anmeldung
 #  6. Verknüpfung, Teilen ohne Datei → kein Absturz
-# Bildschirmfotos (ohne Bildschirmschutz) und Bildschirmtexte landen in emulator-ergebnis/.
+# Bildschirmfotos (ohne Bildschirmschutz), Bildschirmtexte und ein gefiltertes Protokoll landen in emulator-ergebnis/.
 set -u
 APK="$1"
 PKG=de.slizex.allhome
@@ -17,8 +17,19 @@ FEHLER=0
 ok() { echo "::notice title=Emulator::$1"; }
 nein() { echo "::error title=Emulator::$1"; FEHLER=1; }
 foto() { adb exec-out screencap -p > "$OUT/$1.png"; }
-text() { adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1; adb exec-out cat /sdcard/ui.xml > "$OUT/$1.xml"; }
+# uiautomator bricht im Emulator gelegentlich ab („Bad file descriptor“) – bis zu dreimal versuchen
+text() {
+  for v in 1 2 3; do
+    adb shell rm -f /sdcard/ui.xml > /dev/null 2>&1
+    adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
+    adb exec-out cat /sdcard/ui.xml > "$OUT/$1.xml" 2> /dev/null
+    if grep -q "<hierarchy" "$OUT/$1.xml"; then return 0; fi
+    sleep 2
+  done
+  return 1
+}
 hat() { grep -q "$2" "$OUT/$1.xml"; }
+vorne() { adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity" | sed 's/^ *//' | tr -d '\r'; }
 starten() { adb shell am start -W -n "$AKT" > /dev/null; }
 # Einstellungen der App direkt setzen (sperre, bildschirmschutz) – nur mit adb root möglich
 prefs() {
@@ -35,6 +46,7 @@ adb install -r "$APK" > /dev/null || { nein "Installation fehlgeschlagen"; exit 
 ok "Installiert: $(adb shell dumpsys package $PKG | grep -m1 versionName | tr -d ' \r') · Android $(adb shell getprop ro.build.version.release | tr -d '\r') · WebView $(adb shell dumpsys package com.google.android.webview | grep -m1 versionName | tr -d ' \r')"
 adb shell svc power stayon true
 adb shell settings put system screen_off_timeout 1800000
+adb shell wm dismiss-keyguard > /dev/null 2>&1
 adb logcat -c
 
 # 1. ohne Netz
@@ -42,7 +54,7 @@ prefs false false
 adb shell svc wifi disable; adb shell svc data disable; sleep 3
 starten; sleep 12
 text 1-offline; foto 1-offline
-if hat 1-offline "Keine Verbindung"; then ok "Ohne Netz: Offline-Seite"; else nein "Ohne Netz: Offline-Seite fehlt"; fi
+if hat 1-offline "Keine Verbindung"; then ok "Ohne Netz: Offline-Seite"; else nein "Ohne Netz: Offline-Seite fehlt (vorne: $(vorne))"; fi
 
 # 2. mit Netz – die Offline-Seite versucht es selbst wieder
 adb shell svc wifi enable; adb shell svc data enable
@@ -65,27 +77,34 @@ foto 4-schutz-schwarz
 
 # 5. App-Sperre mit Geräte-PIN
 adb shell locksettings set-pin 2580 > /dev/null
+adb shell wm dismiss-keyguard > /dev/null 2>&1
 prefs true false
 starten; sleep 6
 text 5-sperre; foto 5-sperre
-if hat 5-sperre "All-Home ist gesperrt\|All-Home entsperren\|PIN"; then ok "Sperre: Sperrbild bzw. PIN-Abfrage erscheint"; else nein "Sperre: kein Sperrbild"; fi
-adb shell input text 2580; adb shell input keyevent 66; sleep 6
+echo "vorne vor PIN: $(vorne)" >> "$OUT/ablauf.txt"
+if hat 5-sperre "All-Home ist gesperrt\|All-Home entsperren\|PIN"; then ok "Sperre: Sperrbild bzw. PIN-Abfrage erscheint"; else nein "Sperre: kein Sperrbild (vorne: $(vorne))"; fi
+adb shell input text 2580; sleep 1
+text 5b-pin-getippt
+adb shell input keyevent 66; sleep 6
+echo "vorne nach PIN: $(vorne)" >> "$OUT/ablauf.txt"
 text 6-entsperrt; foto 6-entsperrt
-if hat 6-entsperrt "Anmelden" && ! hat 6-entsperrt "All-Home ist gesperrt"; then ok "Sperre: nach PIN wieder offen"; else nein "Sperre: nach PIN nicht offen"; fi
+if hat 6-entsperrt "Anmelden" && ! hat 6-entsperrt "All-Home ist gesperrt"; then ok "Sperre: nach PIN wieder offen"; else nein "Sperre: nach PIN nicht offen (vorne: $(vorne))"; fi
 adb shell locksettings clear --old 2580 > /dev/null
 
 # 6. Verknüpfung „Scannen“ und Teilen ohne Datei
 prefs false false
-adb shell am start -W -a android.intent.action.VIEW -d "allhome://scan" -n "$AKT" > /dev/null; sleep 4
+adb shell am start -W -a android.intent.action.VIEW -d "allhome://scan" -n "$AKT" > /dev/null; sleep 6
 adb shell am start -W -a android.intent.action.SEND -t application/pdf -n "$AKT" > /dev/null; sleep 4
-text 7-danach
-if hat 7-danach "Anmelden"; then ok "Verknüpfung und Teilen: App bleibt stabil"; else nein "Verknüpfung/Teilen: Anmeldung nicht mehr sichtbar"; fi
+text 7-danach; foto 7-danach
+if hat 7-danach "Anmelden"; then ok "Verknüpfung und Teilen: App bleibt stabil"; else nein "Verknüpfung/Teilen: Anmeldung nicht sichtbar (vorne: $(vorne))"; fi
 
-# Abstürze
-adb logcat -d > "$OUT/logcat.txt"
-if grep -E "FATAL EXCEPTION|AndroidRuntime: Process: $PKG" "$OUT/logcat.txt" > "$OUT/absturz.txt"; then
-  nein "Absturz: $(grep -m3 -A3 'FATAL EXCEPTION' "$OUT/logcat.txt" | tr '\n' ' ' | cut -c1-400)"
+# Protokoll: nur die App, Capacitor, Biometrie/Anmeldedialog, Abstürze, Aktivitäten
+adb logcat -d -v time > "$OUT/logcat-voll.txt"
+grep -E "$PKG|Capacitor|AllHome|Biometric|AuthController|AuthService|KeyguardManager|ConfirmDeviceCredential|ActivityTaskManager: (START|Displayed)|AndroidRuntime" "$OUT/logcat-voll.txt" | grep -v "UiAutomation" | tail -400 > "$OUT/logcat.txt"
+if grep -A3 "FATAL EXCEPTION" "$OUT/logcat-voll.txt" | grep -q "Process: $PKG"; then
+  nein "Absturz der App: $(grep -A6 'FATAL EXCEPTION' "$OUT/logcat-voll.txt" | grep -A5 "Process: $PKG" | tr '\n' ' ' | cut -c1-500)"
 else
-  ok "Keine Abstürze im Protokoll"
+  ok "Keine Abstürze der App im Protokoll"
 fi
+rm -f "$OUT/logcat-voll.txt"
 exit $FEHLER

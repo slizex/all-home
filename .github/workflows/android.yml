@@ -1,6 +1,9 @@
 # All-Home Android-App: bauen, signieren, im Emulator prüfen, auf Wunsch veröffentlichen.
 # Die App lädt https://slizex.github.io/all-home/ – Web-Änderungen brauchen keinen neuen Bau.
 # Neu gebaut wird nur, wenn sich android-app/ ändert. Veröffentlichen: „Run workflow“ mit Haken.
+#
+# Sicherheit: Bau und Emulator-Test laufen nur mit Leserecht. Schreibrecht (Release, Prüfbilder)
+# hat allein der zweite Job, der keine fremden Aktionen ausführt, nur gh mit dem fertigen Ergebnis.
 name: Android-App
 
 on:
@@ -24,13 +27,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  app:
+  bauen:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
-      contents: write   # Release und Prüfbilder
+      contents: read
     env:
       HAT_SCHLUESSEL: ${{ secrets.ALLHOME_KEYSTORE_B64 != '' && secrets.ALLHOME_KEYSTORE_PASSWORT != '' }}
+    outputs:
+      name: ${{ steps.v.outputs.name }}
+      code: ${{ steps.v.outputs.code }}
+      sha: ${{ steps.apk.outputs.sha }}
+      groesse: ${{ steps.apk.outputs.groesse }}
+      signiert: ${{ env.HAT_SCHLUESSEL }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -87,12 +96,12 @@ jobs:
           ./gradlew --no-daemon --stacktrace assembleRelease > "$RUNNER_TEMP/gradle.log" 2>&1
           status=$?
           set -e
+          rm -f "$RUNNER_TEMP/allhome.p12"
           tail -40 "$RUNNER_TEMP/gradle.log"
           if [ $status -ne 0 ]; then
             grep -E "error:|e: |What went wrong|FAILURE|> " "$RUNNER_TEMP/gradle.log" | head -12 | while IFS= read -r z; do echo "::error title=Gradle::${z:0:900}"; done
             exit $status
           fi
-          rm -f "$RUNNER_TEMP/allhome.p12"
 
       - name: Signatur prüfen und benennen
         id: apk
@@ -135,26 +144,39 @@ jobs:
             emulator-ergebnis/
           if-no-files-found: ignore
 
+  ablegen:
+    needs: bauen
+    if: always() && needs.bauen.result != 'skipped'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Ergebnisse holen
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --name all-home-app --dir . || true
+          ls -la . emulator-ergebnis 2>/dev/null | head -40
+
       # Bildschirmfotos aus dem Emulator (nur Anmelde-, Offline- und Sperrbild, keine echten Daten)
       - name: Prüfbilder ablegen
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           ls emulator-ergebnis/*.png > /dev/null 2>&1 || exit 0
           gh release delete app-pruefung --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-          gh release create app-pruefung emulator-ergebnis/*.png --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+          gh release create app-pruefung emulator-ergebnis/*.png emulator-ergebnis/*.txt emulator-ergebnis/*.xml --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
             --target "$GITHUB_SHA" --title "App-Prüfung (Emulator)" \
-            --notes "Bildschirmfotos aus dem automatischen Emulator-Test, Lauf ${{ github.run_number }}. Keine echten Daten."
+            --notes "Bildschirmfotos aus dem automatischen Emulator-Test, Lauf $GITHUB_RUN_NUMBER. Keine echten Daten."
 
       - name: Release veröffentlichen
-        if: inputs.veroeffentlichen && env.HAT_SCHLUESSEL == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: needs.bauen.result == 'success' && inputs.veroeffentlichen && needs.bauen.outputs.signiert == 'true'
         run: |
-          V="${{ steps.v.outputs.name }}"
+          V="${{ needs.bauen.outputs.name }}"
+          SHA=$(sha256sum all-home.apk | cut -d' ' -f1)
+          if [ "$SHA" != "${{ needs.bauen.outputs.sha }}" ]; then echo "::error title=Release::Prüfsumme hat sich unterwegs geändert"; exit 1; fi
           cp all-home.apk "all-home-$V.apk"
           gh release create "app-v$V" "all-home-$V.apk" all-home.apk --repo "$GITHUB_REPOSITORY" --latest \
             --target "$GITHUB_SHA" --title "All-Home App $V" \
-            --notes "Android-App von All-Home. Installieren: Datei am Handy öffnen. SHA-256: ${{ steps.apk.outputs.sha }}"
-          echo "::notice title=Release::url=https://github.com/$GITHUB_REPOSITORY/releases/download/app-v$V/all-home-$V.apk sha256=${{ steps.apk.outputs.sha }} groesse=${{ steps.apk.outputs.groesse }} code=${{ steps.v.outputs.code }}"
+            --notes "Android-App von All-Home. Installieren: Datei am Handy öffnen. SHA-256: $SHA"
+          echo "::notice title=Release::url=https://github.com/$GITHUB_REPOSITORY/releases/download/app-v$V/all-home-$V.apk sha256=$SHA groesse=${{ needs.bauen.outputs.groesse }} code=${{ needs.bauen.outputs.code }}"
