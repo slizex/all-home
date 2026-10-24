@@ -94,6 +94,9 @@ foto 4-schutz-schwarz
 # 5. App-Sperre mit Geräte-PIN
 adb shell locksettings set-pin 2580 > /dev/null
 adb shell wm dismiss-keyguard > /dev/null 2>&1
+# Neue Geräte-PIN startet die Google-Play-Dienste neu – Android beendet dabei Apps, die deren Schriften nutzen.
+# Abwarten, sonst misst der Test diesen Neustart statt der App.
+sleep 30
 prefs true false
 starten; sleep 4
 warte 5-sperre "All-Home entsperren" 15; foto 5-sperre
