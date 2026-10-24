@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-mX/tkHi/73D9zwNPNQVK205iwe4kp9zSEopk/b1DtIw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-2qdRfqLYcssXh8v/xELMqjFyQO6YXUJg6bFh8lGjhXY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -671,6 +671,16 @@ body.ansicht-open{overflow:hidden}
 /* Links in Werten (Nachfolger, Vorgänger): Tippfläche 44 px, ohne die Zeile zu verschieben */
 .kvr .kw a.lnk{position:relative}
 .kvr .kw a.lnk::after{content:"";position:absolute;inset:-11px -4px}
+
+/* ================= 1.13.2: Statusleiste ================= */
+/* Android-App (WebView ab 140) und iPhone-Vollbild zeichnen bis ganz oben. env() liefert der Browser,
+   --safe-area-inset-top setzt Capacitor; im normalen Browser ist beides 0 und nichts verschiebt sich. */
+:root{--oben:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px))}
+.shell{padding-top:var(--oben)}
+.auth{padding-top:calc(24px + var(--oben))}
+.side{top:var(--oben);height:calc(100vh - var(--oben))}
+/* Beim Scrollen läuft nichts unter die Uhr: Streifen in Hintergrundfarbe (unter Blättern, Scanner und Ansicht) */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--oben);background:var(--bg);z-index:60;pointer-events:none}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -962,7 +972,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.13.1";
+var APP_VERSION="1.13.2";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -8131,7 +8141,7 @@ function scannerZeigen(p){
   var ad=anfuegenDok();
   if(ad){SCAN.format=istPdfDok(ad)?"pdf":"jpg";SCAN.ki=false;}
   ebeneAnlegen();
-  document.body.classList.add("scan-open");
+  document.body.classList.add("scan-open");systemLeisten();
   entwurfLaden().then(function(e){
     if(!SCAN)return;
     if(e&&e.seiten&&e.seiten.length){SCAN.entwurf=e;scanModus("entwurf");}
@@ -8144,7 +8154,7 @@ function scannerAus(){
   if(SCAN)SCAN.seiten.forEach(function(s){if(s.vUrl)URL.revokeObjectURL(s.vUrl);});
   SCAN=null;SCAN_BILD=null;
   var e=$("#scan");if(e)e.remove();
-  document.body.classList.remove("scan-open");
+  document.body.classList.remove("scan-open");systemLeisten();
 }
 function scanZurueck(){
   if(SCAN_INAPP){SCAN_INAPP=false;history.back();}
@@ -12189,7 +12199,8 @@ function appWiederDa(){
 /* Statusleiste passend zu Hell/Dunkel der App (nicht des Handys) */
 function systemLeisten(){
   var S=appP("SystemBars");if(!S||!istApp())return;
-  try{S.setStyle({style:isDark()?"DARK":"LIGHT"});}catch(e){}
+  var dunkel=isDark()||document.body.classList.contains("scan-open");
+  try{S.setStyle({style:dunkel?"DARK":"LIGHT"});}catch(e){}
 }
 
 /* ---- Zurück-Taste: erst Ansicht/Blatt/Scanner schließen, dann eine Seite zurück, am Start minimieren ---- */
