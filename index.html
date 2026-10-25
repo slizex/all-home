@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-vJgu9c8LJtgS70X31SoszhuntEG1z+cgrfa7/V80WDc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-ldGIu9zyIXzo0heDWKx/l82x9q4SO+bJL5I8Ie2+tis='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -681,6 +681,20 @@ body.ansicht-open{overflow:hidden}
 .side{top:var(--oben);height:calc(100vh - var(--oben))}
 /* Beim Scrollen läuft nichts unter die Uhr: Streifen in Hintergrundfarbe (unter Blättern, Scanner und Ansicht) */
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--oben);background:var(--bg);z-index:60;pointer-events:none}
+
+/* ================= 1.14.0: Download-Link der App ================= */
+.appdl-kopf{display:flex;align-items:center;gap:12px}
+.appdl-kopf .di{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface-2);flex:none}
+.appdl-kopf .db{display:flex;flex-direction:column;min-width:0}
+.appdl-kopf .dn{font-weight:800}
+.appdl-kopf .dm{color:var(--muted);font-size:.86rem}
+.appdl{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.appdl-l{display:flex;flex-direction:column;gap:4px;min-width:0}
+.appdl-l .kk{color:var(--muted);font-size:.86rem;font-weight:700}
+/* Adresse bricht nur an den Schrägstrichen um (<wbr>), nie mitten im Wort */
+.appdl-url{font-size:.84rem;color:var(--text);overflow-wrap:break-word;user-select:all;-webkit-user-select:all}
+.appdl-k{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.appdl-k .btn{flex:1 1 120px;justify-content:center;white-space:nowrap}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -972,7 +986,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.13.3";
+var APP_VERSION="1.14.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1029,6 +1043,13 @@ var curLang="de";
 var T={ru:{
 
 /* ---- 1.13.0 Android-App ---- */
+  "Android-App":"Приложение для Android",
+  "für Android-Handys":"для телефонов Android",
+  "Download-Link":"Ссылка для загрузки",
+  "Herunterladen":"Скачать",
+  "Link teilen":"Поделиться ссылкой",
+  "Link kopieren":"Скопировать ссылку",
+  "All-Home für Android – herunterladen und installieren:":"All-Home для Android — скачать и установить:",
   "Eine Datei von einer anderen App":"Файл из другого приложения",
   "{0} Dateien von einer anderen App":"{0} файлов из другого приложения",
   "Verwerfen":"Отклонить",
@@ -6850,7 +6871,7 @@ async function einladen(hid){
       '<p class="hint" style="margin:0 0 12px">'+t("Die Person meldet sich mit eigenem Konto an und gibt unter Mehr › Häuser & Mitglieder diesen Code ein. Er gilt 14 Tage und nur einmal.")+'</p>'+
       '<div class="code" id="h_einl">'+esc(code)+'</div>'+
       '<div class="factions">'+
-        (navigator.share?'<button class="btn" data-a="hh-share" data-text="'+esc(text)+'">'+ic("share")+' '+t("Einladung teilen")+'</button>':"")+
+        (teilenMoeglich()?'<button class="btn" data-a="hh-share" data-text="'+esc(text)+'">'+ic("share")+' '+t("Einladung teilen")+'</button>':"")+
         '<button class="btn ghost" data-a="hh-copy" data-text="'+esc(code)+'">'+ic("copy")+' '+t("Code kopieren")+'</button>'+
         '<button class="btn ghost" data-a="modal-close">'+t("Fertig")+'</button>'+
       '</div>');
@@ -6861,6 +6882,9 @@ async function kopieren(text){
   catch(e){toast(t("Kopieren ging nicht – bitte den Code abschreiben."),true);}
 }
 async function teilen(text){
+  var A=appP("AllHome");
+  if(istApp()&&A&&A.textTeilen){try{await A.textTeilen({text:text,titel:t("Teilen")});}catch(e){kopieren(text);}return;}
+  if(!navigator.share){kopieren(text);return;}
   try{await navigator.share({title:"All-Home",text:text});}
   catch(e){if(e&&e.name!=="AbortError")kopieren(text);}
 }
@@ -12136,6 +12160,8 @@ var APP_EINRICHTEN_GEZEIGT=false;
 var APP_ERINNERN_KEY="ah_app_erinnerungen";
 var APP_PLAN_AM=0;
 var APP_GETEILT_LAEUFT=false;
+/* Öffentlicher Download-Link – zeigt immer auf die neueste veröffentlichte Version, ohne GitHub-Konto */
+var APP_LINK="https://github.com/slizex/all-home/releases/latest/download/all-home.apk";
 
 function istApp(){
   try{return !!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.AllHome);}
@@ -12162,7 +12188,7 @@ function base64Blob(b64,mime){
 
 /* ================= Start ================= */
 async function appStart(){
-  if(!istApp())return;
+  if(!istApp()){appUpdatePruefen(true);return;}   /* Browser: nur die Versionsangabe für den Download-Block */
   document.documentElement.classList.add("in-app");
   var A=appP("AllHome");
   try{APP=await A.info();}catch(e){APP={};}
@@ -12266,16 +12292,28 @@ function appMehrBlock(){
       '</div>'+
       '<div class="kvr" style="margin-top:12px"><span class="kk">'+t("App-Version")+'</span><span class="kw">'+esc(APP.version||"?")+'</span></div>'+
       (neu?'<button class="btn full" style="margin-top:10px" data-a="app-update">'+ic("download")+' '+tf("Auf {0} aktualisieren",esc(APP_UPDATE.version))+'</button>':"")+
+      appDownloadHtml()+
       '</section>';
   }
-  if(istAndroidBrowser()&&APP_UPDATE&&APP_UPDATE.url)
-    return '<div class="mgrp">'+t("App")+'</div>'+
-      '<section class="card"><a class="drow3" href="'+esc(APP_UPDATE.url)+'" rel="noopener"><span class="di">'+ic("download")+'</span>'+
-        '<span class="db"><span class="dn">'+t("Android-App installieren")+'</span>'+
-        '<span class="dm"><span>'+tf("Version {0}",esc(APP_UPDATE.version))+'</span></span></span>'+
-        '<span class="go">'+ic("right",18)+'</span></a></section>';
-  return "";
+  return '<div class="mgrp">'+t("App")+'</div>'+
+    '<section class="card"><div class="appdl-kopf"><span class="di">'+ic("download")+'</span>'+
+      '<span class="db"><span class="dn">'+t("Android-App")+'</span>'+
+      '<span class="dm">'+(APP_UPDATE&&APP_UPDATE.version?tf("Version {0}",esc(APP_UPDATE.version))+' · ':'')+t("für Android-Handys")+'</span></span></div>'+
+      appDownloadHtml()+'</section>';
 }
+/* Download-Link: sichtbar, herunterladen, teilen (oder kopieren, wo es keinen Teilen-Dialog gibt) */
+function appDownloadHtml(){
+  var teilbar=teilenMoeglich();
+  return '<div class="appdl">'+
+    '<div class="appdl-l"><span class="kk">'+t("Download-Link")+'</span>'+
+      '<span class="appdl-url">'+esc(APP_LINK.replace(/^https:\/\//,"")).replace(/\//g,"/<wbr>")+'</span></div>'+
+    '<div class="appdl-k">'+
+      /* in der App ist „Aktualisieren“ der Hauptknopf, im Browser das Herunterladen */
+      '<a class="btn sm'+(istApp()?" ghost":"")+'" href="'+esc(APP_LINK)+'" target="_blank" rel="noopener">'+ic("download")+' '+t("Herunterladen")+'</a>'+
+      '<button class="btn sm ghost" data-a="app-link-teilen">'+ic(teilbar?"share":"copy")+' '+(teilbar?t("Link teilen"):t("Link kopieren"))+'</button>'+
+    '</div></div>';
+}
+function appLinkText(){return t("All-Home für Android – herunterladen und installieren:")+"\n"+APP_LINK;}
 async function appSperreUmschalten(){
   var A=appP("AllHome");if(!A||!APP)return;
   try{
@@ -12296,7 +12334,6 @@ async function appSchutzUmschalten(){
 
 /* ================= App-Update ================= */
 async function appUpdatePruefen(sofort){
-  if(!istApp()&&!istAndroidBrowser())return;
   if(!sofort&&Date.now()-APP_UPDATE_AM<6*3600*1000)return;
   APP_UPDATE_AM=Date.now();
   try{
@@ -12394,6 +12431,12 @@ async function geteiltHochladen(){
     dateienVerarbeiten(dateien,{});
   }catch(e){toast(appFehler(e),true);}
   finally{APP_GETEILT_LAEUFT=false;}
+}
+
+/* ================= Text/Link teilen ================= */
+function teilenMoeglich(){
+  var A=appP("AllHome");
+  return !!((istApp()&&A&&A.textTeilen)||(!istApp()&&navigator.share));
 }
 
 /* ================= Dateien: Speichern unter / Öffnen mit / Teilen ================= */
@@ -12738,6 +12781,7 @@ document.addEventListener("click",function(ev){
   if(a==="app-schutz"){laeuft(b,appSchutzUmschalten());return;}
   if(a==="app-erinnern"){laeuft(b,erinnerungenSchalten(!erinnerungenAn()).then(render));return;}
   if(a==="app-update"){laeuft(b,appAktualisieren());return;}
+  if(a==="app-link-teilen"){laeuft(b,teilenMoeglich()?teilen(appLinkText()):kopieren(APP_LINK));return;}
   if(a==="geteilt-ja"){laeuft(b,geteiltHochladen());return;}
   if(a==="geteilt-nein"){laeuft(b,geteiltVerwerfen());return;}
   if(a==="ansicht-zu"){ansichtZu();return;}
