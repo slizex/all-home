@@ -618,6 +618,27 @@ public class AllHomePlugin extends Plugin {
         });
     }
 
+    /** Text oder Link über den Android-Teilen-Dialog (der WebView kennt navigator.share nicht). */
+    @PluginMethod
+    public void textTeilen(PluginCall call) {
+        String text = call.getString("text", "");
+        String titel = call.getString("titel", "Teilen");
+        if (text == null || text.isEmpty() || text.length() > 2000) {
+            call.reject("Nichts zu teilen.", "UNGUELTIG");
+            return;
+        }
+        Intent i = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
+        Intent wahl = Intent.createChooser(i, titel);
+        getActivity().runOnUiThread(() -> {
+            try {
+                getActivity().startActivity(wahl);
+                call.resolve();
+            } catch (ActivityNotFoundException e) {
+                call.reject("Keine passende App gefunden.", "KEINE_APP");
+            }
+        });
+    }
+
     /** art = "oeffnen" (Öffnen mit …) oder "teilen" (Teilen …). Die Kopie liegt nur im privaten Cache und wird aufgeräumt. */
     @PluginMethod
     public void dateiWeitergeben(PluginCall call) {
