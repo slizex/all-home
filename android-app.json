@@ -1,8 +1,8 @@
 {
-  "version": "1.0.1",
-  "code": 2,
+  "version": "1.0.2",
+  "code": 3,
   "mindest": 1,
-  "url": "https://github.com/slizex/all-home/releases/download/app-v1.0.1/all-home-1.0.1.apk",
-  "sha256": "46b50c34e8325aba0a0afdbd812496bffc704f8fc3b2ddb98a5afbe41ed0f877",
-  "groesse": 3786065
+  "url": "https://github.com/slizex/all-home/releases/download/app-v1.0.2/all-home-1.0.2.apk",
+  "sha256": "0d7bb78bc83ccc854d9663576bbca212758bc2d41e044f34eee79e55131b70ef",
+  "groesse": 3786269
 }
