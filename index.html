@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-ldGIu9zyIXzo0heDWKx/l82x9q4SO+bJL5I8Ie2+tis='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-GEOPlVflOlBC7Nvf4Ity3hnIulNx0CQhLDlJK1ZyV0M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -986,7 +986,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.14.0";
+var APP_VERSION="1.14.1";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -4135,7 +4135,7 @@ function viewArt(k){
         '<div class="sug info"><span class="si">'+ic("link")+'</span><div class="sb2">'+
           '<div class="st">'+t("Wird in AllTrack geführt")+'</div>'+
           '<div class="sx">'+t("Tarife, Ablesungen und Jahresabrechnung liegen dort. All-Home zeigt den aktuellen Stand nur an.")+'</div>'+
-          '<div class="sa"><a class="btn" href="'+ALLTRACK_URL+'">'+ic("link")+' '+t("In AllTrack öffnen")+'</a></div>'+
+          '<div class="sa"><a class="btn" href="'+ALLTRACK_URL+'" data-a="alltrack-oeffnen">'+ic("link")+' '+t("In AllTrack öffnen")+'</a></div>'+
         '</div></div>'+
         (e?'<div class="kvl">'+
           kv(t("Anbieter"),esc(e.anbieter||"–"))+
@@ -12433,6 +12433,21 @@ async function geteiltHochladen(){
   finally{APP_GETEILT_LAEUFT=false;}
 }
 
+/* ================= AllTrack-App öffnen (ab 1.14.1) =================
+   Die AllTrack-App (de.slizex.alltrack) meldet sich für alltrack://start. Ist sie installiert, geht
+   All-Home in den Hintergrund. Sonst passiert nichts (Capacitor fängt das ab) – dann nach 1,5 s die
+   Seite, die die App wie jede fremde Seite an den Browser weiterreicht. Nur Web, keine neue APK. */
+function allTrackOeffnen(){
+  var weg=false,seite=new URL(ALLTRACK_URL,location.href).href;   /* vor dem Sprung auflösen */
+  function fort(){if(document.visibilityState==="hidden")weg=true;}
+  document.addEventListener("visibilitychange",fort);
+  location.href="alltrack://start";
+  setTimeout(function(){
+    document.removeEventListener("visibilitychange",fort);
+    if(!weg)location.href=seite;
+  },1500);
+}
+
 /* ================= Text/Link teilen ================= */
 function teilenMoeglich(){
   var A=appP("AllHome");
@@ -12782,6 +12797,8 @@ document.addEventListener("click",function(ev){
   if(a==="app-erinnern"){laeuft(b,erinnerungenSchalten(!erinnerungenAn()).then(render));return;}
   if(a==="app-update"){laeuft(b,appAktualisieren());return;}
   if(a==="app-link-teilen"){laeuft(b,teilenMoeglich()?teilen(appLinkText()):kopieren(APP_LINK));return;}
+  /* Im Browser bleibt es ein normaler Link; in der App startet er die AllTrack-App, falls installiert */
+  if(a==="alltrack-oeffnen"){if(istApp()){ev.preventDefault();allTrackOeffnen();}return;}
   if(a==="geteilt-ja"){laeuft(b,geteiltHochladen());return;}
   if(a==="geteilt-nein"){laeuft(b,geteiltVerwerfen());return;}
   if(a==="ansicht-zu"){ansichtZu();return;}

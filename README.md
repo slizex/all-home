@@ -103,6 +103,8 @@ Automatisch (Standard, an sobald AllTrack für das Haus Tarife hat), An oder Aus
 Eigene Einträge derselben Art bleiben sichtbar, zählen dann aber nicht doppelt zu den Kosten.
 
 Beide Apps teilen Anmeldung und Haushalte (gleiches Supabase-Projekt, gleiche Domäne).
+In der All-Home-App startet „In AllTrack öffnen“ die AllTrack-App (`alltrack://start`), wenn sie installiert ist,
+sonst wie im Browser die AllTrack-Seite (seit 1.14.1).
 
 ## Technik
 
