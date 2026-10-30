@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-GEOPlVflOlBC7Nvf4Ity3hnIulNx0CQhLDlJK1ZyV0M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-Lx/DFQuZ62S+nhEAe+0eM6bZeZvBd6344UPcLsAkZ/Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -986,7 +986,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.14.1";
+var APP_VERSION="1.15.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1042,6 +1042,9 @@ var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:
 var curLang="de";
 var T={ru:{
 
+/* ---- 1.15.0 KI ---- */
+  "Schreiben vom {0}, neuer Preis ab {1}. Sonderkündigung meist nur bis dahin.":"Письмо от {0}, новая цена с {1}. Досрочно расторгнуть обычно можно только до этой даты.",
+  "Neuer Preis ab {0} – kündigen meist nur bis dahin.":"Новая цена с {0} — расторгнуть обычно можно только до этой даты.",
 /* ---- 1.13.0 Android-App ---- */
   "Android-App":"Приложение для Android",
   "für Android-Handys":"для телефонов Android",
@@ -4890,6 +4893,8 @@ function kiFelder(ext,name,med){
 /* Edge-Function aufrufen und Guthaben-/Fehlercode herausziehen */
 async function edgeRuf(fn,body){
   body=Object.assign({household_id:HH?HH.id:null},body);
+  /* Dokument auslesen: bekannte Praxen mitgeben, damit dieselbe Praxis gleich heißt (butler-extract v26) */
+  if(fn==="butler-extract"&&!body.modus&&body.aerzte===undefined){try{body.aerzte=bekannteAerzte();}catch(e){}}
   var r=await sb.functions.invoke(fn,{body:body});
   if(r.error){
     var code=null,msg=null;
@@ -5882,8 +5887,26 @@ function medGruppe(icon,name,info,inhalt){
 }
 function medGruppenInfo(liste){var s=medSumme(liste);return tf("{0} Dok.",liste.length)+(s>0?" · "+eur0(s):"");}
 /* Arzt/Praxis als Schlüssel: Titel, Initialen und Satzzeichen egal („Dr. med. A. Meier“ = „Praxis Meier“) */
-var ARZT_FUELL={dr:1,med:1,dent:1,prof:1,dipl:1,univ:1,praxis:1,herr:1,frau:1,und:1,kollegen:1};
+var ARZT_FUELL={dr:1,med:1,dent:1,prof:1,dipl:1,univ:1,praxis:1,herr:1,frau:1,und:1,kollegen:1,
+  arztpraxis:1,zahnarztpraxis:1,gemeinschaftspraxis:1,praxisgemeinschaft:1,zahnarzt:1,zahnaerztin:1,zahnärztin:1,mvz:1,gmbh:1,facharzt:1,fachaerztin:1,fachärztin:1};
 function arztSchluessel(a){return artText(a).trim().split(" ").filter(function(w){return w.length>1&&!ARZT_FUELL[w];}).join(" ");}
+/* Dieselbe Praxis in zwei Schreibweisen („Zahnmedicus, J. Qualen, Bad Nauheim“ / „Zahnarztpraxis Dr. J. Qualen, Bad Nauheim“):
+   alle Wörter der kürzeren Angabe stecken in der längeren (mindestens zwei). Verschiedene Ärzte
+   gleichen Namens im selben Ort bleiben getrennt, weil sich die Vornamen unterscheiden. */
+function arztGleich(a,b){
+  if(!a||!b)return false;if(a===b)return true;
+  var x=a.split(" "),y=b.split(" ");if(x.length>y.length){var z=x;x=y;y=z;}
+  return x.length>=2&&x.every(function(w){return y.indexOf(w)>=0;});
+}
+/* Bekannte Praxen des Haushalts für die KI (gleiche Schreibweise beim nächsten Dokument), neueste zuerst */
+function bekannteAerzte(){
+  var aus=[],schl=[];
+  DOCS.filter(function(d){return d.bereich==="medizin"&&d.arzt;}).sort(medNeuesteZuerst).forEach(function(d){
+    var k=arztSchluessel(d.arzt);if(!k||schl.some(function(s){return arztGleich(s,k);}))return;
+    schl.push(k);aus.push(String(d.arzt).slice(0,120));
+  });
+  return aus.slice(0,30);
+}
 function medInhalt(){
   var liste=medGefiltert(),q=medFilter.q.trim();
   if(q){
@@ -5896,7 +5919,10 @@ function medInhalt(){
   var a=medFilter.ansicht,gr={},keys=[];
   function dazu(k,d){if(!gr[k]){gr[k]=[];keys.push(k);}gr[k].push(d);}
   if(a==="aerzte"){
-    liste.slice().sort(medNeuesteZuerst).forEach(function(d){dazu(arztSchluessel(d.arzt)||"~",d);});
+    liste.slice().sort(medNeuesteZuerst).forEach(function(d){
+      var k=arztSchluessel(d.arzt)||"~",gleich=keys.filter(function(x){return x!=="~"&&arztGleich(x,k);})[0];
+      dazu(gleich||k,d);
+    });
     return keys.map(function(k){
       var l=gr[k],d0=l[0],fa=fachInfo(d0.fachrichtung||"sonstiges");
       return medGruppe(fa.icon,d0.arzt||t("Ohne Arztangabe"),medGruppenInfo(l)+" · "+tf("zuletzt {0}",fmtDate(medDatum(d0))),l.map(function(d){return medZeile(d);}).join(""));
@@ -6399,6 +6425,11 @@ function wegAbgleichen(){
 }
 
 /* ---------------- Die Vorschläge sammeln ---------------- */
+/* Ab wann gilt der neue Preis (butler-extract v26: gueltigAb)? Nur ein plausibles Datum nach dem Schreiben */
+function preisAb(d){
+  var ab=d&&d.extracted&&d.extracted.gueltigAb,dt=d&&(d.doc_date||String(d.created_at||"").slice(0,10));
+  return (typeof ab==="string"&&/^\d{4}-\d\d-\d\d$/.test(ab)&&(!dt||ab>=dt))?ab:null;
+}
 function vorschlaege(){
   var v=[];
 
@@ -6469,7 +6500,8 @@ function vorschlaege(){
       if(alter>90)return;                      /* älter als 3 Monate: nicht mehr aktuell */
       v.push({key:"preis:"+d.id,art:"warn",icon:"alert",
         titel:t("Preiserhöhung erkannt"),
-        text:(c?(c.anbieter||"")+" · ":"")+tf("Schreiben vom {0}. Bei einer Erhöhung hast du meist ein Sonderkündigungsrecht – oft nur bis zum Wirksamwerden.",fmtDate(dt)),
+        text:(c?(c.anbieter||"")+" · ":"")+(preisAb(d)?tf("Schreiben vom {0}, neuer Preis ab {1}. Sonderkündigung meist nur bis dahin.",fmtDate(dt),fmtDate(preisAb(d)))
+          :tf("Schreiben vom {0}. Bei einer Erhöhung hast du meist ein Sonderkündigungsrecht – oft nur bis zum Wirksamwerden.",fmtDate(dt))),
         knopf:c?t("Zum Vertrag"):t("Dokument"),
         href:c?("#/vertrag?id="+c.id):null,aktion:c?null:"d-open",id:c?null:d.id});
     });
@@ -7102,7 +7134,7 @@ function fahrzeugWarnungen(det){
    Function fest zu (butler-extract, -med-explain, -research), hier wird nur die
    Stufe gewählt. Gilt je Person, Standard „Gründlich“. */
 var KI_STUFEN={
-  basic:   {name:"Schnell",  model:"Claude Haiku 4.5",  sub:"Klare Fotos und einfache Belege",            kosten:"€"},
+  basic:   {name:"Schnell",  model:"Claude Haiku 5.5",  sub:"Klare Fotos und einfache Belege",            kosten:"€"},
   advanced:{name:"Gründlich",model:"Claude Sonnet 5.5", sub:"Mehrseitige Verträge, schwierige Fotos",     kosten:"€€"},
   max:     {name:"Maximal",  model:"Claude Opus 5.5",   sub:"Stärkstes Modell für knifflige Dokumente",    kosten:"€€€"}
 };
@@ -7356,7 +7388,7 @@ async function logoLoeschen(id){
 var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
 var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
   "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen","allhome-nk-analyse":"Nebenkosten-Analyse","allhome-nk-frage":"Nebenkosten-Rückfrage",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
-var KI_MODELLNAME={"claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
+var KI_MODELLNAME={"claude-haiku-5-5":"Haiku 5.5","claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
 var KI_KOSTEN=null;   /* {hh, zeilen, fehler, am, laedt} */
 function kiEur(usd){
   var e=(Number(usd)||0)*USD_EUR;
@@ -11647,7 +11679,7 @@ var NKA=null;   /* {hh, berichte, fragen, gedaechtnis, texte, fehlend, laedt, fe
 /* ausTok: gemessen mit fiktiven Testdaten (Opus mittlere Denktiefe ≈ 8.200, Sonnet ≈ 6.800 inkl. Denken); recherche: Zuschlag je Rückfrage */
 var NKA_PREIS={gruendlich:{name:"Gründlich",modell:"Opus 5.5",ein:4,aus:20,ausTok:8500,recherche:0.15},
                schnell:{name:"Schnell",modell:"Sonnet 5.5",ein:2,aus:10,ausTok:7000,recherche:0.05}};
-var NKA_ABSCHREIBEN_USD=0.045;   /* je Dokument (Haiku, Erfahrungswert aus ai_calls) */
+var NKA_ABSCHREIBEN_USD=0.006;   /* je Dokument: Haiku 5.5 seit 30.10.2026 (Haiku 4.5 lag bei 0,045 $ laut ai_calls; 5.5 kostet ein Zehntel, ~30 % mehr Tokens) */
 var NKA_PROMPT_ZEICHEN=9500;     /* fester Teil der Anfrage (Rechtsstand, Aufgabe) */
 var NKA_START=null;              /* offenes Startblatt: {schaetzung, rest} */
 
@@ -12665,9 +12697,10 @@ function fristenDesHaushalts(h){
   if(smartAn("preis"))DOCS.forEach(function(d){
     if(d.doc_type!=="preisaenderung")return;
     var dt=d.doc_date||String(d.created_at||"").slice(0,10);if(!dt)return;
-    var bis=plusTage(dt,28);if(bis<heute)return;
+    /* Frist: Tag vor dem neuen Preis (laut Schreiben), sonst rund einen Monat nach dem Schreiben – das frühere zählt */
+    var ab=preisAb(d),bis=plusTage(dt,28);if(ab&&plusTage(ab,-1)<bis)bis=plusTage(ab,-1)<dt?dt:plusTage(ab,-1);if(bis<heute)return;
     var c=d.contract_id?vertragById(d.contract_id):null;
-    aus.push({key:"preis:"+d.id,datum:bis,art:"preis",name:(c&&c.anbieter)||t("Preiserhöhung"),vom:dt,href:c?"#/vertrag?id="+c.id:"#/dokumente"});
+    aus.push({key:"preis:"+d.id,datum:bis,art:"preis",name:(c&&c.anbieter)||t("Preiserhöhung"),vom:dt,ab:ab,href:c?"#/vertrag?id="+c.id:"#/dokumente"});
   });
   if(smartAn("termine"))CONTRACTS.forEach(function(c){
     var a=artInfo(c.art||"sonstiges");
@@ -12688,7 +12721,7 @@ function erinnerungText(f,vorher){
     text:tf("Letzter Kündigungstag: {0}",fmtDate(f.datum))};
   if(f.art==="termin")return {titel:f.name+": "+f.was+" "+wann,text:fmtDate(f.datum)};
   if(f.art==="preis")return {titel:tf("{0}: Sonderkündigung prüfen",f.name),
-    text:tf("Preiserhöhung vom {0} – kündigen meist nur bis zum Wirksamwerden.",fmtDate(f.vom))};
+    text:f.ab?tf("Neuer Preis ab {0} – kündigen meist nur bis dahin.",fmtDate(f.ab)):tf("Preiserhöhung vom {0} – kündigen meist nur bis zum Wirksamwerden.",fmtDate(f.vom))};
   return {titel:tf("{0}: Einwände bis {1}",f.name,fmtDate(f.datum)),text:t("Danach gilt die Abrechnung als anerkannt.")};
 }
 async function erinnerungenPlanen(){

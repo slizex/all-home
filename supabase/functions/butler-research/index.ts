@@ -30,7 +30,7 @@ Deno.serve(async (req: Request) => {
   const produkt = String(p.produkt || "").slice(0, 120).trim();
   const kategorie = String(p.kategorie || "").slice(0, 40).trim();
   const st = stufe(p.level || p.model);
-  const lv = level(st, { basic: 2500, advanced: 6000, max: 8000 });
+  const lv = level(st, { basic: 6000, advanced: 6000, max: 8000 });
   const lang = (p.lang === "ru") ? "ru" : "de";
 
   const frage = [

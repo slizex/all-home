@@ -41,7 +41,7 @@ Deno.serve(async (req: Request) => {
     ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: fileBase64 } }
     : { type: "image", source: { type: "base64", media_type: mt, data: fileBase64 } };
   const st = stufe(p.level || p.model);
-  const lv = level(st, { basic: 3500, advanced: 8000, max: 10000 });
+  const lv = level(st, { basic: 8000, advanced: 8000, max: 10000 });
   const lang = (p.lang === "ru") ? "ru" : "de";
   const k = p.kontext || {};
 

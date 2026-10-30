@@ -9,9 +9,13 @@ const SB_URL = Deno.env.get("SUPABASE_URL") || "";
 /* ---------- Stufen und Preise (wie AllTrack) ---------- */
 export type Stufe = "basic" | "advanced" | "max";
 export type Level = { model: string; maxTokens: number; effort?: string };
-const MODELLE: Record<Stufe, string> = { basic: "claude-haiku-4-5", advanced: "claude-sonnet-5-5", max: "claude-opus-5-5" };
-// US-Dollar je 1 Mio. Tokens (Eingabe, Ausgabe); Websuche 10 $ je 1000 Suchen
-const PREISE: Record<string, [number, number]> = { "claude-haiku-4-5": [1, 5], "claude-sonnet-5-5": [2, 10], "claude-opus-5-5": [4, 20] };
+// basic seit 30.10.2026: Haiku 5.5 (ein Zehntel des Preises von Haiku 4.5, denkt mit, effort steuert wie viel).
+// Haiku 4.5 bleibt Rückfall, falls Haiku 5.5 eine Anfrage nicht annimmt.
+const MODELLE: Record<Stufe, string> = { basic: "claude-haiku-5-5", advanced: "claude-sonnet-5-5", max: "claude-opus-5-5" };
+const HAIKU_ALT = "claude-haiku-4-5";
+// US-Dollar je 1 Mio. Tokens (Eingabe, Ausgabe); Websuche 10 $ je 1000 Suchen.
+// Haiku 5.5 ab 100.000 Eingabe-Tokens je Anfrage: 0,50 / 2,50 (siehe protokoll)
+const PREISE: Record<string, [number, number]> = { "claude-haiku-5-5": [0.1, 0.5], "claude-haiku-4-5": [1, 5], "claude-sonnet-5-5": [2, 10], "claude-opus-5-5": [4, 20] };
 const USD_JE_SUCHE = 0.01;
 // Grenzen stellt der Superadmin in der Zentrale ein (public.ki_einstellungen, gilt auch für AllTrack).
 // Nur wenn die Datenbank nicht antwortet, gelten diese Rückfallwerte.
@@ -21,9 +25,9 @@ export function stufe(v?: string): Stufe {
   if (v === "ultra") return "max";
   return v === "basic" || v === "advanced" || v === "max" ? v : "advanced";
 }
-/* tok: maximale Antwortlänge je Stufe; Haiku kennt kein effort */
-export function level(st: Stufe, tok: Record<Stufe, number>): Level {
-  return st === "basic" ? { model: MODELLE.basic, maxTokens: tok.basic } : { model: MODELLE[st], maxTokens: tok[st], effort: "medium" };
+/* tok: maximale Antwortlänge je Stufe (das Mitdenken zählt mit); effort: wie gründlich (Abschreiben: "low") */
+export function level(st: Stufe, tok: Record<Stufe, number>, effort = "medium"): Level {
+  return { model: MODELLE[st], maxTokens: tok[st], effort };
 }
 
 /* ---------- Antworten ---------- */
@@ -125,7 +129,8 @@ export async function protokoll(wer: Aufrufer, mode: string, st: Stufe, modell: 
   const inp = Number(usage?.input_tokens) || 0, out = Number(usage?.output_tokens) || 0;
   const suchen = Number((usage?.server_tool_use as Record<string, unknown> | undefined)?.web_search_requests) || 0;
   const preisKey = Object.keys(PREISE).find((k) => modell.indexOf(k) === 0) || "";
-  const p = PREISE[preisKey] || [0, 0];
+  let p = PREISE[preisKey] || [0, 0];
+  if (preisKey === "claude-haiku-5-5" && inp > 100000) p = [0.5, 2.5];
   const usd = Math.round(((inp * p[0] + out * p[1]) / 1e6 + suchen * USD_JE_SUCHE) * 1e6) / 1e6;
   const sh = secretHeaders();
   if (sh && SB_URL) {
@@ -141,26 +146,48 @@ export async function protokoll(wer: Aufrufer, mode: string, st: Stufe, modell: 
 }
 
 /* ---------- Claude ---------- */
-// Anfrage; ist das Modell abgeschaltet, einmal mit Sonnet 5.5 (effort low) wiederholen
+// Anfrage an Claude.
+// - Opus/Sonnet: lehnen die Sicherheitsfilter ab (stop_reason "refusal"), rechnet der Server mit einem passenden
+//   Ersatzmodell weiter (fallbacks "default"); kennt der Server den Parameter nicht, ohne ihn wiederholen.
+// - Haiku 5.5 hat keinen Server-Ersatz: bei Ablehnung einmal mit Sonnet 5.5; nimmt es eine Anfrage nicht an
+//   (400/404, z. B. Werkzeug), wie bisher mit Haiku 4.5.
+// - Ist Opus nicht verfügbar: Sonnet 5.5 (effort low).
 export async function claude(lv: Level, body: Record<string, unknown>): Promise<{ resp: Response; lv: Level }> {
-  const senden = (l: Level) => {
+  const serverErsatz = (m: string) => m === MODELLE.max || m === MODELLE.advanced;
+  const senden = (l: Level, ersatz: boolean) => {
     const b: Record<string, unknown> = { ...body, model: l.model, max_tokens: l.maxTokens };
-    if (l.effort) b.output_config = { effort: l.effort };
-    return fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_API_KEY as string, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify(b),
-    });
+    if (l.effort && l.model !== HAIKU_ALT) b.output_config = { effort: l.effort };   // Haiku 4.5 kennt kein effort
+    const headers: Record<string, string> = { "content-type": "application/json", "x-api-key": ANTHROPIC_API_KEY as string, "anthropic-version": "2023-06-01" };
+    if (ersatz && serverErsatz(l.model)) { headers["anthropic-beta"] = "server-side-fallback-2026-07-01"; b.fallbacks = "default"; }
+    return fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers, body: JSON.stringify(b) });
   };
-  let resp = await senden(lv);
-  const ersatz: Level = { model: MODELLE.advanced, maxTokens: lv.maxTokens, effort: "low" };
-  if ((resp.status === 404 || resp.status === 400) && lv.model !== ersatz.model) {
+  let mitErsatz = true;
+  let resp = await senden(lv, mitErsatz);
+  if (resp.status === 400 && serverErsatz(lv.model)) {
     const peek = await resp.clone().text();
-    if (/model/i.test(peek) && /not_found|not found|invalid|unknown|deprecated/i.test(peek)) {
+    if (/fallback/i.test(peek)) { mitErsatz = false; resp = await senden(lv, false); }
+  }
+  if (resp.status === 404 || resp.status === 400) {
+    const peek = await resp.clone().text();
+    if (lv.model === MODELLE.basic) {
+      console.warn("Haiku 5.5 nimmt die Anfrage nicht an (" + resp.status + "), Rueckfall Haiku 4.5:", peek.slice(0, 300));
+      lv = { model: HAIKU_ALT, maxTokens: lv.maxTokens };
+      resp = await senden(lv, false);
+    } else if (lv.model !== MODELLE.advanced && /model/i.test(peek) && /not_found|not found|invalid|unknown|deprecated/i.test(peek)) {
       console.warn("Modell nicht verfuegbar, nutze Ersatz:", lv.model);
-      lv = ersatz;
-      resp = await senden(lv);
+      lv = { model: MODELLE.advanced, maxTokens: lv.maxTokens, effort: "low" };
+      resp = await senden(lv, mitErsatz);
     }
+  }
+  if (resp.ok && lv.model === MODELLE.basic) {
+    try {
+      const d = await resp.clone().json();
+      if (d && d.stop_reason === "refusal") {
+        console.warn("Haiku 5.5 lehnt ab, einmal mit Sonnet 5.5");
+        lv = { model: MODELLE.advanced, maxTokens: lv.maxTokens, effort: "low" };
+        resp = await senden(lv, mitErsatz);
+      }
+    } catch (_) { /* Antwort unten normal lesen */ }
   }
   return { resp, lv };
 }

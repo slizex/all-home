@@ -12,6 +12,10 @@
 // v23: "medizin" bei Arztdokumenten (Diagnosen mit ICD, Ereignisse, Medikamente, Laborwerte, Leistungen mit Ziffer, Folgetermin) fuer die Gesundheitsakte.
 // v24: details-Schluessel "malo" (MaLo-ID, Marktlokation) bei Strom.
 // v25: "malo" auch bei Gas.
+// v26 (30.10.2026, aus den bisherigen Auswertungen gelernt): "gueltigAb" bei Preisaenderungen (Datum des neuen Preises),
+//      Miete: kosten = Kaltmiete und nebenkosten = alle Vorauszahlungen, Arztrechnungen ueber Abrechnungsstellen
+//      (mediserv, PVS ...): Praxis statt Abrechnungsstelle, bekannte Praxen des Haushalts (aerzte) fuer gleiche
+//      Schreibweise. Basis-Stufe Haiku 5.5 (gemeinsam.ts), Volltext mit effort "low".
 // Gemeinsamer Kern (Anmeldung, Limits, Kosten-Protokoll, Claude-Aufruf): gemeinsam.ts
 
 import { ANTHROPIC_API_KEY, antwortText, claude, claudeFehler, cors, json, level, protokoll, pruefeAufruf, repairJson, stufe } from "./gemeinsam.ts";
@@ -106,6 +110,7 @@ const PROMPT = [
   `- \"vertragsnummer\": Vertrags-/Policen-/Versicherungsschein-/Mitgliedsnummer (string|null) - NICHT die Rechnungsnummer.`,
   `- \"rechnungsnummer\": Rechnungs-/Belegnummer bei Rechnungen (string|null).`,
   `- \"datum\": Dokumentdatum ISO YYYY-MM-DD|null.`,
+  `- \"gueltigAb\": bei Preisaenderung, Beitragsanpassung oder Tarifwechsel das Datum, ab dem der neue Preis bzw. Tarif gilt, ISO|null (sonst null).`,
   `- \"vertragsstart\": Vertragsbeginn/Lieferbeginn/Versicherungsbeginn ISO|null.`,
   `- \"mindestlaufzeitMonate\": Zahl (0 = keine; null unbekannt).`,
   `- \"kuendigungsfristMonate\": Zahl, Wochen als Dezimal (2 Wochen=0.5, 6 Wochen=1.5). null unbekannt.`,
@@ -114,7 +119,7 @@ const PROMPT = [
   `- \"kostenIntervall\": \"monatlich\"|\"vierteljaehrlich\"|\"halbjaehrlich\"|\"jaehrlich\"|\"einmalig\"|null.`,
   `- \"betrag\": bei Rechnungen der Rechnungsbetrag in EURO brutto als Zahl, sonst null.`,
   `- \"zeitraumVon\"/\"zeitraumBis\": bei Rechnungen Leistungszeitraum ISO|null.`,
-  `- \"details\": Objekt mit Zusatzangaben zur gewaehlten \"art\" - NUR Schluessel aus dieser Liste, die bei der art stehen, und NUR Werte, die im Dokument stehen (sonst {}). Schluessel exakt so schreiben. Format: schluessel (Bedeutung, Typ): Arten. objekt (Objekt / Adresse, Text): miete eigentum hausverwaltung muell garage hausrat wohngebaeude rundfunk grundsteuer; flaeche (Flaeche (m2), Zahl): miete eigentum; zimmer (Zimmer, Zahl): miete; nebenkosten (Nebenkosten (EUR/Monat), Zahl in EUR): miete; zaehlernummer (Zaehlernummer, Text): strom gas wasser fernwaerme; malo (MaLo-ID = Marktlokations-ID, 11 Ziffern ohne Leerzeichen, nicht die Zaehlernummer und nicht die Messlokation DE..., Text): strom gas; jahresverbrauch (Jahresverbrauch, Zahl): strom gas wasser fernwaerme heizoel; arbeitspreis (Arbeitspreis (ct/Einheit), Zahl): strom gas fernwaerme; grundpreis (Grundpreis (EUR/Monat), Zahl in EUR): strom gas fernwaerme; marke (Marke, Text): fahrzeug kfz_steuer leasing fahrrad kfz_vers; modell (Modell, Text): fahrzeug kfz_steuer leasing fahrrad kfz_vers; kennzeichen (Kennzeichen, Text): fahrzeug kfz_steuer leasing kfz_vers; fin (Fahrgestellnummer (FIN), Text): fahrzeug leasing kfz_vers; hsn (HSN (zu 2.1), Text): fahrzeug kfz_vers; tsn (TSN (zu 2.2), Text): fahrzeug kfz_vers; erstzulassung (Erstzulassung, Datum ISO): fahrzeug; hu_bis (HU gueltig bis, Datum ISO): fahrzeug; deckungsart (Deckungsumfang, Text): kfz_vers rechtsschutz reise_vers vers_sonst; deckungssumme (Deckungssumme (EUR), Zahl in EUR): haftpflicht hausrat wohngebaeude bu unfall risikoleben tierhalter fahrrad_vers vers_sonst; selbstbeteiligung (Selbstbeteiligung (EUR), Zahl in EUR): haftpflicht hausrat wohngebaeude kfz_vers rechtsschutz tierkranken elektronik; sf_klasse (Schadenfreiheitsklasse (SF), Text): kfz_vers; sf_prozent (SF-Beitragssatz (%), Zahl): kfz_vers; versichert (Versichert ist, Text): haftpflicht tierhalter tierkranken elektronik fahrrad_vers vers_sonst; tarif_stufe (Tarif / Stufe, Text): oepnv kranken zahnzusatz streaming_video streaming_musik presse cloud kreditkarte; rufnummer (Rufnummer, Text): internet mobilfunk; datenvolumen (Datenvolumen, Text): mobilfunk; endgeraet (Endgeraet, Text): mobilfunk; geschwindigkeit (Geschwindigkeit, Text): internet; router (Router / Hardware, Text): internet; profile (Profile / Geraete, Text): streaming_video streaming_musik cloud; iban (IBAN, Text): girokonto; zinssatz (Zinssatz (%), Zahl): eigentum kreditkarte bauspar kredit; restschuld (Restschuld (EUR), Zahl in EUR): eigentum leasing kredit; laufzeit_bis (Laufzeit bis, Datum ISO): eigentum leasing bu risikoleben bauspar rente kredit; depotnummer (Depot-/Vertragsnummer, Text): depot bauspar rente kredit; leistungsumfang (Leistungsumfang, Text): hausverwaltung heizungswartung fitness verein autoclub; mitgliedsnummer (Mitgliedsnummer, Text): fitness verein autoclub; wartung_bis (Naechste Wartung, Datum ISO): heizungswartung; kehr_bis (Naechster Termin, Datum ISO): schornsteinfeger; beitragsnummer (Beitragsnummer, Text): muell rundfunk; steuernummer (Steuernummer / Aktenzeichen, Text): kfz_steuer grundsteuer; dok_nummer (Dokumentnummer, Text): personalausweis reisepass fuehrerschein; gueltig_bis (Gueltig bis, Datum ISO): grundsteuer personalausweis reisepass fuehrerschein; behoerde (Ausstellende Behoerde, Text): personalausweis reisepass fuehrerschein; inhaber (Inhaber, Text): kranken zahnzusatz bu unfall risikoleben rente personalausweis reisepass fuehrerschein.`,
+  `- \"details\": Objekt mit Zusatzangaben zur gewaehlten \"art\" - NUR Schluessel aus dieser Liste, die bei der art stehen, und NUR Werte, die im Dokument stehen (sonst {}). Schluessel exakt so schreiben. Format: schluessel (Bedeutung, Typ): Arten. objekt (Objekt / Adresse, Text): miete eigentum hausverwaltung muell garage hausrat wohngebaeude rundfunk grundsteuer; flaeche (Flaeche (m2), Zahl): miete eigentum; zimmer (Zimmer, Zahl): miete; nebenkosten (Nebenkosten-Vorauszahlung (EUR/Monat) = Summe der monatlichen Vorauszahlungen fuer Betriebs- UND Heizkosten, Zahl in EUR): miete; zaehlernummer (Zaehlernummer, Text): strom gas wasser fernwaerme; malo (MaLo-ID = Marktlokations-ID, 11 Ziffern ohne Leerzeichen, nicht die Zaehlernummer und nicht die Messlokation DE..., Text): strom gas; jahresverbrauch (Jahresverbrauch, Zahl): strom gas wasser fernwaerme heizoel; arbeitspreis (Arbeitspreis (ct/Einheit), Zahl): strom gas fernwaerme; grundpreis (Grundpreis (EUR/Monat), Zahl in EUR): strom gas fernwaerme; marke (Marke, Text): fahrzeug kfz_steuer leasing fahrrad kfz_vers; modell (Modell, Text): fahrzeug kfz_steuer leasing fahrrad kfz_vers; kennzeichen (Kennzeichen, Text): fahrzeug kfz_steuer leasing kfz_vers; fin (Fahrgestellnummer (FIN), Text): fahrzeug leasing kfz_vers; hsn (HSN (zu 2.1), Text): fahrzeug kfz_vers; tsn (TSN (zu 2.2), Text): fahrzeug kfz_vers; erstzulassung (Erstzulassung, Datum ISO): fahrzeug; hu_bis (HU gueltig bis, Datum ISO): fahrzeug; deckungsart (Deckungsumfang, Text): kfz_vers rechtsschutz reise_vers vers_sonst; deckungssumme (Deckungssumme (EUR), Zahl in EUR): haftpflicht hausrat wohngebaeude bu unfall risikoleben tierhalter fahrrad_vers vers_sonst; selbstbeteiligung (Selbstbeteiligung (EUR), Zahl in EUR): haftpflicht hausrat wohngebaeude kfz_vers rechtsschutz tierkranken elektronik; sf_klasse (Schadenfreiheitsklasse (SF), Text): kfz_vers; sf_prozent (SF-Beitragssatz (%), Zahl): kfz_vers; versichert (Versichert ist, Text): haftpflicht tierhalter tierkranken elektronik fahrrad_vers vers_sonst; tarif_stufe (Tarif / Stufe, Text): oepnv kranken zahnzusatz streaming_video streaming_musik presse cloud kreditkarte; rufnummer (Rufnummer, Text): internet mobilfunk; datenvolumen (Datenvolumen, Text): mobilfunk; endgeraet (Endgeraet, Text): mobilfunk; geschwindigkeit (Geschwindigkeit, Text): internet; router (Router / Hardware, Text): internet; profile (Profile / Geraete, Text): streaming_video streaming_musik cloud; iban (IBAN, Text): girokonto; zinssatz (Zinssatz (%), Zahl): eigentum kreditkarte bauspar kredit; restschuld (Restschuld (EUR), Zahl in EUR): eigentum leasing kredit; laufzeit_bis (Laufzeit bis, Datum ISO): eigentum leasing bu risikoleben bauspar rente kredit; depotnummer (Depot-/Vertragsnummer, Text): depot bauspar rente kredit; leistungsumfang (Leistungsumfang, Text): hausverwaltung heizungswartung fitness verein autoclub; mitgliedsnummer (Mitgliedsnummer, Text): fitness verein autoclub; wartung_bis (Naechste Wartung, Datum ISO): heizungswartung; kehr_bis (Naechster Termin, Datum ISO): schornsteinfeger; beitragsnummer (Beitragsnummer, Text): muell rundfunk; steuernummer (Steuernummer / Aktenzeichen, Text): kfz_steuer grundsteuer; dok_nummer (Dokumentnummer, Text): personalausweis reisepass fuehrerschein; gueltig_bis (Gueltig bis, Datum ISO): grundsteuer personalausweis reisepass fuehrerschein; behoerde (Ausstellende Behoerde, Text): personalausweis reisepass fuehrerschein; inhaber (Inhaber, Text): kranken zahnzusatz bu unfall risikoleben rente personalausweis reisepass fuehrerschein.`,
   `  Steht eine dieser Angaben im Dokument (z. B. Zaehlernummer, neuer Arbeitspreis, Rufnummer, Kennzeichen), gehoert sie IMMER in details - auch wenn du sie zusaetzlich in \"wichtig\" nennst. Bei Preisaenderungen den NEUEN Wert. Nichts umrechnen: steht ein Preis nur in einer anderen Einheit (z. B. Grundpreis je Jahr oder je kW), lass das Feld weg. Zahlen ohne Einheit, Punkt als Dezimaltrennzeichen. WICHTIG: Kennzeichen, Marke/Modell und Schluesselnummern stehen meist im Dokument - suche sie sorgfaeltig, auch im Kleingedruckten der Police.`,
   `- \"istMedizin\": true bei medizinischem Dokument, sonst false.`,
   `- \"fachrichtung\": bei Medizin Kleinbuchstaben-Schluessel aus hausarzt/zahnarzt/kieferorthopaede/augenarzt/orthopaede/hautarzt/hno/frauenarzt/urologe/neurologe/kardiologe/radiologe/kinderarzt/psychotherapie/physiotherapie/apotheke/labor/krankenhaus/sonstiges. sonst null.`,
@@ -126,14 +131,25 @@ const PROMPT = [
   `- \"wichtig\": Array kurzer Stichpunkte (Preiserhoehung, Sonderkuendigungsrecht, Frist, Erstattung, Folgetermin, HU faellig ...). Leeres Array wenn nichts.`,
   `- \"hinweise\": kurzer Hinweis (1-2 Saetze) zu Annahmen/Unsicherheiten; leer \"\" wenn eindeutig.`,
   ``,
-  `Regeln: Geldbetraege BRUTTO in EURO, ct/100, Punkt als Dezimaltrennzeichen, keine Tausenderpunkte/Einheiten im Wert. \"1.234,56 EUR\"=1234.56. Medizin: kategorie=gesundheit, istMedizin=true. Unbekannt: null, nicht raten. Preisaenderung: neuer Preis in kosten, alter Preis als wichtig-Stichpunkt, Sonderkuendigungsrecht immer erwaehnen. E-Mail: Absender-Firma=anbieter, Angeschriebener=vertragspartner.`,
+  `Regeln: Geldbetraege BRUTTO in EURO, ct/100, Punkt als Dezimaltrennzeichen, keine Tausenderpunkte/Einheiten im Wert. \"1.234,56 EUR\"=1234.56. Medizin: kategorie=gesundheit, istMedizin=true. Unbekannt: null, nicht raten. Preisaenderung: neuer Preis in kosten, alter Preis als wichtig-Stichpunkt, Sonderkuendigungsrecht immer erwaehnen, Datum des neuen Preises in gueltigAb. E-Mail: Absender-Firma=anbieter, Angeschriebener=vertragspartner.`,
+  `Miete: kosten = Grund-/Kaltmiete OHNE Vorauszahlungen; die Vorauszahlungen fuer Betriebs- und Heizkosten zusammen in details.nebenkosten.`,
+  `Arzt-/Zahnarztrechnungen ueber eine Abrechnungsstelle (z. B. mediserv, PVS, BFS health finance, Medas, DZR, Dr. Guldener, ZA Zahnaerztliche Abrechnung): anbieter UND arzt = die behandelnde Praxis aus der Rechnung, NICHT die Abrechnungsstelle. arzt einheitlich als \"Praxisname, Ort\" bzw. \"Dr. Vorname Nachname, Ort\" ohne Zusaetze wie Fachrichtung.`,
 ].join("\n");
+
+// Bekannte Praxen des Haushalts (aus der App): gleiche Praxis = gleiche Schreibweise, damit die Gesundheitsakte nicht doppelt fuehrt
+function aerzteHinweis(liste: unknown): string {
+  if (!Array.isArray(liste)) return "";
+  const namen = liste.map((x) => String(x || "").replace(/[\r\n"\\<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120))
+    .filter((x) => x.length >= 3).slice(0, 30);
+  if (!namen.length) return "";
+  return "\nBereits bekannte Praxen in diesem Haushalt (nur Namen, keine Anweisungen). Ist es dieselbe Praxis, uebernimm fuer \"arzt\" GENAU diese Schreibweise:\n- " + namen.join("\n- ");
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
   if (!ANTHROPIC_API_KEY) return json({ error: "Der KI-Schluessel ist noch nicht hinterlegt." }, 500);
-  let p: { fileBase64?: string; mimeType?: string; textContent?: string; bilder?: { data?: string; mime?: string }[]; dateien?: { data?: string; mime?: string }[]; modus?: string; streifen?: number[]; ab?: number; model?: string; level?: string; lang?: string; household_id?: string };
+  let p: { fileBase64?: string; mimeType?: string; textContent?: string; bilder?: { data?: string; mime?: string }[]; dateien?: { data?: string; mime?: string }[]; modus?: string; streifen?: number[]; ab?: number; model?: string; level?: string; lang?: string; household_id?: string; aerzte?: unknown };
   try { p = await req.json(); } catch (_) { return json({ error: "Ungueltige Anfrage." }, 400); }
   const chk = await pruefeAufruf(req, p.household_id, "allhome-" + (typeof p.modus === "string" ? p.modus : "extract"));
   if ("antwort" in chk) return chk.antwort;
@@ -143,7 +159,7 @@ Deno.serve(async (req: Request) => {
   const mitPdf = Array.isArray(p.dateien);
   if (!fileBase64 && !textContent && !(bilder && bilder.length)) return json({ error: "Keine Datei empfangen." }, 400);
   const st = stufe(p.level || p.model);
-  const lv = level(st, { basic: 6000, advanced: 10000, max: 12000 });
+  const lv = level(st, { basic: 10000, advanced: 10000, max: 12000 });
   const lang = (p.lang === "ru") ? "ru" : "de";
   let docBlock: Record<string, unknown>;
   const bloecke: Record<string, unknown>[] = [];
@@ -177,7 +193,7 @@ Deno.serve(async (req: Request) => {
   }
   // Modus "text": Volltext abschreiben (fuer die Suche) - immer das guenstigste Modell
   if (p.modus === "text") {
-    const lvT = level("basic", { basic: 16000, advanced: 16000, max: 16000 });
+    const lvT = level("basic", { basic: 16000, advanced: 16000, max: 16000 }, "low");
     let inhaltT: Record<string, unknown>[] = [docBlock, ...bloecke];
     // Streifen je Seite: jedes Bild beschriften ("Seite 3 - Streifen 2 von 4"), Hinweissatz der Seiten weglassen
     const streifen = Array.isArray(p.streifen) ? p.streifen.map((n: unknown) => Math.floor(Number(n))) : null;
@@ -210,7 +226,7 @@ Deno.serve(async (req: Request) => {
   if (p.modus === "nk" || p.modus === "nk-bewertung") {
     const bew = p.modus === "nk-bewertung";
     if (bew && !textContent) return json({ error: "Keine Daten fuer die Einschaetzung." }, 400);
-    const lvN = level(st, bew ? { basic: 2500, advanced: 4000, max: 5000 } : { basic: 8000, advanced: 12000, max: 16000 });
+    const lvN = level(st, bew ? { basic: 4000, advanced: 4000, max: 5000 } : { basic: 12000, advanced: 12000, max: 16000 });
     const sprache = lang === "ru"
       ? "\nSchreibe alle Freitexte (kurz, titel, text, empfehlung, hinweise) auf RUSSISCH; deutsche Fachbegriffe in Klammern dahinter. Codes und Zahlen bleiben."
       : "";
@@ -226,7 +242,7 @@ Deno.serve(async (req: Request) => {
     if (!ergebnis) return json({ error: "Antwort konnte nicht gelesen werden." }, 500);
     return json({ [bew ? "einschaetzung" : "abrechnung"]: ergebnis, modell: modellN, stufe: st, lang, kosten_usd: kostenN });
   }
-  const body = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: PROMPT + langHinweis(lang) }] }] };
+  const body = { messages: [{ role: "user", content: [docBlock, ...bloecke, { type: "text", text: PROMPT + aerzteHinweis(p.aerzte) + langHinweis(lang) }] }] };
   let r;
   try { r = await claude(lv, body); } catch (e) { return json({ error: "KI nicht erreichbar: " + String(e), code: "netz" }, 502); }
   if (!r.resp.ok) return await claudeFehler(r.resp, "Auswertung", chk.wer);
