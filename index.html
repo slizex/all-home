@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-Lx/DFQuZ62S+nhEAe+0eM6bZeZvBd6344UPcLsAkZ/Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-3IZzrOz1UPgmkyjHwIQzLV2s3wMkDWfh/+583Xy4wZE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -565,6 +565,7 @@ html.dark .logo{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}/* Vertragskopf:
 /* Trefferflächen mindestens 40 px hoch – Lage und Aussehen bleiben */
 .back{padding:9px 0;margin:-7px 0}
 main>a.lnk,.arow .lnk{display:inline-block;padding:9px 0;margin:-9px 0}
+.card>a.lnk{display:inline-block;padding:9px 0;margin:1px 0 -9px}
 .drow3>.lnk{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 4px 0 8px;margin:-10px 0}
 .sug .dis{padding:12px;margin:-12px -12px -8px 0}
 .drow3.wahl .wbox{position:relative}
@@ -695,6 +696,10 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--oben);b
 .appdl-url{font-size:.84rem;color:var(--text);overflow-wrap:break-word;user-select:all;-webkit-user-select:all}
 .appdl-k{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .appdl-k .btn{flex:1 1 120px;justify-content:center;white-space:nowrap}
+/* 1.16.0 Dokumentzeile mit Auge: Zeile = Details, Auge = Datei sofort */
+.drow3.blick{padding:0;gap:2px}
+.drow3.blick .dzeile{display:flex;align-items:center;gap:11px;flex:1;min-width:0;padding:11px 0 11px 4px;text-align:left}
+.drow3.blick .dblick{flex:none;width:44px;height:44px;color:var(--text)}
 /* ================= Scanner =================
    Eigene Ebene über der App. Kamera und Seiten dunkel (wie jede Kamera-App),
    das Speichern-Blatt in den Farben der App. */
@@ -986,7 +991,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.15.0";
+var APP_VERSION="1.16.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1042,6 +1047,10 @@ var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:
 var curLang="de";
 var T={ru:{
 
+/* ---- 1.16.0 Dokumente schneller ---- */
+  "Dokument ansehen":"Посмотреть документ",
+  "Zuletzt abgelegt":"Недавно добавленные",
+  "Alle Dokumente":"Все документы",
 /* ---- 1.15.0 KI ---- */
   "Schreiben vom {0}, neuer Preis ab {1}. Sonderkündigung meist nur bis dahin.":"Письмо от {0}, новая цена с {1}. Досрочно расторгнуть обычно можно только до этой даты.",
   "Neuer Preis ab {0} – kündigen meist nur bis dahin.":"Новая цена с {0} — расторгнуть обычно можно только до этой даты.",
@@ -2774,6 +2783,7 @@ var ICONS={
   shield:'<path d="M12 3l7.5 3v6c0 4.4-3.1 7.9-7.5 9-4.4-1.1-7.5-4.6-7.5-9V6z"/>',
   folder:'<path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2.5h8.5A1.5 1.5 0 0 1 21 10v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/>',
   bell:'<path d="M18 15V10a6 6 0 1 0-12 0v5l-1.5 2.5h15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  auge:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4"/>',
   euro:'<path d="M17.5 6.5A6.5 6.5 0 1 0 17.5 17.5"/><path d="M4 10.5h9"/><path d="M4 13.5h9"/>',
   link:'<path d="M10 13.5a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1"/><path d="M14 10.5a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1"/>',
@@ -3857,11 +3867,12 @@ function viewStart(){
     (fristen.length
       ?'<div class="sect">'+t("Als Nächstes")+'</div><section class="card">'+
         fristen.slice(0,4).map(terminZeile).join("")+
-        (fristen.length>4?'<a class="lnk" href="#/termine" style="margin-top:10px;display:inline-block">'+tf("alle {0} Termine ansehen",fristen.length)+'</a>':"")+
+        (fristen.length>4?'<a class="lnk" href="#/termine">'+tf("alle {0} Termine ansehen",fristen.length)+'</a>':"")+
        '</section>'
       :'<div class="sect">'+t("Als Nächstes")+'</div><section class="card"><div class="empty">'+
         '<div class="ei">'+ic("check",28)+'</div><h3>'+t("Nichts Dringendes")+'</h3>'+
         '<p>'+t("In den nächsten 60 Tagen läuft keine Frist aus.")+'</p></div></section>')+
+    zuletztBlock()+
     vorschlagBlock()+
     '<div class="sect">'+t("Dein Haushalt")+'</div>'+
     gruppenUebersicht(true);
@@ -4653,17 +4664,40 @@ function aiExt(d,key){
   return (v==null||v===""||(Array.isArray(v)&&!v.length))?ext[key]:v;
 }
 
+/* Dokumentzeile mit Auge: die Zeile öffnet wie bisher die Details, das Auge zeigt die Datei sofort (ein Tipp weniger).
+   Ohne gespeicherte Datei bleibt es die normale Zeile mit Pfeil. attr: Zusatz-Attribute der Zeile (Suche, Filter) */
+function blickZeile(d,aktion,inhalt,attr){
+  if(!d.storage_path)return '<button class="drow3" data-a="'+aktion+'" data-id="'+d.id+'"'+(attr||"")+'>'+inhalt+'<span class="go">'+ic("right",16)+'</span></button>';
+  return '<div class="drow3 blick"'+(attr||"")+'>'+
+    '<button class="dzeile" data-a="'+aktion+'" data-id="'+d.id+'">'+inhalt+'</button>'+
+    '<button class="ibtn dblick" data-a="d-view" data-id="'+d.id+'" aria-label="'+esc(t("Dokument ansehen"))+'" title="'+esc(t("Dokument ansehen"))+'">'+ic("auge",20)+'</button></div>';
+}
+/* Symbol, Titel, Art und Datum – für Suche und „Zuletzt abgelegt“ */
+function dokKurzInhalt(d,datum){
+  var ty=istMed(d)?medTypInfo(d.med_typ):dtInfo(d.doc_type);
+  return '<span class="di">'+ty.icon+'</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
+    '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(datum||docDatum(d))+'</span></span></span>';
+}
+/* Start: die drei zuletzt abgelegten Dokumente (auch Arztdokumente), neueste zuerst */
+function zuletztBlock(){
+  var neu=DOCS.filter(function(d){return d.storage_path;}).slice()
+    .sort(function(a,b){return String(b.created_at||"").localeCompare(String(a.created_at||""));}).slice(0,3);
+  if(!neu.length)return "";
+  return '<div class="sect">'+t("Zuletzt abgelegt")+'</div><section class="card"><div class="dlist">'+
+    neu.map(function(d){return blickZeile(d,"d-open",dokKurzInhalt(d,String(d.created_at||"").slice(0,10)));}).join("")+'</div>'+
+    (alleDokumente().length?'<a class="lnk" href="#/dokumente?von=start">'+t("Alle Dokumente")+'</a>':"")+'</section>';
+}
+
 /* ---- Dokumentliste an einem Vertrag (mit Lücken-Anzeige) ---- */
 function dokListe(c){
   var doks=DOCS.filter(function(d){return d.contract_id===c.id;});
   var zeilen=doks.map(function(d){
     var ty=dtInfo(d.doc_type);
-    return '<button class="drow3" data-a="d-open" data-id="'+d.id+'">'+
+    return blickZeile(d,"d-open",
       '<span class="di">'+ty.icon+'</span>'+
       '<span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
       '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span>'+
-      (d.extracted&&d.extracted.betrag!=null?'<span>'+eur(d.extracted.betrag)+'</span>':"")+'</span></span>'+
-      '<span class="go">'+ic("right",16)+'</span></button>';
+      (d.extracted&&d.extracted.betrag!=null?'<span>'+eur(d.extracted.betrag)+'</span>':"")+'</span></span>');
   }).join("");
   /* Dokumenten-Lücken: welche Unterlage fehlt? */
   var vorhanden={};doks.forEach(function(d){vorhanden[d.doc_type]=1;});
@@ -5547,10 +5581,9 @@ function dokZeile(d,wahl,mitVertrag){
     '<button class="wbox" data-a="ab-wahl" data-id="'+d.id+'" role="checkbox" aria-checked="'+an+'" aria-label="'+esc(t("Auswählen"))+'">'+(an?ic("check",16):"")+'</button>'+
     '<button class="wtxt" data-a="ab-wahl" data-id="'+d.id+'"><span class="dn">'+esc(docTitel(d))+'</span>'+meta+'</button>'+
     '<button class="ibtn" data-a="d-open" data-id="'+d.id+'" aria-label="'+esc(t("Öffnen"))+'">'+ic("doc",18)+'</button></div>';
-  return '<button class="drow3" data-a="d-open" data-id="'+d.id+'"'+such+'>'+
+  return blickZeile(d,"d-open",
     '<span class="di">'+ty.icon+'</span>'+
-    '<span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+meta+'</span>'+
-    '<span class="go">'+ic("right",16)+'</span></button>';
+    '<span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+meta+'</span>',such);
 }
 function viewDokumente(){
   var rt=route(),p=rt.params;
@@ -6031,15 +6064,14 @@ function viewGesundheit(){
 function medZeile(d,fund){
   var mt=medTypInfo(d.med_typ),pn=personName(d.person_id);
   var beh=aiExt(d,"behandlung");
-  return '<button class="drow3" data-a="med-open" data-id="'+d.id+'">'+
+  return blickZeile(d,"med-open",
     '<span class="di">'+mt.icon+'</span>'+
     '<span class="db"><span class="dn">'+esc(aiVal(d,"titel")||d.arzt||mt.label)+'</span>'+
     '<span class="dm"><span>'+mt.label+'</span>'+
       (pn?'<span>👤 '+esc(pn)+'</span>':"")+
       '<span>'+fmtDate(medDatum(d))+'</span>'+
       (d.betrag!=null?'<span><b>'+eur(d.betrag)+'</b></span>':"")+
-    '</span>'+(fund?'<span class="dm"><span>🔎 '+esc(fund)+'</span></span>':(beh?'<span class="dm"><span>'+esc(beh)+'</span></span>':""))+'</span>'+
-    '<span class="go">'+ic("right",16)+'</span></button>';
+    '</span>'+(fund?'<span class="dm"><span>🔎 '+esc(fund)+'</span></span>':(beh?'<span class="dm"><span>'+esc(beh)+'</span></span>':""))+'</span>');
 }
 /* ---- Strukturierte Angaben im Detail ---- */
 function medStrukturKarte(d){
@@ -9900,8 +9932,8 @@ function nkDetail(n){
     /* Dokumente */
     '<div class="sect">'+t("Dokumente")+'</div><section class="card">'+
       (doks.length?'<div class="dlist">'+doks.map(function(d){
-        return '<button class="drow3" data-a="d-open" data-id="'+d.id+'"><span class="di">📄</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
-          '<span class="dm"><span>'+fmtDate(docDatum(d))+'</span>'+(d.seiten>1?'<span>'+tn(d.seiten,"{0} Seite","{0} Seiten")+'</span>':"")+'</span></span><span class="go">'+ic("right",16)+'</span></button>';
+        return blickZeile(d,"d-open",'<span class="di">📄</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
+          '<span class="dm"><span>'+fmtDate(docDatum(d))+'</span>'+(d.seiten>1?'<span>'+tn(d.seiten,"{0} Seite","{0} Seiten")+'</span>':"")+'</span></span>');
       }).join("")+'</div>':'<p class="hint">'+t("Noch kein Dokument – etwa die Heizkostenabrechnung des Messdienstes dazulegen.")+'</p>')+
       nkHinzuKnoepfe(n.id)+
       (doks.length&&!nkOhneWerte(n)?'<div class="factions" style="margin-top:8px"><button class="btn ghost" data-a="nk-lesen" data-id="'+n.id+'">'+ic("sparkles")+' '+t("Alle Dokumente neu auslesen")+'</button></div>':"")+
@@ -13120,12 +13152,7 @@ function sucheLaufen(){
   },300);
 }
 var SUCHE_UHR=null;
-function sucheDokZeile(d){
-  var ty=istMed(d)?medTypInfo(d.med_typ):dtInfo(d.doc_type);
-  return '<button class="drow3" data-a="d-open" data-id="'+d.id+'">'+
-    '<span class="di">'+ty.icon+'</span><span class="db"><span class="dn">'+esc(docTitel(d))+'</span>'+
-    '<span class="dm"><span>'+ty.label+'</span><span>'+fmtDate(docDatum(d))+'</span></span></span></button>';
-}
+function sucheDokZeile(d){return blickZeile(d,"d-open",dokKurzInhalt(d));}
 
 var setupBusy=false;
 async function setupSpeichern(){
