@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-3IZzrOz1UPgmkyjHwIQzLV2s3wMkDWfh/+583Xy4wZE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-wgng85LEfl9kuaZ9LjMVxUSdA5+U4hkFA8lOlWU6XnM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -991,7 +991,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.16.0";
+var APP_VERSION="1.17.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1046,6 +1046,11 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.17.0 Gesamtprüfung ---- */
+  "Diese Ansicht ließ sich nicht aufbauen. Deine Daten sind nicht betroffen.":"Не удалось открыть этот раздел. Ваши данные не затронуты.",
+  "Neu laden":"Обновить",
+  "Bitte einen Wert zwischen 0 und {0} eingeben.":"Введите значение от 0 до {0}.",
 
 /* ---- 1.16.0 Dokumente schneller ---- */
   "Dokument ansehen":"Посмотреть документ",
@@ -2829,7 +2834,9 @@ function num(n,d){if(n==null||isNaN(n))return "–";return Number(n).toLocaleStr
 
 /* ---- Datum ---- */
 function todayISO(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function fmtDate(iso){if(!iso)return "–";var p=String(iso).slice(0,10).split("-");if(p.length<3)return String(iso);return p[2]+"."+p[1]+"."+p[0];}
+function istIsoDatum(s){s=String(s==null?"":s).slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(s)&&!isNaN(Date.parse(s+"T00:00:00Z"));}
+/* Datum als TT.MM.JJJJ; was kein ISO-Datum ist, kommt ohne HTML-Sonderzeichen zurück */
+function fmtDate(iso){if(!iso)return "–";var s=String(iso);if(!istIsoDatum(s))return s.replace(/[<>"'&]/g,"");var p=s.slice(0,10).split("-");return p[2]+"."+p[1]+"."+p[0];}
 /* Monate addieren; Bruchteile als 30-Tage-Schritte. Monatsende wird geklemmt. */
 function addMonthsISO(iso,months){
   var p=String(iso).slice(0,10).split("-").map(Number);
@@ -2840,6 +2847,7 @@ function addMonthsISO(iso,months){
   return d.toISOString().slice(0,10);
 }
 function daysUntil(iso){
+  if(!istIsoDatum(iso))return null;   /* kein Datum → keine Tage (statt NaN) */
   var heute=new Date(todayISO()+"T00:00:00Z"),ziel=new Date(String(iso).slice(0,10)+"T00:00:00Z");
   return Math.round((ziel-heute)/86400000);
 }
@@ -2897,7 +2905,7 @@ function vertragPhase(c,heute){
   if(!c)return "beendet";heute=heute||todayISO();
   if(c.status==="beendet")return "beendet";
   if(c.status==="gekuendigt")return (c.gekuendigt_zum&&String(c.gekuendigt_zum).slice(0,10)<heute)?"beendet":"gekuendigt";
-  if(c.vertragsstart&&String(c.vertragsstart).slice(0,10)>heute)return "kommend";
+  if(istIsoDatum(c.vertragsstart)&&String(c.vertragsstart).slice(0,10)>heute)return "kommend";
   return "laufend";
 }
 function imArchiv(c){return vertragPhase(c)==="beendet";}
@@ -2917,7 +2925,8 @@ function fristInfo(c){
     var f=(kf==null?1:kf);
     return {kind:"flex",level:"green",label:t("Jederzeit kündbar"),sub:tf("Kündigungsfrist {0}",fristTxt(f))};
   }
-  if(!c.vertragsstart||ml==null){
+  /* Unmögliche Werte (alte Daten, KI) nicht hochrechnen – sonst RangeError in Date */
+  if(!istIsoDatum(c.vertragsstart)||ml==null||ml<0||ml>600||(kf!=null&&(kf<0||kf>120))||(vl!=null&&(vl<0||vl>600))){
     return {kind:"unbekannt",level:"gray",label:t("Fristen unbekannt"),
             sub:t("Vertragsbeginn und Laufzeit ergänzen, dann rechnet All-Home.")};
   }
@@ -2950,7 +2959,7 @@ function terminInfo(c){
   var a=artInfo(c.art||"sonstiges"),w=a.termin&&c.details?c.details[a.termin.k]:null;
   if(!w)return null;
   var d=daysUntil(w);
-  return {days:d,level:ampel(d),label:t(a.termin.l)+": "+fmtDate(w),sub:tageTxt(d)};
+  return {days:d,level:ampel(d),label:t(a.termin.l)+": "+fmtDate(w),sub:d==null?"":tageTxt(d)};
 }
 function fristTxt(m){
   m=numOrNull(m);
@@ -3278,13 +3287,15 @@ function applyTheme(dark){
 
 /* ================= Routing ================= */
 var ROUTES=["start","vertraege","neu","gesundheit","mehr","art","vertrag","einrichten","termine","kosten","vorschlaege","haushalte","haushalt","logos","ablage","dokumente","kikosten","scan","nebenkosten","freigabe","registrierungen","umzug","zentrale","nkanalyse","archiv"];
+/* Adressteil lesen: „+“ bleibt, kaputte %-Folgen bleiben roh statt die Seite zu sprengen */
+function urlTeil(s){try{return decodeURIComponent(s);}catch(e){return s;}}
 function route(){
   var h=location.hash||"";
   if(h.indexOf("#/")!==0)return {name:"start",params:{}};
   var q=h.slice(2).split("?"),name=q[0]||"start",params={};
   (q[1]||"").split("&").forEach(function(kv){
-    if(!kv)return;var p=kv.split("=");
-    params[decodeURIComponent(p[0])]=decodeURIComponent(p[1]||"");
+    if(!kv)return;var i=kv.indexOf("="),k=i<0?kv:kv.slice(0,i),v=i<0?"":kv.slice(i+1);
+    params[urlTeil(k)]=urlTeil(v);
   });
   if(ROUTES.indexOf(name)<0)name="start";
   return {name:name,params:params};
@@ -3330,7 +3341,7 @@ function topBar(){
   '</div>';
 }
 function seitenTitel(s){return '<div class="pt">'+esc(s)+'</div>';}
-function zurueck(hash,label){return '<a class="back" href="'+hash+'">'+ic("arrow")+' '+esc(label)+'</a>';}
+function zurueck(hash,label){return '<a class="back" href="'+esc(hash)+'">'+ic("arrow")+' '+esc(label)+'</a>';}
 
 /* ================= Modal / Blatt ================= */
 /* Im AllTrack-Stil erscheinen Blatt und Abdeckung erst mit der Klasse .on –
@@ -3363,6 +3374,8 @@ function render(){
   /* Freigabe-Link aus der Mail: geht auch ohne Anmeldung */
   if(route().name==="freigabe"){r.innerHTML=freigabeSeiteHtml();return;}
   if(appUpdatePflicht()){r.innerHTML=appPflichtHtml();return;}
+  /* Neues Passwort vergeben: die Sitzung aus Link/Code öffnet die App erst danach */
+  if(AUTH_MODE==="reset"){r.innerHTML=authHtml();return;}
   if(booting){r.innerHTML=ladeHtml();return;}
   if(!me){r.innerHTML=authHtml();return;}
   /* Konto noch nicht freigegeben: nur die Warteseite */
@@ -3380,6 +3393,7 @@ function render(){
   }
   if(rt.name!=="dokumente"&&rt.name!=="ablage")DOK_Q="";   /* Suche gilt nur, solange man dort bleibt */
   var inhalt="",cur=rt.name;
+  try{
   if(rt.name==="start")           inhalt=viewStart();
   else if(rt.name==="vertraege")  inhalt=viewVertraege();
   else if(rt.name==="neu")        inhalt=viewNeu();
@@ -3403,8 +3417,14 @@ function render(){
   else if(rt.name==="umzug")     {inhalt=viewUmzug();cur="mehr";}
   else if(rt.name==="dokumente"||rt.name==="ablage"){inhalt=viewDokumente();cur=rt.params.von==="start"?"start":"mehr";}
   else                            inhalt=viewStart();
+  }catch(e){
+    /* Eine Ansicht scheitert an unerwarteten Daten: sichtbar melden, Navigation bleibt */
+    try{console.error(e);}catch(_){}
+    inhalt=zurueck("#/start",t("Start"))+fehlerKarte(t("Diese Ansicht ließ sich nicht aufbauen. Deine Daten sind nicht betroffen."))+
+      '<button class="btn" type="button" data-a="neu-laden">'+t("Neu laden")+'</button>';
+  }
   r.innerHTML=shell(inhalt,cur);
-  if(rt.name==="nebenkosten"&&typeof nkmNachZeichnen==="function")nkmNachZeichnen();
+  if(rt.name==="nebenkosten"&&typeof nkmNachZeichnen==="function"){try{nkmNachZeichnen();}catch(e){try{console.error(e);}catch(_){}}}
 }
 /* Fehler, der stehen bleibt – anders als eine Kurzmeldung, die man verpasst */
 function fehlerKarte(txt){
@@ -3476,13 +3496,26 @@ async function speichereSetup(arten,fertig){
 var DOK_SPALTEN="id,household_id,user_id,contract_id,doc_type,filename,storage_path,mime_type,size_bytes,doc_date,extracted,"+
   "zusammenfassung,note,created_at,person_id,bereich,arzt,fachrichtung,med_typ,betrag,behandlungsdatum,content_hash,ki_pending,"+
   "med_recherche,med_recherche_am,titel,ai_lang,i18n,weitere_seiten,seiten,ohne_ki,nk_id";
+/* Alle Zeilen holen: je Seite 1000 (Grenze von PostgREST), bis eine Seite kürzer ist.
+   Zweite Sortierung nach id, damit sich Seiten bei gleichem Zeitstempel nicht überschneiden. */
+async function alleSeiten(abfrage){
+  var alle=[],N=1000;
+  for(var s=0;s<100;s++){
+    var r=await abfrage().order("id",{ascending:true}).range(s*N,s*N+N-1);
+    if(r.error)return r;
+    var d=r.data||[];alle=alle.concat(d);
+    if(d.length<N)break;
+  }
+  return {data:alle,error:null};
+}
 async function ladeDaten(){
   if(!HH){CONTRACTS=[];DOCS=[];PERSONS=[];NK=[];return;}
+  var h=HH.id;
   var antw=await Promise.all([
-    sb.from("contracts").select("*").eq("household_id",HH.id).order("created_at",{ascending:false}),
-    sb.from("documents").select(DOK_SPALTEN).eq("household_id",HH.id).order("created_at",{ascending:false}),
-    sb.from("persons").select("*").eq("household_id",HH.id).order("created_at",{ascending:true}),
-    sb.from("nk_abrechnungen").select("*").eq("household_id",HH.id).order("von",{ascending:true})
+    alleSeiten(function(){return sb.from("contracts").select("*").eq("household_id",h).order("created_at",{ascending:false});}),
+    alleSeiten(function(){return sb.from("documents").select(DOK_SPALTEN).eq("household_id",h).order("created_at",{ascending:false});}),
+    alleSeiten(function(){return sb.from("persons").select("*").eq("household_id",h).order("created_at",{ascending:true});}),
+    alleSeiten(function(){return sb.from("nk_abrechnungen").select("*").eq("household_id",h).order("von",{ascending:true});})
   ]);
   if(antw[0].error)throw antw[0].error;
   CONTRACTS=antw[0].data||[];
@@ -3644,6 +3677,7 @@ async function ladeAlles(){
    Benutzer in der Datenbank und ist vor dem Login unbekannt. */
 var AUTH_MODE="login";
 var AUTH_CODE=null;   /* {mail, art:"recovery"|"signup"} – wofür der Code aus der Mail gilt */
+var RESET_WARTET=false;   /* Passwort-Code wird geprüft: SIGNED_IN kommt vor der Antwort und darf die App noch nicht öffnen */
 function authHtml(){
   var reset=AUTH_MODE==="reset";
   if(AUTH_MODE==="signup")return signupHtml();
@@ -3738,13 +3772,14 @@ async function doCode(){
   if(code.length<6||code.length>10){authMsg("Bitte den Code aus der Mail eingeben (nur Ziffern).","err");return;}
   var art=(AUTH_CODE&&AUTH_CODE.art)||"recovery";
   authMsg("Code wird geprüft …");
+  if(art==="recovery")RESET_WARTET=true;
   try{
     var r=await sb.auth.verifyOtp({email:mail,token:code,type:art});
-    if(r.error){authMsg(/expired|invalid/i.test(errMsg(r.error))?"Der Code ist falsch oder abgelaufen.":loginFehler(r.error),"err");return;}
+    if(r.error){RESET_WARTET=false;authMsg(/expired|invalid/i.test(errMsg(r.error))?"Der Code ist falsch oder abgelaufen.":loginFehler(r.error),"err");return;}
     AUTH_CODE=null;
-    if(art==="recovery"){AUTH_MODE="reset";render();authMsg("Code bestätigt – jetzt das neue Passwort.","ok");}
+    if(art==="recovery"){AUTH_MODE="reset";RESET_WARTET=false;render();authMsg("Code bestätigt – jetzt das neue Passwort.","ok");}
     else{AUTH_MODE="login";authMsg("E-Mail bestätigt ✅","ok");}
-  }catch(e){authMsg(loginFehler(e),"err");}
+  }catch(e){RESET_WARTET=false;authMsg(loginFehler(e),"err");}
 }
 async function codeNeuSenden(){
   var mail=($("#a_mail").value||"").trim();
@@ -3765,8 +3800,11 @@ async function doSetPass(){
   try{
     var r=await sb.auth.updateUser({password:p});
     if(r.error){authMsg(loginFehler(r.error),"err");return;}
-    AUTH_MODE="login";authMsg("Passwort geändert ✅","ok");
+    AUTH_MODE="login";
     try{history.replaceState(null,"",location.pathname);}catch(e){}
+    /* Die Sitzung aus Link/Code ist gültig – jetzt erst in die App */
+    if(me){await starteSitzung();toast("Passwort geändert ✅");}
+    else{render();authMsg("Passwort geändert ✅","ok");}
   }catch(e){authMsg(loginFehler(e),"err");}
 }
 async function doLogout(){
@@ -3778,6 +3816,8 @@ async function doLogout(){
   FREIGABE=null;IST_SUPERADMIN=false;REG=null;ZT=null;AUTH_MODE="login";
   curLang="de";applyLangAttr();   /* Anmelde-Bildschirm ist immer deutsch */
   authMsg("");render();
+  /* Neu laden leert jeden Zwischenspeicher (Berichte, KI-Kosten, Entwürfe, Scans) – nichts bleibt im Speicher */
+  try{location.reload();}catch(e){}
 }
 
 /* ================= Verträge einer Art ================= */
@@ -4254,7 +4294,7 @@ function vertragAbloesen(id,nid){
 }
 /* Archiv: beendete Verträge, neueste zuerst; Dokumente bleiben daran */
 function viewArchiv(){
-  var k=route().params.k||"";
+  var k=route().params.k||"";if(!ARTEN[k])k="";   /* nur bekannte Arten */
   var l=CONTRACTS.filter(function(c){return imArchiv(c)&&(!k||(c.art||"sonstiges")===k);})
     .sort(function(x,y){return String(y.gekuendigt_zum||y.updated_at||"").localeCompare(String(x.gekuendigt_zum||x.updated_at||""));});
   var kopf=zurueck(k?"#/art?k="+k:"#/vertraege",k?artInfo(k).label:t("Verträge"))+seitenTitel("📦 "+t("Archiv"));
@@ -4500,6 +4540,12 @@ async function speichereVertrag(){
   var zahlFelder=["f_kosten","f_ml","f_kf","f_vl"].concat(artFelder(a.key)
     .filter(function(fd){return fd.t==="eur"||fd.t==="num";}).map(function(fd){return "f_d_"+fd.k;}));
   if(zahlFehlt(zahlFelder)){toast(t("Bitte eine Zahl eingeben, z. B. 9,90."),true);return;}
+  /* Grenzen: negativ oder absurd groß ergibt falsche Fristen (Jahr 2500) oder Kosten */
+  var grenzen=[["f_kosten",0,10000000,"10.000.000"],["f_ml",0,600,"600"],["f_kf",0,120,"120"],["f_vl",0,600,"600"]];
+  for(var gi=0;gi<grenzen.length;gi++){
+    var gz=grenzen[gi],gw=$("#"+gz[0])?valNum(gz[0]):null;
+    if(gw!=null&&(gw<gz[1]||gw>gz[2])){var gel=$("#"+gz[0]);gel.classList.add("bad");gel.focus();toast(tf("Bitte einen Wert zwischen 0 und {0} eingeben.",gz[3]),true);return;}
+  }
   /* MaLo-ID: Tippfehler fallen über die Prüfziffer auf */
   var maloEl=$("#f_d_malo");
   if(maloEl&&val("f_d_malo")&&!maloNorm(val("f_d_malo"))){maloEl.classList.add("bad");maloEl.focus();toast(t("Die MaLo-ID hat 11 Ziffern, die letzte ist eine Prüfziffer – bitte prüfen."),true);return;}
@@ -4612,7 +4658,7 @@ async function loescheVertrag(id){
 }
 
 /* ================= Kalender-Export (.ics) ================= */
-function icsEsc(s){return String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");}
+function icsEsc(s){return String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r\n?|\n/g,"\\n");}
 function icsExport(id){
   var c=vertragById(id);if(!c)return;
   var f=fristInfo(c);
@@ -11671,7 +11717,7 @@ function ztHaushalteAnsicht(){
 /* ---------- Ereignisse ---------- */
 function ztEreignisZeile(e){
   var typ=ZT_TYP[e.typ]||["info","alle"],hh=e.hh?ztHhName(e.hh):null;
-  return '<div class="drow3 zte '+(e.stufe||"")+'"><span class="di">'+ic(typ[0],18)+'</span><span class="db"><span class="dn">'+esc(e.text||"")+'</span>'+
+  return '<div class="drow3 zte '+(e.stufe==="warn"||e.stufe==="fehler"?e.stufe:"")+'"><span class="di">'+ic(typ[0],18)+'</span><span class="db"><span class="dn">'+esc(e.text||"")+'</span>'+
     '<span class="dm"><span>'+datumZeit(e.t)+'</span>'+(e.von?'<span>'+esc(e.von)+'</span>':"")+(hh?'<span>'+esc(hh)+'</span>':"")+'</span></span></div>';
 }
 function ztEreignisAnsicht(){
@@ -13179,8 +13225,10 @@ async function setupSpeichern(){
 async function boot(){
   if(/type=recovery/i.test(location.hash)||/[?&]type=recovery/i.test(location.search))AUTH_MODE="reset";
   sb.auth.onAuthStateChange(function(ereignis,sitzung){
-    if(ereignis==="PASSWORD_RECOVERY"){AUTH_MODE="reset";me=null;booting=false;render();return;}
     var neuerUser=(sitzung&&sitzung.user)||null;
+    /* Passwort zurücksetzen: Sitzung merken, aber erst nach dem neuen Passwort in die App (doSetPass) */
+    if(ereignis==="PASSWORD_RECOVERY"){AUTH_MODE="reset";me=neuerUser;booting=false;render();return;}
+    if(AUTH_MODE==="reset"||RESET_WARTET){me=neuerUser;booting=false;return;}
     var wechsel=(neuerUser&&neuerUser.id)!==(me&&me.id);
     me=neuerUser;
     if(!me){booting=false;render();return;}
@@ -13194,7 +13242,14 @@ async function boot(){
   if(me)await starteSitzung();
   else{booting=false;render();}
 }
-async function starteSitzung(){
+/* Nur ein Ladevorgang gleichzeitig (Anmelde-Ereignis und getSession kommen fast zugleich) */
+var SITZUNG_LAEUFT=null;
+function starteSitzung(){
+  if(SITZUNG_LAEUFT)return SITZUNG_LAEUFT;
+  SITZUNG_LAEUFT=sitzungLaden().then(function(){SITZUNG_LAEUFT=null;},function(e){SITZUNG_LAEUFT=null;throw e;});
+  return SITZUNG_LAEUFT;
+}
+async function sitzungLaden(){
   booting=true;render();
   await ladeFreigabe();
   if(freigabeFehlt()){booting=false;render();return;}
