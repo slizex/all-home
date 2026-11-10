@@ -47,6 +47,17 @@
                 android:resource="@xml/verknuepfungen" />
         </activity>
 
+        <!-- App-Symbol hell/dunkel: Job wartet auf den Dunkelmodus-Wechsel, Anstoss ist eine leere Komponente,
+             deren Umschalten den Launcher das Symbol neu zeichnen lässt (siehe SymbolFarbe.java) -->
+        <service
+            android:name=".SymbolFarbe"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+        <receiver
+            android:name=".SymbolFarbe$Anstoss"
+            android:enabled="false"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

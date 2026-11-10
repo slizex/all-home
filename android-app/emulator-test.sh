@@ -2,6 +2,7 @@
 # Rauchtest der All-Home-App im Android-Emulator (GitHub Actions, Abbild google_apis = adb root).
 #  1. ohne Netz      → Offline-Seite aus der APK
 #  2. mit Netz       → All-Home-Anmeldung live, Versionszeile beweist Brücke + Plugin „AllHome“
+#  3a. Symbol       → App-Symbol hell/dunkel folgt dem Modus (Launcher-Zwischenspeicher, Job, App-Start)
 #  3. dunkel         → Darstellung im Nachtmodus
 #  4. Schutz an      → FLAG_SECURE am Fenster
 #  5. Sperre an      → PIN-Abfrage, Abbrechen lässt das Sperrbild stehen, „Entsperren“ + PIN öffnet
@@ -78,6 +79,57 @@ adb shell svc wifi enable; adb shell svc data enable
 warte 2-anmeldung "All-Home-App" 90; sleep 1; foto 2-anmeldung
 if hat 2-anmeldung "Anmelden"; then ok "Mit Netz: All-Home-Anmeldung geladen"; else nein "Mit Netz: Anmeldung nicht geladen"; fi
 if hat 2-anmeldung "All-Home-App"; then ok "Brücke und Plugin AllHome laufen (Versionszeile)"; else nein "Versionszeile fehlt – Brücke oder Plugin?"; fi
+
+SYMBOLNAME="All-Home"
+# 3a. App-Symbol folgt hell/dunkel – auch wenn der Launcher Symbole zwischenspeichert (ColorOS).
+#     Gemessen wird die mittlere Helligkeit in der Mitte des Symbols in der App-Übersicht (0 = schwarz, 100 = weiß).
+read -r BR HO <<< "$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1 | tr 'x' ' ')"
+helligkeit() { # x0 y0 x1 y1 → 0..100 aus einem rohen Bildschirmabzug (ohne Bildbibliothek)
+  adb exec-out screencap > /tmp/roh.bin
+  python3 - "$@" <<'PY'
+import struct, sys
+x0, y0, x1, y1 = map(int, sys.argv[1:5])
+d = open('/tmp/roh.bin', 'rb').read()
+w, h = struct.unpack('<II', d[:8])
+kopf = len(d) - w * h * 4
+s = n = 0
+for y in range(max(0, y0), min(h, y1), 2):
+    for x in range(max(0, x0), min(w, x1), 2):
+        o = kopf + (y * w + x) * 4
+        s += 0.2126 * d[o] + 0.7152 * d[o + 1] + 0.0722 * d[o + 2]
+        n += 1
+print(round(s / n / 2.55) if n else '')
+PY
+}
+symbol() { # $1 Name → Helligkeit des Symbols „$SYMBOLNAME“ in der App-Übersicht (leer = nicht gefunden)
+  adb shell input keyevent 3; sleep 2
+  adb shell input swipe $((BR / 2)) $((HO * 3 / 4)) $((BR / 2)) $((HO / 5)) 250; sleep 3
+  text "$1" || true; foto "$1"
+  local b
+  b=$(tr '>' '\n' < "$OUT/$1.xml" | grep -E "(text|content-desc)=\"$SYMBOLNAME\"" | grep -o 'bounds="[^"]*"' | head -1 | grep -o '[0-9]\+' | tr '\n' ' ')
+  [ -n "$b" ] || { echo ""; return; }
+  set -- $b
+  local h=$(( $4 - $2 )) cx=$(( ($1 + $3) / 2 ))
+  local cy=$(( $2 + h * 38 / 100 )) s=$(( h * 12 / 100 ))
+  helligkeit $((cx - s)) $((cy - s)) $((cx + s)) $((cy + s))
+}
+adb shell cmd uimode night no; sleep 1
+starten; sleep 4                                   # App einmal im Hellen: Zustand gemerkt, Job geplant
+S1=$(symbol 3a-symbol-hell)
+adb shell cmd uimode night yes; sleep 10           # App im Hintergrund: Job stößt den Launcher an
+S2=$(symbol 3a-symbol-dunkel)
+adb shell am force-stop "$PKG"                     # ohne App und Job: zeigt der Launcher das alte Symbol?
+adb shell cmd uimode night no; sleep 6
+S3=$(symbol 3a-symbol-hell-gestoppt)
+starten; sleep 5                                   # App-Start gleicht aus
+S4=$(symbol 3a-symbol-hell-nach-start)
+adb shell input keyevent 3
+echo "Symbol-Helligkeit: hell $S1 · dunkel (App im Hintergrund) $S2 · hell nach Stopp $S3 · hell nach App-Start $S4" >> "$OUT/ablauf.txt"
+if [ -n "$S1" ] && [ -n "$S2" ] && [ -n "$S4" ] && [ "$S1" -gt 50 ] && [ "$S2" -lt 50 ] && [ "$S4" -gt 50 ]; then
+  ok "Symbol folgt hell/dunkel: hell $S1 · dunkel $S2 · nach Stopp $S3 · nach App-Start $S4"
+else
+  echo "::warning title=Symbol::Messung auffällig: hell $S1 · dunkel $S2 · nach Stopp $S3 · nach App-Start $S4 (0 = schwarz, 100 = weiß)"
+fi
 
 # 3. dunkel
 adb shell cmd uimode night yes; sleep 1
