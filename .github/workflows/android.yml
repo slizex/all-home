@@ -111,6 +111,12 @@ jobs:
           APK=android-app/android/app/build/outputs/apk/release/app-release.apk
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           "$BT/apksigner" verify --verbose --print-certs "$APK" > zert.txt
+          # Dunkle App-Symbole: Fläche und Linie brauchen eine night-Fassung (sonst bleibt das Symbol im Dunkelmodus hell)
+          "$BT/aapt2" dump resources "$APK" > res.txt
+          for f in ic_launcher_background ic_symbol_linie; do
+            Z=$(grep -A2 -w "color/$f" res.txt | paste -sd ' ' | tr -s ' ')
+            if echo "$Z" | grep -qF "(night)"; then echo "::notice title=Symbol::$Z"; else echo "::error title=Symbol::color/$f ohne dunkle Fassung: $Z"; exit 1; fi
+          done
           ZERT=$(grep -m1 "certificate SHA-256 digest" zert.txt | sed 's/.*: //')
           SCHEMA=$(grep -E "Verified using v[0-9] scheme.*true" zert.txt | sed 's/Verified using //;s/ scheme.*//' | tr '\n' ' ')
           cp "$APK" all-home.apk

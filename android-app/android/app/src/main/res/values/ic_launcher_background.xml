@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Farben des App-Symbols (hell). Die dunkle Fassung steht in values-night. -->
 <resources>
     <color name="ic_launcher_background">#F7F4EF</color>
+    <color name="ic_symbol_linie">#231F1A</color>
 </resources>
