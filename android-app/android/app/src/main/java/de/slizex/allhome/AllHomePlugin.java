@@ -508,6 +508,8 @@ public class AllHomePlugin extends Plugin {
             for (Uri u : quellen) {
                 if (neu.size() >= GETEILT_ANZAHL) break;
                 try {
+                    /* Nur Inhalte, die eine andere App ausdrücklich freigibt – keine Dateipfade (könnten auf eigene App-Daten zeigen) */
+                    if (!"content".equals(u.getScheme()) || (getContext().getPackageName() + ".fileprovider").equals(u.getAuthority())) continue;
                     String mime = getContext().getContentResolver().getType(u);
                     if (mime == null) mime = "";
                     if (!mime.equals("application/pdf") && !mime.startsWith("image/")) continue;
