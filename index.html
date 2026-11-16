@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-wgng85LEfl9kuaZ9LjMVxUSdA5+U4hkFA8lOlWU6XnM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-u72l6OfDTeTVqlRc5DvAthun8JQCF5R8HH6Ue5rP4Rw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -991,7 +991,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.17.0";
+var APP_VERSION="1.17.1";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1046,6 +1046,9 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.17.1 ---- */
+  "Der Vertrag ist gespeichert, das Dokument ließ sich aber nicht verknüpfen.":"Договор сохранён, но документ не удалось привязать.",
 
 /* ---- 1.17.0 Gesamtprüfung ---- */
   "Diese Ansicht ließ sich nicht aufbauen. Deine Daten sind nicht betroffen.":"Не удалось открыть этот раздел. Ваши данные не затронуты.",
@@ -2834,7 +2837,8 @@ function num(n,d){if(n==null||isNaN(n))return "–";return Number(n).toLocaleStr
 
 /* ---- Datum ---- */
 function todayISO(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function istIsoDatum(s){s=String(s==null?"":s).slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(s)&&!isNaN(Date.parse(s+"T00:00:00Z"));}
+function istIsoDatum(s){s=String(s==null?"":s).slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;var d=new Date(s+"T00:00:00Z");return !isNaN(d.getTime())&&d.toISOString().slice(0,10)===s;}
+function isoOderNull(s){return istIsoDatum(s)?String(s).slice(0,10):null;}
 /* Datum als TT.MM.JJJJ; was kein ISO-Datum ist, kommt ohne HTML-Sonderzeichen zurück */
 function fmtDate(iso){if(!iso)return "–";var s=String(iso);if(!istIsoDatum(s))return s.replace(/[<>"'&]/g,"");var p=s.slice(0,10).split("-");return p[2]+"."+p[1]+"."+p[0];}
 /* Monate addieren; Bruchteile als 30-Tage-Schritte. Monatsende wird geklemmt. */
@@ -2870,11 +2874,11 @@ function ampel(days){return days==null?"gray":(days<=30?"red":(days<=90?"amber":
    Fenster verpasst → in Verlängerungsschritten weiterrechnen.
    Monatlich kündbar nach der Mindestlaufzeit nur, wo das Gesetz es vorschreibt:
    TKG § 56 (Internet, Mobilfunk) und § 309 Nr. 9 BGB für Abos/Dienstleistungen
-   ab 1.3.2022 – NICHT für Versicherungen, Miete, Kredite, Energie. Im Zweifel
+   ab 1.3.2022 (auch Strom- und Gaslieferverträge) – NICHT für Versicherungen, Miete, Kredite. Im Zweifel
    lieber erinnern als schweigen.
    Liefert {kind, level, end, lastDay, days, label, sub}. */
 var NEUES_RECHT_TKG={internet:1,mobilfunk:1};
-var NEUES_RECHT_BGB={streaming_video:1,streaming_musik:1,presse:1,cloud:1,fitness:1,oepnv:1,heizungswartung:1};
+var NEUES_RECHT_BGB={streaming_video:1,streaming_musik:1,presse:1,cloud:1,fitness:1,oepnv:1,heizungswartung:1,strom:1,gas:1};
 function neuesRechtGilt(c){
   var k=(c&&c.art)||"sonstiges";
   if(NEUES_RECHT_TKG[k])return true;
@@ -2966,7 +2970,7 @@ function fristTxt(m){
   if(m==null)return t("unbekannt");
   if(m===0.5)return t("2 Wochen");
   if(m===1)return t("1 Monat");
-  if(m<1)return tn(Math.round(m*30),"{0} Tag","{0} Tage");
+  if(m<1)return tn(Math.round(m*28),"{0} Tag","{0} Tage");
   return tn(m,"{0} Monat","{0} Monate");
 }
 function ivLabel(k){return INTERVALL_LABEL[k]?t(INTERVALL_LABEL[k]):"?";}
@@ -3301,7 +3305,17 @@ function route(){
   return {name:name,params:params};
 }
 function go(hash){if(location.hash===hash)render();else location.hash=hash;}
-window.addEventListener("hashchange",function(){closeModal(true);render();window.scrollTo(0,0);});
+/* Weg merken: führt der Wechsel auf die Seite zurück, von der man kam, steht sie wieder an derselben Stelle */
+var WEG_STAPEL=[],WEG_HOEHE={};
+window.addEventListener("hashchange",function(ev){
+  closeModal(true);
+  var alt="",neu=location.hash||"",y=0;
+  try{alt=new URL(ev.oldURL).hash||"";}catch(e){}
+  WEG_HOEHE[alt]=window.scrollY||0;
+  if(WEG_STAPEL.length&&WEG_STAPEL[WEG_STAPEL.length-1]===neu){WEG_STAPEL.pop();y=WEG_HOEHE[neu]||0;}
+  else{WEG_STAPEL.push(alt);if(WEG_STAPEL.length>40)WEG_STAPEL.shift();}
+  render();window.scrollTo(0,y);
+});
 
 /* ================= Rahmen ================= */
 var NAV=[
@@ -3677,6 +3691,7 @@ async function ladeAlles(){
    Benutzer in der Datenbank und ist vor dem Login unbekannt. */
 var AUTH_MODE="login";
 var AUTH_CODE=null;   /* {mail, art:"recovery"|"signup"} – wofür der Code aus der Mail gilt */
+var AUTH_HINWEIS="";      /* einmalige Meldung auf dem Anmelde-Bildschirm (z. B. abgelaufener Link) */
 var RESET_WARTET=false;   /* Passwort-Code wird geprüft: SIGNED_IN kommt vor der Antwort und darf die App noch nicht öffnen */
 function authHtml(){
   var reset=AUTH_MODE==="reset";
@@ -3687,10 +3702,11 @@ function authHtml(){
     '<p>'+(reset?"Vergib jetzt ein neues Passwort.":"Alle Verträge deines Haushalts an einem Ort.")+'</p>'+
     (reset
       ?'<label class="fld"><span>Neues Passwort</span><input class="inp" id="a_new" type="password" autocomplete="new-password" minlength="8"></label>'+
-       '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="setpass">Passwort speichern</button>'
+       '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="setpass">Passwort speichern</button>'+
+       '<div class="arow"><button type="button" class="lnk" data-a="reset-abbruch">Abbrechen</button></div>'
       :'<label class="fld"><span>E-Mail</span><input class="inp" id="a_mail" type="email" autocomplete="username" inputmode="email"></label>'+
        '<label class="fld"><span>Passwort</span><input class="inp" id="a_pass" type="password" autocomplete="current-password"></label>'+
-       '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="login">Anmelden</button>'+
+       '<div class="amsg'+(AUTH_HINWEIS?" err":"")+'" id="amsg">'+esc(AUTH_HINWEIS)+'</div><button class="btn lg full" type="submit" data-mode="login">Anmelden</button>'+
        '<div class="arow"><button type="button" class="lnk" data-a="signup">Neues Konto</button><button type="button" class="lnk" data-a="forgot">Passwort vergessen?</button></div>')+
   appVersionZeile()+'</form></div>';
 }
@@ -3719,7 +3735,7 @@ function signupHtml(){
     '<div class="arow"><button type="button" class="lnk" data-a="auth-login">Ich habe schon ein Konto</button></div>'+
   '</form></div>';
 }
-function authMsg(txt,kind){var m=$("#amsg");if(m){m.textContent=txt||"";m.className="amsg"+(kind?" "+kind:"");}}
+function authMsg(txt,kind){AUTH_HINWEIS="";var m=$("#amsg");if(m){m.textContent=txt||"";m.className="amsg"+(kind?" "+kind:"");}}
 function loginFehler(e){
   var m=errMsg(e);
   if(/invalid login/i.test(m))return "E-Mail oder Passwort ist falsch.";
@@ -3806,6 +3822,14 @@ async function doSetPass(){
     if(me){await starteSitzung();toast("Passwort geändert ✅");}
     else{render();authMsg("Passwort geändert ✅","ok");}
   }catch(e){authMsg(loginFehler(e),"err");}
+}
+/* Neues Passwort doch nicht vergeben: die Sitzung aus Link/Code beenden, zurück zur Anmeldung */
+async function resetAbbrechen(){
+  AUTH_MODE="login";RESET_WARTET=false;
+  try{history.replaceState(null,"",location.pathname);}catch(e){}
+  me=null;
+  try{await sb.auth.signOut();}catch(e){}
+  render();
 }
 async function doLogout(){
   if(SCAN)scannerAus();
@@ -4610,7 +4634,9 @@ async function speichereVertrag(){
     /* Ein mitgebrachtes Dokument gleich verknüpfen */
     if(FORM.prefill&&(FORM.prefill._docIds||FORM.prefill._docId)){
       var dids=FORM.prefill._docIds||[FORM.prefill._docId];
-      for(var di=0;di<dids.length;di++){try{await sb.from("documents").update({contract_id:FORM.id}).eq("id",dids[di]);}catch(e){}}
+      var dFehl=0;
+      for(var di=0;di<dids.length;di++){try{var dr=await sb.from("documents").update({contract_id:FORM.id}).eq("id",dids[di]);if(dr&&dr.error)dFehl++;}catch(e){dFehl++;}}
+      if(dFehl)toast(t("Der Vertrag ist gespeichert, das Dokument ließ sich aber nicht verknüpfen."),true);
     }
     /* Die Art muss angehakt sein, sonst wäre der Vertrag unsichtbar */
     if(!artAktiv(a.key)){
@@ -4949,7 +4975,10 @@ async function einesVerarbeiten(file,ziel){
     IMPORT.ergebnisse.push({name:name,icon:"⚠️",text:t("abgelegt, nichts erkannt"),docId:reihe.id});
     return;
   }
-  try{await sb.from("documents").update(kiFelder(ext,name,false)).eq("id",reihe.id);}catch(e){}
+  /* Ließ sich das Gelesene nicht speichern, darf nicht „eingelesen“ dastehen */
+  var kiSp=null;
+  try{var ku=await sb.from("documents").update(kiFelder(ext,name,false)).eq("id",reihe.id);if(ku&&ku.error)kiSp=ku.error;}catch(e){kiSp=e;}
+  if(kiSp){IMPORT.ergebnisse.push({name:name,icon:"⚠️",text:t("abgelegt, aber KI-Analyse fehlgeschlagen")+": "+errMsg(kiSp),docId:reihe.id});return;}
   /* Arztdokument: Volltext für die Suche im Hintergrund (günstigstes Modell) */
   if(ext.istMedizin){if(istPdf)volltextAusPdf(reihe.id,bytes);else volltextHolen(reihe.id,[bytes],"");}
   IMPORT.ergebnisse.push({name:name,icon:"✅",text:t("eingelesen"),docId:reihe.id});
@@ -4958,7 +4987,7 @@ async function einesVerarbeiten(file,ziel){
 function kiFelder(ext,name,med){
   var upd={extracted:ext,ai_lang:curLang,
     doc_type:(ext.docType&&DOCTYPE[ext.docType])?ext.docType:"sonstiges",
-    doc_date:ext.datum||null,zusammenfassung:ext.zusammenfassung||null,
+    doc_date:isoOderNull(ext.datum),zusammenfassung:ext.zusammenfassung||null,
     titel:(ext.titel||name||"").slice(0,80)};
   if(ext.istMedizin||med){
     upd.bereich="medizin";
@@ -4966,7 +4995,7 @@ function kiFelder(ext,name,med){
     upd.arzt=ext.arzt||null;
     upd.med_typ=(ext.medTyp&&MEDTYP[ext.medTyp])?ext.medTyp:(ext.docType==="rechnung"?"rechnung":"sonstiges");
     upd.betrag=ext.betrag!=null?numOrNull(ext.betrag):null;
-    upd.behandlungsdatum=ext.datum||null;
+    upd.behandlungsdatum=isoOderNull(ext.datum);
   }
   return upd;
 }
@@ -7093,6 +7122,12 @@ async function hausLoeschen(hid){
   var knopf=document.querySelector('[data-form="haus-loeschen"] button[type=submit]');
   if(knopf){knopf.disabled=true;knopf.textContent=t("Wird gelöscht …");}
   try{
+    /* Frisch nachsehen (anderes Gerät kann inzwischen etwas geändert haben): Admin? Nicht das letzte Haus? */
+    var pm=await sbPub.from("household_members").select("household_id,is_admin").eq("user_id",me.id);
+    if(pm.error)throw pm.error;
+    var eigene=pm.data||[];
+    if(!eigene.some(function(m){return m.household_id===hid&&m.is_admin;}))throw new Error("not_admin");
+    if(eigene.length<=1)throw new Error("last_household");
     await dateienEntfernen(sb,BUCKET,"documents",hid,true);     /* All-Home (mit weiteren Seiten) */
     await dateienEntfernen(sbPub,"documents","documents",hid);  /* AllTrack */
     var r=await sbPub.rpc("delete_household",{p_household_id:hid});
@@ -12878,7 +12913,8 @@ document.addEventListener("click",function(ev){
 
   /* --- Anmeldung --- */
   if(a==="signup"){AUTH_MODE="signup";var sm=$("#a_mail"),smw=sm?sm.value:"";render();var sm2=$("#a_mail");if(sm2)sm2.value=smw;var vn=$("#a_vorname");if(vn)vn.focus();return;}
-  if(a==="auth-login"){AUTH_MODE="login";render();return;}
+  if(a==="auth-login"){AUTH_MODE="login";AUTH_HINWEIS="";render();return;}
+  if(a==="reset-abbruch"){laeuft(b,resetAbbrechen());return;}
   if(a==="freigabe-pruefen"){laeuft(b,freigabePruefen());return;}
   if(a==="fg-ja"){laeuft(b,freigabeEntscheiden("freigeben"));return;}
   if(a==="fg-nein"){laeuft(b,freigabeEntscheiden("ablehnen"));return;}
@@ -13224,13 +13260,22 @@ async function setupSpeichern(){
 /* ================= Start der App ================= */
 async function boot(){
   if(/type=recovery/i.test(location.hash)||/[?&]type=recovery/i.test(location.search))AUTH_MODE="reset";
+  /* Abgelaufener oder schon benutzter Link aus der Mail: sagen, statt kommentarlos die Anmeldung zu zeigen */
+  var linkFehler=/[#&?]error(_code)?=/.test(location.hash+location.search)&&/otp_expired|access_denied|invalid/i.test(location.hash+location.search);
+  if(linkFehler){
+    AUTH_MODE="login";AUTH_HINWEIS="Der Link aus der Mail ist abgelaufen oder wurde schon benutzt. Bitte fordere einen neuen an.";
+    try{history.replaceState(null,"",location.pathname);}catch(e){}
+  }
   sb.auth.onAuthStateChange(function(ereignis,sitzung){
     var neuerUser=(sitzung&&sitzung.user)||null;
     /* Passwort zurücksetzen: Sitzung merken, aber erst nach dem neuen Passwort in die App (doSetPass) */
     if(ereignis==="PASSWORD_RECOVERY"){AUTH_MODE="reset";me=neuerUser;booting=false;render();return;}
     if(AUTH_MODE==="reset"||RESET_WARTET){me=neuerUser;booting=false;return;}
-    var wechsel=(neuerUser&&neuerUser.id)!==(me&&me.id);
+    var wechsel=(neuerUser&&neuerUser.id)!==(me&&me.id),war=me;
     me=neuerUser;
+    /* Abgemeldet (auch in einem anderen Tab oder weil die Sitzung ablief) oder anderes Konto:
+       neu laden, damit nichts vom vorherigen Konto im Speicher bleibt */
+    if(war&&wechsel){try{location.reload();return;}catch(e){}}
     if(!me){booting=false;render();return;}
     if(wechsel)starteSitzung();
   });
@@ -13238,6 +13283,8 @@ async function boot(){
     var s=await sb.auth.getSession();
     me=(s&&s.data&&s.data.session&&s.data.session.user)||null;
   }catch(e){me=null;}
+  /* Passwort-Link ohne gültige Sitzung: Speichern könnte nur scheitern */
+  if(AUTH_MODE==="reset"&&!me){AUTH_MODE="login";AUTH_HINWEIS="Der Link aus der Mail ist abgelaufen oder wurde schon benutzt. Bitte fordere einen neuen an.";}
   if(AUTH_MODE==="reset"){booting=false;render();return;}
   if(me)await starteSitzung();
   else{booting=false;render();}

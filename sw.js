@@ -1,5 +1,5 @@
 /* All-Home Service Worker — network-first (immer frisch, offline Fallback) */
-var CACHE = "allhome-shell-v42";
+var CACHE = "allhome-shell-v43";
 /* Gleiche Domain wie AllTrack: der Cache-Speicher ist geteilt, aufgeräumt wird nur der eigene */
 var PREFIX = "allhome-shell-";
 
@@ -27,7 +27,8 @@ self.addEventListener("fetch", function (e) {
       }
       return resp;
     }).catch(function () {
-      return caches.match(e.request).then(function (m) { return m || caches.match("./index.html"); });
+      /* Nur Seitenaufrufe fallen auf die App zurück – für Daten und Bilder wäre die HTML-Seite eine falsche Antwort */
+      return caches.match(e.request).then(function (m) { return m || (e.request.mode === "navigate" ? caches.match("./index.html") : Response.error()); });
     })
   );
 });
