@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-tO4yS10QsMoZUuTo38k3d8qneNiZraBXt0Dv/EBU6Lo='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-XM+IRJpHrc523i9xPtz6a9nRQIsJWPqxJKbaG1Qmzxk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -651,7 +651,16 @@ main>.sug+.card,main>.sug+.sug,main>.card+.sug,main>.card+.card{margin-top:12px}
 .kvr{flex-wrap:wrap}
 .kvr .kw{margin-left:auto}
 /* Gesundheit auf dem Handy: Reiter 2 × 2, Filter umbrechen statt abgeschnitten */
-@media(max-width:559px){.langrow.medtabs{display:grid;grid-template-columns:1fr 1fr}.filt.medfilt .sel{flex:1 1 140px}}
+@media(max-width:559px){.filt.medfilt .sel{flex:1 1 140px}}
+/* Gesundheit: Reiter in einer Zeile (bei Platzmangel seitlich schiebbar), Filter hinter einem Knopf */
+.langrow.medtabs{display:flex;overflow-x:auto;scrollbar-width:none}
+.langrow.medtabs::-webkit-scrollbar{display:none}
+.langrow.medtabs .lb{flex:1 0 auto;min-width:auto;padding:9px 12px;white-space:nowrap;overflow-wrap:normal}
+.filt.medfilt:empty{display:none}
+.medfk{position:relative;padding:0 14px;min-height:48px}
+.medfk.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.medfz{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--ink);color:var(--ink-fg);font-size:.72rem;font-weight:900;display:grid;place-items:center}
+.kpis.eins{grid-template-columns:1fr}
 
 /* ================= 1.13.0: Android-App ================= */
 /* Update-Karte oben auf der Startseite */
@@ -998,7 +1007,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.17.3";
+var APP_VERSION="1.17.4";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1161,7 +1170,7 @@ var T={ru:{
   "Preiserhöhung":"Повышение цены",
 
 /* ---- 1.11.0 Zeit ---- */
-  "Die Analyse hat zu lange gedauert. Bitte „Schnell“ wählen oder später erneut versuchen.":"Анализ занял слишком много времени. Выбери «Быстро» или попробуй позже.",
+  "Die Analyse hat zu lange gedauert. Bitte „Gründlich“ wählen oder später erneut versuchen.":"Анализ занял слишком много времени. Выбери «Тщательно» или попробуй позже.",
 
 
 /* ---- 1.11.0 NK-Analyse ---- */
@@ -2376,6 +2385,7 @@ var T={ru:{
   "Von Hand eintragen":"Внести вручную",
   "Vertrag nicht gefunden.":"Договор не найден.",
   "Neues Recht":"Новый закон",
+  "unbekanntes Konto":"неизвестный аккаунт",
   "Frist in den Kalender":"Срок в календарь",
   "Angaben":"Данные",
   "Kosten":"Расходы",
@@ -2803,6 +2813,7 @@ var ICONS={
   bell:'<path d="M18 15V10a6 6 0 1 0-12 0v5l-1.5 2.5h15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   auge:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4"/>',
+  trichter:'<path d="M3.5 5h17l-6.5 7.5V19l-4 2v-8.5z"/>',
   euro:'<path d="M17.5 6.5A6.5 6.5 0 1 0 17.5 17.5"/><path d="M4 10.5h9"/><path d="M4 13.5h9"/>',
   link:'<path d="M10 13.5a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1"/><path d="M14 10.5a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1"/>',
   trash:'<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/>',
@@ -4369,7 +4380,7 @@ function viewVertrag(id){
       '<div style="display:flex;align-items:center;gap:10px"><span class="dot '+f.level+'"></span>'+
         '<b style="font-size:1.05rem">'+esc(f.label)+'</b></div>'+
       (f.sub?'<p class="hint" style="margin:6px 0 0">'+esc(f.sub)+'</p>':"")+
-      (neuesRecht?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2">'+
+      (neuesRecht&&f.kind!=="flex"?'<div class="sug info" style="margin-top:12px"><span class="si">'+ic("info")+'</span><div class="sb2">'+
         '<div class="st">'+t("Neues Recht")+'</div><div class="sx">'+t("Nach der Mindestlaufzeit jederzeit mit höchstens 1 Monat Frist kündbar – das ist hier schon eingerechnet.")+'</div>'+
       '</div></div>':"")+
       (f.lastDay?'<div class="factions" style="margin-top:12px"><button class="btn ghost" data-a="ics" data-id="'+c.id+'">'+ic("calendar")+' '+t("Frist in den Kalender")+'</button></div>':"")+
@@ -5899,7 +5910,7 @@ function medTypInfo(k){var o=MEDTYP[k]||MEDTYP.sonstiges;return {icon:o.icon,lab
 function personById(id){return PERSONS.filter(function(p){return p.id===id;})[0]||null;}
 function personName(id){var p=personById(id);return p?p.name:null;}
 
-var medFilter={fach:"",jahr:"",person:"",ansicht:"zeit",ereignis:"",q:""};
+var medFilter={fach:"",jahr:"",person:"",ansicht:"zeit",ereignis:"",q:"",offen:false};
 /* Ereignisarten der KI (butler-extract v23: extracted.medizin.ereignisse[].art) */
 var MED_EREIGNIS={
   untersuchung:{label:"Untersuchung",icon:"🩺"},diagnose:{label:"Diagnose",icon:"📋"},behandlung:{label:"Behandlung",icon:"🩹"},
@@ -6108,26 +6119,30 @@ function viewGesundheit(){
     var j=medDatum(d).slice(0,4);if(/^\d{4}$/.test(j))jahre[j]=1;
     medEreignisse(d).forEach(function(e){arten[e.art]=1;});
   });
+  var nFilt=(medFilter.fach?1:0)+(medFilter.person?1:0)+(medFilter.jahr?1:0);
   var ansichten=[["zeit",t("Zeitleiste")],["aerzte",t("Ärzte")],["art",t("Art")],["ereignisse",t("Ereignisse")]];
   var evOpts=[["",t("Alle Ereignisse")],["diagnosen","📋 "+t("Diagnosen")],["medikamente","💊 "+t("Medikamente")],["laborwerte","🧪 "+t("Laborwerte")]]
     .concat(Object.keys(MED_EREIGNIS).filter(function(k){return arten[k];}).map(function(k){return [k,ereignisInfo(k).icon+" "+ereignisInfo(k).label];}));
   return topBar()+seitenTitel(t("Gesundheit"))+
-    '<div class="kpis">'+
-      '<div class="kpi"><div class="kl">'+tf("Arztkosten {0}",jahr)+'</div><div class="kv">'+eur0(kostenJahr)+'</div></div>'+
-      '<div class="kpi"><div class="kl">'+t("Gesamt erfasst")+'</div><div class="kv">'+eur0(kostenGes)+'</div><div class="ks">'+tn(meds.length,"{0} Dokument","{0} Dokumente")+'</div></div>'+
-    '</div>'+
+    (Math.abs(kostenJahr-kostenGes)<0.005
+      ?'<div class="kpis eins"><div class="kpi"><div class="kl">'+tf("Arztkosten {0}",jahr)+'</div><div class="kv">'+eur0(kostenJahr)+'</div><div class="ks">'+tn(meds.length,"{0} Dokument","{0} Dokumente")+'</div></div></div>'
+      :'<div class="kpis">'+
+        '<div class="kpi"><div class="kl">'+tf("Arztkosten {0}",jahr)+'</div><div class="kv">'+eur0(kostenJahr)+'</div></div>'+
+        '<div class="kpi"><div class="kl">'+t("Gesamt erfasst")+'</div><div class="kv">'+eur0(kostenGes)+'</div><div class="ks">'+tn(meds.length,"{0} Dokument","{0} Dokumente")+'</div></div>'+
+      '</div>')+
     (offen.length?'<div class="sug info" style="margin-bottom:14px"><span class="si">'+ic("search")+'</span><div class="sb2">'+
       '<div class="st">'+tn(offen.length,"{0} Dokument noch nicht voll durchsuchbar","{0} Dokumente noch nicht voll durchsuchbar")+'</div>'+
       '<div class="sx">'+t("Diagnosen, Ereignisse und Volltext nachholen (KI).")+'</div>'+
       '<div class="sa"><button class="btn sm" data-a="med-nachholen">'+t("Nachholen")+'</button></div></div></div>':"")+
-    '<div class="filt dsrow"><input class="inp" id="msuche" type="search" value="'+esc(medFilter.q)+'" placeholder="'+esc(t("Arzt, Diagnose, Medikament, Leistung …"))+'" aria-label="'+esc(t("Gesundheit durchsuchen"))+'" autocomplete="off"></div>'+
+    '<div class="filt dsrow"><input class="inp" id="msuche" type="search" value="'+esc(medFilter.q)+'" placeholder="'+esc(t("Arzt, Diagnose, Medikament, Leistung …"))+'" aria-label="'+esc(t("Gesundheit durchsuchen"))+'" autocomplete="off">'+
+      '<button class="btn ghost medfk'+(medFilter.offen||nFilt?" on":"")+'" data-a="med-filter" aria-expanded="'+(!!medFilter.offen)+'" aria-label="'+esc(t("Filter"))+'">'+ic("trichter")+(nFilt?'<span class="medfz">'+nFilt+'</span>':"")+'</button></div>'+
     '<div class="langrow dokf medtabs">'+ansichten.map(function(a){
       return '<button class="lb'+(medFilter.ansicht===a[0]?" on":"")+'" data-a="med-ansicht" data-k="'+a[0]+'">'+a[1]+'</button>';
     }).join("")+'</div>'+
     '<div class="filt medfilt">'+
       (medFilter.ansicht==="ereignisse"?'<select class="sel voll" id="mfEreignis" aria-label="'+esc(t("Ereignisse"))+'">'+evOpts.map(function(o){
         return '<option value="'+o[0]+'"'+(medFilter.ereignis===o[0]?" selected":"")+'>'+esc(o[1])+'</option>';}).join("")+'</select>':"")+
-      '<select class="sel" id="mfFach" aria-label="'+esc(t("Fachrichtung"))+'">'+
+      (!medFilter.offen?"":'<select class="sel" id="mfFach" aria-label="'+esc(t("Fachrichtung"))+'">'+
         '<option value="">'+t("Fach")+'</option>'+
         Object.keys(faecher).map(function(f){
           return '<option value="'+f+'"'+(medFilter.fach===f?" selected":"")+'>'+fachInfo(f).icon+' '+esc(fachInfo(f).label)+'</option>';
@@ -6140,7 +6155,7 @@ function viewGesundheit(){
         '<option value="">'+t("Jahr")+'</option>'+
         Object.keys(jahre).sort().reverse().map(function(j){
           return '<option value="'+j+'"'+(medFilter.jahr===j?" selected":"")+'>'+j+'</option>';
-        }).join("")+'</select>'+
+        }).join("")+'</select>')+
     '</div>'+
     '<div id="medInhalt">'+medInhalt()+'</div>'+
     '<div class="factions" style="margin-top:18px">'+
@@ -6899,7 +6914,7 @@ function viewHaushalt(id){
     liste.map(function(m){
       var ich=me&&m.user_id===me.id;
       var inhalt='<span class="di av">'+esc(((m.email||"?")[0]||"?").toUpperCase())+'</span>'+
-        '<span class="db"><span class="dn">'+esc(m.email||"–")+'</span>'+
+        '<span class="db"><span class="dn">'+(m.email?esc(m.email):'<span class="mut">'+t("unbekanntes Konto")+'</span>')+'</span>'+
         '<span class="dm">'+(ich?'<span class="pill">'+t("Du")+'</span>':"")+
           (m.is_admin?'<span class="pill admin">'+ic("shield",12)+' '+t("Admin")+'</span>':'<span>'+t("Mitglied")+'</span>')+'</span></span>';
       /* Admins verwalten andere; jeder darf seine eigene Admin-Rolle abgeben */
@@ -11765,7 +11780,7 @@ function ztHaushalteAnsicht(){
           return '<div><b>'+num(Number(x[1])||0,0)+'</b><span>'+x[0]+'</span></div>';}).join("")+'</div>'+
         '<div class="ztmeta"><span>'+ztBytes(h.speicher)+'</span><span>angelegt '+fmtDate(String(h.angelegt_am||"").slice(0,10))+'</span>'+
           '<span>aktiv '+fmtDate(String(h.aktiv||"").slice(0,10))+'</span></div>'+
-        '<div class="ztmitgl">'+(h.mitglieder||[]).map(function(m){return '<span>'+esc(m.email||"?")+(m.admin?' <span class="pill mut">Admin</span>':"")+'</span>';}).join("")+'</div>'+
+        '<div class="ztmitgl">'+(h.mitglieder||[]).map(function(m){return '<span>'+(m.email?esc(m.email):'<span class="mut">'+t("unbekanntes Konto")+'</span>')+(m.admin?' <span class="pill mut">Admin</span>':"")+'</span>';}).join("")+'</div>'+
       '</section>';
     }).join("");
 }
@@ -11811,8 +11826,8 @@ function ztMehrEintrag(){
 var EDGE_NKA="butler-nk-analyse";
 var NKA=null;   /* {hh, berichte, fragen, gedaechtnis, texte, fehlend, laedt, fehler, am, laeuft, recherche, uebersetzt} */
 /* ausTok: gemessen mit fiktiven Testdaten (Opus mittlere Denktiefe ≈ 8.200, Sonnet ≈ 6.800 inkl. Denken); recherche: Zuschlag je Rückfrage */
-var NKA_PREIS={gruendlich:{name:"Gründlich",modell:"Opus 5.5",ein:4,aus:20,ausTok:8500,recherche:0.15},
-               schnell:{name:"Schnell",modell:"Sonnet 5.5",ein:2,aus:10,ausTok:7000,recherche:0.05}};
+var NKA_PREIS={gruendlich:{name:"Maximal",modell:"Opus 5.5",ein:4,aus:20,ausTok:8500,recherche:0.15},
+               schnell:{name:"Gründlich",modell:"Sonnet 5.5",ein:2,aus:10,ausTok:7000,recherche:0.05}};
 var NKA_ABSCHREIBEN_USD=0.006;   /* je Dokument: Haiku 5.5 seit 30.10.2026 (Haiku 4.5 lag bei 0,045 $ laut ai_calls; 5.5 kostet ein Zehntel, ~30 % mehr Tokens) */
 var NKA_PROMPT_ZEICHEN=9500;     /* fester Teil der Anfrage (Rechtsstand, Aufgabe) */
 var NKA_START=null;              /* offenes Startblatt: {schaetzung, rest} */
@@ -12049,7 +12064,7 @@ async function nkaLos(q){
   }catch(x){
     closeModal(true);
     if(nkKiGesperrt(x))nkLeseFehler(x,[],null);
-    else if(/546|504|timeout|zeitüberschreitung|non-2xx|failed to fetch/i.test(errMsg(x)))toast(t("Die Analyse hat zu lange gedauert. Bitte „Schnell“ wählen oder später erneut versuchen."),true);
+    else if(/546|504|timeout|zeitüberschreitung|non-2xx|failed to fetch/i.test(errMsg(x)))toast(t("Die Analyse hat zu lange gedauert. Bitte „Gründlich“ wählen oder später erneut versuchen."),true);
     else toast(t("Analyse fehlgeschlagen")+": "+errMsg(x),true);
   }finally{A.laeuft=false;}
 }
@@ -13054,6 +13069,7 @@ document.addEventListener("click",function(ev){
 
   /* --- Gesundheit --- */
   if(a==="med-open"){go("#/gesundheit?doc="+id);return;}
+  if(a==="med-filter"){medFilter.offen=!medFilter.offen;render();return;}
   if(a==="med-ansicht"){medFilter.ansicht=b.dataset.k||"zeit";render();return;}
   if(a==="med-nachholen"){laeuft(b,medNachholen(id?[id]:null));return;}
   if(a==="med-edit"){laeuft(b,medFormular(id));return;}
