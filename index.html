@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-u72l6OfDTeTVqlRc5DvAthun8JQCF5R8HH6Ue5rP4Rw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-blqUxPeXgMUGccuC2HduCubBQpTh1wDt/4MmeUg58zU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -991,7 +991,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.17.1";
+var APP_VERSION="1.17.2";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -1046,6 +1046,9 @@ var loaded=false,booting=true;
 var LANGS={de:{label:"Deutsch",flag:"🇩🇪"},ru:{label:"Русский",flag:"🇷🇺"}};
 var curLang="de";
 var T={ru:{
+
+/* ---- 1.17.2 ---- */
+  "Abgelegt am":"Добавлено",
 
 /* ---- 1.17.1 ---- */
   "Der Vertrag ist gespeichert, das Dokument ließ sich aber nicht verknüpfen.":"Договор сохранён, но документ не удалось привязать.",
@@ -3922,6 +3925,7 @@ function viewStart(){
   /* Monatskosten: dieselbe Rechnung wie auf der Kostenseite */
   var mk=kostenPosten().reduce(function(s,p){return s+p.m;},0);
   var fristen=naheTermine(60);
+  var schon={};fristen.slice(0,4).forEach(function(x){schon[x.href]=1;});
   return topBar()+appUpdateKarte()+
     '<div class="kpis k3">'+
       '<a class="kpi" href="#/kosten"><div class="kl">'+t("Pro Monat")+'</div><div class="kv">'+eur0(mk)+'</div><div class="ks">'+tn(aktive.length,"{0} laufender Vertrag","{0} laufende Verträge")+'</div></a>'+
@@ -3937,7 +3941,7 @@ function viewStart(){
         '<div class="ei">'+ic("check",28)+'</div><h3>'+t("Nichts Dringendes")+'</h3>'+
         '<p>'+t("In den nächsten 60 Tagen läuft keine Frist aus.")+'</p></div></section>')+
     zuletztBlock()+
-    vorschlagBlock()+
+    vorschlagBlock(schon)+
     '<div class="sect">'+t("Dein Haushalt")+'</div>'+
     gruppenUebersicht(true);
 }
@@ -4653,9 +4657,12 @@ async function speichereVertrag(){
 function kuendigenBlatt(id){
   var c=vertragById(id);if(!c)return;
   var f=fristInfo(c);
+  /* Vorgabe: das Laufzeitende – bei „jederzeit kündbar“ heute plus Kündigungsfrist statt heute */
+  var vorgabe=(f&&f.end)||todayISO();
+  if(f&&f.kind==="flex"){var kfv=numOrNull(c.kuendigungsfrist_monate);if(kfv==null)kfv=1;if(neuesRechtGilt(c))kfv=Math.min(kfv,1);if(kfv>=0&&kfv<=120)vorgabe=addMonthsISO(todayISO(),kfv);}
   openModal('<h2 class="mhead">✂️ '+t("Als gekündigt markieren")+'</h2>'+
     '<p class="hint" style="margin:0 0 12px">'+esc(c.anbieter||artInfo(c.art).label)+'</p>'+
-    fld(t("Gekündigt zum"),'<input class="inp" id="k_zum" type="date" value="'+esc((f&&f.end)||todayISO())+'">')+
+    fld(t("Gekündigt zum"),'<input class="inp" id="k_zum" type="date" value="'+esc(vorgabe)+'">')+
     '<div class="factions" style="margin-top:16px;flex-direction:column">'+
       '<button class="btn full" data-a="v-kuend-ok" data-id="'+esc(c.id)+'">'+ic("check")+' '+t("Speichern")+'</button>'+
       '<button class="btn ghost full" data-a="modal-close">'+t("Abbrechen")+'</button>'+
@@ -4756,7 +4763,7 @@ function zuletztBlock(){
     .sort(function(a,b){return String(b.created_at||"").localeCompare(String(a.created_at||""));}).slice(0,3);
   if(!neu.length)return "";
   return '<div class="sect">'+t("Zuletzt abgelegt")+'</div><section class="card"><div class="dlist">'+
-    neu.map(function(d){return blickZeile(d,"d-open",dokKurzInhalt(d,String(d.created_at||"").slice(0,10)));}).join("")+'</div>'+
+    neu.map(function(d){return blickZeile(d,"d-open",dokKurzInhalt(d));}).join("")+'</div>'+
     (alleDokumente().length?'<a class="lnk" href="#/dokumente?von=start">'+t("Alle Dokumente")+'</a>':"")+'</section>';
 }
 
@@ -5514,7 +5521,7 @@ async function dokumentOeffnen(id){
     (hinweise?'<div class="sug info"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"")+
     '<div class="kvl">'+
       kv(t("Art"),ty.icon+" "+ty.label)+
-      kv(t("Dokumentdatum"),fmtDate(d.doc_date))+
+      (d.doc_date?kv(t("Dokumentdatum"),fmtDate(d.doc_date)):kv(t("Abgelegt am"),fmtDate(String(d.created_at||"").slice(0,10))))+
       kv(t("Vertrag"),c?esc(c.anbieter||artInfo(c.art).label):'<span class="mut">'+t("nicht zugeordnet")+'</span>')+
       (ext.betrag!=null?kv(t("Betrag"),eur(ext.betrag)):"")+
       (ext.kundennummer?kv(t("Kundennummer"),esc(ext.kundennummer)):"")+
@@ -6634,6 +6641,8 @@ function vorschlaege(){
     aktiveArten().forEach(function(k){
       var a=artInfo(k);
       if(spiegelArt(k))return;                 /* Energie läuft über AllTrack */
+      if({miete:1,abgabe:1,finanzierung:1,sparen:1,versorger:1,dokument:1,sache:1}[(ART_PROFIL[k]||{}).p])return;   /* kein Markt zum Vergleichen */
+      if({miete:1,abgabe:1,finanzierung:1,sparen:1,versorger:1,dokument:1,sache:1}[(ART_PROFIL[k]||{}).p])return;   /* kein Markt zum Vergleichen */
       vertraegeDerArt(k).forEach(function(c){
         if(c.status!=="aktiv")return;
         var m=monatskosten(c);
@@ -6710,19 +6719,24 @@ function vorschlagHtml(x){
   '</div>';
 }
 /* Vorschlagsblock für die Startseite */
-function vorschlagBlock(){
-  var v=vorschlaege();
-  if(!v.length)return "";
+/* Dringendes zuerst – auf Start und in der Liste gleich */
+function vorschlaegeSortiert(){
   var reihe={bad:0,warn:1,info:2};
   function rang(x){return (x.art in reihe)?reihe[x.art]:3;}
-  v.sort(function(a,b){return rang(a)-rang(b);});
-  var zeige=v.slice(0,3);
+  return vorschlaege().map(function(x,i){return [x,i];}).sort(function(a,b){return rang(a[0])-rang(b[0])||a[1]-b[1];}).map(function(p){return p[0];});
+}
+/* schon: Ziele, die auf Start bereits unter „Als Nächstes“ stehen – dieselbe Frist nicht doppelt zeigen */
+function vorschlagBlock(schon){
+  var v=vorschlaegeSortiert();
+  var rest=schon?v.filter(function(x){return !(/^(frist|termin):/.test(x.key||"")&&schon[x.href]);}):v;
+  if(!rest.length)return "";
+  var zeige=rest.slice(0,3);
   return '<div class="sect">'+t("All-Home schlägt vor")+'</div>'+
     '<div class="sugs">'+zeige.map(vorschlagHtml).join("")+'</div>'+
     (v.length>3?'<a class="lnk" href="#/vorschlaege" style="margin-top:10px;display:inline-block">'+tf("alle {0} Vorschläge",v.length)+'</a>':"");
 }
 function viewVorschlaege(){
-  var v=vorschlaege();
+  var v=vorschlaegeSortiert();
   return zurueck("#/start",t("Start"))+seitenTitel(t("Vorschläge"))+
     (v.length?'<div class="sugs">'+v.map(vorschlagHtml).join("")+'</div>'
       :'<section class="card"><div class="empty"><div class="ei">'+ic("check",28)+'</div>'+
