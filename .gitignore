@@ -1,3 +1,4 @@
 .claude/
 *.local.*
 android-app/node_modules/
+werkzeug/

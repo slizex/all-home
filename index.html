@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-XM+IRJpHrc523i9xPtz6a9nRQIsJWPqxJKbaG1Qmzxk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-E5Ti4iGei+sow7FRd738IevTpqr55qZE+zdV6jcTjAg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -290,7 +290,7 @@ button.mrow2:hover,a.mrow2:hover{background:var(--surface-2)}
 
 .grp{display:flex;align-items:center;gap:9px;margin:var(--sect) 4px 10px;font-weight:900;font-size:1.02rem}
 .grp .gi{width:30px;height:30px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;font-size:.95rem;flex:none}
-.grp .gn{color:var(--muted);font-weight:800;font-size:.84rem;margin-left:auto;white-space:nowrap;flex:none}/* Platz einer Vertragsart: gefüllt oder sichtbar leer */
+.grp .gn{color:var(--muted);font-weight:800;font-size:.84rem;margin-left:auto;flex:0 1 auto;min-width:0;text-align:right}/* Platz einer Vertragsart: gefüllt oder sichtbar leer */
 
 
 .slots{display:grid;gap:12px;grid-template-columns:1fr}
@@ -1007,7 +1007,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.17.4";
+var APP_VERSION="1.17.5";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -2386,6 +2386,11 @@ var T={ru:{
   "Vertrag nicht gefunden.":"Договор не найден.",
   "Neues Recht":"Новый закон",
   "unbekanntes Konto":"неизвестный аккаунт",
+  "Zusammengeführte Verträge":"Объединённые договоры",
+  "Zusammengeführte Abrechnungen":"Объединённые расчёты",
+  "Die alten Einträge im bisherigen Haushalt ließen sich nicht löschen – bitte dort von Hand entfernen.":"Старые записи в прежнем хозяйстве удалить не удалось – удалите их там вручную.",
+  "Vertragsarten im Ziel nicht angehakt":"Типы договоров в новом хозяйстве не отмечены",
+  "bitte im Ziel unter Mehr › Vertragsarten anpassen anhaken, sonst bleiben die Verträge dort unsichtbar.":"отметьте их там в разделе «Ещё › Изменить виды договоров», иначе договоры не будут видны.",
   "Frist in den Kalender":"Срок в календарь",
   "Angaben":"Данные",
   "Kosten":"Расходы",
@@ -3722,7 +3727,7 @@ function authHtml(){
     '<h1>'+(reset?"Neues Passwort":"All-Home")+'</h1>'+
     '<p>'+(reset?"Vergib jetzt ein neues Passwort.":"Alle Verträge deines Haushalts an einem Ort.")+'</p>'+
     (reset
-      ?'<label class="fld"><span>Neues Passwort</span><input class="inp" id="a_new" type="password" autocomplete="new-password" minlength="8"></label>'+
+      ?'<label class="fld"><span>Neues Passwort</span><input class="inp" id="a_new" type="password" autocomplete="new-password" minlength="10"></label>'+
        '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="setpass">Passwort speichern</button>'+
        '<div class="arow"><button type="button" class="lnk" data-a="reset-abbruch">Abbrechen</button></div>'
       :'<label class="fld"><span>E-Mail</span><input class="inp" id="a_mail" type="email" autocomplete="username" inputmode="email"></label>'+
@@ -3751,7 +3756,7 @@ function signupHtml(){
     '<div class="two"><label class="fld"><span>Vorname</span><input class="inp" id="a_vorname" type="text" autocomplete="given-name" maxlength="80"></label>'+
     '<label class="fld"><span>Nachname</span><input class="inp" id="a_nachname" type="text" autocomplete="family-name" maxlength="80"></label></div>'+
     '<label class="fld"><span>E-Mail</span><input class="inp" id="a_mail" type="email" autocomplete="username" inputmode="email"></label>'+
-    '<label class="fld"><span>Passwort</span><input class="inp" id="a_pass" type="password" autocomplete="new-password" minlength="8"></label>'+
+    '<label class="fld"><span>Passwort</span><input class="inp" id="a_pass" type="password" autocomplete="new-password" minlength="10"></label>'+
     '<div class="amsg" id="amsg"></div><button class="btn lg full" type="submit" data-mode="signup">Konto anlegen</button>'+
     '<div class="arow"><button type="button" class="lnk" data-a="auth-login">Ich habe schon ein Konto</button></div>'+
   '</form></div>';
@@ -3781,7 +3786,7 @@ async function doSignup(){
   if(!vn||!nn){authMsg("Bitte Vor- und Nachname eingeben.","err");return;}
   if(!mail||!pass){authMsg("Bitte E-Mail und Passwort eingeben.","err");return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){authMsg("Bitte eine gültige E-Mail-Adresse eingeben.","err");return;}
-  if(pass.length<8){authMsg("Das Passwort muss mindestens 8 Zeichen haben.","err");return;}
+  if(pass.length<10){authMsg("Das Passwort muss mindestens 10 Zeichen haben.","err");return;}
   authMsg("Konto wird erstellt …");
   try{
     var r=await sb.auth.signUp({email:mail,password:pass,options:{emailRedirectTo:location.origin+location.pathname,data:{vorname:vn.slice(0,80),nachname:nn.slice(0,80),app:"all-home"}}});
@@ -3832,7 +3837,7 @@ async function codeNeuSenden(){
 }
 async function doSetPass(){
   var p=$("#a_new").value||"";
-  if(p.length<8){authMsg("Das Passwort muss mindestens 8 Zeichen haben.","err");return;}
+  if(p.length<10){authMsg("Das Passwort muss mindestens 10 Zeichen haben.","err");return;}
   authMsg("Passwort wird gespeichert …");
   try{
     var r=await sb.auth.updateUser({password:p});
@@ -4741,7 +4746,7 @@ function lade(blob,name){
    Zuordnung vor – gespeichert wird erst, wenn du bestätigst. */
 function dtInfo(k){var o=DOCTYPE[k]||DOCTYPE.sonstiges;return {icon:o.icon,label:t(o.label)};}
 function docTitel(d){return (d&&aiVal(d,"titel"))||(d&&d.filename)||t("Dokument");}
-function docDatum(d){return d.doc_date||String(d.created_at||"").slice(0,10);}
+function docDatum(d){return d.doc_date||tsTag(d.created_at);}
 function istMed(d){return d.bereich==="medizin";}
 
 /* ---- Zweisprachige KI-Texte (ai_lang + i18n) ---- */
@@ -5539,7 +5544,7 @@ async function dokumentOeffnen(id){
     (hinweise?'<div class="sug info"><span class="si">'+ic("info")+'</span><div class="sb2"><div class="sx">'+esc(hinweise)+'</div></div></div>':"")+
     '<div class="kvl">'+
       kv(t("Art"),ty.icon+" "+ty.label)+
-      (d.doc_date?kv(t("Dokumentdatum"),fmtDate(d.doc_date)):kv(t("Abgelegt am"),fmtDate(String(d.created_at||"").slice(0,10))))+
+      (d.doc_date?kv(t("Dokumentdatum"),fmtDate(d.doc_date)):kv(t("Abgelegt am"),fmtDate(tsTag(d.created_at))))+
       kv(t("Vertrag"),c?esc(c.anbieter||artInfo(c.art).label):'<span class="mut">'+t("nicht zugeordnet")+'</span>')+
       (ext.betrag!=null?kv(t("Betrag"),eur(ext.betrag)):"")+
       (ext.kundennummer?kv(t("Kundennummer"),esc(ext.kundennummer)):"")+
@@ -5922,7 +5927,7 @@ function ereignisInfo(k){var o=MED_EREIGNIS[k]||MED_EREIGNIS.sonstiges;return {i
 /* Ohne ausgelesene Ereignisse ist das Dokument selbst das Ereignis */
 var MEDTYP_EREIGNIS={rechnung:"behandlung",befund:"untersuchung",rezept:"rezept",attest:"krankschreibung",laborwerte:"labor",
   ueberweisung:"ueberweisung",impfung:"impfung",roentgen:"bildgebung",arztbrief:"untersuchung",sonstiges:"sonstiges"};
-function medDatum(d){return String(d.behandlungsdatum||d.doc_date||String(d.created_at||"").slice(0,10)||"");}
+function medDatum(d){return String(d.behandlungsdatum||d.doc_date||tsTag(d.created_at)||"");}
 function isoTag(v){v=String(v||"").slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:null;}
 function kurzText(v,n){return v==null?"":String(v).replace(/\s+/g," ").trim().slice(0,n||200);}
 /* Strukturierte Angaben eines Arztdokuments – geprüft, damit eine kaputte KI-Antwort nichts sprengt */
@@ -6290,7 +6295,7 @@ function medErklaerungKarte(d,rc){
        return /^https?:\/\//i.test(u)?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(ti)+'</a>':esc(ti);
      }).join(" · ")+'</p>':"";
   return '<div class="sect">'+t("Verständlich erklärt")+'</div><section class="card">'+
-    '<p class="hint" style="margin:0 0 10px">'+tf("Stand {0}",fmtDate(String(d.med_recherche_am||"").slice(0,10)))+
+    '<p class="hint" style="margin:0 0 10px">'+tf("Stand {0}",fmtDate(tsTag(d.med_recherche_am)))+
       ' · '+t("KI-Recherche mit Internetsuche – ersetzt keine ärztliche oder rechtliche Beratung.")+'</p>'+
     (rc.erklaerung?'<p>'+esc(String(rc.erklaerung))+'</p>':"")+
     liste("🧾 "+t("Was wurde abgerechnet?"),rc.leistungen,"position","erklaerung")+
@@ -6563,7 +6568,7 @@ function wegAbgleichen(){
 /* ---------------- Die Vorschläge sammeln ---------------- */
 /* Ab wann gilt der neue Preis (butler-extract v26: gueltigAb)? Nur ein plausibles Datum nach dem Schreiben */
 function preisAb(d){
-  var ab=d&&d.extracted&&d.extracted.gueltigAb,dt=d&&(d.doc_date||String(d.created_at||"").slice(0,10));
+  var ab=d&&d.extracted&&d.extracted.gueltigAb,dt=d&&(d.doc_date||tsTag(d.created_at));
   return (typeof ab==="string"&&/^\d{4}-\d\d-\d\d$/.test(ab)&&(!dt||ab>=dt))?ab:null;
 }
 function vorschlaege(){
@@ -6631,7 +6636,7 @@ function vorschlaege(){
     DOCS.forEach(function(d){
       if(d.doc_type!=="preisaenderung")return;
       var c=d.contract_id?vertragById(d.contract_id):null;
-      var dt=d.doc_date||String(d.created_at||"").slice(0,10);
+      var dt=d.doc_date||tsTag(d.created_at);
       var alter=dt?-daysUntil(dt):999;
       if(alter>90)return;                      /* älter als 3 Monate: nicht mehr aktuell */
       v.push({key:"preis:"+d.id,art:"warn",icon:"alert",
@@ -6814,7 +6819,7 @@ function rechercheKarte(c){
     if(markt>0&&mein>0&&markt<mein&&markt>mein*0.3)spar=(mein-markt)*12;
   }
   return '<div class="sect">'+t("Markt-Recherche")+'</div><section class="card">'+
-    '<p class="hint" style="margin:0 0 10px">'+tf("Stand {0}",fmtDate(String(c.recherche_am||"").slice(0,10)))+
+    '<p class="hint" style="margin:0 0 10px">'+tf("Stand {0}",fmtDate(tsTag(c.recherche_am)))+
       ' · '+t("öffentliche Angaben – können von deinem Vertrag abweichen.")+'</p>'+
     (spar?'<div class="sug good"><span class="si">'+ic("euro")+'</span><div class="sb2">'+
       '<div class="st">'+tf("Bis zu {0} im Jahr günstiger",eur0(spar))+'</div>'+
@@ -7544,7 +7549,7 @@ function kiEur(usd){
   return e<1?"≈ "+num(e*100,e*100<10?1:0)+" ct":"≈ "+eur(e);
 }
 function kiModell(id){var m=String(id||"");for(var k in KI_MODELLNAME)if(m.indexOf(k)===0)return KI_MODELLNAME[k];return m||"–";}
-function datumZeit(iso){var d=new Date(iso);return isNaN(d)?"–":fmtDate(iso)+", "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+function datumZeit(iso){var d=new Date(iso);return isNaN(d)?"–":fmtDate(tsTag(iso))+", "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
 /* Jeder Seitenwechsel macht die Liste alt – beim nächsten Öffnen kommt sie frisch */
 window.addEventListener("hashchange",function(){if(KI_KOSTEN)KI_KOSTEN.am=0;});
 function neuesteZuerst(a,b){return (Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0);}
@@ -9483,6 +9488,8 @@ function entwurfHtml(){
     '<div class="sc-knoepfe"><button class="btn lg" data-s="entwurf-weiter">'+t("Fortsetzen")+'</button>'+
     '<button class="btn lg ghost danger" data-s="entwurf-weg">'+ic("trash")+' '+t("Verwerfen und neu beginnen")+'</button></div></div></div>';
 }
+/* Tag eines Zeitstempels in Ortszeit (reine Datumsangaben bleiben, wie sie sind) */
+function tsTag(v){var s=String(v==null?"":v);if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;var d=new Date(s);return isNaN(d.getTime())?"":todayISOvon(d);}
 function todayISOvon(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 
 /* ================= Bedienung im Scanner ================= */
@@ -11069,7 +11076,7 @@ function freigabeSeiteHtml(){
   return kopf+'<p>'+(ab?"Diese Registrierung ablehnen?":"Diese Registrierung freigeben?")+'</p>'+
     '<div class="kvl" style="text-align:left;margin:4px 0 18px">'+
       kv("Vorname",esc(d.vorname||"–"))+kv("Nachname",esc(d.nachname||"–"))+kv("E-Mail",esc(d.email||""))+
-      kv("Registriert",esc(fmtDate(String(d.angelegt_am||"").slice(0,10))))+kv("Über",esc(d.app==="alltrack"?"AllTrack":(d.app==="all-home"?"All-Home":"–")))+
+      kv("Registriert",esc(fmtDate(tsTag(d.angelegt_am))))+kv("Über",esc(d.app==="alltrack"?"AllTrack":(d.app==="all-home"?"All-Home":"–")))+
     '</div>'+
     '<div class="amsg" id="amsg"></div>'+
     '<button class="btn lg full'+(ab?" danger":"")+'" type="button" data-a="'+(ab?"fg-nein":"fg-ja")+'">'+(ab?"Ablehnen und Konto löschen":"Freigeben")+'</button>'+
@@ -11337,14 +11344,18 @@ async function umzugAusfuehren(plan,zd,melde){
   if(mitDok)zeilen.push({icon:"📄",name:tn(mitDok,"{0} Dokument","{0} Dokumente"),text:t("mit den Verträgen bzw. Abrechnungen umgezogen")});
   /* 5. Zusammengeführte Quell-Verträge/-Abrechnungen entfernen */
   var weg=plan.vertraege.filter(function(p){return p.aktion==="zusammen"&&cOk[p.c.id];}).map(function(p){return p.c.id;});
-  if(weg.length){try{await sb.from("contracts").delete().in("id",weg);}catch(e){}}
+  if(weg.length){var rw;try{rw=await sb.from("contracts").delete().in("id",weg);}catch(e){rw={error:e};}
+    if(rw&&rw.error)zeilen.push({icon:"⚠️",name:t("Zusammengeführte Verträge"),text:t("Die alten Einträge im bisherigen Haushalt ließen sich nicht löschen – bitte dort von Hand entfernen.")});}
   var wegN=plan.nk.filter(function(p){return p.aktion==="zusammen"&&nOk[p.n.id];}).map(function(p){return p.n.id;});
-  if(wegN.length){try{await sb.from("nk_abrechnungen").delete().in("id",wegN);}catch(e){}}
+  if(wegN.length){var rwn;try{rwn=await sb.from("nk_abrechnungen").delete().in("id",wegN);}catch(e){rwn={error:e};}
+    if(rwn&&rwn.error)zeilen.push({icon:"⚠️",name:t("Zusammengeführte Abrechnungen"),text:t("Die alten Einträge im bisherigen Haushalt ließen sich nicht löschen – bitte dort von Hand entfernen.")});}
   /* 6. Vertragsarten im Ziel anhaken, sonst wären die Verträge dort unsichtbar */
   var arten=(zd.setup&&Array.isArray(zd.setup.arten))?zd.setup.arten.slice():[],fehlt=plan.arten.filter(function(a){return a!=="sonstiges"&&arten.indexOf(a)<0;});
   if(fehlt.length){
-    try{await sb.from("household_setup").upsert({household_id:Z,arten:arten.concat(fehlt),eingerichtet:zd.setup?!!zd.setup.eingerichtet:false,updated_at:new Date().toISOString()});
-      zeilen.push({icon:"🧩",name:t("Vertragsarten im Ziel angehakt"),text:fehlt.map(function(a){return artInfo(a).label;}).join(", ")});}catch(e){}
+    var ru;try{ru=await sb.from("household_setup").upsert({household_id:Z,arten:arten.concat(fehlt),eingerichtet:zd.setup?!!zd.setup.eingerichtet:false,updated_at:new Date().toISOString()});}catch(e){ru={error:e};}
+    var artNamen=fehlt.map(function(a){return artInfo(a).label;}).join(", ");
+    if(ru&&ru.error)zeilen.push({icon:"⚠️",name:t("Vertragsarten im Ziel nicht angehakt"),text:artNamen+" – "+t("bitte im Ziel unter Mehr › Vertragsarten anpassen anhaken, sonst bleiben die Verträge dort unsichtbar.")});
+    else zeilen.push({icon:"🧩",name:t("Vertragsarten im Ziel angehakt"),text:artNamen});
   }
   plan.hinweise.forEach(function(h){zeilen.push({icon:"ℹ️",name:t("Hinweis"),text:h});});
   return {zeilen:zeilen,log:log,ziel:Z,quelle:Q};
@@ -11718,7 +11729,7 @@ function ztKontenAnsicht(){
       return '<button class="drow3" data-a="zt-konto" data-id="'+esc(k.user_id)+'"><span class="di">'+ic(k.status==="gesperrt"?"shield":"user",18)+'</span>'+
         '<span class="db"><span class="dn">'+esc(ztName(k))+(k.superadmin?' <span class="pill">Superadmin</span>':"")+(k.logo_rolle?' <span class="pill mut">Logos</span>':"")+'</span>'+
         '<span class="dm">'+(ztName(k)!==k.email?'<span>'+esc(k.email)+'</span>':"")+
-          '<span>'+(k.status==="offen"?"seit "+fmtDate(String(k.angelegt_am||"").slice(0,10))+(k.email_bestaetigt?"":" · E-Mail nicht bestätigt")
+          '<span>'+(k.status==="offen"?"seit "+fmtDate(tsTag(k.angelegt_am))+(k.email_bestaetigt?"":" · E-Mail nicht bestätigt")
             :(k.zuletzt_angemeldet?"zuletzt "+fmtDate(String(k.zuletzt_angemeldet).slice(0,10)):"nie angemeldet"))+'</span>'+
           '<span>'+tn(Number(k.haushalte)||0,"{0} Haushalt","{0} Haushalte")+'</span></span></span>'+
         '<span class="go">'+ic("right",16)+'</span></button>';
@@ -11742,7 +11753,7 @@ function ztKontoBlatt(id){
   openModal('<h2 class="mhead">'+esc(ztName(k))+'</h2>'+
     '<div class="kvl">'+kv("E-Mail",esc(k.email||"–"))+kv("Status",'<span class="pill '+(ZT_STATUS[k.status]||["",""])[0]+'">'+esc((ZT_STATUS[k.status]||["",k.status])[1])+'</span>')+
       kv("Rollen",esc([k.superadmin?"Superadmin":"",k.logo_rolle?"Logo-Pflege":""].filter(Boolean).join(", ")||"–"))+
-      kv("Registriert",fmtDate(String(k.angelegt_am||"").slice(0,10))+(k.app?" · über "+app:""))+
+      kv("Registriert",fmtDate(tsTag(k.angelegt_am))+(k.app?" · über "+app:""))+
       kv("E-Mail bestätigt",k.email_bestaetigt?"ja":"nein")+
       kv("Zuletzt angemeldet",k.zuletzt_angemeldet?datumZeit(k.zuletzt_angemeldet):"nie")+
       kv("Haushalte",String(Number(k.haushalte)||0))+'</div>'+
@@ -11778,8 +11789,8 @@ function ztHaushalteAnsicht(){
       return '<section class="card ztkarte"><div class="ztkopf"><b>'+esc(h.name||"Haushalt")+'</b>'+w.map(function(x){return '<span class="pill warnp">'+esc(x)+'</span>';}).join("")+'</div>'+
         '<div class="ztzahlen">'+[["Dokumente",h.dokumente],["Verträge",h.vertraege],["Abrechnungen",h.abrechnungen],["Personen",h.personen]].map(function(x){
           return '<div><b>'+num(Number(x[1])||0,0)+'</b><span>'+x[0]+'</span></div>';}).join("")+'</div>'+
-        '<div class="ztmeta"><span>'+ztBytes(h.speicher)+'</span><span>angelegt '+fmtDate(String(h.angelegt_am||"").slice(0,10))+'</span>'+
-          '<span>aktiv '+fmtDate(String(h.aktiv||"").slice(0,10))+'</span></div>'+
+        '<div class="ztmeta"><span>'+ztBytes(h.speicher)+'</span><span>angelegt '+fmtDate(tsTag(h.angelegt_am))+'</span>'+
+          '<span>aktiv '+fmtDate(tsTag(h.aktiv))+'</span></div>'+
         '<div class="ztmitgl">'+(h.mitglieder||[]).map(function(m){return '<span>'+(m.email?esc(m.email):'<span class="mut">'+t("unbekanntes Konto")+'</span>')+(m.admin?' <span class="pill mut">Admin</span>':"")+'</span>';}).join("")+'</div>'+
       '</section>';
     }).join("");
@@ -12258,7 +12269,7 @@ function nkaGedaechtnisHtml(){
     (G.length?'<div class="dlist">'+G.map(function(g){
       var darf=ichAdmin(HH.id)||(me&&g.user_id===me.id);
       return '<div class="drow3"><span class="di">'+ic(g.quelle==="bot"?"sparkles":"user",16)+'</span><span class="db"><span class="dn nkagt">'+esc(g.text)+'</span>'+
-        '<span class="dm">'+(g.created_at?'<span>'+fmtDate(String(g.created_at).slice(0,10))+'</span>':"")+'<span>'+esc(g.quelle==="bot"?t("von der KI"):(g.user_email||""))+'</span></span></span>'+
+        '<span class="dm">'+(g.created_at?'<span>'+fmtDate(tsTag(g.created_at))+'</span>':"")+'<span>'+esc(g.quelle==="bot"?t("von der KI"):(g.user_email||""))+'</span></span></span>'+
         (darf?'<button class="ibtn" data-a="nka-gdel" data-id="'+g.id+'" aria-label="'+esc(t("Eintrag löschen"))+'">'+ic("trash",16)+'</button>':"")+'</div>';
     }).join("")+'</div>':'<p class="hint" style="margin:0 0 10px">'+t("Noch nichts gemerkt.")+'</p>')+
     '<form id="nkaMerken" class="nkamerk" novalidate><input class="inp" id="nka_merken" maxlength="300" placeholder="'+esc(t("Merk dir: …"))+'" aria-label="'+esc(t("Merk dir"))+'">'+
@@ -12845,7 +12856,7 @@ function fristenDesHaushalts(h){
   /* Preiserhöhung: wirksam frühestens rund einen Monat nach dem Schreiben – bis dahin gilt meist das Sonderkündigungsrecht */
   if(smartAn("preis"))DOCS.forEach(function(d){
     if(d.doc_type!=="preisaenderung")return;
-    var dt=d.doc_date||String(d.created_at||"").slice(0,10);if(!dt)return;
+    var dt=d.doc_date||tsTag(d.created_at);if(!dt)return;
     /* Frist: Tag vor dem neuen Preis (laut Schreiben), sonst rund einen Monat nach dem Schreiben – das frühere zählt */
     var ab=preisAb(d),bis=plusTage(dt,28);if(ab&&plusTage(ab,-1)<bis)bis=plusTage(ab,-1)<dt?dt:plusTage(ab,-1);if(bis<heute)return;
     var c=d.contract_id?vertragById(d.contract_id):null;
