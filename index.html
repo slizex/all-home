@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-E5Ti4iGei+sow7FRd738IevTpqr55qZE+zdV6jcTjAg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js 'sha256-6BJ+aE8frk3Ov2UHGREMh69MZ0KqgamEDsgqymYgwLM=' 'sha256-GcZ2LDm1bQeJA7t5uBLB7ZF2YO0vhOLsUvDLpvKO6CA='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://xiwibfscbfrglgfjadza.supabase.co; font-src 'self'; connect-src 'self' https://xiwibfscbfrglgfjadza.supabase.co wss://xiwibfscbfrglgfjadza.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f4ef">
@@ -1007,7 +1007,7 @@ textarea#nka_frage{width:100%;resize:vertical}
    Backend: Supabase-Schema "butler" (Haushalte aus public wiederverwendet).
    ====================================================================== */
 
-var APP_VERSION="1.17.5";
+var APP_VERSION="1.18.0";
 
 /* ---------- Anbindung ---------- */
 var SB_URL="https://xiwibfscbfrglgfjadza.supabase.co";
@@ -2752,7 +2752,15 @@ var T={ru:{
 
 /* ---- Sprache & Darstellung ---- */
 "Sprache":"Язык","Gilt nur für dich – andere im Haushalt behalten ihre Sprache.":"Действует только для вас — у остальных в хозяйстве язык не меняется.",
-"Sprache umgestellt":"Язык изменён","Darstellung":"Оформление","Hell":"Светлое","Dunkel":"Тёмное"
+"Sprache umgestellt":"Язык изменён","Darstellung":"Оформление","Hell":"Светлое","Dunkel":"Тёмное",
+
+/* ---- Aus AllTrack (1.18.0) ---- */
+"Preiserhöhung ab {0}":"Повышение цены с {0}","Neuer Tarif ab {0}":"Новый тариф с {0}",
+"Sonderkündigung bis {0} möglich":"Досрочное расторжение возможно до {0}",
+"Preiserhöhung ab {0} · Sonderkündigung bis {1}":"Повышение цены с {0} · досрочное расторжение до {1}",
+"Letzte Jahresabrechnung":"Последний годовой расчёт","Dokumente aus AllTrack":"Документы из AllTrack",
+"Vertrag oder Tarif":"Договор или тариф","Jahresabrechnung":"Годовой расчёт","Beleg":"Квитанция",
+"AllTrack · Dokument":"AllTrack · документ"
 }};
 
 function t(s){
@@ -3577,11 +3585,19 @@ var ALLTRACK_URL="../verbrauchs-tracker/";
    arbeitspreis (€ je Einheit), grundpreis_jahr (€/Jahr), gueltig_ab,
    vertragsstart, laufzeit (Text), kuendigungsfrist (Text), kundennummer. */
 async function ladeEnergie(){
-  ENERGIE={};
+  ENERGIE={};AT_DOKS=[];AT_ABR=[];
   if(!HH)return;
+  var hh=HH.id;
   try{
-    var r=await Promise.all([sbPub.from("tariffs").select("*").eq("household_id",HH.id),
-      sbPub.from("abschlag_changes").select("*").eq("household_id",HH.id)]);
+    var r=await Promise.all([sbPub.from("tariffs").select("*").eq("household_id",hh),
+      sbPub.from("abschlag_changes").select("*").eq("household_id",hh),
+      sbPub.from("documents").select("id,household_id,category,kind,filename,mime_type,storage_path,tariff_id,created_at,sk:extracted->>sonderkuendigungBis").eq("household_id",hh),
+      sbPub.from("settlements").select("id,household_id,category,period_from,period_to,ergebnis,anbieter,created_at").eq("household_id",hh)]);
+    if(!HH||HH.id!==hh)return;   /* Haus inzwischen gewechselt */
+    if(r[2]&&!r[2].error)AT_DOKS=(r[2].data||[]).filter(function(d){return d.household_id===hh;})
+      .sort(function(a,b){return String(a.created_at||"")<String(b.created_at||"")?1:-1;});
+    if(r[3]&&!r[3].error)AT_ABR=(r[3].data||[]).filter(function(x){return x.household_id===hh&&x.period_to;})
+      .sort(function(a,b){return String(a.period_to)<String(b.period_to)?1:-1;});
     if(!r[0]||r[0].error)return;
     ENERGIE=energieAuswerten(r[0].data||[],(r[1]&&!r[1].error&&r[1].data)||[],todayISO());
   }catch(e){}
@@ -3601,6 +3617,15 @@ function energieAuswerten(tarife,aenderungen,heute){
       .filter(function(e){return e.d<=heute&&e.b!=null;})
       .sort(function(a,b){if(a.d!==b.d)return a.d<b.d?1:-1;if(a.r!==b.r)return a.r<b.r?1:-1;return a.o<b.o?1:-1;});
     aus[cat]=Object.assign({},tar,{abschlag:ev.length?ev[0].b:tar.abschlag,abschlag_ab:ev.length?ev[0].d:(tar.gueltig_ab||null)});
+    var fut=ts.filter(function(x){return String(x.gueltig_ab||"")>heute;});
+    if(fut.length&&String(tar.gueltig_ab||"")<=heute){
+      var d0=String(fut[fut.length-1].gueltig_ab),kom=fut.filter(function(x){return String(x.gueltig_ab)===d0;})[0];
+      var ev0=ts.map(function(x){return {d:String(x.gueltig_ab||""),b:x.abschlag,r:0,o:String(x.erstellt_am||"")};})
+        .concat((aenderungen||[]).filter(function(a){return a&&a.category===cat;}).map(function(a){return {d:String(a.gueltig_ab||""),b:a.betrag,r:1,o:String(a.erstellt_am||"")};}))
+        .filter(function(e){return e.d<=d0&&e.b!=null;})
+        .sort(function(a,b){if(a.d!==b.d)return a.d<b.d?1:-1;if(a.r!==b.r)return a.r<b.r?1:-1;return a.o<b.o?1:-1;});
+      aus[cat].kommend=Object.assign({},kom,{abschlag:ev0.length?ev0[0].b:kom.abschlag});
+    }
   });
   return aus;
 }
@@ -3612,13 +3637,94 @@ function energieInfo(art){
     abschlag:numOrNull(r.abschlag),                                  /* € im Monat */
     arbeitspreisCt:r.arbeitspreis!=null?numOrNull(r.arbeitspreis)*100:null, /* € → ct */
     grundpreisMon:r.grundpreis_jahr!=null?numOrNull(r.grundpreis_jahr)/12:null,
-    kundennummer:r.kundennummer||null,
+    kundennummer:r.kundennummer||(r.kommend&&atGleich(r.anbieter,r.kommend.anbieter)?r.kommend.kundennummer:null)||null,
     vertragsstart:r.vertragsstart||null,
     laufzeit:r.laufzeit||null,
     kuendigungsfrist:r.kuendigungsfrist||null,
     ab:r.gueltig_ab||null,
     abschlagAb:r.abschlag_ab||null
   };
+}
+/* ---- Aus AllTrack nur zum Ansehen (ab 1.18.0): kommender Tarif, letzte Jahresabrechnung, Dokumente ----
+   Dokumente liegen in public.documents (Ablage „documents“), Abrechnungen in public.settlements.
+   Bearbeitet wird nur in AllTrack. */
+var AT_DOKS=[],AT_ABR=[],AT_BUCKET="documents";
+var AT_ART={tarif:"Vertrag oder Tarif",abrechnung:"Jahresabrechnung",beleg:"Beleg"};
+function atGleich(a,b){
+  a=String(a||"").toLowerCase().replace(/[^a-z0-9äöüß]/g,"");b=String(b||"").toLowerCase().replace(/[^a-z0-9äöüß]/g,"");
+  return !!a&&!!b&&(a.indexOf(b)>=0||b.indexOf(a)>=0);
+}
+function atTagVor(iso){
+  var p=String(iso).slice(0,10).split("-").map(Number),d=new Date(p[0],p[1]-1,p[2]-1);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+/* Steigt der Preis beim selben Anbieter, gilt ein Sonderkündigungsrecht:
+   Frist aus dem Brief, sonst bis zum Tag vor der Erhöhung (wie AllTrack) */
+function atKommend(cat){
+  var r=ENERGIE[cat],k=r&&r.kommend;if(!k)return null;
+  var preis=function(x){return numOrNull(cat==="wasser"?x.wasser_kanal:x.arbeitspreis);};
+  var pa=preis(r),pn=preis(k),ga=numOrNull(r.grundpreis_jahr),gn=numOrNull(k.grundpreis_jahr);
+  var hoch=(pa!=null&&pn!=null&&pn>pa+1e-9)||(ga!=null&&gn!=null&&gn>ga+0.005);
+  var runter=(pa!=null&&pn!=null&&pn<pa-1e-9)||(ga!=null&&gn!=null&&gn<ga-0.005);
+  var erh=hoch&&!runter&&atGleich(r.anbieter,k.anbieter);
+  var brief=AT_DOKS.filter(function(d){return String(d.tariff_id)===String(k.id)&&d.sk&&istIsoDatum(String(d.sk).slice(0,10));})[0];
+  return {ab:String(k.gueltig_ab).slice(0,10),anbieter:k.anbieter||r.anbieter||"",preis:pn,abschlag:numOrNull(k.abschlag),erhoehung:erh,
+    frist:erh?(brief?String(brief.sk).slice(0,10):atTagVor(k.gueltig_ab)):null};
+}
+function atKommendHtml(cat){
+  var k=atKommend(cat);if(!k)return "";
+  var teile=[];
+  if(k.preis!=null)teile.push(cat==="wasser"?num(k.preis,4)+" €/m³":num(k.preis*100,3)+" ct/kWh");
+  if(k.abschlag!=null)teile.push(t("Abschlag")+" "+eur(k.abschlag));
+  var frist=k.frist&&k.frist>=todayISO()?k.frist:null;
+  return '<div class="sug '+(k.erhoehung?"warn":"info")+'" style="margin-top:12px"><span class="si">'+ic(k.erhoehung?"trendUp":"calendar")+'</span><div class="sb2">'+
+    '<div class="st">'+esc(k.erhoehung?tf("Preiserhöhung ab {0}",fmtDate(k.ab)):tf("Neuer Tarif ab {0}",fmtDate(k.ab)))+'</div>'+
+    '<div class="sx">'+esc((k.anbieter?k.anbieter+" · ":"")+teile.join(" · "))+'</div>'+
+    (frist?'<div class="sx"><b>'+esc(tf("Sonderkündigung bis {0} möglich",fmtDate(frist)))+'</b></div>':"")+
+  '</div></div>';
+}
+function atAbrHtml(cat){
+  var s=AT_ABR.filter(function(x){return x.category===cat;})[0];if(!s)return "";
+  var e=numOrNull(s.ergebnis);
+  return '<div class="sect">'+t("Letzte Jahresabrechnung")+'</div><section class="card">'+
+    '<a class="trow" href="'+esc(ALLTRACK_URL+"#/abrechnung?id="+encodeURIComponent(s.id))+'" data-a="alltrack-oeffnen">'+
+      '<span class="dot '+(e==null?"gray":(e>=0?"green":"red"))+'"></span>'+
+      '<span class="tb"><span class="tn">'+esc((s.period_from?fmtDate(s.period_from)+" – ":"")+fmtDate(s.period_to))+'</span>'+
+      '<span class="tx">'+esc((s.anbieter?s.anbieter+" · ":"")+(e==null?"–":t(e>=0?"Guthaben":"Nachzahlung")))+'</span></span>'+
+      '<span class="tw">'+(e==null?"":esc((e>=0?"+":"−")+eur(Math.abs(e))))+'</span></a></section>';
+}
+function atDokHtml(cat){
+  var l=AT_DOKS.filter(function(d){return d.category===cat;});if(!l.length)return "";
+  return '<div class="sect">'+t("Dokumente aus AllTrack")+'<span class="more">'+l.length+'</span></div><section class="card"><div class="dlist">'+
+    l.map(function(d){
+      return '<button class="drow3" data-a="at-doc" data-id="'+esc(d.id)+'"><span class="di">'+ic("doc",16)+'</span>'+
+        '<span class="db"><span class="dn">'+esc(d.filename||t("Dokument"))+'</span><span class="dm"><span>'+esc(t(AT_ART[d.kind]||"Dokument"))+'</span>'+
+        '<span>'+fmtDate(tsTag(d.created_at))+'</span></span></span>'+
+        '<span class="go">'+ic("right",16)+'</span></button>';
+    }).join("")+'</div></section>';
+}
+async function atDokAnzeigen(id){
+  var d=AT_DOKS.filter(function(x){return String(x.id)===String(id);})[0];if(!d)return;
+  if(istApp()){appDokAnsicht({id:"at:"+d.id,filename:d.filename,mime_type:d.mime_type,storage_path:d.storage_path,created_at:d.created_at,_bucket:AT_BUCKET});return;}
+  try{
+    var r=await sb.storage.from(AT_BUCKET).createSignedUrl(d.storage_path,120);
+    if(r.error)throw r.error;
+    window.open(r.data.signedUrl,"_blank","noopener");
+  }catch(e){toast(t("Konnte Dokument nicht öffnen")+": "+errMsg(e),true);}
+}
+/* Termine: Preiserhöhung samt Sonderkündigung bzw. neuer Tarif – je gespiegeltem Bereich einmal */
+function atTermine(){
+  var raus=[],heute=todayISO(),schon={};
+  Object.keys(ARTEN).forEach(function(k){
+    var sp=spiegelArt(k);if(!sp||schon[sp])return;schon[sp]=1;
+    var x=atKommend(sp);if(!x)return;
+    var a=artInfo(k),fr=x.frist&&x.frist>=heute?x.frist:null,d=daysUntil(fr||x.ab);
+    if(d==null||d<0)return;
+    raus.push({days:d,level:ampel(d),icon:a.icon,titel:a.label+(x.anbieter?" · "+x.anbieter:""),
+      text:fr?tf("Preiserhöhung ab {0} · Sonderkündigung bis {1}",fmtDate(x.ab),fmtDate(fr)):tf(x.erhoehung?"Preiserhöhung ab {0}":"Neuer Tarif ab {0}",fmtDate(x.ab)),
+      href:"#/art?k="+k});
+  });
+  return raus;
 }
 /* ---- Ist die AllTrack-Verbindung für dieses Haus an? ----
    household_setup.alltrack: true an, false aus, null automatisch (an, sobald
@@ -4092,7 +4198,7 @@ function naheTermine(tage){
                    href:"#/vertrag?id="+c.id});
     }
   });
-  raus=raus.concat(nkTermine().filter(function(x){return x.days<=tage;}));
+  raus=raus.concat(nkTermine().filter(function(x){return x.days<=tage;}),atTermine().filter(function(x){return x.days<=tage;}));
   raus.sort(function(x,y){return x.days-y.days;});
   return raus;
 }
@@ -4250,7 +4356,9 @@ function viewArt(k){
           (e.kundennummer?kv(t("Kundennummer"),esc(e.kundennummer)):"")+
           (e.ab?kv(t("Gültig ab"),fmtDate(e.ab)):"")+
         '</div>':'<p class="hint">'+t("In AllTrack ist für diese Art noch kein Tarif erfasst.")+'</p>')+
+        (e?atKommendHtml(sp):"")+
       '</section>'+
+      atAbrHtml(sp)+atDokHtml(sp)+
       (liste.length?'<div class="sect">'+t("Auch in All-Home erfasst")+'</div>'+
         '<p class="hint" style="margin:-4px 4px 10px">'+t("Zählt nicht zu den Kosten, solange AllTrack verbunden ist.")+'</p>'+
         '<div class="slots">'+liste.map(function(c){
@@ -7541,7 +7649,7 @@ async function logoLoeschen(id){
    lesen dürfen es nur Admins des Hauses (RLS über my_admin_household_ids). */
 var USD_EUR=0.86;   /* grobe Umrechnung – Anthropic rechnet in US-Dollar ab */
 var KI_ZWECK={"allhome-extract":"Dokument auslesen","allhome-research":"Markt-Recherche","allhome-med":"Arztdokument erklären",
-  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen","allhome-nk-analyse":"Nebenkosten-Analyse","allhome-nk-frage":"Nebenkosten-Rückfrage",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung"};
+  "allhome-translate":"Übersetzung","allhome-text":"Volltext für die Suche","allhome-nk":"Nebenkosten auslesen","allhome-nk-bewertung":"Nebenkosten einschätzen","allhome-nk-analyse":"Nebenkosten-Analyse","allhome-nk-frage":"Nebenkosten-Rückfrage",zaehler:"AllTrack · Zählerfoto",tarif:"AllTrack · Tarif",abrechnung:"AllTrack · Jahresabrechnung",dokument:"AllTrack · Dokument"};
 var KI_MODELLNAME={"claude-haiku-5-5":"Haiku 5.5","claude-haiku-4-5":"Haiku 4.5","claude-sonnet-5-5":"Sonnet 5.5","claude-opus-5-5":"Opus 5.5"};
 var KI_KOSTEN=null;   /* {hh, zeilen, fehler, am, laedt} */
 function kiEur(usd){
@@ -12629,8 +12737,8 @@ async function geteiltHochladen(){
    Die AllTrack-App (de.slizex.alltrack) meldet sich für alltrack://start. Ist sie installiert, geht
    All-Home in den Hintergrund. Sonst passiert nichts (Capacitor fängt das ab) – dann nach 1,5 s die
    Seite, die die App wie jede fremde Seite an den Browser weiterreicht. Nur Web, keine neue APK. */
-function allTrackOeffnen(){
-  var weg=false,seite=new URL(ALLTRACK_URL,location.href).href;   /* vor dem Sprung auflösen */
+function allTrackOeffnen(ziel){
+  var weg=false,seite=new URL(ziel||ALLTRACK_URL,location.href).href;   /* vor dem Sprung auflösen */
   function fort(){if(document.visibilityState==="hidden")weg=true;}
   document.addEventListener("visibilitychange",fort);
   location.href="alltrack://start";
@@ -12678,7 +12786,7 @@ async function appDokAnsicht(d){
   APP_ANSICHT={d:d,laedt:true};
   ansichtZeichnen();
   try{
-    var dl=await sb.storage.from(BUCKET).download(d.storage_path);
+    var dl=await sb.storage.from(d._bucket||BUCKET).download(d.storage_path);
     if(dl.error)throw new Error(t("Datei konnte nicht geladen werden."));
     if(!APP_ANSICHT||APP_ANSICHT.d!==d)return;
     var blob=dl.data,pdf=istPdfDok(d)||blob.type==="application/pdf";
@@ -12992,7 +13100,7 @@ document.addEventListener("click",function(ev){
   if(a==="app-update"){laeuft(b,appAktualisieren());return;}
   if(a==="app-link-teilen"){laeuft(b,teilenMoeglich()?teilen(appLinkText()):kopieren(APP_LINK));return;}
   /* Im Browser bleibt es ein normaler Link; in der App startet er die AllTrack-App, falls installiert */
-  if(a==="alltrack-oeffnen"){if(istApp()){ev.preventDefault();allTrackOeffnen();}return;}
+  if(a==="alltrack-oeffnen"){if(istApp()){ev.preventDefault();allTrackOeffnen(b.getAttribute("href"));}return;}
   if(a==="geteilt-ja"){laeuft(b,geteiltHochladen());return;}
   if(a==="geteilt-nein"){laeuft(b,geteiltVerwerfen());return;}
   if(a==="ansicht-zu"){ansichtZu();return;}
@@ -13064,6 +13172,7 @@ document.addEventListener("click",function(ev){
   /* --- Dokumente --- */
   if(a==="d-open"){laeuft(b,dokumentOeffnen(id));return;}
   if(a==="d-view"){laeuft(b,dokumentAnzeigen(id));return;}
+  if(a==="at-doc"){laeuft(b,atDokAnzeigen(id));return;}
   if(a==="d-del"){laeuft(b,dokumentLoeschen(id));return;}
   if(a==="d-del-wahl"){laeuft(b,dokumenteAuswahlLoeschen());return;}
   if(a==="ab-wahl"){laeuft(b,ablageWahl(id));return;}
